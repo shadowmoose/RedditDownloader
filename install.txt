@@ -1,2 +1,0 @@
-pip install lxml==3.6.0
-pip install newspaper3k
