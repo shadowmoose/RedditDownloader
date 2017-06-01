@@ -91,9 +91,9 @@ class Scraper():
 				i+=1;
 		except KeyboardInterrupt:
 			print("Interrupted.");
-		print('=============================== All URLS LOCATED =============================')
-		for u in self.urls:
-			out(u);
+		#print('=============================== All URLS LOCATED =============================')
+		#for u in self.urls:
+		#	out(u);
 		print('================================= FILE MAP ===================================')
 		for k, v in self.file_map.items():
 			print("["+str(k)+"] = ["+str(v)+"]")

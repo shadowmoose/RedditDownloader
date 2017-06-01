@@ -8,4 +8,5 @@ Requires that you register an app at [Reddit's App Page](https://www.reddit.com/
 On first launch, it will generate a *settings.json* file, where you can enter your data.
 
 If you use this, and hit any links at the end which it does not support, feel free to request modules for them here.
-This program is currently in an extremely tenative state, and functionality may radically change and expand in the future.
+
+*This program is currently in an extremely tentative state, and functionality may radically change and expand in the future.*
