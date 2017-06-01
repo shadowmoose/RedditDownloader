@@ -1,3 +1,14 @@
+*.ini
+*.zip
+*.7z
+*.json
+*.pyc
+
+/reference
+/download
+
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
