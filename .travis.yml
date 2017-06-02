@@ -12,4 +12,4 @@ install:
 # command to run tests
 before_script:
   - chmod +x ./tests/run_tests.py
-script: sudo tests/run_tests.py
+script: tests/run_tests.py
