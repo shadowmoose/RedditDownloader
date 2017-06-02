@@ -261,13 +261,13 @@ if args.test:
 			files.append( os.path.basename(f.replace('\\','/')) );
 	
 	# Check that we found the correct # of posts/comments.
-	if types_found['Comment'] != 1 or types_found['Post'] != 2:
+	if types_found['Comment'] != 1 or types_found['Post'] != 3:
 		print('Invalid posts or comment parsing: '+str(types_found));
 	
 	# Really basic filename check to make sure the given downloads were named properly.
-	compare = sorted(files) == ['', 'Test Direct Link - (theshadowmoose).png', 'Test Image Upload - (theshadowmoose) . 2 .png'];
+	compare = sorted(files) == ['', 'Test Direct Link - (theshadowmoose).png', 'Test Image Upload - (theshadowmoose) . 2 .png', 'Test animation for YTDL - (theshadowmoose).mp4'];
 	if not compare:
-		print("Invalid file list: Expecting one directory and two filenames: "+str(sorted(files)) );
+		print("Error: File list did not match expectations: "+str(sorted(files)) );
 		sys.exit(106);
 	
 	# Check manifest was built (should always be during testing).

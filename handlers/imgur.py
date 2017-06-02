@@ -177,7 +177,7 @@ def handle(url, data):
 	if 'imgur' not in url:
 		return False;
 		
-	# Not a gallery, sow e have to do out best to manually find/format this image.
+	# Not a gallery, so we have to do out best to manually find/format this image.
 	if not any(x in url for x in ['gallery', 'a/']):
 		# If we're got a non-gallery, and missing the direct image url, correct to the direct image link.
 		if 'i.img' not in url:
@@ -250,7 +250,7 @@ def handle(url, data):
 		downloader.save_images(targ_dir);
 		print("\n\t\tImgur download complete!");
 		if downloader.num_images() == 1:
-			ret = downloader.custom_path;# if single, downloader modifies this to include the image extension after saving the single file.
+			ret = downloader.custom_path;# if there's only a single image, the downloader auto-modifies this to include the image extension after saving the single file.
 		return ret;
 	except ImgurAlbumException as e:
 		print("\t\tImgur Error: "+e.msg);
