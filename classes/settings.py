@@ -21,9 +21,9 @@ default_settings = {
 }
 
 class Settings(object):
-	def __init__(self, file):
+	def __init__(self, file, can_save=True):
 		self.vals = default_settings;
-		
+		self.can_save = can_save;
 		self.settings_file = file;
 		if not os.path.isfile(self.settings_file):
 			self.save();# Save defaults.
@@ -38,6 +38,8 @@ class Settings(object):
 		self.save();
 	
 	def save(self):
+		if not self.can_save:
+			return;
 		with open(self.settings_file, 'w') as outfile:
 			json.dump(self.vals, outfile, sort_keys=True, indent=4, separators=(',', ': '))
 	

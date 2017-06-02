@@ -1,4 +1,15 @@
+import argparse
 import sys;
+parser = argparse.ArgumentParser(description="Save all Media Upvoted & Saved on Reddit")
+parser.add_argument("--settings", help="path to custom Settings file")
+parser.add_argument("-t", "--test", help="launch in Test Mode. Only used for Travis testing.",action="store_true")
+parser.add_argument("--username", help="Account Username")
+parser.add_argument("--password", help="Account password")
+parser.add_argument("--c_id", help="Reddit Client ID")
+parser.add_argument("--c_secret", help="Reddit Client Secret")
+parser.add_argument("--agent", help="String to use for User-Agent")
+args = parser.parse_args()
+
 sys.path.insert(0, './handlers')
 sys.path.insert(0, './classes')
 
@@ -34,15 +45,17 @@ def out(obj):
 		print(pformat(vars(obj)).encode('ascii', 'ignore').decode('ascii') );
 #
 
-class Scraper():
+class Scraper(object):
 	
-	def __init__(self, settings_file='./settings.json'):
-		self.settings = Settings(settings_file);
+	def __init__(self, settings_file=None, override_login=None):
+		if not settings_file:
+			settings_file = './settings.json'
+		self.settings = Settings(settings_file, override_login==None );
 		self.reddit = None;
 		self.me = None;
-		self.manifest_file = 'manifest.json';
 		self.output = self.settings.get('output', {'base_dir':'./download/', 'subdir_pattern':'/[subreddit]/', 'file_name_pattern':'[title] - ([author])'}, True);
 		self.download_dir = self.output['base_dir'];
+		self.manifest_file = self.download_dir+'/manifest.json';
 		
 		self.all_reddit = [];# List of all posts we've liked/saved. Stored initially to avoid timeouts.
 		self.elements = [];# List of redditelement wrappers
@@ -51,7 +64,12 @@ class Scraper():
 		
 		
 		# Authenticate and prepare to scan:
-		info = self.settings.get('auth');
+		info = {};
+		if not override_login:
+			info = self.settings.get('auth');
+		else:
+			info = override_login;
+			print("Using custom login.");
 		if not info:
 			print('Error loading authentication information!');
 			return;
@@ -201,5 +219,69 @@ class Scraper():
 	
 #
 
-p = Scraper();
+auth = None;
+settings = None;
+if args.settings:
+	settings = args.settings;
+if args.test:
+	print("Test Mode running")
+if args.c_id and args.c_secret and args.password and args.agent and args.username:
+	auth = {
+        "client_id": args.c_id,
+        "client_secret": args.c_secret,
+        "password": args.password,
+        "user_agent": args.agent,
+        "username": args.username
+    }
+#
+p = Scraper(settings_file = settings, override_login = auth);
 p.run();
+
+types_found = {};
+if args.test:
+	# Run some extremely basic tests to be sure (mostly) everything's working.
+	# Uses data specific to a test user account. This functionality is useless outside of building.
+	print("Checking premade data...");
+	for e in p.elements:
+		if e.author != 'theshadowmoose':
+			print("Invalid author name from test data: "+str(e.author));
+			sys.exit(100);
+		if e.subreddit != 'shadow_test_sub':
+			print('Invalid Subreddit: '+str(e.subreddit));
+			sys.exit(101);
+		if 'Test' not in e.title:
+			print('Non-test title!: '+str(e.title));
+			sys.exit(104);
+		if e.type in types_found:
+			types_found[e.type] = types_found[e.type]+1;
+		else:
+			types_found[e.type] = 1;
+	#
+	# Check that we found the correct # of posts/comments.
+	if types_found['Comment'] != 1 or types_found['Post'] != 2:
+		print('Invalid posts or comment parsing: '+str(types_found));
+	# Check manifest was built (should always be during testing).
+	if not os.path.exists(p.manifest_file):
+		print('Failed to build manifest!');
+		sys.exit(103);
+	
+	import glob
+	import hashlib
+	import fnmatch;
+	# Make sure all test files downloaded properly:
+	# This tests the Imgur downloader, as well as the file duplicate renaming, & the album naming.
+	hashes = ['da0739019c490cbc4c184b9b2abca919','5d5a60b1eb50bc29d27f5f15ebea0e15','16392ddc40fabe7d8e9c467e7ab89fdf','e9cb466caa1e243e54d3e8d38bfd1162','9c100b8dc2dab4a33098bcb383468767']
+	for root, dirnames, filenames in os.walk(p.download_dir):
+		for filename in fnmatch.filter(filenames, '*.png'):
+			digest = str(hashlib.md5( (str(open( os.path.join(root, filename) , 'rb').read())+filename).replace('/','.').replace('\\', '.').encode('utf-8') ).hexdigest());
+			print('\t'+digest);
+			if digest in hashes:
+				hashes.remove( digest )
+			else:
+				print('Invalid file: '+str(filename));
+				sys.exit(106);
+				
+	if len(hashes) > 0:
+		print("Missing or incorrect file was downloaded!");
+		sys.exit(105);
+#
