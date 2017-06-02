@@ -218,7 +218,8 @@ def handle(url, data):
 					return False;
 			except KeyboardInterrupt:
 				raise
-			except:
+			except Exception as e:
+				print("\t\t"+str(e) );
 				print("\t\tError downloading direct Image: [%s] to path [%s]" % (url, path));
 				if path and os.path.isfile(path):
 					os.remove(path)

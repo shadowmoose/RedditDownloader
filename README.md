@@ -10,7 +10,7 @@ Requires that you register an app at [Reddit's App Page](https://www.reddit.com/
 
 On first launch, it will generate a *settings.json* file, where you can enter your data.
 
-This program uses multiple Handlers, included in the */handlers* directory, to process the various links it finds. Many are extremely generic to allow for the widest possible site coverage.
+This program uses multiple Handlers, included in the *handlers* directory, to process the various links it finds. Many are extremely generic to allow for the widest possible site coverage.
 If you hit any links at the end which it does not support, feel free to request modules for them here.
 
 *This program is currently in an extremely tentative state, and functionality may radically change and expand in the future.*
