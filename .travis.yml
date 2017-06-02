@@ -1,19 +1,11 @@
 language: python
 python:
-  - "3.2"
-  - "3.3"
   - "3.4"
   - "3.5"
   - "3.5-dev" # 3.5 development branch
   - "3.6"
 # command to install dependencies
 install:
-  - pip install -U pip wheel
   - pip install -r requirements.txt
 # command to run tests
-before_script:
-  - chmod +x ./tests/run_tests.py
-script: python tests/run_tests.py
-cache:
-  directories:
-    - $HOME/.cache/pip
+script: python reddit.py --test --username=$username --password=$password --c_id=$client_id --c_secret=$client_secret --agent="TestAgent"
