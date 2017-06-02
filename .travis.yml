@@ -10,4 +10,6 @@ python:
 install:
   - pip install -r requirements.txt
 # command to run tests
-script: tests/run_tests.py
+before_script:
+  - chmod +x ./tests/run_tests.py
+script: sudo tests/run_tests.py
