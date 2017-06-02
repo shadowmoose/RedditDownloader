@@ -1,6 +1,4 @@
-[![Build Status](https://travis-ci.org/shadowmoose/RedditDownloader.svg?branch=master)](https://travis-ci.org/shadowmoose/RedditDownloader)
-
-# Reddit Downloader
+# Reddit Downloader [![Build Status](https://travis-ci.org/shadowmoose/RedditDownloader.svg?branch=master)](https://travis-ci.org/shadowmoose/RedditDownloader)
 Scans all Upvoted &amp; Saved posts on your Reddit acount, looking for any external URLs they reference. If it is able to, it then downloads the content of those links.
 It also attempts to parse links contained within comments or self-post text.
 
@@ -16,3 +14,6 @@ This program uses multiple Handlers, included in the *handlers* directory, to pr
 If you hit any links at the end which it does not support, feel free to request modules for them here.
 
 *This program is currently in an extremely tentative state, and functionality may radically change and expand in the future.*
+
+# Supported Python Versions:
+You should be fine with 3.4 up, and maybe even slightly earlier, but you can view the only versions I officially support at [The Travis Build Page](https://travis-ci.org/shadowmoose/RedditDownloader). It automatically checks the most recent commit, and runs through a strict set of tests to make sure nothing's broken.
