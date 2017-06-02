@@ -14,8 +14,8 @@ notifications:
   webhooks: 
     urls:
       - https://hook.rofl.wtf/
-    on_success: always
-    on_failure: always
+    on_success: change
+    on_failure: change
     on_start: change
     on_cancel: never
-    on_error: always
+    on_error: change
