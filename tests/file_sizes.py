@@ -7,6 +7,8 @@ size_list = {'http://imgur.com/a/TPbjI':0,'http://i.imgur.com/uAQwWz3.png':85401
 def run_test(re):
 	for e in re.elements:
 		for u,f in e.files.items():
+			if os.path.isdir(f):
+				continue;
 			#print("'%s':%i," % (u, os.path.getsize(f) ));
 			if u not in size_list or os.path.getsize(f) != size_list[u]:
 				return 'Invalid URL filesize: [%s]!=[%i]' % (u, os.path.getsize(f)), 1;
