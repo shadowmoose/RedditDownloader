@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/shadowmoose/RedditDownloader.svg?branch=master)](https://travis-ci.org/shadowmoose/RedditDownloader)
+
 # Reddit Downloader
 Scans all Upvoted &amp; Saved posts on your Reddit acount, looking for any external URLs they reference. If it is able to, it then downloads the content of those links.
 It also attempts to parse links contained within comments or self-post text.
