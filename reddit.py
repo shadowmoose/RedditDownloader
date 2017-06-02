@@ -227,12 +227,12 @@ if args.test:
 	print("Test Mode running")
 if args.c_id and args.c_secret and args.password and args.agent and args.username:
 	auth = {
-        "client_id": args.c_id,
-        "client_secret": args.c_secret,
-        "password": args.password,
-        "user_agent": args.agent,
-        "username": args.username
-    }
+		"client_id": args.c_id,
+		"client_secret": args.c_secret,
+		"password": args.password,
+		"user_agent": args.agent,
+		"username": args.username
+	}
 #
 p = Scraper(settings_file = settings, override_login = auth);
 p.run();
@@ -242,6 +242,7 @@ if args.test:
 	# Run some extremely basic tests to be sure (mostly) everything's working.
 	# Uses data specific to a test user account. This functionality is useless outside of building.
 	print("Checking premade data...");
+	files = [];
 	for e in p.elements:
 		if e.author != 'theshadowmoose':
 			print("Invalid author name from test data: "+str(e.author));
@@ -256,32 +257,21 @@ if args.test:
 			types_found[e.type] = types_found[e.type]+1;
 		else:
 			types_found[e.type] = 1;
-	#
+		for u,f in e.files.items():
+			files.append( os.path.basename(f.replace('\\','/')) );
+	# Really basic filename check to make sure the given downloads were named properly.
+	compare = sorted(files) == ['', 'Test Direct Link - (theshadowmoose).png', 'Test Image Upload - (theshadowmoose) . 2 .png'];
+	if not compare:
+		print("Invalid file list: Expecting one directory and two filenames: "+str(sorted(files)) );
+		sys.exit(106);
 	# Check that we found the correct # of posts/comments.
 	if types_found['Comment'] != 1 or types_found['Post'] != 2:
 		print('Invalid posts or comment parsing: '+str(types_found));
+	
 	# Check manifest was built (should always be during testing).
 	if not os.path.exists(p.manifest_file):
 		print('Failed to build manifest!');
 		sys.exit(103);
 	
-	import glob
-	import hashlib
-	import fnmatch;
-	# Make sure all test files downloaded properly:
-	# This tests the Imgur downloader, as well as the file duplicate renaming, & the album naming.
-	hashes = ['da0739019c490cbc4c184b9b2abca919','5d5a60b1eb50bc29d27f5f15ebea0e15','16392ddc40fabe7d8e9c467e7ab89fdf','e9cb466caa1e243e54d3e8d38bfd1162','9c100b8dc2dab4a33098bcb383468767']
-	for root, dirnames, filenames in os.walk(p.download_dir):
-		for filename in fnmatch.filter(filenames, '*.png'):
-			digest = str(hashlib.md5( (str(open( os.path.join(root, filename) , 'rb').read())+filename).replace('/','.').replace('\\', '.').encode('utf-8') ).hexdigest());
-			print('\t'+digest);
-			if digest in hashes:
-				hashes.remove( digest )
-			else:
-				print('Invalid file: '+str(filename));
-				sys.exit(106);
-				
-	if len(hashes) > 0:
-		print("Missing or incorrect file was downloaded!");
-		sys.exit(105);
+	print("Passed the test!");
 #

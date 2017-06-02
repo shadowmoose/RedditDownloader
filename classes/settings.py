@@ -25,14 +25,14 @@ class Settings(object):
 		self.vals = default_settings;
 		self.can_save = can_save;
 		self.settings_file = file;
-		if not os.path.isfile(self.settings_file):
+		if self.can_save and not os.path.isfile(self.settings_file):
 			self.save();# Save defaults.
 			print('Please configure the generated settings file before launching again.');
 			print('Fill in your username/password, and register an app here: https://www.reddit.com/prefs/apps \nFill the app\'s information in as well.');
 			sys.exit(1);
-		with open(self.settings_file) as json_data:
-			self.vals = json.load(json_data);
-	
+		if os.path.isfile(self.settings_file):
+			with open(self.settings_file) as json_data:
+				self.vals = json.load(json_data);
 	def set(self, key, value):
 		self.vals[key] = value;
 		self.save();
