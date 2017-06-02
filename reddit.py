@@ -1,13 +1,17 @@
 import argparse
 import sys;
 parser = argparse.ArgumentParser(description="Save all Media Upvoted & Saved on Reddit")
-parser.add_argument("--settings", help="path to custom Settings file")
-parser.add_argument("-t", "--test", help="launch in Test Mode. Only used for Travis testing.",action="store_true")
-parser.add_argument("--username", help="Account Username")
-parser.add_argument("--password", help="Account password")
-parser.add_argument("--c_id", help="Reddit Client ID")
-parser.add_argument("--c_secret", help="Reddit Client Secret")
-parser.add_argument("--agent", help="String to use for User-Agent")
+parser.add_argument("--settings", help="path to custom Settings file.", type=str, metavar='')
+parser.add_argument("--test", help="launch in Test Mode. Only used for TravisCI release testing.",action="store_true")
+parser.add_argument("--username", help="account username.", type=str, metavar='')
+parser.add_argument("--password", help="account password.", type=str, metavar='')
+parser.add_argument("--c_id", help="Reddit client id.", type=str, metavar='')
+parser.add_argument("--c_secret", help="Reddit client secret.", type=str, metavar='')
+parser.add_argument("--agent", help="String to use for User-Agent.", type=str, metavar='')
+
+parser.add_argument("--base_dir", help="override base directory.", type=str, metavar='')
+parser.add_argument("--file_pattern", help="override filename output pattern", type=str, metavar='')
+parser.add_argument("--subdir_pattern", help="override subdirectory name pattern", type=str, metavar='')
 args = parser.parse_args()
 
 sys.path.insert(0, './handlers')
@@ -47,29 +51,25 @@ def out(obj):
 
 class Scraper(object):
 	
-	def __init__(self, settings_file=None, override_login=None):
-		if not settings_file:
-			settings_file = './settings.json'
-		self.settings = Settings(settings_file, override_login==None );
+	def __init__(self, settings_file, custom_settings=None):
+		self.settings = Settings(settings_file, custom_settings==None );
+		if custom_settings:
+			for k,v in custom_settings.items():
+				self.settings.set(k, v);
 		self.reddit = None;
 		self.me = None;
-		self.output = self.settings.get('output', {'base_dir':'./download/', 'subdir_pattern':'/[subreddit]/', 'file_name_pattern':'[title] - ([author])'}, True);
+		self.output = self.settings.get('output');
 		self.download_dir = self.output['base_dir'];
 		self.manifest_file = self.download_dir+'/manifest.json';
 		
 		self.all_reddit = [];# List of all posts we've liked/saved. Stored initially to avoid timeouts.
-		self.elements = [];# List of redditelement wrappers
+		self.elements = [];# List of Reddit Element wrappers
 		self.used_filenames = [];# Keep a local list of used filenames, just for ease of lookup.
 		
 		
 		
 		# Authenticate and prepare to scan:
-		info = {};
-		if not override_login:
-			info = self.settings.get('auth');
-		else:
-			info = override_login;
-			print("Using custom login.");
+		info = self.settings.get('auth');
 		if not info:
 			print('Error loading authentication information!');
 			return;
@@ -109,7 +109,6 @@ class Scraper(object):
 				print();
 		except KeyboardInterrupt:
 			print("Interrupted by User.");
-		self.settings.set('last_finished', time.time() );
 		self.build_manifest();
 	#
 	
@@ -219,13 +218,32 @@ class Scraper(object):
 	
 #
 
-auth = None;
-settings = None;
+settings = 'settings.json';
 if args.settings:
 	settings = args.settings;
 if args.test:
 	print("Test Mode running")
-if args.c_id and args.c_secret and args.password and args.agent and args.username:
+#
+
+# Though the settings file can be manually edited, 
+# Using the format default listed in 'settings', we allow the user to override most of them with command-line args.
+# Simply pop key->value replacements into this obj to override those key->value pairs when the Scraper launches.
+custom_settings = {};
+
+if args.base_dir:
+	mod = Settings(settings, False).get('output');# get default output format from a non-saving Settings object.
+	mod['base_dir'] = args.base_dir;
+	if args.file_pattern:
+		mod['file_name_pattern'] = arg.file_pattern;
+	if args.subdir_pattern:
+		mod['subdir_pattern'] = args.subdir_pattern;
+	custom_settings['output'] = mod;
+
+user_settings = [args.c_id , args.c_secret , args.password , args.agent , args.username]
+if any(user_settings):
+	if not all(user_settings):
+		print('You must set all the Client & User parameters to use any of their settings.');
+		sys.exit(5);
 	auth = {
 		"client_id": args.c_id,
 		"client_secret": args.c_secret,
@@ -233,47 +251,49 @@ if args.c_id and args.c_secret and args.password and args.agent and args.usernam
 		"user_agent": args.agent,
 		"username": args.username
 	}
-#
-p = Scraper(settings_file = settings, override_login = auth);
+	print('Using command-line authorization details!');
+	custom_settings['auth'] = auth;
+
+# If no settings were specified, pass 'None' to stick completely with default, auto-saving file values.
+if len(custom_settings) == 0:
+	print('Using file values.');
+	custom_settings = None;
+
+p = Scraper(settings, custom_settings);
 p.run();
 
-types_found = {};
 if args.test:
 	# Run some extremely basic tests to be sure (mostly) everything's working.
 	# Uses data specific to a test user account. This functionality is useless outside of building.
-	print("Checking premade data...");
-	files = [];
-	for e in p.elements:
-		if e.author != 'theshadowmoose':
-			print("Invalid author name from test data: "+str(e.author));
-			sys.exit(100);
-		if e.subreddit != 'shadow_test_sub':
-			print('Invalid Subreddit: '+str(e.subreddit));
-			sys.exit(101);
-		if 'Test' not in e.title:
-			print('Non-test title!: '+str(e.title));
-			sys.exit(104);
-		if e.type in types_found:
-			types_found[e.type] = types_found[e.type]+1;
-		else:
-			types_found[e.type] = 1;
-		for u,f in e.files.items():
-			files.append( os.path.basename(f.replace('\\','/')) );
+	print("Checking against prearranged data...");
+	if not os.path.isdir('tests'):
+		print('No tests directory found.');
+		sys.exit(1);
 	
-	# Check that we found the correct # of posts/comments.
-	if types_found['Comment'] != 1 or types_found['Post'] != 3:
-		print('Invalid posts or comment parsing: '+str(types_found));
-	
-	# Really basic filename check to make sure the given downloads were named properly.
-	compare = sorted(files) == ['', 'Test Direct Link - (theshadowmoose).png', 'Test Image Upload - (theshadowmoose) . 2 .png', 'Test animation for YTDL - (theshadowmoose).mp4'];
-	if not compare:
-		print("Error: File list did not match expectations: "+str(sorted(files)) );
-		sys.exit(106);
-	
-	# Check manifest was built (should always be during testing).
-	if not os.path.exists(p.manifest_file):
-		print('Failed to build manifest!');
-		sys.exit(103);
-	
-	print("Passed the test!");
+	# Import all the testing modules.
+	import os.path, pkgutil
+	import tests
+	pkgpath = os.path.dirname(tests.__file__);
+	padding_len = str(max( [len(name) for _, name, _ in pkgutil.iter_modules([pkgpath])]) );
+	i = 0;
+	exit_values = [0];
+	for _,name,_ in pkgutil.iter_modules([pkgpath]):
+		i+=1;
+		try:
+			print(("\t%i:%-"+padding_len+"s -> ") % (i, name), end='');
+			name = "tests." + name
+			test = __import__(name, fromlist=[''])
+			msg,val = test.run_test(p);
+			if val != 0:
+				print( 'FAIL: %s' % str(msg) );
+				exit_values.append(1000+i);# use a unique error code for potential help debugging.
+			else:
+				print('PASSED');
+		except Exception as e:
+			print('EXCEPTION:', e);
+			exit_values.append(i);
+	if max(exit_values) > 0:
+		sys.exit( max(exit_values) );
+	print('Passed all tests!');
+	sys.exit(0);
 #

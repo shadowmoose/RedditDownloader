@@ -11,7 +11,6 @@ default_settings = {
         "username": "Your_Username"
     },
     "build_manifest": True,
-    "last_finished": 0,
     "last_started": 0,
     "output": {
         "base_dir": "./download/",
