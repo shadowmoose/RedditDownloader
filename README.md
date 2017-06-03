@@ -13,7 +13,7 @@ Avoids downloading duplicates of the same file, and will automatically seek to -
 
 # Setup:
 1. **Get the above requirements set up**
-2. **Download:** Download this program, either using git or by [clicking here](./archive/master.zip). If you download the zip, unpack it.
+2. **Download:** Download this program, either using git or by [clicking here](../../archive/master.zip). If you download the zip, unpack it.
 3. **Install dependencies:** launch a terminal inside wherever you saved the program, and run the code:
 
 ```
