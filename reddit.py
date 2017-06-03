@@ -2,7 +2,10 @@ import argparse
 import sys;
 parser = argparse.ArgumentParser(description="Save all Media Upvoted & Saved on Reddit")
 parser.add_argument("--settings", help="path to custom Settings file.", type=str, metavar='')
-parser.add_argument("--test", help="launch in Test Mode. Only used for TravisCI release testing.",action="store_true")
+parser.add_argument("--test", help="launch in Test Mode. Only used for TravisCI testing.",action="store_true")
+parser.add_argument("--update", help="Update modules.", action="store_true")
+parser.add_argument("--update_only", help="Only update modules and exit.", action="store_true")
+parser.add_argument("--skip_pauses", help="Skip all skippable pauses", action="store_true")
 parser.add_argument("--username", help="account username.", type=str, metavar='')
 parser.add_argument("--password", help="account password.", type=str, metavar='')
 parser.add_argument("--c_id", help="Reddit client id.", type=str, metavar='')
@@ -27,9 +30,29 @@ from redditelement import RedditElement as RE;
 import json;
 import time;
 from settings import Settings;
+from updater import Updater;
+
+print("""
+=============================
+   Reddit Media Downloader
+=============================
+""");
+
+if args.update or args.update_only:
+	# Attempt to update the handlers.
+	print('Launching updater...');
+	print('Make sure to visit https://travis-ci.org/shadowmoose/RedditDownloader and make sure that the latest build is passing!');
+	if not args.skip_pauses:
+		if 'c' in input('Press enter to continue (enter "c" to abort): ').lower():
+			print('Aborted update');
+			sys.exit(1);
+	Updater('handlers', 'https://api.github.com/repos/shadowmoose/RedditDownloader/contents/handlers?ref=master').run();
+	if args.update_only:
+		print('Exit after update.');
+		sys.exit(0);
 
 handlers = [];
-for module in os.listdir('./handlers/'):
+for module in os.listdir('handlers'):
 	if module == '__init__.py' or module[-3:] != '.py':
 		continue
 	lib = __import__(module[:-3], locals(), globals())
@@ -242,7 +265,7 @@ if args.base_dir:
 user_settings = [args.c_id , args.c_secret , args.password , args.agent , args.username]
 if any(user_settings):
 	if not all(user_settings):
-		print('You must set all the Client & User parameters to use any of their settings.');
+		print('You must set all the Client, User, and User-Agent parameters to do that!');
 		sys.exit(5);
 	auth = {
 		"client_id": args.c_id,
