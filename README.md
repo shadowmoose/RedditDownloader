@@ -1,5 +1,7 @@
-# Reddit Downloader [![Build Status](https://travis-ci.org/shadowmoose/RedditDownloader.svg?branch=master)](https://travis-ci.org/shadowmoose/RedditDownloader)
-Scans all Upvoted &amp; Saved posts on your Reddit acount, searching for any media they link to. If it is able to, it then downloads that media.
+# Reddit Media Downloader [![Build Status](https://travis-ci.org/shadowmoose/RedditDownloader.svg?branch=master)](https://travis-ci.org/shadowmoose/RedditDownloader)
+Scans all Upvoted &amp; Saved posts on your Reddit acount, searching for any media they link to. If it is able to, it then downloads that media. 
+
+It works on most video sites, image hosts, and image blogs.
 It also works with links inside comments, and links within selfpost text.
 
 This program is useful for building archives of all the images and videos you've Upvoted or Saved over the years.
