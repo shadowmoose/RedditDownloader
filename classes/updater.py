@@ -16,10 +16,11 @@ class Updater(object):
 	
 	def run(self):
 		print('== Updating... ==');
-		# requests allows for "#.get().json()", but not all target libs support that. Looking at you, 3.5 .
+		# requests allows for "#.get().json()", but not all target libs support that.
 		response = requests.get(self.url);
 		print('Github Response: %i' % response.status_code)
 		files = json.loads(response.text);
+		print(files);
 		self.yes_all = self.skip_pauses;
 		
 		local_files = [];
@@ -33,7 +34,6 @@ class Updater(object):
 			
 			found = False;
 			for cf in files:
-				print(cf);
 				if cf['name'] == ff:
 					found = True;
 					if cf['sha'] != hash:
