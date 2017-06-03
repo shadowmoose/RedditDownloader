@@ -303,7 +303,7 @@ if args.test:
 	for _,name,_ in pkgutil.iter_modules([pkgpath]):
 		i+=1;
 		try:
-			print(("\t%i:%-"+padding_len+"s -> ") % (i, name), end='');
+			print(("\t%3d:%-"+padding_len+"s -> ") % (i, name), end='');
 			name = "tests." + name
 			test = __import__(name, fromlist=[''])
 			msg,val = test.run_test(p);

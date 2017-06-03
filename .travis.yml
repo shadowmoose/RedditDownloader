@@ -7,8 +7,10 @@ python:
 # command to install dependencies
 install:
   - pip install -r requirements.txt
+before_script:
+  - rm ./handlers/ytdl.py
 # command to run tests
-script: python reddit.py --test --username=$username --password=$password --c_id=$client_id --c_secret=$client_secret --agent="TestAgent"
+script: python reddit.py --test --update --skip_pauses --username=$username --password=$password --c_id=$client_id --c_secret=$client_secret --agent="TestAgent"
 notifications:
   email: false
   webhooks: 
