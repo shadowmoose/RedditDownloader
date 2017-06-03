@@ -2,20 +2,23 @@ import sys
 from hashlib import sha1
 import requests;
 import os;
+import json;
 
 
 class Updater(object):
 	""" Uses the supplied github url to sync the given directory to the contents of the git folder. """
-	def __init__(self, target_dir, url):
+	def __init__(self, target_dir, url, skip_pauses = False):
 		self.dir = target_dir;
 		self.url = url;
+		self.skip_pauses = skip_pauses;
 	#
 	
 	
 	def run(self):
 		print('== Updating... ==');
-		files = requests.get(self.url).json();
-		self.yes_all = False;
+		# requests allows for "#.get().json(), but not all target libs support that."
+		files = json.loads(requests.get(self.url).text);
+		self.yes_all = self.skip_pauses;
 		
 		local_files = [];
 		

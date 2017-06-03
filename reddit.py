@@ -46,7 +46,7 @@ if args.update or args.update_only:
 		if 'c' in input('Press enter to continue (enter "c" to abort): ').lower():
 			print('Aborted update');
 			sys.exit(1);
-	Updater('handlers', 'https://api.github.com/repos/shadowmoose/RedditDownloader/contents/handlers?ref=master').run();
+	Updater('handlers', 'https://api.github.com/repos/shadowmoose/RedditDownloader/contents/handlers?ref=master', args.skip_pauses).run();
 	if args.update_only:
 		print('Exit after update.');
 		sys.exit(0);
