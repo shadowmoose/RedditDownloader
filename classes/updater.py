@@ -16,12 +16,13 @@ class Updater(object):
 	
 	def run(self):
 		print('== Updating... ==');
+		self.yes_all = self.skip_pauses;
 		# requests allows for "#.get().json()", but not all target libs support that.
 		response = requests.get(self.url);
 		print('Github Response: %i' % response.status_code)
 		files = json.loads(response.text);
-		print(files);
-		self.yes_all = self.skip_pauses;
+		if self.yes_all:
+			print(files);
 		
 		local_files = [];
 		
