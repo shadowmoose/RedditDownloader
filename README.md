@@ -27,6 +27,7 @@ python reddit.py
 ```
 On first launch, it will generate a *settings.json* file, where you can enter your data.
 
+See [Here](Argument Guide.md) for more information on (optional) parameters.
 
 
 # Issues?
