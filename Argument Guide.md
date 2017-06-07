@@ -11,8 +11,7 @@ All arguments are optional, but some must be supplied in a group (and are groupe
 
 **--update_only** -     Only update modules and exit. *See above note.*
 
-**--skip_pauses** -     If supplied, skips any pauses for confirmation, by auto-accepting prompts. Useful for automated updating/running.
-
+**--skip_pauses** -     If supplied, skips any pauses for confirmation, by auto-accepting prompts. Useful for automation.
 #### Pass login parameters through arguments:
 (All are required to be passed at once)
 + **--username**  -       account username. 
