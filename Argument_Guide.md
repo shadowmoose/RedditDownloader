@@ -7,7 +7,7 @@ All arguments are optional, but some must be supplied in a group (and are groupe
 
 **--test** -            launch in Test Mode. Only used for TravisCI testing. *Will not operate outside of the testing environment.*
 
-**--update**  -         Update modules if this is supplied. *Check TravisCI to be sure the latest build works before updating.*
+**--update**  -         Update modules if this is supplied. *[Check TravisCI](https://travis-ci.org/shadowmoose/RedditDownloader) to be sure the latest build works before updating.*
 
 **--update_only** -     Only update modules and exit. *See above note.*
 
