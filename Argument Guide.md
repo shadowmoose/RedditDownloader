@@ -34,7 +34,7 @@ To insert them, include *'[tag_name]'* in the path. EG: *'/custom/[subreddit]/[u
 
 **Available tags:** type *('Post'/'Comment')*, id, title, author, subreddit
 
-**Files are saved as ** *base_dir/subdir_pattern/file_pattern*
+__Files are saved as:__ *base_dir/subdir_pattern/file_pattern*
 
 **--base_dir**  -       override base directory. This changes where the files are saved, and can be absolute or relative.
 
