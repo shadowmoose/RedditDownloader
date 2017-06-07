@@ -34,10 +34,11 @@ To insert them, include *'[tag_name]'* in the path. EG: *'/custom/[subreddit]/[u
 
 **Available tags:** type *('Post'/'Comment')*, id, title, author, subreddit
 
+**Files are saved as ** *base_dir/subdir_pattern/file_pattern*
+
 **--base_dir**  -       override base directory. This changes where the files are saved, and can be absolute or relative.
 
 + **--file_pattern** -    override filename output pattern. *Leave extension out.*
-  + Saves files as *base_dir/subdir_pattern/file_pattern*
   + Albums and groups of multiple files will save file_pattern as a directory, containing the incrementally-named files.
   
 + **--subdir_pattern** -  override subdirectory name pattern. 
