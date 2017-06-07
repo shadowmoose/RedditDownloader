@@ -1,5 +1,5 @@
 # List of arguments, in-depth:
-All arguments are optional, but some must be supplied in a group:
+All arguments are optional, but some must be supplied in a group (and are grouped as such):
 
 **-h, --help** -        show help message and exit
 
@@ -36,7 +36,7 @@ To insert them, include *'[tag_name]'* in the path. EG: *'/custom/[subreddit]/[u
 
 __Files are saved as:__ *base_dir/subdir_pattern/file_pattern*
 
-**--base_dir**  -       override base directory. This changes where the files are saved, and can be absolute or relative.
++ **--base_dir**  -       override base directory. This changes where the files are saved, and can be absolute or relative.
 
 + **--file_pattern** -    override filename output pattern. *Leave extension out.*
   + Albums and groups of multiple files will save file_pattern as a directory, containing the incrementally-named files.
