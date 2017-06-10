@@ -18,7 +18,7 @@ class Updater(object):
 		print('== Updating... ==');
 		self.yes_all = self.skip_pauses;
 		# requests allows for "#.get().json()", but not all target libs support that.
-		response = requests.get(self.url);
+		response = requests.get(self.url, headers = {'User-Agent': 'RedditDownloader-HandlerUpdater'});
 		print('Github Response: %i' % response.status_code)
 		files = json.loads(response.text);
 		if self.yes_all:
@@ -71,7 +71,7 @@ class Updater(object):
 	
 	def download(self, url, path):
 		print("\tDownloading new source: %s" % url);
-		response = requests.get(url, stream=True)
+		response = requests.get(url,  headers = {'User-Agent': 'RedditDownloader-HandlerUpdater'}, stream=True)
 		total_length = response.headers.get('content-length')
 		
 		with open(path, "wb") as f:

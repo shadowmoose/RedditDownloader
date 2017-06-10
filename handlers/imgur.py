@@ -6,6 +6,7 @@ from collections import Counter
 import requests
 import mimetypes
 import shutil
+import urllib.parse
 from stringutil import StringUtil;
 
 
@@ -250,7 +251,7 @@ def handle(url, data):
 			targ_dir = data['parent_dir'];
 		
 		def print_image_progress(index, url, dest):
-			crop = StringUtil.fit(dest, 100);
+			crop = StringUtil.fit(dest, 75);
 			print("\t\tDownloading Image %d	%s >> %s" % (index, url, crop) , end='\r')
 		#
 		downloader.on_image_download(print_image_progress)
