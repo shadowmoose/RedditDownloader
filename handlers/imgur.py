@@ -165,7 +165,7 @@ class ImgurAlbumDownloader:
 					r = requests.get(image_url, headers = {'User-Agent': self.user_agent}, stream=True)
 					if r.status_code != 200:
 						print("Failed to download image! [%i]" % r.status_code);
-						raise ImgurAlbumException("Error reading Imgur: Error Code %d" % r.status_code);
+						raise ImgurAlbumException("Error reading Imgur Image: Error Code %d" % r.status_code);
 					with open(path, 'wb') as f:
 						r.raw.decode_content = True
 						shutil.copyfileobj(r.raw, f);
@@ -175,6 +175,7 @@ class ImgurAlbumDownloader:
 					print ("Imgur Download failed.")
 					if os.path.isfile(path):
 						os.remove(path)
+					raise;
 
 		# Run the complete callbacks:
 		for fn in self.complete_callbacks:
@@ -211,6 +212,8 @@ def handle(url, data):
 						print('\t\tError locating file MIME Type: %s' % url)
 						# Attempt to download this image (missing a file ext) as a png.
 						return handle(url+'.png', data);
+					if '.jp' in ext:
+						ext = '.jpg';
 					path = data['single_file'] % ext;
 					if not os.path.isfile(path):
 						if not os.path.isdir(data['parent_dir']):
