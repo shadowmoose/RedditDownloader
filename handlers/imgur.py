@@ -240,7 +240,7 @@ def handle(url, data):
 	#
 	try:
 		# Fire up the class:
-		downloader = ImgurAlbumDownloader(url);
+		downloader = ImgurAlbumDownloader(url, data['user_agent']);
 		print(("\t\tFound {0} images in album".format(downloader.num_images())))
 		
 		ret = data['multi_dir'];# Create with a default value, assumes we're getting multiple files.
