@@ -216,6 +216,7 @@ class Scraper(object):
 				'multi_dir' 	: basefile+"/",		# If the handler is going to download multiple files, it will save them under this directory.
 				'post_title'	: re.title,			# The title of the Reddit post.
 				'post_subreddit': re.subreddit,		# The subreddit this post came from.
+				'user_agent'	: self.settings.get('auth', None)['user_agent'],
 			};
 			
 			re.add_file(url, False);# Default to 'False', meaning no file was located by a handler.

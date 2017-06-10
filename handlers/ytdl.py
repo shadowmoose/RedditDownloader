@@ -40,6 +40,7 @@ def handle(url, data):
 	global file;
 	file = '';
 	ydl_opts['outtmpl'] = data['single_file'] % '.%(ext)s'; # single_file only needs the extension. In this case, use the YTDL ext format.
+	ydl_opts['http_headers'] = {'User-Agent': data['user_agent']};
 	try:
 		with youtube_dl.YoutubeDL(ydl_opts) as ydl:
 			ydl.download([url]);

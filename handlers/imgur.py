@@ -1,6 +1,5 @@
 import sys
 import re
-import urllib.request, urllib.parse, urllib.error
 import os
 import math
 from collections import Counter
@@ -34,7 +33,7 @@ class ImgurAlbumException(Exception):
 
 
 class ImgurAlbumDownloader:
-	def __init__(self, album_url):
+	def __init__(self, album_url, user_agent=""):
 		"""
 		Constructor. Pass in the album_url that you want to download.
 		"""
@@ -43,6 +42,8 @@ class ImgurAlbumDownloader:
 		# Callback members:
 		self.image_callbacks = []
 		self.complete_callbacks = []
+		
+		self.user_agent = user_agent;
 
 		# Check the URL is actually imgur:
 		match = re.match("(https?)\:\/\/(www\.)?(?:m\.)?imgur\.com/(a|gallery)/([a-zA-Z0-9]+)(#[0-9]+)?", album_url)
@@ -57,17 +58,17 @@ class ImgurAlbumDownloader:
 		fullListURL = "http://imgur.com/a/" + self.album_key + "/layout/blog"
 
 		try:
-			self.response = urllib.request.urlopen(url=fullListURL)
-			response_code = self.response.getcode()
+			self.response = requests.get(fullListURL, headers = {'User-Agent': self.user_agent});
+			response_code = self.response.status_code;
 		except Exception as e:
 			self.response = False
 			response_code = e.code
 
-		if not self.response or self.response.getcode() != 200:
+		if not self.response or response_code != 200:
 			raise ImgurAlbumException("Error reading Imgur: Error Code %d" % response_code)
 
 		# Read in the images now so we can get stats and stuff:
-		html = self.response.read().decode('utf-8')
+		html = self.response.text;
 		self.imageIDs = re.findall('.*?{"hash":"([a-zA-Z0-9]+)".*?"ext":"(\.[a-zA-Z0-9]+)".*?', html)
 		seen = set()
 		self.imageIDs =  [x for x in self.imageIDs if x not in seen and not seen.add(x)]
@@ -159,13 +160,20 @@ class ImgurAlbumDownloader:
 			# Actually download the thing
 			if not os.path.isfile(path):
 				try:
-					urllib.request.urlretrieve(image_url, path)
+					#urllib.request.urlretrieve(image_url, path)
+					r = requests.get(image_url, headers = {'User-Agent': self.user_agent}, stream=True)
+					if r.status_code != 200:
+						print("Failed to download image! [%i]" % r.status_code);
+						raise ImgurAlbumException("Error reading Imgur: Error Code %d" % r.status_code);
+					with open(path, 'wb') as f:
+						r.raw.decode_content = True
+						shutil.copyfileobj(r.raw, f);
 				except KeyboardInterrupt:
 					raise
-				except:
-					print ("Imgur Download failed.")
-					if os.path.isfile(path):
-						os.remove(path)
+				#except:
+				#	print ("Imgur Download failed.")
+				#	if os.path.isfile(path):
+				#		os.remove(path)
 
 		# Run the complete callbacks:
 		for fn in self.complete_callbacks:
@@ -182,7 +190,7 @@ def handle(url, data):
 		# If we're got a non-gallery, and missing the direct image url, correct to the direct image link.
 		if 'i.img' not in url:
 			base_img = url.split("/")[-1];
-			for u in StringUtil.html(requests.get(url).text, 'img', 'src'):
+			for u in StringUtil.html(requests.get(url, headers = {'User-Agent': data['user_agent']}).text, 'img', 'src'):
 				if base_img in u:
 					u = urllib.parse.urljoin('https://i.imgur.com/', u);
 					print("\t\t+Corrected Imgur URL: %s" % u);
@@ -194,7 +202,7 @@ def handle(url, data):
 			path = None;
 			try:
 				# I don't like that we basically end up loading every image just to skip some, but it's best to verify filetype with imgur, because the URL can ignore extension.
-				r = requests.get(url, stream=True)
+				r = requests.get(url, headers = {'User-Agent': data['user_agent']}, stream=True)
 				if r.status_code == 200:
 					content_type = r.headers['content-type']
 					ext = mimetypes.guess_extension(content_type)

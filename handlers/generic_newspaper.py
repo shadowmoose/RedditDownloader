@@ -1,4 +1,4 @@
-from newspaper import Article
+from newspaper import Article, Config
 import requests;
 import mimetypes
 import os;
@@ -17,14 +17,16 @@ order = 90000;
 # Return filename/directory name of created file(s), False if a failure is reached, or None if there was no issue, but there are no files.
 def handle(url, data):
 	try:
-		article = Article(url);
+		config = Config()
+		config.browser_user_agent = data['user_agent'];
+		article = Article(url, config);
 		article.download();
 		article.parse();
 		path = '';
 		if article.top_image:
 			print('\tNewspaper located image: %s' % article.top_image)
 			
-			r = requests.get(article.top_image, stream=True)
+			r = requests.get(article.top_image, headers = {'User-Agent': data['user_agent']}, stream=True)
 			if r.status_code == 200:
 				content_type = r.headers['content-type']
 				ext = mimetypes.guess_extension(content_type)
