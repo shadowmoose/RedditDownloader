@@ -170,10 +170,10 @@ class ImgurAlbumDownloader:
 						shutil.copyfileobj(r.raw, f);
 				except KeyboardInterrupt:
 					raise
-				#except:
-				#	print ("Imgur Download failed.")
-				#	if os.path.isfile(path):
-				#		os.remove(path)
+				except:
+					print ("Imgur Download failed.")
+					if os.path.isfile(path):
+						os.remove(path)
 
 		# Run the complete callbacks:
 		for fn in self.complete_callbacks:
