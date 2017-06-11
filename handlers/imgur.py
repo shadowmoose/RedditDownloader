@@ -243,7 +243,7 @@ def handle(url, data):
 			except KeyboardInterrupt:
 				raise
 			except Exception as e:
-				StringUtil.error("\t\t"+str(e.msg) );
+				StringUtil.error("\t\t"+str(e) );
 				StringUtil.error("\t\tError downloading direct Image: [%s] to path [%s]" % (url, path));
 				if path and os.path.isfile(path):
 					os.remove(path)

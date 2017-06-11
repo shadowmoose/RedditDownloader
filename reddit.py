@@ -25,7 +25,7 @@ from pprint import pformat
 import os;
 import re;
 import string;
-from stringutil import StringUtil;
+from stringutil import StringUtil as SU;
 from redditelement import RedditElement as RE;
 import json;
 import time;
@@ -36,7 +36,7 @@ from colorama import Fore, Style
 
 colorama.init()
 
-StringUtil.print_color(Fore.GREEN,"""
+SU.print_color(Fore.GREEN,"""
 =============================
    Reddit Media Downloader
 =============================
@@ -66,16 +66,6 @@ handlers.sort(key=lambda x: x.order, reverse=False);
 print("Loaded handlers: ", ', '.join([x.tag for x in handlers]) );
 
 
-def out(obj):
-	""" Prints out the given object in the shitty format the Windows Charmap supports. """
-	if isinstance(obj, str):
-		print(obj.encode('ascii', 'ignore').decode('ascii') );
-	elif isinstance(obj, (int, float, complex)):
-		print(obj);
-	else:
-		print(pformat(vars(obj)).encode('ascii', 'ignore').decode('ascii') );
-#
-
 class Scraper(object):
 	
 	def __init__(self, settings_file, custom_settings=None):
@@ -101,12 +91,12 @@ class Scraper(object):
 			print('Error loading authentication information!');
 			return;
 		self.settings.set('last_started', time.time());
-		StringUtil.print_color(Fore.YELLOW, "Authenticating via OAuth...");
+		SU.print_color(Fore.YELLOW, "Authenticating via OAuth...");
 		
 		self.reddit = praw.Reddit(client_id=info['client_id'], client_secret=info['client_secret'],password=info['password'], user_agent=info['user_agent'], username=info['username']);
 		self.me = self.reddit.user.me();
 		
-		StringUtil.print_color(Fore.YELLOW, "Authenticated as [%s]\n" % self.me.name)
+		SU.print_color(Fore.YELLOW, "Authenticated as [%s]\n" % self.me.name)
 	#
 	
 	
@@ -115,12 +105,12 @@ class Scraper(object):
 		if not self.me:
 			return;
 		
-		StringUtil.print_color(Fore.CYAN, 'Loading Saved Comments & Posts...');
+		SU.print_color(Fore.CYAN, 'Loading Saved Comments & Posts...');
 		for saved in self.me.saved(limit=None):
 			if saved not in self.all_reddit:
 				self.all_reddit.append(saved);
 		
-		StringUtil.print_color(Fore.CYAN, 'Loading Upvoted Comments & Posts...');
+		SU.print_color(Fore.CYAN, 'Loading Upvoted Comments & Posts...');
 		for upvoted in self.me.upvoted(limit=None):
 			if upvoted not in self.all_reddit:
 				self.all_reddit.append(upvoted);
@@ -192,12 +182,10 @@ class Scraper(object):
 	
 	def process_ele(self, re):
 		'''  Accepts a RedditElement of Post/Comment details, then runs through the Handlers loaded from the other directory, attempting to download the url.  '''
-		print(Fore.YELLOW, end="");
-		out("[%s](%s): %s" % (re.type, re.subreddit, re.title) );
-		print(Style.RESET_ALL, end="");
+		SU.print_color(Fore.YELLOW, SU.out("[%s](%s): %s" % (re.type, re.subreddit, re.title), False) );
 		
 		for url in re.get_urls():
-			out("\tProcessing URL: %s" % url);
+			SU.out("\tProcessing URL: %s" % url);
 			existing = False;
 			# Check if we've handled this URL before, and pass the file location if we have.
 			for e in self.elements:
@@ -207,7 +195,7 @@ class Scraper(object):
 					existing = True;
 					break;
 			if existing:
-				StringUtil.print_color(Fore.GREEN, "\t\t+URL already taken care of.")
+				SU.print_color(Fore.GREEN, "\t\t+URL already taken care of.")
 				continue;
 			
 			dir_pattern  = self.download_dir + self.output['subdir_pattern']+'/';
@@ -237,11 +225,11 @@ class Scraper(object):
 				ret = h.handle(url, data)
 				if ret==None:
 					# None is returned when the handler specifically wants this URL to be "finished", but not added to the files list.
-					StringUtil.print_color(Fore.GREEN, "\t+Handler '%s' completed correctly, but returned no files!" % h.tag )
+					SU.print_color(Fore.GREEN, "\t+Handler '%s' completed correctly, but returned no files!" % h.tag )
 					re.add_file(url, None);
 					break;
 				if ret:
-					out("%s\t+Handler '%s' completed correctly! %s%s" % (Fore.GREEN, h.tag, StringUtil.fit(ret, 75), Style.RESET_ALL) )
+					SU.out("%s\t+Handler '%s' completed correctly! %s%s" % (Fore.GREEN, h.tag, SU.fit(ret, 75), Style.RESET_ALL) )
 					self.used_filenames.append(ret);
 					# The handler will return a file/directory name if it worked properly.
 					re.add_file(url, ret);
@@ -301,9 +289,9 @@ p.run();
 if args.test:
 	# Run some extremely basic tests to be sure (mostly) everything's working.
 	# Uses data specific to a test user account. This functionality is useless outside of building.
-	print("Checking against prearranged data...");
+	SU.print_color(Fore.YELLOW, "Checking against prearranged data...");
 	if not os.path.isdir('tests'):
-		print('No tests directory found.');
+		SU.print_color(Fore.RED, 'No tests directory found.');
 		sys.exit(1);
 	
 	# Import all the testing modules.
@@ -316,20 +304,21 @@ if args.test:
 	for _,name,_ in pkgutil.iter_modules([pkgpath]):
 		i+=1;
 		try:
-			StringUtil.print_color(Fore.YELLOW, ("\t%3d:%-"+padding_len+"s -> ") % (i, name), end='');
+			print( ("\t%3d:%-"+padding_len+"s -> ") % (i, name) , end='');
 			name = "tests." + name
 			test = __import__(name, fromlist=[''])
 			msg,val = test.run_test(p);
 			if val != 0:
-				StringUtil.print_color(Fore.RED, 'FAIL: %s' % str(msg) );
+				SU.print_color(Fore.RED, 'FAIL: %s' % str(msg) );
 				exit_values.append(1000+i);# use a unique error code for potential help debugging.
 			else:
-				StringUtil.print_color(Fore.GREEN, 'PASSED');
+				SU.print_color(Fore.GREEN, 'PASSED');
 		except Exception as e:
-			StringUtil.print_color(Fore.RED, 'EXCEPTION: %s' % e.msg);
+			SU.print_color(Fore.RED, 'EXCEPTION: %s' % e);
 			exit_values.append(i);
 	if max(exit_values) > 0:
+		SU.print_color(Fore.RED, "Failed testing!")
 		sys.exit( max(exit_values) );
-	print('Passed all tests!');
+	SU.print_color(Fore.GREEN, 'Passed all tests!');
 	sys.exit(0);
 #
