@@ -4,3 +4,4 @@ lxml>=3.6.0
 newspaper3k
 youtube_dl
 beautifulsoup4
+colorama

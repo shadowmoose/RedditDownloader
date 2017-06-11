@@ -31,8 +31,12 @@ import json;
 import time;
 from settings import Settings;
 from updater import Updater;
+import colorama;
+from colorama import Fore, Style
 
-print("""
+colorama.init()
+
+StringUtil.print_color(Fore.GREEN,"""
 =============================
    Reddit Media Downloader
 =============================
@@ -97,11 +101,12 @@ class Scraper(object):
 			print('Error loading authentication information!');
 			return;
 		self.settings.set('last_started', time.time());
+		StringUtil.print_color(Fore.YELLOW, "Authenticating via OAuth...");
 		
-		print("Authenticating via OAuth...");
 		self.reddit = praw.Reddit(client_id=info['client_id'], client_secret=info['client_secret'],password=info['password'], user_agent=info['user_agent'], username=info['username']);
 		self.me = self.reddit.user.me();
-		print("Authenticated as [%s]" % self.me.name)
+		
+		StringUtil.print_color(Fore.YELLOW, "Authenticated as [%s]\n" % self.me.name)
 	#
 	
 	
@@ -109,14 +114,18 @@ class Scraper(object):
 		''' Grab all saved Comments and Posts in advance, called automaticall by run(). '''
 		if not self.me:
 			return;
-		print('Loading Saved Comments & Posts...');
+		
+		StringUtil.print_color(Fore.CYAN, 'Loading Saved Comments & Posts...');
 		for saved in self.me.saved(limit=None):
 			if saved not in self.all_reddit:
 				self.all_reddit.append(saved);
-		print('Loading Upvoted Comments & Posts...');
+		
+		StringUtil.print_color(Fore.CYAN, 'Loading Upvoted Comments & Posts...');
 		for upvoted in self.me.upvoted(limit=None):
 			if upvoted not in self.all_reddit:
 				self.all_reddit.append(upvoted);
+				
+		print();
 	#
 	
 	
@@ -183,7 +192,10 @@ class Scraper(object):
 	
 	def process_ele(self, re):
 		'''  Accepts a RedditElement of Post/Comment details, then runs through the Handlers loaded from the other directory, attempting to download the url.  '''
+		print(Fore.YELLOW, end="");
 		out("[%s](%s): %s" % (re.type, re.subreddit, re.title) );
+		print(Style.RESET_ALL, end="");
+		
 		for url in re.get_urls():
 			out("\tProcessing URL: %s" % url);
 			existing = False;
@@ -195,7 +207,7 @@ class Scraper(object):
 					existing = True;
 					break;
 			if existing:
-				print("\t\t+URL already taken care of.")
+				StringUtil.print_color(Fore.GREEN, "\t\t+URL already taken care of.")
 				continue;
 			
 			dir_pattern  = self.download_dir + self.output['subdir_pattern']+'/';
@@ -221,15 +233,15 @@ class Scraper(object):
 			
 			re.add_file(url, False);# Default to 'False', meaning no file was located by a handler.
 			for h in handlers:
-				out("\tChecking handler: %s" % h.tag);
+				print("\tChecking handler: %s" % h.tag);
 				ret = h.handle(url, data)
 				if ret==None:
 					# None is returned when the handler specifically wants this URL to be "finished", but not added to the files list.
-					out("\t+Handler '%s' completed correctly, but returned no files!" % h.tag )
+					StringUtil.print_color(Fore.GREEN, "\t+Handler '%s' completed correctly, but returned no files!" % h.tag )
 					re.add_file(url, None);
 					break;
 				if ret:
-					out("\t+Handler '%s' completed correctly! %s" % (h.tag, StringUtil.fit(ret, 75)) )
+					out("%s\t+Handler '%s' completed correctly! %s%s" % (Fore.GREEN, h.tag, StringUtil.fit(ret, 75), Style.RESET_ALL) )
 					self.used_filenames.append(ret);
 					# The handler will return a file/directory name if it worked properly.
 					re.add_file(url, ret);
@@ -304,17 +316,17 @@ if args.test:
 	for _,name,_ in pkgutil.iter_modules([pkgpath]):
 		i+=1;
 		try:
-			print(("\t%3d:%-"+padding_len+"s -> ") % (i, name), end='');
+			StringUtil.print_color(Fore.YELLOW, ("\t%3d:%-"+padding_len+"s -> ") % (i, name), end='');
 			name = "tests." + name
 			test = __import__(name, fromlist=[''])
 			msg,val = test.run_test(p);
 			if val != 0:
-				print( 'FAIL: %s' % str(msg) );
+				StringUtil.print_color(Fore.RED, 'FAIL: %s' % str(msg) );
 				exit_values.append(1000+i);# use a unique error code for potential help debugging.
 			else:
-				print('PASSED');
+				StringUtil.print_color(Fore.GREEN, 'PASSED');
 		except Exception as e:
-			print('EXCEPTION:', e);
+			StringUtil.print_color(Fore.RED, 'EXCEPTION: %s' % e.msg);
 			exit_values.append(i);
 	if max(exit_values) > 0:
 		sys.exit( max(exit_values) );

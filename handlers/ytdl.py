@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 import youtube_dl
+from stringutil import StringUtil as su;
 
 tag = 'ytdl';
 order = 100;
@@ -7,14 +8,15 @@ order = 100;
 file = '';
 
 class MyLogger(object):
-    def debug(self, msg):
-        pass
+	def debug(self, msg):
+		pass
 
-    def warning(self, msg):
-        pass
+	def warning(self, msg):
+		pass
 
-    def error(self, msg):
-        print("\t\tYTDL :: %s" % msg)
+	def error(self, msg):
+		if 'Unsupported' not in msg:
+			su.error("\t\tYTDL :: %s" % msg)
 
 
 def my_hook(d):

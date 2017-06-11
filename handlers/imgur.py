@@ -9,7 +9,6 @@ import shutil
 import urllib.parse
 from stringutil import StringUtil;
 
-
 tag = 'imgur';
 order = 1;
 
@@ -164,7 +163,7 @@ class ImgurAlbumDownloader:
 					#urllib.request.urlretrieve(image_url, path)
 					r = requests.get(image_url, headers = {'User-Agent': self.user_agent}, stream=True)
 					if r.status_code != 200:
-						print("Failed to download image! [%i]" % r.status_code);
+						StringUtil.error("Failed to download image! [%i]" % r.status_code );
 						raise ImgurAlbumException("Error reading Imgur Image: Error Code %d" % r.status_code);
 					with open(path, 'wb') as f:
 						r.raw.decode_content = True
@@ -188,16 +187,23 @@ def handle(url, data):
 		return False;
 		
 	# Not a gallery, so we have to do out best to manually find/format this image.
-	if not any(x in url for x in ['gallery', 'a/']):
+	if not any(x in url for x in ['gallery', '/a/']):
 		# If we're got a non-gallery, and missing the direct image url, correct to the direct image link.
 		if 'i.img' not in url:
 			base_img = url.split("/")[-1];
-			for u in StringUtil.html(requests.get(url, headers = {'User-Agent': data['user_agent']}).text, 'img', 'src'):
-				if base_img in u:
-					u = urllib.parse.urljoin('https://i.imgur.com/', u);
-					print("\t\t+Corrected Imgur URL: %s" % u);
-					url = u;
-					break;
+			req = requests.get(url, headers = {'User-Agent': data['user_agent']});
+			if 'i.img' in req.url:
+				# Redirected to valid Image.
+				url = req.url;
+				print("\t\t+Auto-corrected Imgur URL: %s" % url);
+			else:
+				# Load the page and parse for image.
+				for u in StringUtil.html(req.text, 'img', 'src'):
+					if base_img in u:
+						u = urllib.parse.urljoin('https://i.imgur.com/', u);
+						print("\t\t+Corrected Imgur URL: %s" % u);
+						url = u;
+						break;
 		
 		# Handle the direct imgur links, because the lib doesn't.
 		if 'i.imgur.com' in url:
@@ -208,17 +214,23 @@ def handle(url, data):
 				if r.status_code == 200:
 					content_type = r.headers['content-type']
 					ext = mimetypes.guess_extension(content_type)
+					if 'gifv' in url:
+						print('\t\t-Allowing YTDL Handler to download animations.');
+						return False;# Let Youtube-dl module convert animations.
 					if not ext or ext=='':
-						print('\t\tError locating file MIME Type: %s' % url)
-						# Attempt to download this image (missing a file ext) as a png.
+						StringUtil.error('\t\tError locating file MIME Type: %s' % url)
+						# Attempt to download this image (missing a file ext) as a png. It's last-ditch, but works in some cases.
 						return handle(url+'.png', data);
+					
 					if '.jp' in ext:
 						ext = '.jpg';
 					path = data['single_file'] % ext;
+					
 					if not os.path.isfile(path):
 						if not os.path.isdir(data['parent_dir']):
 							print("\t\t+Building dir: %s" % data['parent_dir'])
 							os.makedirs(data['parent_dir']);# Parent dir for the full filepath is supplied already.
+						
 						with open(path, 'wb') as f:
 							r.raw.decode_content = True
 							shutil.copyfileobj(r.raw, f);
@@ -226,16 +238,16 @@ def handle(url, data):
 					else:
 						return path;
 				else:
-					print('\t\tError Reading Image: %s responded with code %i!' % (url, r.status_code) );
+					StringUtil.error('\t\tError Reading Image: %s responded with code %i!' % (url, r.status_code) );
 					return False;
 			except KeyboardInterrupt:
 				raise
 			except Exception as e:
-				print("\t\t"+str(e) );
-				print("\t\tError downloading direct Image: [%s] to path [%s]" % (url, path));
+				StringUtil.error("\t\t"+str(e.msg) );
+				StringUtil.error("\t\tError downloading direct Image: [%s] to path [%s]" % (url, path));
 				if path and os.path.isfile(path):
 					os.remove(path)
-			print('\t\tSomething strange failed with direct Imgur download...');
+			StringUtil.error('\t\tSomething strange failed with direct Imgur download...');
 			return False;
 	else:
 		if 'i.' in url:
@@ -265,5 +277,5 @@ def handle(url, data):
 			ret = downloader.custom_path;# if there's only a single image, the downloader auto-modifies this to include the image extension after saving the single file.
 		return ret;
 	except ImgurAlbumException as e:
-		print("\t\tImgur Error: "+e.msg);
+		StringUtil.error("\t\tImgur Error: "+e.msg);
 	return False;

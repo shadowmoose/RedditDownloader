@@ -24,7 +24,7 @@ def handle(url, data):
 		article.parse();
 		path = '';
 		if article.top_image:
-			print('\tNewspaper located image: %s' % article.top_image)
+			print('\t\tNewspaper located image: %s' % article.top_image)
 			
 			r = requests.get(article.top_image, headers = {'User-Agent': data['user_agent']}, stream=True)
 			if r.status_code == 200:

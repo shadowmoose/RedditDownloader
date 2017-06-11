@@ -1,5 +1,6 @@
 import math;
 from bs4 import BeautifulSoup
+from colorama import Fore, Back, Style
 
 class StringUtil:
 	def fit(input_string, desired_len):
@@ -20,4 +21,11 @@ class StringUtil:
 			if link.get(tag_val):
 				urls.append( str(link.get(tag_val)).strip() );
 		return urls;
+	
+	def error(string_output, **kwargs):
+		StringUtil.print_color(Fore.RED, string_output)
+		
+	def print_color(fore_color, string_output, **kwargs):
+		""" Print() the given string colored as desired. """
+		print(fore_color+string_output+Style.RESET_ALL, **kwargs);
 #
