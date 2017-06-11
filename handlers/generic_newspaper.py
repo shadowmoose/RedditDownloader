@@ -33,6 +33,8 @@ def handle(url, data):
 				if not ext or ext=='':
 					print('\t\tNewsPaper Error locating file MIME Type: %s' % url)
 					return False;
+				if '.jp' in ext:
+					ext = '.jpg';
 				path = data['single_file'] % ext;
 				if not os.path.isfile(path):
 					if not os.path.isdir(data['parent_dir']):

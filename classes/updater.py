@@ -11,6 +11,13 @@ class Updater(object):
 		self.dir = target_dir;
 		self.url = url;
 		self.skip_pauses = skip_pauses;
+		self.url_append = '?';
+		if 'GITHUB_CLIENT_ID' in os.environ:
+			if '?' in self.url:
+				self.url_append = '&'
+			self.url_append += ('client_id=%s&client_secret=%s' % (os.environ['GITHUB_CLIENT_ID'], os.environ['GITHUB_CLIENT_SECRET']) );
+			print("Using custom github auth.");
+			self.url += self.url_append;
 	#
 	
 	
