@@ -101,7 +101,7 @@ class Scraper(object):
 	
 	
 	def scan(self):
-		''' Grab all saved Comments and Posts in advance, called automaticall by run(). '''
+		''' Grab all saved Comments and Posts in advance, called automatically by run(). '''
 		if not self.me:
 			return;
 		
@@ -206,9 +206,10 @@ class Scraper(object):
 			
 			og = basefile;
 			i=2;
-			while next((s for s in self.used_filenames if basefile in s), None):
+			while basefile in self.used_filenames:
 				print("\t!Incrementing duplicate filename.")
 				basefile = og+' . '+str(i)+' ';
+				i+=1;
 			
 			data = {
 				'parent_dir'	: basedir,			# Some handlers will need to build the parent directory for their single file first. This simplifies parsing.
@@ -230,7 +231,7 @@ class Scraper(object):
 					break;
 				if ret:
 					SU.out("%s\t+Handler '%s' completed correctly! %s%s" % (Fore.GREEN, h.tag, SU.fit(ret, 75), Style.RESET_ALL) )
-					self.used_filenames.append(ret);
+					self.used_filenames.append(basefile);
 					# The handler will return a file/directory name if it worked properly.
 					re.add_file(url, ret);
 					break;
