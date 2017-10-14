@@ -193,7 +193,7 @@ if args.test:
 			print( ("\t%3d:%-"+padding_len+"s -> ") % (i, name) , end='')
 			name = "tests." + name
 			test = __import__(name, fromlist=[''])
-			msg,val = test.run_test(p)
+			msg,val = test.run_test(p.reddit)
 			if val != 0:
 				SU.print_color(Fore.RED, 'FAIL: %s' % str(msg) )
 				exit_values.append(1000+i)# use a unique error code for potential help debugging.

@@ -103,7 +103,7 @@ class RedditElement(object):
 	def contains_file(self, file_name):
 		''' if this element contains the given file name. '''
 		files = self.get_completed_files()
-		return any(file_name in files[key] for key in files)
+		return any(file_name in str(files[key]) for key in files)
 	
 	def to_obj(self):
 		''' we use this to translate the element into a simple, constant layout for template variables and JSON output. '''

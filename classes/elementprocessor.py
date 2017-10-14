@@ -42,13 +42,14 @@ class ElementProcessor():
 		
 		for url in re.get_urls():
 			print('\tURL: %s' % url)
-			if self.loader.url_exists(url):
+			file = self.loader.url_exists(url)
+			if file:
 				SU.print_color(Fore.GREEN, "\t\t+URL already taken care of.")
-				re.add_file(url, 'Duplicate')
+				re.add_file(url, file)
 				continue
 			base_file, file_info = self.build_file_info(re)# Build the file information array using this RedditElement's information
 			file_path = self.process_url(url, file_info)
-			re.add_file(url, base_file)# Add this completed file information to the Element
+			re.add_file(url, file_path)# Add this completed file information to the Element
 	#
 	
 	
@@ -67,9 +68,9 @@ class ElementProcessor():
 				ret_val = None
 				break
 			if ret:
-				SU.out("%s\t+Handler '%s' completed correctly! %s%s" % (Fore.GREEN, h.tag, SU.fit(ret, 75), Style.RESET_ALL) )
 				# The handler will return a file/directory name if it worked properly.
-				ret_val = ret
+				ret_val = SU.normalize_file(ret)
+				SU.out("%s\t+Handler '%s' completed correctly! %s%s" % (Fore.GREEN, h.tag, SU.fit(ret_val, 75), Style.RESET_ALL) )
 				break
 			#
 		#
@@ -81,7 +82,7 @@ class ElementProcessor():
 		dir_pattern  = '%s/%s' % ( self.settings.save_base() , self.settings.save_subdir() )
 		file_pattern = '%s/%s' % ( dir_pattern, self.settings.save_filename())
 		
-		basedir = SU.insert_vars(dir_pattern, re)
+		basedir = SU.normalize_file(SU.insert_vars(dir_pattern, re))
 		basefile = SU.insert_vars(file_pattern, re)
 		
 		og = basefile

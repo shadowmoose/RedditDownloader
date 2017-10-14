@@ -5,7 +5,8 @@ size_list = {'http://imgur.com/a/TPbjI':0,'http://i.imgur.com/uAQwWz3.png':85401
 # Check all file sizes to be sure all downloaders are properly functioning.
 # Does not confirm the # of files, but leaves that to the 'file_names' tester.
 def run_test(re):
-	for e in re.elements:
+	eles = re.get_elements()
+	for e in eles:
 		for u,f in e.files.items():
 			if os.path.isdir(f):
 				continue;

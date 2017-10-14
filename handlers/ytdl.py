@@ -46,7 +46,7 @@ def handle(url, data):
 	try:
 		with youtube_dl.YoutubeDL(ydl_opts) as ydl:
 			ydl.download([url]);
-		print("\tCompleted YouTube-DL Download successfully! File: [%s]" % file);
+		print("\tCompleted YouTube-DL Download successfully! File: [%s]" % su.fit(file, 25));
 		return file;
 	except KeyboardInterrupt:
 		raise
