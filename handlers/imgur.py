@@ -182,7 +182,7 @@ class ImgurAlbumDownloader:
 
 
 # Return filename/directory name of created file(s), False if a failure is reached, or None if there was no issue, but there are no files.
-def handle(url, data):
+def handle(url, data, guess=True):
 	if 'imgur' not in url:
 		return False;
 		
@@ -219,8 +219,11 @@ def handle(url, data):
 						return False;# Let Youtube-dl module convert animations.
 					if not ext or ext=='':
 						StringUtil.error('\t\tError locating file MIME Type: %s' % url)
-						# Attempt to download this image (missing a file ext) as a png. It's last-ditch, but works in some cases.
-						return handle(url+'.png', data);
+						if guess:
+							# Attempt to download this image (missing a file ext) as a png. It's last-ditch, but works in some cases.
+							return handle(url+'.png', data, False);
+						else:
+							return False;
 					
 					if '.jp' in ext:
 						ext = '.jpg';

@@ -14,8 +14,8 @@ default_settings = {
     "last_started": 0,
     "output": {
         "base_dir": "./download/",
-        "file_name_pattern": "[title] - ([author])",
-        "subdir_pattern": "/[subreddit]/"
+        "subdir_pattern": "/[subreddit]/",
+        "file_name_pattern": "[title] - ([author])"
     }
 }
 
@@ -32,15 +32,19 @@ class Settings(object):
 		if os.path.isfile(self.settings_file):
 			with open(self.settings_file) as json_data:
 				self.vals = json.load(json_data);
+	#
+	
 	def set(self, key, value):
 		self.vals[key] = value;
 		self.save();
+	#
 	
 	def save(self):
 		if not self.can_save:
 			return;
 		with open(self.settings_file, 'w') as outfile:
 			json.dump(self.vals, outfile, sort_keys=True, indent=4, separators=(',', ': '))
+	#
 	
 	def get(self, key, default_val=None, save_if_default=False):
 		if key in self.vals:
@@ -49,3 +53,25 @@ class Settings(object):
 			self.set(key, default_val);
 			return default_val;
 		return default_val;
+	#
+	
+	def get_save_location(self, sub):
+		''' Used for internal fast access to the save path patterns. '''
+		out = self.get('output')
+		if not out:
+			print('!Malformed output settings. Using defaults.')
+			return default_settings['output']
+		return out[sub]
+	#
+	
+	def save_base(self):
+		''' The base folder pattern to save to. '''
+		return self.get_save_location('base_dir')
+	
+	def save_subdir(self):
+		''' The save path's subdirectory pattern. '''
+		return self.get_save_location('subdir_pattern')
+	
+	def save_filename(self):
+		''' The save path's filename pattern. '''
+		return self.get_save_location('file_name_pattern')

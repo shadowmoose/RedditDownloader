@@ -11,7 +11,7 @@ order = 90000;
 """
 	TODO: Is it better to fail sometimes, or to get the wrong parse instead?
 	This library will almost *certainly* find something to download, even if that image is a really bad option.
-	Still, though, it works on sites like Tumblr and other really fringe pages, so it's probably worhtwhile to be correct more often than not.
+	Still, though, it works on sites like Tumblr and other really fringe pages, so it's probably worthwhile to be correct more often than not.
 """
 
 # Return filename/directory name of created file(s), False if a failure is reached, or None if there was no issue, but there are no files.

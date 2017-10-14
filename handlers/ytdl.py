@@ -19,7 +19,7 @@ class MyLogger(object):
 			su.error("\t\tYTDL :: %s" % msg)
 
 
-def my_hook(d):
+def ytdl_hook(d):
 	global file;
 	if '_percent_str' in d:
 		print("\t\t+ Downloading:: %s" % d['_percent_str'], end="\r");
@@ -34,7 +34,7 @@ def my_hook(d):
 ydl_opts = {
 	'outtmpl': './downloaded/%(title)s.%(ext)s',
 	'logger': MyLogger(),
-	'progress_hooks': [my_hook],
+	'progress_hooks': [ytdl_hook],
 }
 
 # Return filename/directory name of created file(s), False if a failure is reached, or None if there was no issue, but there are no files.

@@ -1,6 +1,9 @@
 import math;
 from bs4 import BeautifulSoup
 from colorama import Fore, Back, Style
+import string
+from pprint import pformat
+import os.path
 
 class StringUtil:
 	def fit(input_string, desired_len):
@@ -13,7 +16,7 @@ class StringUtil:
 		return input_string;
 	#
 	
-	def html(html_string, tag='a', tag_val='href'):
+	def html_elements(html_string, tag='a', tag_val='href'):
 		""" Get all the href elements from this HTML string. """
 		soup = BeautifulSoup(html_string, 'html.parser')
 		urls = [];
@@ -21,6 +24,10 @@ class StringUtil:
 			if link.get(tag_val):
 				urls.append( str(link.get(tag_val)).strip() );
 		return urls;
+	
+	def html(html_string, tag='a', tag_val='href'):
+		''' TODO: This is a polyfill so I can commit a few changes without breaking old Parsers... This will be removed when I get a more comprehensive updater. '''
+		return StringUtil.html_elements(html_string, tag, tag_val)
 	
 	def error(string_output, **kwargs):
 		StringUtil.print_color(Fore.RED, string_output)
@@ -42,4 +49,22 @@ class StringUtil:
 			print(val);
 		return val;
 	#
+	
+	
+	def filename(filename):
+		''' Format the given string into an acceptable filename. '''
+		valid_chars = "-_.() %s%s[]" % (string.ascii_letters, string.digits)
+		return ''.join(c for c in filename if c in valid_chars)
+	#
+	
+	def normalize_file(str_file):
+		''' Standardize all paths. Needed in a few spots. '''
+		return os.path.normpath(str_file)
+	
+	def insert_vars(str_path, ele):
+		''' Replace the [tagged] ele fields in the given string. Sanitizes any inserted values to be filename-compatible. '''
+		for k,v in ele.to_obj().items():
+			str_path = str_path.replace('[%s]' % str(k), StringUtil.filename(str(v)) )
+		str_path = StringUtil.normalize_file(str_path)
+		return str_path
 #
