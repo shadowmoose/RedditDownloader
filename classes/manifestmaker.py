@@ -3,20 +3,20 @@ import time
 from colorama import Fore
 import os.path
 
-from stringutil import StringUtil
+import stringutil
 
 
-class ManifestMaker():
+class ManifestMaker:
 	def __init__(self, settings, load = True):
-		''' Prepare the Manifest Builder. Optionally load information from the given file. '''
+		""" Prepare the Manifest Builder. Optionally load information from the given file. """
 		self.data = {}
-		self.file = StringUtil.normalize_file(settings.save_base()+'/Manifest.json')
+		self.file = stringutil.normalize_file(settings.save_base()+'/Manifest.json')
 		if load and os.path.isfile(self.file):
 			try:
 				with open(self.file) as data_file:
 					self.data = json.load(data_file)
 			except:
-				StringUtil.print_color(Fore.RED, 'Failed to load Manifest at [%s]. Probably corrupt. Try removing the file.' % self.file)
+				stringutil.print_color(Fore.RED, 'Failed to load Manifest at [%s]. Probably corrupt. Try removing the file.' % self.file)
 				raise
 		#
 	#
@@ -29,10 +29,10 @@ class ManifestMaker():
 		failed = []
 		for ele in gen:
 			files = ele.get_completed_files()
-			if any(False == files[key] for key in files):
-				failed.append(ele.to_obj())
-			else:
+			if len(files)>0 and not any(False == files[key] for key in files):
 				done.append(ele.to_obj())
+			else:
+				failed.append(ele.to_obj())
 		#
 		
 		with open(self.file, 'w') as outfile:

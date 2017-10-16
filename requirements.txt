@@ -1,3 +1,4 @@
+pip
 requests
 praw
 lxml>=3.6.0

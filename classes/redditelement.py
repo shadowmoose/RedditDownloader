@@ -1,5 +1,4 @@
-from stringutil import StringUtil
-from colorama import Fore, Style
+import stringutil
 import praw
 
 class RedditElement(object):
@@ -15,7 +14,7 @@ class RedditElement(object):
 	"""
 	
 	def __init__(self, obj):
-		''' Creates the object. Automatically calls its own detect_type() function to resolve variable name mappings. '''
+		""" Creates the object. Automatically calls its own detect_type() function to resolve variable name mappings. """
 		self.files = {}
 		self.type = None
 		self.id = None
@@ -24,9 +23,11 @@ class RedditElement(object):
 		self.urls = []
 		self.subreddit = str(obj.subreddit.display_name)
 		self.detect_type(obj)
+		assert self.type is not None
+		assert self.id is not None
 	
 	def detect_type(self, obj):
-		''' Simple function to call the proper Comment or Submission handler. '''
+		""" Simple function to call the proper Comment or Submission handler. """
 		if type(obj) == praw.models.Submission:
 			self.submission(obj)
 		elif type(obj) == praw.models.reddit.comment.Comment:
@@ -47,7 +48,7 @@ class RedditElement(object):
 		else:
 			self.author = 'Unknown'
 		
-		for url in StringUtil.html_elements(c.body_html, 'a', 'href'):
+		for url in stringutil.html_elements(c.body_html, 'a', 'href'):
 			self.add_url(url)
 	#
 	
@@ -57,56 +58,55 @@ class RedditElement(object):
 		self.type = 'Post'
 		self.id = str(post.name)
 		self.title = str(post.title)
-		if post.author==None:
-			self.author = 'Unknown'
+		if post.author is None:
+			self.author = 'Deleted'
 		else:
 			self.author = str(post.author.name)
-		
-		if post.selftext!='':
+
+		if post.selftext.strip() != '':
 			# This post probably doesn't have a URL, and has selftext instead.
-			for url in StringUtil.html_elements(post.selftext_html, 'a', 'href'):
+			for url in stringutil.html_elements(post.selftext_html, 'a', 'href'):
 				self.add_url(url)
-		if post.url !=None and post.url !='':
+		if post.url is not None and post.url.strip() != '':
 			self.add_url(post.url)
 	#
 	
 	def add_file(self, url, file):
-		''' add a url and it's file location to this element. Signifies that this URL is completed. '''
+		""" add a url and it's file location to this element. Signifies that this URL is completed. """
 		self.files[url] = file
 	
 	def add_url(self, url):
-		''' Add a URL to this element. '''
+		""" Add a URL to this element. """
 		if url not in self.urls:
 			self.urls.append(url)
 	
-	def get_id():
-		'''get this element's ID. '''
+	def get_id(self):
+		"""get this element's ID. """
 		return self.id
 	
 	def get_urls(self):
-		''' returns a list of all this element's UNIQUE urls. '''
+		""" returns a list of all this element's UNIQUE urls. """
 		return self.urls
 		
 	def get_completed_files(self):
-		''' Returns the [url]=[files] array build for the completed URLs of this element. '''
+		""" Returns the [url]=[files] array build for the completed URLs of this element. """
 		return self.files
 	
 	def get_json_url(self):
-		''' Returns the API access point for this comment's JSON. '''
+		""" Returns the API access point for this comment's JSON. """
 		return 'https://www.reddit.com/api/info.json?id=%s' % self.id
-	
-	
+
 	def contains_url(self, url):
-		''' if this element contains the given URL. '''
+		""" if this element contains the given URL. """
 		return url in self.get_completed_files()
 	
 	def contains_file(self, file_name):
-		''' if this element contains the given file name. '''
+		""" if this element contains the given file name. """
 		files = self.get_completed_files()
 		return any(file_name in str(files[key]) for key in files)
 	
 	def to_obj(self):
-		''' we use this to translate the element into a simple, constant layout for template variables and JSON output. '''
+		""" we use this to translate the element into a simple, constant layout for template variables and JSON output. """
 		ob = {
 			'files':self.get_completed_files(),
 			'subreddit': self.subreddit,

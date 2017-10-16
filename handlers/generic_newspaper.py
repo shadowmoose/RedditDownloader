@@ -1,12 +1,12 @@
 from newspaper import Article, Config
-import requests;
+import requests
 import mimetypes
-import os;
-import shutil;
+import os
+import shutil
 
 ''' This is (one of) the last-ditch handlers. If all else fails, we attempt to use the Newspaper library to extract the top image from whatever site. '''
-tag = 'newspaper';
-order = 90000;
+tag = 'newspaper'
+order = 90000
 
 """
 	TODO: Is it better to fail sometimes, or to get the wrong parse instead?
@@ -18,11 +18,10 @@ order = 90000;
 def handle(url, data):
 	try:
 		config = Config()
-		config.browser_user_agent = data['user_agent'];
-		article = Article(url, config);
-		article.download();
-		article.parse();
-		path = '';
+		config.browser_user_agent = data['user_agent']
+		article = Article(url, config)
+		article.download()
+		article.parse()
 		if article.top_image:
 			print('\t\tNewspaper located image: %s' % article.top_image)
 			
@@ -32,21 +31,21 @@ def handle(url, data):
 				ext = mimetypes.guess_extension(content_type)
 				if not ext or ext=='':
 					print('\t\tNewsPaper Error locating file MIME Type: %s' % url)
-					return False;
+					return False
 				if '.jp' in ext:
-					ext = '.jpg';
-				path = data['single_file'] % ext;
+					ext = '.jpg'
+				path = data['single_file'] % ext
 				if not os.path.isfile(path):
 					if not os.path.isdir(data['parent_dir']):
 						print("\t\t+Building dir: %s" % data['parent_dir'])
-						os.makedirs(data['parent_dir']);# Parent dir for the full filepath is supplied already.
+						os.makedirs(data['parent_dir'])# Parent dir for the full filepath is supplied already.
 					with open(path, 'wb') as f:
 						r.raw.decode_content = True
-						shutil.copyfileobj(r.raw, f);
-				return path;
+						shutil.copyfileobj(r.raw, f)
+				return path
 			else:
-				print('\t\tError Reading Image: %s responded with code %i!' % (url, r.status_code) );
-				return False;
+				print('\t\tError Reading Image: %s responded with code %i!' % (url, r.status_code) )
+				return False
 	except Exception as e:
-		print('\t\t'+str(e) );
-	return False;
+		print('\t\t'+str(e).strip() )
+	return False
