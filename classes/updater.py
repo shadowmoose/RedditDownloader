@@ -1,7 +1,7 @@
 import requests
 import os
 from hashlib import sha1
-import stringutil
+import pip
 
 
 class Updater:
@@ -22,6 +22,7 @@ class Updater:
 
 	def run(self, prompt_remove_old = False):
 		""" Launches the updater process, and prompts to clean up old files if remove_old is true. """
+		self._pip_update()
 		self._check_missing_updated()
 		if prompt_remove_old:
 			self._clean_existing_files()
@@ -63,7 +64,7 @@ class Updater:
 		tree = self._get_latest_file_tree()
 		print("Checking for file updates...")
 		for f in tree:
-			file = stringutil.normalize_file(os.path.join('./', f['path'])) # The relative path to the file.
+			file = os.path.normpath(os.path.join('./', f['path'])) # The relative path to the file.
 			f_type = f['type'] # What this file represents
 			sha = f['sha']   # The git hash of this file
 
@@ -115,4 +116,17 @@ class Updater:
 
 		with open(path, "wb") as f:
 			f.write(response.content)
+
+
+	def _pip_update(self):
+		""" Uses the pip module to update all required libs. """
+		print("Attempting package update...")
+		if os.path.isfile('./requirements.txt'):
+			# I don't really like calling this type of thing, because it can easily fail without root access when it builds.
+			# However, it's a very straightforward way to let people automatically update the ever-shifting packages like YTDL
+			print("Attempting to automatically update required external packages. May require root to work properly on some setups.")
+			pip.main(["install", "--upgrade", "-r","requirements.txt"])
+			print("Completed package update.")
+		else:
+			print("Couldn't locate a requirements.txt file. Cannot update dependencies.")
 		#
