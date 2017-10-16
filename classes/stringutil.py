@@ -6,6 +6,7 @@ from pprint import pformat
 import os.path
 
 def fit(input_string, desired_len):
+	""" Shrinks the given string to fit within the desired_len by collapsing the middle. """
 	if desired_len<=3:
 		return input_string
 	if len(input_string)>desired_len:
