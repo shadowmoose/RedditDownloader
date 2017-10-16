@@ -15,7 +15,7 @@ Avoids downloading duplicates of the same file, and will automatically seek to -
 
 # Setup:
 1. **Get the above requirements set up**
-2. **Download:** Download this program, either using git or by [clicking here](../../archive/master.zip). If you download the zip, unpack it.
+2. **Download:** Download this program, either using git or by [clicking here](../../archive/latest-release.zip). If you download the zip, unpack it.
 3. **Install dependencies:** launch a terminal inside wherever you saved the program, and run the code:
 
 ```
@@ -29,6 +29,7 @@ On first launch, it will generate a *settings.json* file, where you can enter yo
 
 See [Here](Argument_Guide.md) for more information on (optional) parameters.
 
+If you're checking this out with Git, I strongly suggest you pull from the *latest-release* branch, to assure stability.
 
 # Issues?
 This program uses multiple Handlers, included in the *handlers* directory, to process the various links it finds. Many are extremely generic to allow for the widest possible site coverage.

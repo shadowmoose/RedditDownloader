@@ -26,7 +26,7 @@ assert not all([args.skip_pauses, args.rm_old_files]) # You cannot call with bot
 
 if args.update or args.update_only:
 	from updater import Updater
-	upd = Updater('shadowmoose', 'RedditDownloader', 'master')
+	upd = Updater('shadowmoose', 'RedditDownloader', 'latest-release') # Pull from the "latest-release" branch.
 	upd.run(prompt_remove_old=args.rm_old_files)
 
 	if args.update_only:
