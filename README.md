@@ -1,4 +1,8 @@
-# Reddit Media Downloader [![Build Status](https://travis-ci.org/shadowmoose/RedditDownloader.svg?branch=master)](https://travis-ci.org/shadowmoose/RedditDownloader)
+# Reddit Media Downloader
+**Master** [![Build Status](https://travis-ci.org/shadowmoose/RedditDownloader.svg?branch=master)](https://travis-ci.org/shadowmoose/RedditDownloader)
+
+**Latest Release** [![Build Status](https://travis-ci.org/shadowmoose/RedditDownloader.svg?branch=latest-release)](https://travis-ci.org/shadowmoose/RedditDownloader/branches)
+
 Scans all Upvoted &amp; Saved posts on your Reddit acount, searching for any media they link to. If it is able to, it then downloads that media. 
 
 It works on most video sites, image hosts, and image blogs.
@@ -15,7 +19,7 @@ Avoids downloading duplicates of the same file, and will automatically seek to -
 
 # Setup:
 1. **Get the above requirements set up**
-2. **Download:** Download this program, either using git or by [clicking here](../../archive/latest-release.zip). If you download the zip, unpack it.
+2. **Download:** Download this program, either using git or by [clicking here](../../archive/latest-release.zip) *(Latest Release)*. If you download the zip, unpack it.
 3. **Install dependencies:** launch a terminal inside wherever you saved the program, and run the code:
 
 ```
