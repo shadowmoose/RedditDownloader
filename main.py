@@ -1,4 +1,4 @@
-__version__ = "1.1"
+__version__ = "1.2"
 
 import argparse
 import sys
@@ -45,10 +45,10 @@ from manifestmaker import ManifestMaker
 colorama.init()
 
 stringutil.print_color(Fore.GREEN, """
-=============================
-   Reddit Media Downloader
-=============================
-""")
+====================================
+    Reddit Media Downloader %s
+====================================
+""" % __version__)
 
 
 class Scraper(object):
