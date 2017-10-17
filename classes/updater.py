@@ -82,7 +82,7 @@ class Updater:
 			if status == 'modified' or status == 'added':
 				if local_sha != f_sha:
 					print("\t\t+Downloading [%s] from [%s]..." % (f_local, f_url))
-					self._download(f_url, f_local)
+					self._download(f_url, f_local, sha_hash=f_sha)
 				else:
 					print('\t\tLOCAL OK | %s [%s]' % (f_local, local_sha))
 			elif status == 'renamed':
@@ -96,7 +96,7 @@ class Updater:
 					os.rename(prev_path, f_local)
 					print('\t\t+Moved file.')
 				else:
-					self._download(f_url, f_local)
+					self._download(f_url, f_local, sha_hash=f_sha)
 					print("\t\t+Couldn't find original, so downloaded file.")
 			elif status == 'removed':
 				if os.path.exists(f_local):
@@ -138,8 +138,8 @@ class Updater:
 		return sh.hexdigest()
 
 
-	def _download(self, url, path):
-		""" Downloads the target file. """
+	def _download(self, url, path, sha_hash=None):
+		""" Downloads the target file. If sha_hash is set, it will validate the download with the provided hash. """
 		if not os.path.exists(os.path.dirname(path)) and os.path.dirname(path) != '':
 			import errno
 			try:
@@ -151,6 +151,9 @@ class Updater:
 
 		with open(path, "wb") as f:
 			f.write(response.content)
+
+		if sha_hash:
+			assert sha_hash == self._file_hash(path)
 
 
 	def _pip_update(self):
