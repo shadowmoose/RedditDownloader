@@ -33,7 +33,7 @@ class Updater:
 		self._file_tree = []
 
 		print("Checking for new version...")
-		n_dat = requests.get('https://api.github.com/repos/%s/%s/releases/latest' % (self._author, self._repo)).json()
+		n_dat = requests.get('https://api.github.com/repos/%s/%s/releases/latest?%s' % (self._author, self._repo, self._client_auth)).json()
 		newest_version = n_dat['tag_name']
 		update_text = n_dat['body']
 		update_title = n_dat['name']
