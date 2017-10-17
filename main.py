@@ -1,3 +1,5 @@
+__version__ = "1.1"
+
 import argparse
 import sys
 import os
@@ -6,8 +8,7 @@ parser.add_argument("--settings", help="path to custom Settings file.", type=str
 parser.add_argument("--test", help="launch in Test Mode. Only used for TravisCI testing.",action="store_true")
 parser.add_argument("--update", help="Update modules.", action="store_true")
 parser.add_argument("--update_only", help="Only update modules and exit.", action="store_true")
-parser.add_argument("--skip_pauses", help="Skip all skippable pauses. Doesn't impact rm_old_files.", action="store_true")
-parser.add_argument("--rm_old_files", help="Opt-in prompt to delete old files if Update is called.", action="store_true")
+parser.add_argument("--skip_pauses", help="Skip all skippable pauses.", action="store_true")
 parser.add_argument("--username", help="account username.", type=str, metavar='')
 parser.add_argument("--password", help="account password.", type=str, metavar='')
 parser.add_argument("--c_id", help="Reddit client id.", type=str, metavar='')
@@ -22,12 +23,10 @@ args = parser.parse_args()
 sys.path.insert(0, './classes')
 sys.path.insert(0, './handlers')
 
-assert not all([args.skip_pauses, args.rm_old_files]) # You cannot call with both auto-skipping and file deletion.
-
 if args.update or args.update_only:
 	from updater import Updater
-	upd = Updater('shadowmoose', 'RedditDownloader', 'latest-release') # Pull from the "latest-release" branch.
-	upd.run(prompt_remove_old=args.rm_old_files)
+	upd = Updater('shadowmoose', 'RedditDownloader', __version__, args.skip_pauses) # Pull from the latest release
+	upd.run()
 
 	if args.update_only:
 		print('Exit after update.')

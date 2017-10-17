@@ -9,8 +9,8 @@ def run_test(re):
 	for e in eles:
 		for u,f in e.files.items():
 			if os.path.isdir(f):
-				continue;
+				continue
 			#print("'%s':%i," % (u, os.path.getsize(f) ));
 			if u not in size_list or os.path.getsize(f) != size_list[u]:
-				return 'Invalid URL filesize: [%s]!=[%i]' % (u, os.path.getsize(f)), 1;
-	return '', 0;
+				return 'Invalid URL filesize: [%s]!=[%i]' % (u, os.path.getsize(f)), 1
+	return '', 0
