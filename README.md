@@ -1,7 +1,5 @@
-# Reddit Media Downloader
-**Master** [![Build Status](https://travis-ci.org/shadowmoose/RedditDownloader.svg?branch=master)](https://travis-ci.org/shadowmoose/RedditDownloader)
+# Reddit Media Downloader [![Build Status](https://travis-ci.org/shadowmoose/RedditDownloader.svg?branch=master)](https://travis-ci.org/shadowmoose/RedditDownloader)
 
-**Latest Release** [![Build Status](https://travis-ci.org/shadowmoose/RedditDownloader.svg?branch=latest-release)](https://travis-ci.org/shadowmoose/RedditDownloader/branches)
 
 Scans all Upvoted &amp; Saved posts on your Reddit acount, searching for any media they link to. If it is able to, it then downloads that media. 
 
