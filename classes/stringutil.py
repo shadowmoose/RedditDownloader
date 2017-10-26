@@ -52,7 +52,7 @@ def out(obj, print_val=True):
 
 def filename(f_name):
 	""" Format the given string into an acceptable filename. """
-	valid_chars = "-_.() %s%s[]" % (string.ascii_letters, string.digits)
+	valid_chars = "-_.() %s%s[]&" % (string.ascii_letters, string.digits)
 	return ''.join(c for c in f_name if c in valid_chars)
 #
 

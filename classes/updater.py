@@ -141,10 +141,10 @@ class Updater:
 	def _download(self, url, path, sha_hash=None):
 		""" Downloads the target file. If sha_hash is set, it will validate the download with the provided hash. """
 		if not os.path.exists(os.path.dirname(path)) and os.path.dirname(path) != '':
-			import errno
 			try:
 				os.makedirs(os.path.dirname(path))
 			except OSError as exc: # Guard against race condition
+				import errno
 				if exc.errno != errno.EEXIST:
 					raise
 		response = requests.get(url,  headers = {'User-Agent': 'RedditDownloader-HandlerUpdater'}, stream=True)
