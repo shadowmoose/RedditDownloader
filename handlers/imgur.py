@@ -11,10 +11,7 @@ import stringutil
 tag = 'imgur'
 order = 1
 
-
-#!/usr/bin/env python3
-# encoding: utf-8
-
+# TODO: This class needs some major refactoring. The library is fine, but the single-image handler needs splitting.
 
 """
 imguralbum.py - Download a whole imgur album in one go.
@@ -185,9 +182,9 @@ def handle(url, data, guess=True):
 	if 'imgur' not in url:
 		return False
 		
-	# Not a gallery, so we have to do out best to manually find/format this image.
+	# Not a gallery, so we have to do our best to manually find/format this image.
 	if not any(x in url for x in ['gallery', '/a/']):
-		# If we're got a non-gallery, and missing the direct image url, correct to the direct image link.
+		# If we've got a non-gallery, and missing the direct image url, correct to the direct image link.
 		if 'i.img' not in url:
 			base_img = url.split("/")[-1]
 			req = requests.get(url, headers = {'User-Agent': data['user_agent']})
@@ -197,7 +194,7 @@ def handle(url, data, guess=True):
 				print("\t\t+Auto-corrected Imgur URL: %s" % url)
 			else:
 				# Load the page and parse for image.
-				for u in stringutil.html(req.text, 'img', 'src'):
+				for u in stringutil.html_elements(req.text, 'img', 'src'):
 					if base_img in u:
 						u = urllib.parse.urljoin('https://i.imgur.com/', u)
 						print("\t\t+Corrected Imgur URL: %s" % u)
@@ -208,7 +205,8 @@ def handle(url, data, guess=True):
 		if 'i.imgur.com' in url:
 			path = None
 			try:
-				# I don't like that we basically end up loading every image just to skip some, but it's best to verify filetype with imgur, because the URL can ignore extension.
+				# I don't like that we basically end up loading every image just to skip some,
+				# but it's best to verify filetype with imgur, because the URL can ignore extension.
 				r = requests.get(url, headers = {'User-Agent': data['user_agent']}, stream=True)
 				if r.status_code == 200:
 					content_type = r.headers['content-type']
@@ -219,7 +217,8 @@ def handle(url, data, guess=True):
 					if not ext or ext=='':
 						stringutil.error('\t\tError locating file MIME Type: %s' % url)
 						if guess:
-							# Attempt to download this image (missing a file ext) as a png. It's last-ditch, but works in some cases.
+							# Attempt to download this image (missing a file ext) as a png.
+							# It's last-ditch, but works in some cases.
 							return handle(url+'.png', data, False)
 						else:
 							return False
@@ -253,7 +252,8 @@ def handle(url, data, guess=True):
 			return False
 	else:
 		if 'i.' in url:
-			# Sometimes people include 'i.imgur' in album releases, which is incorrect. Imgur redirects this, but we correct for posterity.
+			# Sometimes people include 'i.imgur' in album releases, which is incorrect.
+			# Imgur redirects this, but we correct for posterity.
 			url = url.replace('i.', '')
 	#
 	try:
@@ -276,7 +276,10 @@ def handle(url, data, guess=True):
 		downloader.save_images(targ_dir)
 		print("\n\t\tImgur download complete!")
 		if downloader.num_images() == 1:
-			ret = downloader.custom_path# if there's only a single image, the downloader auto-modifies this to include the image extension after saving the single file.
+			# if there's only a single image, the downloader auto-modifies this to include
+			# the image extension after saving the single file.
+			ret = downloader.custom_path
+
 		return ret
 	except ImgurAlbumException as e:
 		stringutil.error("\t\tImgur Error: "+e.msg)
