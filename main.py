@@ -123,6 +123,9 @@ if any(user_settings):
 	print('Using command-line authorization details!')
 	custom_settings['auth'] = auth
 
+if args.deduplicate_files:
+	custom_settings['deduplicate_files'] = args.deduplicate_files
+
 # If no settings were specified, pass 'None' to stick completely with default, auto-saving file values.
 if len(custom_settings) == 0:
 	print('Using file values.')
