@@ -6,3 +6,4 @@ newspaper3k
 youtube_dl
 beautifulsoup4
 colorama
+Pillow

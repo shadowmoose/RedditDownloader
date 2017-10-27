@@ -11,6 +11,7 @@ default_settings = {
         "username": "Your_Username"
     },
     "build_manifest": True,
+	"deduplicate_files":True,
     "last_started": 0,
     "output": {
         "base_dir": "./download/",

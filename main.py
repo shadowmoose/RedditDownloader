@@ -9,6 +9,7 @@ parser.add_argument("--test", help="launch in Test Mode. Only used for TravisCI 
 parser.add_argument("--update", help="Update modules.", action="store_true")
 parser.add_argument("--update_only", help="Only update modules and exit.", action="store_true")
 parser.add_argument("--skip_pauses", help="Skip all skippable pauses.", action="store_true")
+parser.add_argument('--deduplicate_files', help='Deduplicate similar files.', action="store_true")
 parser.add_argument("--username", help="account username.", type=str, metavar='')
 parser.add_argument("--password", help="account password.", type=str, metavar='')
 parser.add_argument("--c_id", help="Reddit client id.", type=str, metavar='')

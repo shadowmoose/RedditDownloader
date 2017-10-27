@@ -54,7 +54,8 @@ class RedditLoader:
 	def count_completed(self):
 		""" Returns the number of elements already processed. """
 		return len(self.completed)
-	
+
+
 	def get_elements(self):
 		""" Generator to return the loaded RedditElements one-by-one, and automatically add them to the "completed" list on finish. Skips duplicates. """
 		self._elements.extend(self.completed)# Shuffle back, so this function could be rerun multiple times.
@@ -64,7 +65,8 @@ class RedditLoader:
 			yield ele
 			self.completed.append(ele)
 	#
-	
+
+
 	def url_exists(self, url):
 		""" Returns the file name if the given URL has already been processed before. """
 		for ele in self.completed:
@@ -72,8 +74,14 @@ class RedditLoader:
 				return ele.get_completed_files()[url]
 		#
 		return None
-	
+
+
 	def file_exists(self, file_name):
 		""" Returns True if the given filename is already used by an Element. """
 		return any(ele.contains_file(file_name) for ele in self.completed)
+
+
+	def get_elements_for_file(self, file_name):
+		""" Gets a list of elements that contain the given filename. """
+		return [ele for ele in self.completed if ele.contains_file(file_name)]
 	

@@ -1,7 +1,7 @@
 import stringutil
 from colorama import Fore, Style
 import os
-
+import hashjar
 
 class ElementProcessor:
 	""" The heavy-lifting bit. Handles processing all the Elements provided to it via the generator it's created with, by finding the most appropriate Handler for each Element. """
@@ -48,10 +48,10 @@ class ElementProcessor:
 				continue
 			base_file, file_info = self.build_file_info(re)# Build the file information array using this RedditElement's information
 			file_path = self.process_url(url, file_info)
-			re.add_file(url, file_path)# Add this completed file information to the Element
+			re.add_file(url, self.check_duplicates(file_path))
 	#
-	
-	
+
+
 	def process_url(self, url, info):
 		""" Accepts a URL and the array of file info generated for it by this class, and then attempts to download it using any possible handler.
 			Returns whatever the handlers do, which should be a path to the file itself or the contianing directory for an album.
@@ -77,7 +77,8 @@ class ElementProcessor:
 			stringutil.error("\t!No handlers were able to accept this URL." )
 		return ret_val
 	#
-	
+
+
 	def build_file_info(self, re):
 		""" Generates an array of file locations and element data that is passed down to every handler, so they can choose where best to save for themselves. """
 		dir_pattern  = '%s/%s' % ( self.settings.save_base() , self.settings.save_subdir() )
@@ -103,3 +104,29 @@ class ElementProcessor:
 			'post_subreddit': re.subreddit,		# The subreddit this post came from.
 			'user_agent'	: self.settings.get('auth', None)['user_agent'],
 		}
+
+	def check_duplicates(self, file_path):
+		""" Check the given file path to see if another file like it already exists. Purges worse copies.
+			Returns the filename that the file exists under.
+		"""
+		if not self.settings.get('deduplicate_files', True):
+			# Deduplication disabled.
+			return file_path
+		if not file_path:
+			return file_path
+		was_new, existing_path = hashjar.add_hash(file_path) # Check if the file exists already.
+		if not was_new:
+			print("\tFile already exists! Resolving...")
+			# Quick and dirty comparison, assumes larger filesize means better quality.
+			if os.path.isfile(file_path) and os.path.isfile(existing_path):
+				if os.path.getsize(file_path) > os.path.getsize(existing_path):
+					print('\t\tNew file was better quality. Removing old file.')
+					os.remove(existing_path)
+					for ele in self.loader.get_elements_for_file(existing_path):
+						ele.remap_file(existing_path, file_path)
+					return file_path
+				else:
+					print("\tOld file was better quality, removing newer file.")
+					os.remove(file_path)
+					return existing_path
+		return file_path

@@ -104,7 +104,14 @@ class RedditElement(object):
 		""" if this element contains the given file name. """
 		files = self.get_completed_files()
 		return any(file_name in str(files[key]) for key in files)
-	
+
+	def remap_file(self, filename_old, filename_new):
+		""" Remap an old filename to a new one. """
+		for f in self.files:
+			if self.files[f] == filename_old:
+				self.files[f] = filename_new
+
+
 	def to_obj(self):
 		""" we use this to translate the element into a simple, constant layout for template variables and JSON output. """
 		ob = {
