@@ -13,25 +13,30 @@ Avoids downloading duplicates of the same file, and will automatically seek to -
 
 # Requirements:
 1. **Python**: You can download Python executable for your operating system from [https://www.python.org/downloads/](https://www.python.org/downloads/).
-2. Requires that you register an app at [Reddit's App Page](https://www.reddit.com/prefs/apps) to get access to view Posts through the Reddit API.
+2. Requires that you register an app at [Reddit's App Page](https://www.reddit.com/prefs/apps) to get access to view Posts through the Reddit API. Fortunately, they make this part extremely easy. You'll enter the client info into the settings file in the steps below.
 
 # Setup:
 1. **Get the above requirements set up**
 2. **Download:** Download this program, either using git or by [clicking here](../../releases/latest) *(Latest Release)*. If you download the zip, unpack it.
-3. **Install dependencies:** launch a terminal inside wherever you saved the program, and run the code:
+3. **Install dependencies:** launch a terminal inside wherever you saved the program, and run the line:
 
 ```
 pip install -r requirements.txt
 ```
 4. Once the install finishes, launch the program with:
 ```
-python reddit.py
+python main.py
 ```
 On first launch, it will generate a *settings.json* file, where you can enter your data.
 
+5. Whenever desired, you can automatically update the program and its dependencies by running:
+```
+python main.py --update
+```
+
 See [Here](Argument_Guide.md) for more information on (optional) parameters.
 
-If you're checking this out with Git, I strongly suggest you pull from the *latest-release* branch, to assure stability.
+If you're checking this out with Git, I strongly suggest you pull the *latest-release*, to assure stability.
 
 # Issues?
 This program uses multiple Handlers, included in the *handlers* directory, to process the various links it finds. Many are extremely generic to allow for the widest possible site coverage.
