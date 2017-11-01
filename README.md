@@ -33,7 +33,7 @@ python main.py --update
 ```
 python main.py
 ```
-On first launch, it will generate a *settings.json* file, where you can enter your data.
+On first launch, it will run an assistant to aid in the setup process.
 
 5. Whenever desired, you can automatically update the program and its dependencies by running:
 ```
