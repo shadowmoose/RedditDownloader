@@ -3,21 +3,21 @@ import json
 import sys
 
 default_settings = {
-    "auth": {
-        "client_id": "ID_From_Registering_app",
-        "client_secret": "Secret_from_registering_app",
-        "password": "Your_password",
-        "user_agent": "USE_A_RANDOM_ID_HERE",
-        "username": "Your_Username"
-    },
-    "build_manifest": True,
+	"auth": {
+		"client_id": "ID_From_Registering_app",
+		"client_secret": "Secret_from_registering_app",
+		"password": "Your_password",
+		"user_agent": "USE_A_RANDOM_ID_HERE",
+		"username": "Your_Username"
+	},
+	"build_manifest": True,
 	"deduplicate_files":True,
-    "last_started": 0,
-    "output": {
-        "base_dir": "./download/",
-        "subdir_pattern": "/[subreddit]/",
-        "file_name_pattern": "[title] - ([author])"
-    }
+	"last_started": 0,
+	"output": {
+		"base_dir": "./download/",
+		"subdir_pattern": "/[subreddit]/",
+		"file_name_pattern": "[title] - ([author])"
+	}
 }
 
 class Settings(object):
@@ -27,9 +27,15 @@ class Settings(object):
 		self.settings_file = file
 		if self.can_save and not os.path.isfile(self.settings_file):
 			self.save()# Save defaults.
-			print('Please configure the generated settings file before launching again.')
-			print('Fill in your username/password, and register an app here: https://www.reddit.com/prefs/apps \nFill the app\'s information in as well.')
-			sys.exit(1)
+			if 'y' in input('Would you like to launch the first-time setup assistant? (y/n): ').lower():
+				import tutorial
+				print('\n\n')
+				tutorial.run(file)
+			else:
+				print('Please configure the generated settings file before launching again.')
+				print('Fill in your username/password, and register an app here: https://www.reddit.com/prefs/apps \n'
+					  'Fill the app\'s client information in as well.')
+				sys.exit(1)
 		if os.path.isfile(self.settings_file):
 			with open(self.settings_file) as json_data:
 				self.vals = json.load(json_data)
@@ -40,8 +46,8 @@ class Settings(object):
 		self.save()
 	#
 	
-	def save(self):
-		if not self.can_save:
+	def save(self, override_save=False):
+		if not self.can_save and not override_save:
 			return
 		with open(self.settings_file, 'w') as outfile:
 			json.dump(self.vals, outfile, sort_keys=True, indent=4, separators=(',', ': '))

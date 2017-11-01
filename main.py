@@ -43,7 +43,7 @@ from elementprocessor import ElementProcessor
 from redditloader import RedditLoader
 from manifestmaker import ManifestMaker
 
-colorama.init()
+colorama.init(convert=True)
 
 stringutil.print_color(Fore.GREEN, """
 ====================================
