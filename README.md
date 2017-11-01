@@ -22,18 +22,12 @@ Avoids downloading duplicates of the same file, and will automatically seek to -
 2. **Download:** Download this program, either using git or by [clicking here](../../releases/latest) *(Latest Release)*. If you download the zip, unpack it.
 3. **Install dependencies:** launch a terminal inside wherever you saved the program, and run the line:
 
-```
-pip install -r requirements.txt
-```
-or
-```
-python main.py --update
-```
+```pip install -r requirements.txt```
+
 4. Once the install finishes, launch the program with:
-```
-python main.py
-```
-On first launch, it will run an assistant to aid in the setup process.
+```python main.py```
+
+*On first launch, it will run an assistant to aid in the setup process.*
 
 5. Whenever desired, you can automatically update the program and its dependencies by running:
 ```
