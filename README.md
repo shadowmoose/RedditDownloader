@@ -15,6 +15,8 @@ Avoids downloading duplicates of the same file, and will automatically seek to -
 1. **Python**: You can download Python executable for your operating system from [https://www.python.org/downloads/](https://www.python.org/downloads/).
 2. Requires that you register an app at [Reddit's App Page](https://www.reddit.com/prefs/apps) to get access to view Posts through the Reddit API. Fortunately, they make this part extremely easy. Simply click to register a "Script" for personal use, name it whatever you want, and enter anything (like 'http://localhost' - it doesn't matter) for the URI/URL fields. You'll enter the client info it gives you into the settings file in the steps below.
 
+*The program will launch an assistant to help you with the second requirement*, when run for the first time, but it doesn't hurt to get the client information prepared.
+
 # Setup:
 1. **Get the above requirements set up**
 2. **Download:** Download this program, either using git or by [clicking here](../../releases/latest) *(Latest Release)*. If you download the zip, unpack it.
@@ -22,6 +24,10 @@ Avoids downloading duplicates of the same file, and will automatically seek to -
 
 ```
 pip install -r requirements.txt
+```
+or
+```
+python main.py --update
 ```
 4. Once the install finishes, launch the program with:
 ```
