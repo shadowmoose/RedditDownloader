@@ -13,7 +13,7 @@ Avoids downloading duplicates of the same file, and will automatically seek to -
 
 # Requirements:
 1. **Python**: You can download Python executable for your operating system from [https://www.python.org/downloads/](https://www.python.org/downloads/).
-2. Requires that you register an app at [Reddit's App Page](https://www.reddit.com/prefs/apps) to get access to view Posts through the Reddit API. Fortunately, they make this part extremely easy. You'll enter the client info into the settings file in the steps below.
+2. Requires that you register an app at [Reddit's App Page](https://www.reddit.com/prefs/apps) to get access to view Posts through the Reddit API. Fortunately, they make this part extremely easy. Simply click to register a "Script" for personal use, name it whatever you want, and enter anything (like 'http://localhost' - it doesn't matter) for the URI/URL fields. You'll enter the client info it gives you into the settings file in the steps below.
 
 # Setup:
 1. **Get the above requirements set up**
