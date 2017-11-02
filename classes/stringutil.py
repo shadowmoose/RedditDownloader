@@ -25,10 +25,6 @@ def html_elements(html_string, tag='a', tag_val='href'):
 			urls.append( str(link.get(tag_val)).strip() )
 	return urls
 
-def html(html_string, tag='a', tag_val='href'):
-	""" TODO: This is a polyfill so I can commit a few changes without breaking old Parsers... This will be removed when I get a more comprehensive updater. """
-	return html_elements(html_string, tag, tag_val)
-
 def error(string_output, **kwargs):
 	print_color(Fore.RED, string_output, **kwargs)
 
@@ -61,7 +57,7 @@ def normalize_file(str_file):
 	return os.path.normpath(str_file)
 
 def insert_vars(str_path, ele):
-	""" Replace the [tagged] ele fields in the given string. Sanitizes any inserted values to be filename-compatible. """
+	""" Replace the [tagged] ele fields in the given string. Sanitizes inserted values to be filename-compatible. """
 	for k,v in ele.to_obj().items():
 		str_path = str_path.replace('[%s]' % str(k), filename(str(v)) )
 	str_path = normalize_file(str_path)

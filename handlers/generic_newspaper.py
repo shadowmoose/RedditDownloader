@@ -47,5 +47,5 @@ def handle(url, data):
 				print('\t\tError Reading Image: %s responded with code %i!' % (url, r.status_code) )
 				return False
 	except Exception as e:
-		print('\t\t'+str(e).strip() )
+		print('\t\t"Newspaper" Generic handler failed. '+(str(e).strip()) )
 	return False

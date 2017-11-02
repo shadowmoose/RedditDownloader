@@ -13,7 +13,10 @@ All arguments are optional, but some must be supplied in a group (and are groupe
 
 **--skip_pauses** -     If supplied, skips any pauses for confirmation, by auto-accepting prompts. Useful for automation.
 
-**--deduplicate_files** - On by default, this tells the program if it should remove duplicate copies of files it downloads.
+**--duplicate, -nd** - On by default, this prevents the program from removing duplicate copies of files it downloads.
+
+**--skip_manifest** - The Manifest generated is used to rapidly skip files downloaded in previous runs. If you download a lot of shifting content, use this to ignore the manifest.
+
 #### Pass login parameters through arguments:
 (All are required to be passed at once)
 + **--username**  -       account username. 

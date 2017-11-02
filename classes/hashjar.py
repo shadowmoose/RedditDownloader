@@ -62,7 +62,7 @@ def _get_best_hash(filename):
 			is_image = False
 		else:
 			best_hash = _dhash(image)
-	except IOError as e:
+	except IOError:
 		best_hash = _sha_hash(filename)
 	return is_image, best_hash
 

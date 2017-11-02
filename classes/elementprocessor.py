@@ -6,11 +6,12 @@ import hashjar
 class ElementProcessor:
 	""" The heavy-lifting bit. Handles processing all the Elements provided to it via the generator it's created with, by finding the most appropriate Handler for each Element. """
 	
-	def __init__(self, reddit_loader, settings):
+	def __init__(self, reddit_loader, settings, manifest):
 		""" Creates and prepares the Processor object, with the given RedditLoader to provide RedditElements. Takes a loaded Settings object to find the configured save path. """
 		self.loader = reddit_loader
 		self.gen = self.loader.get_elements()
 		self.settings = settings
+		self.manifest = manifest
 		self.handlers = []
 		self.load_handlers()
 	#
@@ -38,7 +39,7 @@ class ElementProcessor:
 		""" Accepts a RedditElement of Post/Comment details, then runs through the Handlers loaded from the other directory, attempting to download the url.  """
 		print('%i/%i: ' % (self.loader.count_completed()+1, self.loader.count_total() ), end='')
 		stringutil.print_color(Fore.YELLOW, stringutil.out("[%s](%s): %s" % (re.type, re.subreddit, re.title), False) )
-		
+
 		for url in re.get_urls():
 			print('\tURL: %s' % url)
 			file = self.loader.url_exists(url)
@@ -46,6 +47,12 @@ class ElementProcessor:
 				stringutil.print_color(Fore.GREEN, "\t\t+URL already taken care of.")
 				re.add_file(url, file)
 				continue
+			if self.manifest:
+				skip, file = self.manifest.url_completed(url)
+				if skip:
+					stringutil.print_color(Fore.GREEN, "\t\t+URL already handled in previous run.")
+					re.add_file(url, file)
+					continue
 			base_file, file_info = self.build_file_info(re)# Build the file information array using this RedditElement's information
 			file_path = self.process_url(url, file_info)
 			re.add_file(url, self.check_duplicates(file_path))

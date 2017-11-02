@@ -3,13 +3,14 @@ __version__ = "1.4"
 import argparse
 import sys
 import os
-parser = argparse.ArgumentParser(description="Save all Media Upvoted & Saved on Reddit")
+parser = argparse.ArgumentParser(description="Save all Media Upvoted & Saved on Reddit - https://goo.gl/V99Ccs")
 parser.add_argument("--settings", help="path to custom Settings file.", type=str, metavar='')
 parser.add_argument("--test", help="launch in Test Mode. Only used for TravisCI testing.",action="store_true")
-parser.add_argument("--update", help="Update modules.", action="store_true")
-parser.add_argument("--update_only", help="Only update modules and exit.", action="store_true")
+parser.add_argument("--update", help="Update the program.", action="store_true")
+parser.add_argument("--update_only", help="Update the program and exit.", action="store_true")
 parser.add_argument("--skip_pauses", help="Skip all skippable pauses.", action="store_true")
-parser.add_argument('--deduplicate_files', help='Deduplicate similar files.', action="store_true")
+parser.add_argument('--duplicate','-nd', help='Skip deduplicating similar files.', action="store_true")
+parser.add_argument('--skip_manifest', help='Skip using manifest to prevent rechecking existing downloads.', action="store_true")
 parser.add_argument("--username", help="account username.", type=str, metavar='')
 parser.add_argument("--password", help="account password.", type=str, metavar='')
 parser.add_argument("--c_id", help="Reddit client id.", type=str, metavar='')
@@ -41,7 +42,7 @@ from settings import Settings
 import stringutil
 from elementprocessor import ElementProcessor
 from redditloader import RedditLoader
-from manifestmaker import ManifestMaker
+from manifest import Manifest
 
 colorama.init(convert=True)
 
@@ -49,6 +50,7 @@ stringutil.print_color(Fore.GREEN, """
 ====================================
     Reddit Media Downloader %s
 ====================================
+    (By ShadowMoose @ Github)
 """ % __version__)
 
 
@@ -59,8 +61,11 @@ class Scraper(object):
 			for k,v in c_settings.items():
 				self.settings.set(k, v)
 		#
-		
-		manifest = ManifestMaker(self.settings, True)
+		self.manifest = None
+		if self.settings.get('build_manifest', True):
+			self.manifest = Manifest(self.settings, True)
+		else:
+			print('Not using manifest.')
 		
 		# Authenticate and prepare to scan:
 		info = self.settings.get('auth')
@@ -72,17 +77,26 @@ class Scraper(object):
 		self.reddit = RedditLoader(client_id=info['client_id'], client_secret=info['client_secret'],
 									password=info['password'], user_agent=info['user_agent'], username=info['username'])
 		self.reddit.scan()
-		self.processor = ElementProcessor(self.reddit, self.settings)
+		self.processor = ElementProcessor(self.reddit, self.settings, self.manifest)
 		try:
 			self.processor.run()
 		except KeyboardInterrupt:
 			print("Interrupted by User.")
 		
-		print('Building manifest.')
-		manifest.build(self.reddit)
-		
-		if not args.skip_pauses:
-			input("Press Enter to exit.")
+
+		if self.manifest:
+			if not args.skip_pauses:
+				if 'y' in input("Save Manifest? (y/n): ").lower():
+					print('Building manifest.')
+					self.manifest.build(self.reddit)
+			else:
+				print('Automatically building manifest.')
+				self.manifest.build(self.reddit)
+		else:
+			print('Manifest not built.')
+			if not args.skip_pauses:
+				input("Press Enter to exit.")
+		print('Download complete!')
 	#
 #
 
@@ -123,8 +137,12 @@ if any(user_settings):
 	print('Using command-line authorization details!')
 	custom_settings['auth'] = auth
 
-if args.deduplicate_files:
-	custom_settings['deduplicate_files'] = args.deduplicate_files
+if args.duplicate:
+	custom_settings['deduplicate_files'] = False
+
+if args.skip_manifest:
+	custom_settings['build_manifest'] = False
+
 
 # If no settings were specified, pass 'None' to stick completely with default, auto-saving file values.
 if len(custom_settings) == 0:
