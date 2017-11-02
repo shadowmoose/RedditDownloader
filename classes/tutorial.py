@@ -74,5 +74,3 @@ def run(settings_file='settings.json'):
 		su.print_color(Fore.RED, "Please retry these steps and assure you've gotten everything correct.")
 		sys.exit(1)
 #
-
-run()
