@@ -1,9 +1,14 @@
-import requests
 import os
 from hashlib import sha1
 import pip
 import shutil
 
+try:
+	import requests
+except ImportError:
+	print('Bootstrapping "requests" package... ')
+	pip.main(["install", "--upgrade", "requests"])
+	import requests
 
 class Updater:
 	def __init__(self, author, repo, version, skip_prompt=False):
@@ -22,7 +27,7 @@ class Updater:
 	def run(self):
 		""" Launches the updater process, and prompts to clean up old files if remove_old is true. """
 		self._update_from_git()
-		self._pip_update()
+		self._pip_update() # call second so the requirements file is updated in advance.
 
 
 	def _get_latest_file_tree(self):
@@ -38,7 +43,7 @@ class Updater:
 		update_text = n_dat['body']
 		update_title = n_dat['name']
 
-		if self._version == newest_version:
+		if self._version >= newest_version:
 			print("\t+Up to date! (Version: %s)" % self._version)
 			return self._file_tree
 		print("\nCurrently on version: %s" % self._version)

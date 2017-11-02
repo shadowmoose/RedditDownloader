@@ -46,7 +46,7 @@ class RedditElement(object):
 		if c.author:
 			self.author = str(c.author.name)
 		else:
-			self.author = 'Unknown'
+			self.author = 'Deleted'
 		
 		for url in stringutil.html_elements(c.body_html, 'a', 'href'):
 			self.add_url(url)

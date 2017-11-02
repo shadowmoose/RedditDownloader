@@ -6,7 +6,7 @@ order = 100
 
 file = ''
 
-class MyLogger(object):
+class Logger(object):
 	def debug(self, msg):
 		pass
 
@@ -15,6 +15,8 @@ class MyLogger(object):
 
 	def error(self, msg):
 		if 'Unsupported' not in msg:
+			if ';' in msg:
+				msg = msg.split(';')[0].strip()
 			stringutil.error("\t\tYTDL :: %s" % msg)
 
 
@@ -32,7 +34,7 @@ def ytdl_hook(d):
 
 ydl_opts = {
 	'outtmpl': './downloaded/%(title)s.%(ext)s',
-	'logger': MyLogger(),
+	'logger': Logger(),
 	'progress_hooks': [ytdl_hook],
 }
 
@@ -51,5 +53,4 @@ def handle(url, data):
 	except Exception:
 		# Don't allow the script to crash due to a YTDL exception.
 		return False
-	return False
 #
