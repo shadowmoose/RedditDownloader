@@ -20,6 +20,7 @@ class Updater:
 		self._skip_prompt = skip_prompt
 		if 'GITHUB_CLIENT_ID' in os.environ:
 			# Support custom environment variables to bypass github's unathenticated request throttling.
+			# This is mostly done for testing services like TravisCI, who get throttled constantly without auth.
 			self._client_auth = 'client_id=%s&client_secret=%s' % (os.environ['GITHUB_CLIENT_ID'], os.environ['GITHUB_CLIENT_SECRET'])
 			print("Using custom github auth.")
 
@@ -37,13 +38,19 @@ class Updater:
 			return self._file_tree
 		self._file_tree = []
 
+		if '-' in self._version:
+			print('Standalone versions cannot auto-update!')
+			print('You are currently running Standalone version %s' % self._version)
+			print('Go manually update from: https://github.com/%s/%s/releases' % (self._author, self._repo))
+			return []
+
 		print("Checking for new version...")
 		n_dat = requests.get('https://api.github.com/repos/%s/%s/releases/latest?%s' % (self._author, self._repo, self._client_auth)).json()
 		newest_version = n_dat['tag_name']
 		update_text = n_dat['body']
 		update_title = n_dat['name']
 
-		if '-' in newest_version or '-' in self._version or float(self._version) >= float(newest_version):
+		if '-' in newest_version or float(self._version) >= float(newest_version):
 			print("\t+Up to date! (Version: %s)" % self._version)
 			return self._file_tree
 		print("\nCurrently on version: %s" % self._version)
