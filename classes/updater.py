@@ -43,7 +43,7 @@ class Updater:
 		update_text = n_dat['body']
 		update_title = n_dat['name']
 
-		if self._version >= newest_version:
+		if '-' in newest_version or '-' in self._version or float(self._version) >= float(newest_version):
 			print("\t+Up to date! (Version: %s)" % self._version)
 			return self._file_tree
 		print("\nCurrently on version: %s" % self._version)
