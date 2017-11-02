@@ -15,8 +15,8 @@ class Manifest:
 		self.file = stringutil.normalize_file(settings.save_base()+'/Manifest.json.gz')
 		if load and os.path.isfile(self.file):
 			try:
-				with gzip.GzipFile(self.file, 'r') as data_file:
-					self.data = json.load(data_file)
+				with gzip.GzipFile(self.file, 'rb') as data_file:
+					self.data = json.loads(data_file.read().decode('utf8'))
 			except:
 				stringutil.print_color(Fore.RED, 'Failed to load Manifest at [%s]. Probably corrupt. Try removing the file.' % self.file)
 				raise
