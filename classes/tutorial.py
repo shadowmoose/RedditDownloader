@@ -8,8 +8,6 @@ from settings import Settings
 
 
 def run(settings_file='settings.json'):
-	settings_file = 'settings.json'
-
 	client_setup = {'secret':None, 'id':None}
 	user_setup = {'username':None, 'password':None}
 
@@ -76,3 +74,5 @@ def run(settings_file='settings.json'):
 		su.print_color(Fore.RED, "Please retry these steps and assure you've gotten everything correct.")
 		sys.exit(1)
 #
+
+run()
