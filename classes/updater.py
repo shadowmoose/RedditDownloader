@@ -38,7 +38,7 @@ class Updater:
 			return self._file_tree
 		self._file_tree = []
 
-		if '-' in self._version:
+		if '-' in str(self._version):
 			print('Standalone versions cannot auto-update!')
 			print('You are currently running Standalone version %s' % self._version)
 			print('Go manually update from: https://github.com/%s/%s/releases' % (self._author, self._repo))
