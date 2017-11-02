@@ -37,8 +37,7 @@ class Manifest:
 
 		if v <= 1:
 			# We don't adapt from version <= 1, because of missing data.
-			# Still adjusts to 2.0 format, for future compat.
-			print('Adapted Manifest from version 1')
+			# Still adjusts to 2.0 format, to future-proof the baseline format.
 			return True, {
 				'@meta':{
 					'version': 2.0,
