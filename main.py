@@ -23,7 +23,7 @@ parser.add_argument("--subdir_pattern", help="override subdirectory name pattern
 args = parser.parse_args()
 
 sys.path.insert(0, './classes')
-sys.path.insert(0, './handlers')
+sys.path.insert(0, './classes/handlers')
 
 if args.update or args.update_only:
 	from updater import Updater
