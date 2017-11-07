@@ -42,7 +42,5 @@ If you're checking this out with Git, I strongly suggest you pull the *latest re
 This program uses multiple Handlers, included in the *handlers* directory, to process the various links it finds. Many are extremely generic to allow for the widest possible site coverage.
 If you hit any links which it does not support, find anything broken, or just need assistance, please open a new request [here](../../issues/new).
 
-*NOTE: This program is currently in an extremely tentative state, and functionality may radically change and expand in the future.*
-
 # Supported Python Versions:
 You should be fine with 3.4 up, and maybe even slightly earlier, but you can view the only versions I officially support at [The Travis Build Page](https://travis-ci.org/shadowmoose/RedditDownloader). It automatically checks the most recent commit, and runs through a strict set of tests to make sure nothing's broken.
