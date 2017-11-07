@@ -19,7 +19,7 @@ class ElementProcessor:
 	def load_handlers(self):
 		""" Loads all the available handlers from the handler directory. """
 		self.handlers = []
-		for mod in os.listdir('handlers'):
+		for mod in os.listdir('classes/handlers'):
 			if mod == '__init__.py' or mod[-3:] != '.py':
 				continue
 			lib = __import__(mod[:-3], locals(), globals())
