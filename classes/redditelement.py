@@ -20,12 +20,21 @@ class RedditElement(object):
 		self.id = None
 		self.title = None
 		self.author = None
+		self.body = None
 		self.urls = []
 		self.subreddit = str(obj.subreddit.display_name)
 		self.detect_type(obj)
+
+		self.over_18 = obj.over_18
+		self.created_utc = obj.created_utc
+		self.num_comments = obj.num_comments
+		self.score = obj.score
+		self.link_count = len(self.urls)
+
 		assert self.type is not None
 		assert self.id is not None
-	
+
+
 	def detect_type(self, obj):
 		""" Simple function to call the proper Comment or Submission handler. """
 		if type(obj) == praw.models.Submission:
@@ -47,7 +56,7 @@ class RedditElement(object):
 			self.author = str(c.author.name)
 		else:
 			self.author = 'Deleted'
-		
+		self.body = c.body
 		for url in stringutil.html_elements(c.body_html, 'a', 'href'):
 			self.add_url(url)
 	#
@@ -62,7 +71,7 @@ class RedditElement(object):
 			self.author = 'Deleted'
 		else:
 			self.author = str(post.author.name)
-
+		self.body = post.selftext
 		if post.selftext.strip() != '':
 			# This post probably doesn't have a URL, and has selftext instead.
 			for url in stringutil.html_elements(post.selftext_html, 'a', 'href'):
@@ -74,36 +83,44 @@ class RedditElement(object):
 	def add_file(self, url, file):
 		""" add a url and it's file location to this element. Signifies that this URL is completed. """
 		self.files[url] = file
-	
+
+
 	def add_url(self, url):
 		""" Add a URL to this element. """
 		if url not in self.urls:
 			self.urls.append(url)
-	
+
+
 	def get_id(self):
 		"""get this element's ID. """
 		return self.id
-	
+
+
 	def get_urls(self):
 		""" returns a list of all this element's UNIQUE urls. """
 		return self.urls
-		
+
+
 	def get_completed_files(self):
 		""" Returns the [url]=[files] array build for the completed URLs of this element. """
 		return self.files
-	
+
+
 	def get_json_url(self):
 		""" Returns the API access point for this comment's JSON. """
 		return 'https://www.reddit.com/api/info.json?id=%s' % self.id
 
+
 	def contains_url(self, url):
 		""" if this element contains the given URL. """
 		return url in self.get_completed_files()
-	
+
+
 	def contains_file(self, file_name):
 		""" if this element contains the given file name. """
 		files = self.get_completed_files()
 		return any(file_name in str(files[key]) for key in files)
+
 
 	def remap_file(self, filename_old, filename_new):
 		""" Remap an old filename to a new one. """
