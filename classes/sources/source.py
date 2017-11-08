@@ -58,7 +58,7 @@ class Source:
 """
 "sources":[
 	{
-		"type": "personal_account",
+		"type": "test-source",
 		"data":{
 			"auth": {
 				"client_id": "ID_From_Registering_app",
@@ -68,15 +68,42 @@ class Source:
 				"username": "Your_Username"
 			}
 		},
-		"filters":[
-			{
+		"filters":{
 				"created_utc.min": 0,
 				"created_utc.max": 0,
 				"score.min": 0,
 				"author": "shadowmoose"
 			}
-		]
 	}
 ]
 
 """
+
+if __name__ == '__main__':
+	import sys
+	sys.path.insert(0, '../filters')
+	so = Source('test-source')
+	built = so.from_obj({
+		"type": "test-source",
+		"data":{
+			"auth": {
+				"client_id": "ID_From_Registering_app",
+				"client_secret": "Secret_from_registering_app",
+				"password": "Your_password",
+				"user_agent": "USE_A_RANDOM_ID_HERE",
+				"username": "Your_Username"
+			}
+		},
+		"filters":{
+				"created_utc.min": 0,
+				"created_utc.max": 0,
+				"score.min": 0,
+				"author": "shadowmoose"
+			}
+	})
+	print('Built Source Object: ', built)
+	print('Loaded Filters:')
+	for f in so.filters:
+		print('\t',f)
+	print('\n\nLoaded Data: ', end='')
+	print(so.data)

@@ -24,6 +24,8 @@ args = parser.parse_args()
 
 sys.path.insert(0, './classes')
 sys.path.insert(0, './classes/handlers')
+sys.path.insert(0, './classes/sources')
+sys.path.insert(0, './classes/filters')
 
 if args.update or args.update_only:
 	from updater import Updater
