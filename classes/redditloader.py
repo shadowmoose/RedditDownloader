@@ -1,44 +1,24 @@
-import praw
 import stringutil
 from colorama import Fore
 
-from redditelement import RedditElement
-
-
 class RedditLoader:
-	def __init__(self, client_id, client_secret, password, username, user_agent):
+	def __init__(self):
 		""" Initializes a connector object to the given Reddit account, which instantly attempts to login.
 			The script will hang on creating this connection, until the user is signed in.
 		"""
 		self._elements = []
 		self.completed = []
 		self.total_count = 0
-		
-		stringutil.print_color(Fore.YELLOW, "Authenticating via OAuth...")
-		
-		self.reddit = praw.Reddit(client_id=client_id, client_secret=client_secret, password=password, user_agent=user_agent, username=username)
-		self.user = self.reddit.user.me()
-		
-		stringutil.print_color(Fore.YELLOW, "Authenticated as [%s]\n" % self.user.name)
 	#
 	
-	def scan(self):
+	def scan(self, sources):
 		""" Grab all saved Comments and Posts in advance, to avoid timeouts """
-		if not self.user:
-			return
-		
-		stringutil.print_color(Fore.CYAN, 'Loading Saved Comments & Posts...')
-		for saved in self.user.saved(limit=None):
-			re = RedditElement(saved)
-			if re not in self._elements:
-				self._elements.append(re)
-		
-		stringutil.print_color(Fore.CYAN, 'Loading Upvoted Comments & Posts...')
-		for upvoted in self.user.upvoted(limit=None):
-			re = RedditElement(upvoted)
-			if re not in self._elements:
-				self._elements.append(re)
-		
+		self._elements = []
+		for s in sources:
+			stringutil.print_color(Fore.GREEN, 'Downloading from Source: %s' % s.alias)
+			for r in s.get_elements():
+				self._elements.append(r)
+
 		self.total_count = len(self._elements)
 		print("Element loading complete.\n")
 	#
