@@ -28,7 +28,7 @@ def add_hash(filename):
 		return True, None
 
 	if is_image:
-		print("\tFingerprinting new image...", end='\r')
+		print("\tManifest :: Fingerprinting new image...", end='\r')
 		for h in _image_hashes:
 			dist = _hamming_distance(h, final_hash)
 			if dist < 4:
@@ -51,10 +51,8 @@ def _get_best_hash(filename):
 	:param filename: The path to hash.
 	:return:
 	"""
-	is_image = False
 	try:
 		image = Image.open(filename)
-		is_image = True
 		if _is_animated(image):
 			#best_hash = _hash_gif(image)
 			# Could dhash gifs to compare them, but that's a lot of memory for little likely gain.
@@ -62,8 +60,11 @@ def _get_best_hash(filename):
 			is_image = False
 		else:
 			best_hash = _dhash(image)
+			is_image = True
 	except IOError:
+		# Pillow can't load the file, so we have to assume it's not an image.
 		best_hash = _sha_hash(filename)
+		is_image = False
 	return is_image, best_hash
 
 

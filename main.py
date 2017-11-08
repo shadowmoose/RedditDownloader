@@ -45,6 +45,8 @@ import stringutil
 from elementprocessor import ElementProcessor
 from redditloader import RedditLoader
 from manifest import Manifest
+from sources import source
+import reddit
 
 colorama.init(convert=True)
 
@@ -75,10 +77,17 @@ class Scraper(object):
 			print('Error loading authentication information!')
 			return
 		self.settings.set('last_started', time.time())
-		
-		self.reddit = RedditLoader(client_id=info['client_id'], client_secret=info['client_secret'],
-									password=info['password'], user_agent=info['user_agent'], username=info['username'])
-		self.reddit.scan()
+
+		reddit.init(client_id=info['client_id'], client_secret=info['client_secret'],
+					password=info['password'], user_agent=info['user_agent'], username=info['username'])
+		reddit.login()
+
+		self.sources = source.get_sources( self.settings.get_sources() )
+		for s in self.sources:
+			print('Loaded Source: ', s.alias)
+
+		self.reddit = RedditLoader()
+		self.reddit.scan(self.sources)
 		self.processor = ElementProcessor(self.reddit, self.settings, self.manifest)
 		try:
 			self.processor.run()

@@ -1,9 +1,5 @@
 """
-	Filter class
-	OVERIDES:
-		init() !- To set the field value
-		check() - If this Filter needs to use custom logic to check values
-		parse_limit() - If the user-supplied limit value needs converting.
+	Filter class and static methods to access all available filters.
 """
 import pkgutil
 import filters
@@ -11,7 +7,14 @@ import os
 import re
 
 class Filter:
-
+	"""
+	The generic Filter class. Also used as the base for any custom filters.
+	Filters are used by Sources to weed out RedditElements the user doesn't want.
+	OVERRIDES:
+		init() !- To set the field value
+		check() - If this Filter needs to use custom logic to check values
+		_convert_imported_limit() - If the user-supplied limit value needs converting.
+	"""
 	def __init__(self, field, description):
 		""" Creates a new Filter with the given field name/operator/limit. """
 		self.field = field
@@ -28,11 +31,11 @@ class Filter:
 		if self.field not in obj:
 			return True
 		if self.operator == '<':
-			return self.cast(obj[self.field]) < self.cast(self.limit)
+			return self._cast(obj[self.field]) < self._cast(self.limit)
 		if self.operator == '>':
-			return self.cast(obj[self.field]) > self.cast(self.limit)
+			return self._cast(obj[self.field]) > self._cast(self.limit)
 		if self.operator == '=':
-			return self.cast(obj[self.field]) == self.cast(self.limit)
+			return self._cast(obj[self.field]) == self._cast(self.limit)
 		if self.operator == 're':
 			pattern = re.compile(str(self.limit), re.IGNORECASE)
 			if pattern.match(str(obj[self.field])):
@@ -41,16 +44,16 @@ class Filter:
 		assert False # This should never happen.
 
 
-	def cast(self, val):
-		"""  Attempt to cast to number, or just return the original value.  """
+	def _cast(self, val):
+		"""  Attempt to _cast to number, or just return the original value.  """
 		try:
 			return float(val)
 		except ValueError:
 			return str(val)
 
 
-	def parse_limit(self, val):
-		""" Does nothing by default, exists to allow easy overriding to convert input limit values. """
+	def _convert_imported_limit(self, val):
+		""" Returns unchanged val by default. Exists to allow easy overriding to convert input limit values. """
 		return val
 
 
@@ -59,7 +62,7 @@ class Filter:
 			Expects key, value pair from Settings. Parses this setting into a Filter object.
 			Returns False if this Filter doesn't match the given key.
 		"""
-		self.limit = self.parse_limit(value)
+		self.limit = self._convert_imported_limit(value)
 		return self._parse_str(key)
 
 
@@ -105,8 +108,6 @@ def get_filters(filter_dict=None):
 		If passed a dict of {'field.operator':val} - as specified by the filter settings syntax -
 			it will return loaded filters objects.
 	"""
-	#TODO:	Perhaps it would be simplest to generate a bunch of known fields in a loop (from generic Filter() objects)
-	#TODO:	since the generic class works for almost every field in a Post/Comment by default.  - maybe generate defaults unless a custom overrides?
 	pkg_path = os.path.dirname(filters.__file__)
 	loaded = []
 	used = []
@@ -116,7 +117,7 @@ def get_filters(filter_dict=None):
 			continue
 		fi = __import__(name, fromlist=[''])
 		for clazz in _module_classes(fi):
-			if filter_dict:
+			if filter_dict is not None:
 				for k, v in filter_dict.items():
 					cl = clazz()
 					if cl.from_obj(k, v):
@@ -126,11 +127,11 @@ def get_filters(filter_dict=None):
 				cl = clazz()
 				loaded.append(cl)
 				used.append(cl.field)
-	# Append default field filters, if not already handled by special one above.
+	# Append default field filters, if not already handled by special ones above.
 	for k, v in get_filter_fields().items():
 		if k in used:
 			continue
-		if filter_dict:
+		if filter_dict is not None:
 			for loaded_field, loaded_val in filter_dict.items():
 				cl = Filter(field=k, description=v) # New filter for default values.
 				if cl.from_obj(loaded_field, loaded_val):
@@ -142,40 +143,30 @@ def get_filters(filter_dict=None):
 	return loaded
 
 
-def _module_classes(module):
+def _module_classes(module_trg):
 	"""  Pull the classes from the given module.  """
-	md = module.__dict__
+	md = module_trg.__dict__
 	return [
 		md[c] for c in md if (
-			isinstance(md[c], type) and md[c].__module__ == module.__name__
+			isinstance(md[c], type) and md[c].__module__ == module_trg.__name__
 		)
 	]
+
 
 def get_filter_fields():
 	""" Builds a list of acceptable fields to filter this Element by. """
 	return {
 		'link_count': 'The amount of links found for this element. (#)',
 		'element_type': 'The type of element this is. (Post/Comment)',
-		'title':  'The title of this post containing this element. (String)',
-		'author': 'The author of this element. (String)',
-		'body':  'The text in this element. Blank if a Post without selftext. (String)',
-		'subreddit': 'The subreddit this element is from. (String)',
+		'title':  'The title of this post containing this element. (Text)',
+		'author': 'The author of this element. (Text)',
+		'body':  'The text in this element. Blank if a Post without selftext. (Text)',
+		'subreddit': 'The subreddit this element is from. (Text)',
 		'over_18': 'If this post is age-limited. (True/False)',
 		'created_utc':'The timestamp, in UTC seconds, that this element was posted. (#)',
 		'num_comments': 'The number of comments on this element. (#)',
 		'score': 'The number of net upvotes on this element. (#)',
 	}
-
-"""
-"filters":[
-	{
-		"created_utc.min": 0,
-		"created_utc.max": 0,
-		"score.min": 0,
-		"author": "shadowmoose"
-	}
-]
-"""
 
 
 
@@ -187,9 +178,9 @@ if __name__ == '__main__':
 	print()
 	print("Loading...")
 
-	test_post = {'created_utc':99, 'title':'Test Title'}
+	test_filters = {'created_utc':99, 'title': 'Test Title'}
 	all_filters = get_filters({
-		'created_utc.min':10,
+		'created_utc.min':'10/10/2015',
 		'created_utc.max':100,
 		'created_utc': 99,
 		'created_utc.regex': '99',
@@ -199,7 +190,7 @@ if __name__ == '__main__':
 	for f in all_filters:
 		print('\t', f.to_obj())
 
-	print('\nRunning checks on test:', test_post)
+	print('\nRunning checks on test:', test_filters)
 	for f in all_filters:
-		print(f.check(test_post), '|', f)
-	#TODO: Write a test for a large range of these, and compare the list get_filters returns to make sure they all load.
+		print(f.check(test_filters), '|', f)
+	#TODO: Write a test for a large range of these, and compare the list get_sources returns to make sure they all load.

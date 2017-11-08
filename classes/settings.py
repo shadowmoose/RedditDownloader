@@ -13,11 +13,20 @@ default_settings = {
 	"build_manifest": True,
 	"deduplicate_files": True,
 	"last_started": 0,
+	"meta-version": 2,
 	"output": {
 		"base_dir": "./download/",
 		"subdir_pattern": "/[subreddit]/",
 		"file_name_pattern": "[title] - ([author])"
-	}
+	},
+	"sources":[
+		{
+			"alias": "default-downloader",
+			"data": {},
+			"filters": {},
+			"type": "personal-upvoted-saved"
+		}
+	]
 }
 
 class Settings(object):
@@ -38,7 +47,7 @@ class Settings(object):
 				sys.exit(1)
 		if os.path.isfile(self.settings_file):
 			with open(self.settings_file) as json_data:
-				self.vals = json.load(json_data)
+				self.vals = self.adapt(json.load(json_data))
 	#
 	
 	def set(self, key, value):
@@ -70,7 +79,10 @@ class Settings(object):
 			return default_settings['output']
 		return out[sub]
 	#
-	
+
+	def get_sources(self):
+		return self.get('sources', [])
+
 	def save_base(self):
 		""" The base folder pattern to save to. """
 		return self.get_save_location('base_dir')
@@ -82,3 +94,20 @@ class Settings(object):
 	def save_filename(self):
 		""" The save path's filename pattern. """
 		return self.get_save_location('file_name_pattern')
+
+
+	def adapt(self, obj):
+		version = 1
+		if 'meta-version' in obj:
+			version = obj['meta-version']
+
+		if version == 1:
+			# Version 1->2 saw addition of Sources & Filters.
+			obj['meta-version'] = 2
+			obj['sources'] = {}
+			from sources.upvoted_saved_source import UpvotedSaved
+			us = UpvotedSaved()# This Source doesn't need any extra info, and it simulates original behavior.
+			us.set_alias('default-downloader')
+			obj['sources'].append(us.to_obj())
+			print("Adapted from Settings version 1 -> 2!")
+		return obj
