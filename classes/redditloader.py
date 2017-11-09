@@ -12,25 +12,27 @@ class RedditLoader:
 	#
 	
 	def scan(self, sources):
-		""" Grab all saved Comments and Posts in advance, to avoid timeouts """
+		""" Grab all RedditElements from all the supplied Sources """
 		self._elements = []
-		for s in sources:
-			stringutil.print_color(Fore.GREEN, 'Downloading from Source: %s' % s.alias)
-			for r in s.get_elements():
+		for source in sources:
+			stringutil.print_color(Fore.GREEN, 'Downloading from Source: %s' % source.alias)
+			for r in source.get_elements():
+				r.set_source(source)
 				self._elements.append(r)
-
 		self.total_count = len(self._elements)
 		print("Element loading complete.\n")
-	#
-	
+
+
 	def count_total(self):
 		""" Return the total count of elements. """
 		return self.total_count
-	
+
+
 	def count_remaining(self):
 		""" Returns the total number of remaining elements to process. """
 		return self.count_total() -  self.count_completed()
-	
+
+
 	def count_completed(self):
 		""" Returns the number of elements already processed. """
 		return len(self.completed)
@@ -44,7 +46,6 @@ class RedditLoader:
 			ele = self._elements.pop(0)
 			yield ele
 			self.completed.append(ele)
-	#
 
 
 	def url_exists(self, url):

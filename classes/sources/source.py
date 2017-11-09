@@ -40,6 +40,14 @@ class Source:
 		self.alias = alias
 
 
+	def check_filters(self, ele):
+		""" Checks if the given RedditElement can pass this Source's filters. """
+		for fi in self.filters:
+			if not fi.check(ele):
+				return False
+		return True
+
+
 	def from_obj(self, obj):
 		"""
 		Build this Source from the data model loaded.

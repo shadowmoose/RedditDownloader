@@ -1,13 +1,14 @@
 # Stuff to Do Before Release
-*  Make Sources check with Filters
+
+Important:
+
 *  Build genie for adding sources and filters.
 *  Write testing for Sources and Filters
 *  Build more Sources
+*  Consider switching to a generator provider system for loading elements
 
+Pre-Release:
 
-*  Verify settings forward-compatibility from scratch.
-*  Change how settings/context is passed down 
-    * Expose Source alias to filename patterns
-      * Possibly just append that data to the RedditElement
-    * Possibly reevaluate how settings are handed off
-      * Mostly to remove auth info from global scope. 
+* Verify settings forward-compatibility from scratch.
+* Possibly reevaluate how settings are handed off
+  * Mostly to remove auth info from global scope. 
