@@ -7,7 +7,7 @@ size_list = {'http://imgur.com/a/TPbjI':0,'http://i.imgur.com/uAQwWz3.png':85401
 def run_test(re):
 	eles = re.get_elements()
 	for e in eles:
-		for u,f in e.files.items():
+		for u,f in e._file_map.items():
 			if os.path.isdir(f):
 				continue
 			#print("'%s':%i," % (u, os.path.getsize(f) ));

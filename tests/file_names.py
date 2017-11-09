@@ -9,7 +9,7 @@ def run_test(re):
 	files = []
 	eles = re.get_elements()
 	for e in eles:
-		for u,f in e.files.items():
+		for u,f in e._file_map.items():
 			files.append( os.path.basename(str(f).replace('\\','/')) )
 	#print(sorted( [hashlib.sha1(s.encode('utf-8')).hexdigest() for s in files] ));
 	
