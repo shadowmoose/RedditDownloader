@@ -35,27 +35,27 @@ class ElementProcessor:
 	#
 	
 	
-	def process_ele(self, re):
+	def process_ele(self, reddit_element):
 		""" Accepts a RedditElement of Post/Comment details, then runs through the Handlers loaded from the other directory, attempting to download the url.  """
 		print('%i/%i: ' % (self.loader.count_completed()+1, self.loader.count_total() ), end='')
-		stringutil.print_color(Fore.YELLOW, stringutil.out("[%s](%s): %s" % (re.type, re.subreddit, re.title), False) )
+		stringutil.print_color(Fore.YELLOW, stringutil.out("[%s](%s): %s" % (reddit_element.type, reddit_element.subreddit, reddit_element.title), False))
 
-		for url in re.get_urls():
+		for url in reddit_element.get_urls():
 			print('\tURL: %s' % url)
 			file = self.loader.url_exists(url)
 			if file:
 				stringutil.print_color(Fore.GREEN, "\t\t+URL already taken care of.")
-				re.add_file(url, file)
+				reddit_element.add_file(url, file)
 				continue
 			if self.manifest:
 				skip, file = self.manifest.url_completed(url)
 				if skip:
 					stringutil.print_color(Fore.GREEN, "\t\t+URL already handled in previous run.")
-					re.add_file(url, file)
+					reddit_element.add_file(url, file)
 					continue
-			base_file, file_info = self.build_file_info(re)# Build the file information array using this RedditElement's information
+			base_file, file_info = self.build_file_info(reddit_element)# Build the file information array using this RedditElement's information
 			file_path = self.process_url(url, file_info)
-			re.add_file(url, self.check_duplicates(file_path))
+			reddit_element.add_file(url, self.check_duplicates(file_path))
 	#
 
 
@@ -86,31 +86,33 @@ class ElementProcessor:
 	#
 
 
-	def build_file_info(self, re):
+	def build_file_info(self, reddit_element):
 		""" Generates an array of file locations and element data that is passed down to every handler, so they can choose where best to save for themselves. """
 		dir_pattern  = '%s/%s' % ( self.settings.save_base() , self.settings.save_subdir() )
 		file_pattern = '%s/%s' % ( dir_pattern, self.settings.save_filename())
 		
-		basedir = stringutil.normalize_file(stringutil.insert_vars(dir_pattern, re))
-		basefile = stringutil.insert_vars(file_pattern, re)
+		basedir = stringutil.normalize_file(stringutil.insert_vars(dir_pattern, reddit_element))
+		basefile = stringutil.insert_vars(file_pattern, reddit_element)
 		
 		og = basefile
 		i=2
-		while self.loader.file_exists(basefile) or re.contains_file(basefile):
+		while self.loader.file_exists(basefile) or reddit_element.contains_file(basefile):
 			print("\t!Incrementing duplicate filename. (%s)" % i, end='\r')
 			basefile = og+' . '+str(i)+' '
 			i+=1
 		if i>2:
 			print('')
-		
+
+		# Build an array of pre-generated possible locations & important data for handlers to have access to.
 		return basefile, {
 			'parent_dir'	: basedir,			# Some handlers will need to build the parent directory for their single file first. This simplifies parsing.
 			'single_file'	: basefile+"%s",	# If this handler can output a single file, it will use this path.
 			'multi_dir' 	: basefile+"/",		# If the handler is going to download multiple files, it will save them under this directory.
-			'post_title'	: re.title,			# The title of the Reddit post.
-			'post_subreddit': re.subreddit,		# The subreddit this post came from.
+			'post_title'	: reddit_element.title,			# The title of the Reddit post.
+			'post_subreddit': reddit_element.subreddit,		# The subreddit this post came from.
 			'user_agent'	: self.settings.get('auth', None)['user_agent'],
 		}
+
 
 	def check_duplicates(self, file_path):
 		""" Check the given file path to see if another file like it already exists. Purges worse copies.

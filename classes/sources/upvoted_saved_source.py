@@ -10,7 +10,7 @@ class UpvotedSaved(source.Source):
 
 
 	def get_elements(self):
-		return reddit.my_liked_saved()#TODO: Use filters.
+		return [ele for ele in reddit.my_liked_saved() if self.check_filters(ele)]# Use filters.
 
 
 	def setup_wizard(self):

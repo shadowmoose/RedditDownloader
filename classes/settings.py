@@ -48,19 +48,19 @@ class Settings(object):
 		if os.path.isfile(self.settings_file):
 			with open(self.settings_file) as json_data:
 				self.vals = self.adapt(json.load(json_data))
-	#
+
 	
 	def set(self, key, value):
 		self.vals[key] = value
 		self.save()
-	#
+
 	
 	def save(self, override_save=False):
 		if not self.can_save and not override_save:
 			return
 		with open(self.settings_file, 'w') as outfile:
 			json.dump(self.vals, outfile, sort_keys=True, indent=4, separators=(',', ': '))
-	#
+
 	
 	def get(self, key, default_val=None, save_if_default=False):
 		if key in self.vals:
@@ -69,7 +69,7 @@ class Settings(object):
 			self.set(key, default_val)
 			return default_val
 		return default_val
-	#
+
 	
 	def get_save_location(self, sub):
 		""" Used for internal fast access to the save path patterns. """
@@ -78,19 +78,22 @@ class Settings(object):
 			print('!Malformed output settings. Using defaults.')
 			return default_settings['output']
 		return out[sub]
-	#
+
 
 	def get_sources(self):
 		return self.get('sources', [])
 
+
 	def save_base(self):
 		""" The base folder pattern to save to. """
 		return self.get_save_location('base_dir')
-	
+
+
 	def save_subdir(self):
 		""" The save path's subdirectory pattern. """
 		return self.get_save_location('subdir_pattern')
-	
+
+
 	def save_filename(self):
 		""" The save path's filename pattern. """
 		return self.get_save_location('file_name_pattern')

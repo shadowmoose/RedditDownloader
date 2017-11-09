@@ -10,18 +10,18 @@ class RedditElement(object):
 			subreddit: A string representing the subreddit name owning this element.
 			title: A string representing the title of the Post belonging to this element.
 			author: string representing the author of this element.
-			urls: A String Array of urls parsed for this post/comment.
+			_urls: A String Array of urls parsed for this post/comment.
 	"""
-	
+
 	def __init__(self, obj):
 		""" Creates the object. Automatically calls its own detect_type() function to resolve variable name mappings. """
-		self.files = {}
+		self._file_map = {}
+		self._urls = []
 		self.type = None
 		self.id = None
 		self.title = None
 		self.author = None
 		self.body = None
-		self.urls = []
 		self.subreddit = str(obj.subreddit.display_name)
 		self.detect_type(obj)
 
@@ -29,7 +29,8 @@ class RedditElement(object):
 		self.created_utc = obj.created_utc
 		self.num_comments = obj.num_comments
 		self.score = obj.score
-		self.link_count = len(self.urls)
+		self.link_count = len(self._urls)
+		self.source_alias = None
 
 		assert self.type is not None
 		assert self.id is not None
@@ -60,7 +61,8 @@ class RedditElement(object):
 		for url in stringutil.html_elements(c.body_html, 'a', 'href'):
 			self.add_url(url)
 	#
-	
+
+
 	def submission(self, post):
 		""" Handle a user's Post. """
 		#out("[Post](%s): %s" % (post.subreddit.display_name, post.title) )
@@ -79,16 +81,22 @@ class RedditElement(object):
 		if post.url is not None and post.url.strip() != '':
 			self.add_url(post.url)
 	#
-	
+
+
 	def add_file(self, url, file):
 		""" add a url and it's file location to this element. Signifies that this URL is completed. """
-		self.files[url] = file
+		self._file_map[url] = file
 
 
 	def add_url(self, url):
 		""" Add a URL to this element. """
-		if url not in self.urls:
-			self.urls.append(url)
+		if url not in self._urls:
+			self._urls.append(url)
+
+
+	def set_source(self, source_obj):
+		"""  Sets this Element's source alias by pulling it directly from the object.  """
+		self.source_alias = str(source_obj.alias)
 
 
 	def get_id(self):
@@ -98,12 +106,12 @@ class RedditElement(object):
 
 	def get_urls(self):
 		""" returns a list of all this element's UNIQUE urls. """
-		return self.urls
+		return self._urls
 
 
 	def get_completed_files(self):
 		""" Returns the [url]=[files] array build for the completed URLs of this element. """
-		return self.files
+		return self._file_map
 
 
 	def get_json_url(self):
@@ -124,9 +132,9 @@ class RedditElement(object):
 
 	def remap_file(self, filename_old, filename_new):
 		""" Remap an old filename to a new one. """
-		for f in self.files:
-			if self.files[f] == filename_old:
-				self.files[f] = filename_new
+		for f in self._file_map:
+			if self._file_map[f] == filename_old:
+				self._file_map[f] = filename_new
 
 
 	def to_obj(self):
@@ -138,6 +146,7 @@ class RedditElement(object):
 			'id': self.id,
 			'title': self.title,
 			'author': self.author,
-			'urls': self.urls,
+			'urls': self._urls,
+			'source_alias': self.source_alias,
 		}
 		return ob

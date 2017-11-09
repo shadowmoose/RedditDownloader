@@ -5,6 +5,15 @@ import pkgutil
 import filters
 import os
 import re
+from enum import Enum
+
+class Operators(Enum):
+	""" Enum for porting around operators. """
+	EQUALS = ''
+	MINIMUM = '.min'
+	MAXIMUM = '.max'
+	MATCH  = '.match'
+
 
 class Filter:
 	"""
@@ -21,24 +30,25 @@ class Filter:
 		self.operator = None
 		self.limit = None
 		self.description = description
-		self.operators = {'<':'.max', '>':'.min', '=':'', 're':'.regex'}
 
 
 	def check(self, obj):
 		"""  Checks the given object to verify if this Filter's field - within the object - is within parameters.
 			Automatically casts numeric values if possible, then compares.
 		"""
-		if self.field not in obj:
+		if not hasattr(obj, self.field):
+			print('No field: ', self.field)
 			return True
-		if self.operator == '<':
-			return self._cast(obj[self.field]) < self._cast(self.limit)
-		if self.operator == '>':
-			return self._cast(obj[self.field]) > self._cast(self.limit)
-		if self.operator == '=':
-			return self._cast(obj[self.field]) == self._cast(self.limit)
-		if self.operator == 're':
-			pattern = re.compile(str(self.limit), re.IGNORECASE)
-			if pattern.match(str(obj[self.field])):
+		val = getattr(obj, self.field) # Don't cast implicitly to avoid rounding/trailing decimals on string numbers.
+		if self.operator == Operators.MAXIMUM:
+			return self._cast(val) <= self._cast(self.limit)
+		if self.operator == Operators.MINIMUM:
+			return self._cast(val) >= self._cast(self.limit)
+		if self.operator == Operators.EQUALS:
+			return self._cast(val) == self._cast(self.limit)
+		if self.operator == Operators.MATCH:
+			regexp = re.compile(self.limit, re.IGNORECASE)
+			if regexp.search( str(val)):
 				return True
 			return False
 		assert False # This should never happen.
@@ -62,8 +72,11 @@ class Filter:
 			Expects key, value pair from Settings. Parses this setting into a Filter object.
 			Returns False if this Filter doesn't match the given key.
 		"""
+		ret = self._parse_str(key)
+		if not ret:
+			return False
 		self.limit = self._convert_imported_limit(value)
-		return self._parse_str(key)
+		return ret
 
 
 	def to_obj(self):
@@ -76,11 +89,12 @@ class Filter:
 		if self.field not in str_key:
 			return False
 		op = None
-		for k, v in self.operators.items():
+		for k in Operators:
+			v = k.value
 			if v != '' and v in str_key.lower():
 				op = k
 		if '.' not in str_key:
-			op = '='
+			op = Operators.EQUALS
 		if self._lookup_operator(op):
 			self.operator = op
 		else:
@@ -91,9 +105,9 @@ class Filter:
 
 	def _lookup_operator(self, op, return_value=False):
 		"""  Returns if this operator is a valid operator string or not. If set, returns mapped value. """
-		if op in self.operators:
+		if op in Operators:
 			if return_value:
-				return self.operators[op]
+				return op.value
 			return True
 		return False
 
