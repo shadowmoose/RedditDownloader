@@ -5,9 +5,7 @@ python:
   - "3.6"
   - "nightly"
 # install dependencies
-#install:
-#  - pip install -r requirements.txt
-before_script:
+install:
    - pip install coveralls
 #  - rm ./handlers/ytdl.py
 # command to run tests
