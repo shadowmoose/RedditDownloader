@@ -30,11 +30,11 @@ default_settings = {
 }
 
 class Settings(object):
-	def __init__(self, file, can_save=True):
+	def __init__(self, file, can_save=True, can_load=True):
 		self.vals = default_settings
 		self.can_save = can_save
 		self.settings_file = file
-		if self.can_save and not os.path.isfile(self.settings_file):
+		if can_load and not os.path.isfile(self.settings_file):
 			self.save()# Save defaults.
 			if 'y' in input('Would you like to launch the first-time setup assistant? (y/n): ').lower():
 				import tutorial
@@ -45,7 +45,7 @@ class Settings(object):
 				print('Fill in your username/password, and register an app here: https://www.reddit.com/prefs/apps \n'
 					  'Fill the app\'s client information in as well.')
 				sys.exit(1)
-		if os.path.isfile(self.settings_file):
+		if can_load and os.path.isfile(self.settings_file):
 			with open(self.settings_file) as json_data:
 				self.vals = self.adapt(json.load(json_data))
 
@@ -55,8 +55,8 @@ class Settings(object):
 		self.save()
 
 	
-	def save(self, override_save=False):
-		if not self.can_save and not override_save:
+	def save(self):
+		if not self.can_save:
 			return
 		with open(self.settings_file, 'w') as outfile:
 			json.dump(self.vals, outfile, sort_keys=True, indent=4, separators=(',', ': '))

@@ -60,7 +60,7 @@ stringutil.print_color(Fore.GREEN, """
 
 class Scraper(object):
 	def __init__(self, settings_file, c_settings=None):
-		self.settings = Settings(settings_file, c_settings is None)
+		self.settings = Settings(settings_file, c_settings is None, not args.test)
 		if c_settings:
 			for k,v in c_settings.items():
 				self.settings.set(k, v)
