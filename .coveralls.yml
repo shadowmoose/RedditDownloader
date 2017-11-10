@@ -1,0 +1,4 @@
+[report]
+omit =
+    # omit packages
+    /home/*
