@@ -56,7 +56,7 @@ def run(settings_file='settings.json'):
 
 		su.print_color(Fore.GREEN, "Authenticated as [%s]\n" % user.name)
 
-		settings = Settings(settings_file, can_save=False) # Will be overridden to save.
+		settings = Settings(settings_file, can_load=False) # Skip loading and just build from defaults.
 		settings.set('auth', {
 			"client_id": client_setup['id'],
 			"client_secret": client_setup['secret'],
@@ -64,7 +64,7 @@ def run(settings_file='settings.json'):
 			"user_agent": "RMD-User-Agent",
 			"username": user_setup['username']
 		})
-		settings.save(override_save=True)
+		settings.save()
 
 		su.print_color(Fore.GREEN, "Well done, it all works!\n"
 								   "Your setup is complete!\n"
