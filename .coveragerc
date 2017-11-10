@@ -1,0 +1,7 @@
+# .coveragerc to control coverage.py
+[run]
+branch = False
+source = .
+
+[report]
+ignore_errors = True
