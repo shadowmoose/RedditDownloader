@@ -12,3 +12,4 @@ Pre-Release:
 * Verify settings forward-compatibility from scratch.
 * Possibly reevaluate how settings are handed off
   * Mostly to remove auth info from global scope. 
+* Swap coveralls image branch.
