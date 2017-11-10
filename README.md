@@ -1,4 +1,4 @@
-# Reddit Media Downloader [![Build Status](https://travis-ci.org/shadowmoose/RedditDownloader.svg?branch=master)](https://travis-ci.org/shadowmoose/RedditDownloader)
+# Reddit Media Downloader [![Build Status](https://travis-ci.org/shadowmoose/RedditDownloader.svg?branch=master)](https://travis-ci.org/shadowmoose/RedditDownloader) [![Coverage Status](https://coveralls.io/repos/github/shadowmoose/RedditDownloader/badge.svg?branch=sources-and-filters)](https://coveralls.io/github/shadowmoose/RedditDownloader?branch=sources-and-filters)
 
 
 Scans all Upvoted &amp; Saved posts on your Reddit acount, searching for any media they link to. If it is able to, it then downloads that media. 
@@ -12,10 +12,10 @@ Avoids downloading duplicates of the same file, and will automatically seek to -
 
 
 # Requirements:
-1. **Python**: You can download Python executable for your operating system from [https://www.python.org/downloads/](https://www.python.org/downloads/).
-2. Requires that you register an app at [Reddit's App Page](https://www.reddit.com/prefs/apps) to get access to view Posts through the Reddit API. Fortunately, they make this part extremely easy. Simply click to register a "Script" for personal use, name it whatever you want, and enter anything (like 'http://localhost' - it doesn't matter) for the URI/URL fields. You'll enter the client info it gives you into the settings file in the steps below.
+1. **Python**: You can download Python for your operating system from [https://www.python.org/downloads/](https://www.python.org/downloads/).
+2. You also need to register an app at [Reddit's App Page](https://www.reddit.com/prefs/apps) to get access to view Posts through the Reddit API. Fortunately, they make this part extremely easy. Simply click to register a "Script" for personal use, name it whatever you want, and enter anything (like 'http://localhost' - it doesn't matter) for the URI/URL fields. You'll enter the client info it gives you into the settings file in the steps below.
 
-*The program will launch an assistant to help you with the second requirement*, when run for the first time, but it doesn't hurt to get the client information prepared.
+*The program will launch an assistant to help you register your app, when run for the first time.*
 
 # Setup:
 1. **Get the above requirements set up**
@@ -30,9 +30,7 @@ Avoids downloading duplicates of the same file, and will automatically seek to -
 *On first launch, it will run an assistant to aid in the setup process.*
 
 5. Whenever desired, you can automatically update the program and its dependencies by running:
-```
-python main.py --update
-```
+```python main.py --update```
 
 See [Here](Argument_Guide.md) for more information on (optional) parameters.
 
