@@ -9,7 +9,7 @@ install:
    - pip install coveralls
 #  - rm ./handlers/ytdl.py
 # command to run tests
-script: coverage run main.py --test --update --skip_pauses --username=$username --password=$password --c_id=$client_id --c_secret=$client_secret --agent="TestUpdaterAgent"
+script: coverage run --omit=/home/* main.py --test --update --skip_pauses --username=$username --password=$password --c_id=$client_id --c_secret=$client_secret --agent="TestUpdaterAgent"
 after_script:
   - ls -la
   - COVERALLS_PARALLEL=true coveralls
