@@ -14,7 +14,7 @@ before_script:
 script: coverage run main.py --test --update --skip_pauses --username=$username --password=$password --c_id=$client_id --c_secret=$client_secret --agent="TestUpdaterAgent"
 after_script:
   - COVERALLS_PARALLEL=true coveralls
-  - coveralls debug
+  - ls -l
 notifications:
   email: false
   webhooks: 
