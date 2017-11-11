@@ -37,9 +37,9 @@ class Settings(object):
 		if can_load and not os.path.isfile(self.settings_file):
 			self.save()# Save defaults.
 			if 'y' in input('Would you like to launch the first-time setup assistant? (y/n): ').lower():
-				import tutorial
+				import wizard
 				print('\n\n')
-				tutorial.run(file)
+				wizard.run(file)
 			else:
 				print('Please configure the generated settings file before launching again.')
 				print('Fill in your username/password, and register an app here: https://www.reddit.com/prefs/apps \n'
@@ -62,12 +62,9 @@ class Settings(object):
 			json.dump(self.vals, outfile, sort_keys=True, indent=4, separators=(',', ': '))
 
 	
-	def get(self, key, default_val=None, save_if_default=False):
+	def get(self, key, default_val=None):
 		if key in self.vals:
 			return self.vals[key]
-		elif save_if_default:
-			self.set(key, default_val)
-			return default_val
 		return default_val
 
 	
@@ -81,7 +78,25 @@ class Settings(object):
 
 
 	def get_sources(self):
-		return self.get('sources', [])
+		""" Builds and then returns a list of the Sources in this Settings config. """
+		from sources import source
+		return source.get_sources( self.get('sources', []) )
+
+
+	def add_source(self, source):
+		""" Adds the given source to the JSON-encoded Settings data. Will not add a duplicate Source alias.
+			Returns if the Source was added
+		"""
+		sources = self.get_sources()
+		for s in sources:
+			if s.alias == source.alias:
+				return False
+		sources.append(source.to_obj())
+		final = []
+		for s in source:
+			final.append(s.to_obj())
+		self.set('sources', final)
+		return True
 
 
 	def save_base(self):

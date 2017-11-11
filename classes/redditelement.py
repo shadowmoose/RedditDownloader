@@ -1,5 +1,5 @@
 import stringutil
-import praw
+import praw.models
 
 class RedditElement(object):
 	"""

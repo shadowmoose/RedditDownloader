@@ -76,6 +76,8 @@ class Filter:
 		if not ret:
 			return False
 		self.limit = self._convert_imported_limit(value)
+		if self.limit is None:
+			return False
 		return ret
 
 
@@ -171,7 +173,7 @@ def get_filter_fields():
 	""" Builds a list of acceptable fields to filter this Element by. """
 	return {
 		'link_count': 'The amount of links found for this element. (#)',
-		'element_type': 'The type of element this is. (Post/Comment)',
+		'element_type': 'The type of element this is. ("Post" or "Comment")',
 		'title':  'The title of this post containing this element. (Text)',
 		'author': 'The author of this element. (Text)',
 		'body':  'The text in this element. Blank if a Post without selftext. (Text)',

@@ -12,14 +12,17 @@ class Source:
 		init() !- To set type
 		get_elements() !- To return the values from this Source
 		setup_wizard() !- The function that takes control of prompting the user for the data this Source will need.
+		get_config_summary() !- The function to return a user-friendly setup status.
 	"""
-	def __init__(self, source_type):
+	def __init__(self, source_type, description):
 		"""
 		The Source object, the core provider of RedditElements to the rest of the system.
 
 		:param source_type: The ID of which Source object to load as
+		:param description: The description to show the User.
 		"""
 		self.type = source_type
+		self.description = description
 		self.alias = self.type
 		self.filters = []
 		self.data = {}
@@ -30,14 +33,30 @@ class Source:
 		pass
 
 
+	def get_config_summary(self):
+		""" Override this method to print out a user-friendly string descriping this Source's current configuration. """
+		return "No status"
+
 	def setup_wizard(self):
-		"""  Make this Souce object prompt the user for the information it needs to retrieve data. """
-		pass
+		"""  Make this Souce object prompt the user for the information it needs to retrieve data.
+			Returns if the Source was properly set up or not.
+		"""
+		return False
+
+
+	def available_filters(self):
+		""" Returns a list of the available filters this Source can listen to. """
+		return filter.get_filters()
 
 
 	def set_alias(self, alias):
 		""" Set the alias of this Source. """
 		self.alias = alias
+
+
+	def get_alias(self):
+		""" Accessor for this Source's alias. """
+		return self.alias
 
 
 	def check_filters(self, ele):
@@ -136,7 +155,7 @@ if __name__ == '__main__':
 	print()
 	import sys
 	sys.path.insert(0, '../filters')
-	so = Source('test-source')
+	so = Source('test-source', description="This is just a test source.")
 	built = so.from_obj({
 		"type": "test-source",
 		"alias": "test-source-alias",
