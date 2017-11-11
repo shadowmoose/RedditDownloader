@@ -45,7 +45,6 @@ import stringutil
 from elementprocessor import ElementProcessor
 from redditloader import RedditLoader
 from manifest import Manifest
-from sources import source
 import reddit
 
 colorama.init(convert=True)
@@ -82,7 +81,7 @@ class Scraper(object):
 					password=info['password'], user_agent=info['user_agent'], username=info['username'])
 		reddit.login()
 
-		self.sources = source.get_sources( self.settings.get_sources() )
+		self.sources = self.settings.get_sources()
 		for s in self.sources:
 			print('Loaded Source: ', s.alias)
 

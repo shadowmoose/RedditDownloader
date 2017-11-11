@@ -65,3 +65,12 @@ def insert_vars(str_path, ele):
 		str_path = str_path.replace('[%s]' % str(k), filename(str(v)) )
 	str_path = normalize_file(str_path)
 	return str_path
+
+
+def is_numeric(s):
+	""" Check if the given string is numeric """
+	try:
+		float(s)
+		return True
+	except ValueError:
+		return False
