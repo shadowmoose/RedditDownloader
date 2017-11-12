@@ -165,7 +165,7 @@ if __name__ == '__main__':
 	print('All Available Sources: ')
 	for s in get_sources():
 		print('Source:', end='')
-		print(s.to_keyval())
+		print(s.to_obj())
 	print()
 	import sys
 	sys.path.insert(0, '../filters')

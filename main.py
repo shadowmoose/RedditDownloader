@@ -94,7 +94,7 @@ class Scraper(object):
 
 		self.sources = self.settings.get_sources()
 		for s in self.sources:
-			print('Loaded Source: ', s.alias)
+			print('Loaded Source: ', s.get_alias())
 
 		self.reddit = RedditLoader()
 		self.reddit.scan(self.sources)

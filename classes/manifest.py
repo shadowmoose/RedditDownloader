@@ -58,9 +58,9 @@ class Manifest:
 		for ele in gen:
 			files = ele.get_completed_files()
 			if len(files)>0 and not any(False == files[key] for key in files):
-				done.append(ele.to_keyval())
+				done.append(ele.to_obj())
 			else:
-				failed.append(ele.to_keyval())
+				failed.append(ele.to_obj())
 		#
 		
 		with gzip.GzipFile(self.file, 'w') as outfile:
