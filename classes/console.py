@@ -2,6 +2,14 @@
 	Package for getting & validating user input in various ways, via the console.
 """
 import stringutil
+from stringutil import Fore
+
+
+def col_input(prompt, color=Fore.LIGHTYELLOW_EX):
+	""" Prints a colorized input prompt. """
+	stringutil.print_color(color, prompt, end='')
+	return input()
+
 
 def number(prompt, min_num = None, max_num = None, round_val=True):
 	"""
@@ -13,7 +21,7 @@ def number(prompt, min_num = None, max_num = None, round_val=True):
 	:return: The value chosen, or none.
 	"""
 	while True:
-		text = input(prompt)
+		text = col_input(prompt)
 		if not stringutil.is_numeric(text):
 			continue
 		num = float(text)
@@ -32,12 +40,12 @@ def prompt_list(prompt, options, allow_none=False):
 	"""
 	if len(options) == 0:
 		return None
-	print(prompt)
+	stringutil.print_color(Fore.CYAN, prompt)
 	is_tuple = isinstance(options[0], tuple)
 	if not is_tuple:
 		options = [(o, o) for o in options]
 	if allow_none:
-		options.append(('None', None))
+		options.append(('Cancel', None))
 	for idx, opt in enumerate(options):
 		print("\t%s: %s" % (idx+1, opt[0]) )
 	select = number("Choose an option: ", 1, len(options), round_val=True) - 1
@@ -46,20 +54,20 @@ def prompt_list(prompt, options, allow_none=False):
 
 def confirm(prompt, default=None):
 	""" Prompts the user with a confirmation dialogue, supporting optional default. """
-	defa = '[y]'
+	defa = '[y]/n'
 	if default is None:
-		defa = ''
+		defa = 'y/n'
 	elif not default:
-		defa = '[n]'
-	inp = input("%s(y/n)%s: " % (prompt, defa))
+		defa = 'y/[n]'
+	inp = col_input("%s(%s): " % (prompt, defa))
 	if inp=='' and default is not None:
 		return default
 	return 'y' in inp.lower()
 
 
 def string(prompt, auto_strip=True):
-	""" Prompts the user, just like *input()*, but returns None if nothing was input. """
-	ret = input("%s: " % prompt)
+	""" Prompts the user, just like *col_input()*, but returns None if nothing was input. """
+	ret = col_input("%s: " % prompt)
 	if auto_strip:
 		ret = ret.strip()
 	if ret=='':
@@ -69,7 +77,7 @@ def string(prompt, auto_strip=True):
 
 def pause():
 	""" Prompts the User to press any button to continue. """
-	input('[Press Enter to continue]')
+	stringutil.print_color(Fore.GREEN, '[Press Enter to continue]')
 
 
 if __name__ == '__main__':

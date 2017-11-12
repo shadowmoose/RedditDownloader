@@ -14,7 +14,7 @@ class UserPostsSource(source.Source):
 
 
 	def setup_wizard(self):
-		print('Setup wizard for %s' % self.alias)
+		print('Setup wizard for %s' % self.get_alias())
 		user = console.string('Name of the User to scan')
 		if user is None:
 			print('Aborting setup.')

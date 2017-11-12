@@ -83,20 +83,36 @@ class Settings(object):
 		return source.get_sources( self.get('sources', []) )
 
 
-	def add_source(self, source):
+	def has_source_alias(self, alias):
+		""" Check if the given source alias exists. """
+		sources = self.get_sources()
+		for s in sources:
+			if s.get_alias() == alias:
+				return True
+		return False
+
+
+	def add_source(self, new_source):
 		""" Adds the given source to the JSON-encoded Settings data. Will not add a duplicate Source alias.
 			Returns if the Source was added
 		"""
-		sources = self.get_sources()
-		for s in sources:
-			if s.alias == source.alias:
-				return False
-		sources.append(source.to_obj())
-		final = []
-		for s in source:
-			final.append(s.to_obj())
-		self.set('sources', final)
+		if self.has_source_alias(new_source.get_alias()):
+			return False
+		new_sources = self.get_sources()
+		new_sources.append(new_source)
+		self._set_source_list(new_sources)
 		return True
+
+
+	def remove_source(self, source):
+		""" Removes the given Source from the list of sources, and resaves. """
+		new_sources = [s for s in self.get_sources() if s.get_alias() != source.get_alias()]
+		self._set_source_list(new_sources)
+
+
+	def _set_source_list(self, s_list):
+		""" Internal, saves the given list of sources to JSON format. """
+		self.set('sources', [s.to_obj() for s in s_list])
 
 
 	def save_base(self):

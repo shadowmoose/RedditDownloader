@@ -23,7 +23,7 @@ class Source:
 		"""
 		self.type = source_type
 		self.description = description
-		self.alias = self.type
+		self._alias = self.type
 		self.filters = []
 		self.data = {}
 
@@ -36,6 +36,7 @@ class Source:
 	def get_config_summary(self):
 		""" Override this method to print out a user-friendly string descriping this Source's current configuration. """
 		return "No status"
+
 
 	def setup_wizard(self):
 		"""  Make this Souce object prompt the user for the information it needs to retrieve data.
@@ -51,12 +52,12 @@ class Source:
 
 	def set_alias(self, alias):
 		""" Set the alias of this Source. """
-		self.alias = alias
+		self._alias = alias
 
 
 	def get_alias(self):
 		""" Accessor for this Source's alias. """
-		return self.alias
+		return self._alias
 
 
 	def check_filters(self, ele):
@@ -67,6 +68,18 @@ class Source:
 		return True
 
 
+	def get_filters(self):
+		return self.filters
+
+
+	def remove_filter(self, rem_filter):
+		self.filters.remove(rem_filter)
+
+
+	def add_filter(self, new_filter):
+		self.filters.append(new_filter)
+
+
 	def from_obj(self, obj):
 		"""
 		Build this Source from the data model loaded.
@@ -75,16 +88,17 @@ class Source:
 		if self.type != obj['type']:
 			return False
 		self.data = obj['data']
-		self.alias = obj['alias']
+		self._alias = obj['alias']
 		self._load_filters(obj)
 		return True
 
 
 	def to_obj(self):
 		"""  Convert this Source into a data model that can be output to the Settings file.  """
-		out = {'type':self.type, 'filters':[], 'data':self.data, 'alias':self.alias}
-		for fi in self.filters:
-			out['filters'].append(fi.to_obj())
+		out = {'type':self.type, 'filters':{}, 'data':self.data, 'alias':self._alias}
+		for fi in self.get_filters():
+			k, v = fi.to_keyval()
+			out['filters'][k] = v
 		return out
 
 
@@ -151,7 +165,7 @@ if __name__ == '__main__':
 	print('All Available Sources: ')
 	for s in get_sources():
 		print('Source:', end='')
-		print(s.to_obj())
+		print(s.to_keyval())
 	print()
 	import sys
 	sys.path.insert(0, '../filters')

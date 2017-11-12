@@ -4,6 +4,7 @@ import argparse
 import sys
 import os
 parser = argparse.ArgumentParser(description="Save all Media Upvoted & Saved on Reddit - https://goo.gl/V99Ccs")
+parser.add_argument('--wizard', '-w', help="Run the Setup Wizard to simplify editing settings.", action="store_true")
 parser.add_argument("--settings", help="path to custom Settings file.", type=str, metavar='')
 parser.add_argument("--test", help="launch in Test Mode. Only used for TravisCI testing.",action="store_true")
 parser.add_argument("--update", help="Update the program.", action="store_true")
@@ -46,6 +47,7 @@ from elementprocessor import ElementProcessor
 from redditloader import RedditLoader
 from manifest import Manifest
 import reddit
+import wizard
 
 colorama.init(convert=True)
 
@@ -59,11 +61,20 @@ stringutil.print_color(Fore.GREEN, """
 
 class Scraper(object):
 	def __init__(self, settings_file, c_settings=None):
-		self.settings = Settings(settings_file, c_settings is None, not args.test)
+		self.settings = Settings(settings_file, can_save=(c_settings is None), can_load=(not args.test) )
 		if c_settings:
 			for k,v in c_settings.items():
 				self.settings.set(k, v)
 		#
+		if args.wizard:
+			if args.wizard and args.skip_pauses:
+				stringutil.error('You cannot run the Wizard with pause skipping enabled.')
+				sys.exit(16)
+			print('\n\n')
+			wizard.source_wizard(self.settings)
+			print('Exit after Wizard.')
+			sys.exit(0)
+
 		self.manifest = None
 		if self.settings.get('build_manifest', True):
 			self.manifest = Manifest(self.settings, True)
