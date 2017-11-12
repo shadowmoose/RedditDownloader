@@ -14,8 +14,9 @@ class UpvotedSaved(source.Source):
 
 
 	def setup_wizard(self):
-		print('Setup wizard for %s' % self.alias)
+		print('Setup wizard for %s' % self.get_alias())
 		print('This source requires no additional information.')
+		return True
 
 
 	def get_config_summary(self):

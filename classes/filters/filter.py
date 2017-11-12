@@ -9,7 +9,7 @@ from enum import Enum
 
 class Operators(Enum):
 	""" Enum for porting around operators. """
-	EQUALS = ''
+	EQUALS = '.equals'
 	MINIMUM = '.min'
 	MAXIMUM = '.max'
 	MATCH  = '.match'
@@ -28,8 +28,28 @@ class Filter:
 		""" Creates a new Filter with the given field name/operator/limit. """
 		self.field = field
 		self.operator = None
-		self.limit = None
+		self._limit = None
 		self.description = description
+
+
+	def set_operator(self, op):
+		""" Sets this Filter's Operator. """
+		if self._lookup_operator(op):
+			self.operator = op
+			return True
+		return False
+
+
+	def set_limit(self, limit):
+		""" Sets the limit of this Filter. Autocasts as needed. """
+		self._limit = self._cast(limit)
+
+
+	def get_limit(self):
+		return self._limit
+
+	def get_description(self):
+		return self.description
 
 
 	def check(self, obj):
@@ -39,15 +59,15 @@ class Filter:
 		if not hasattr(obj, self.field):
 			print('No field: ', self.field)
 			return True
-		val = getattr(obj, self.field) # Don't cast implicitly to avoid rounding/trailing decimals on string numbers.
+		val = self._cast(getattr(obj, self.field))
 		if self.operator == Operators.MAXIMUM:
-			return self._cast(val) <= self._cast(self.limit)
+			return val <= self._limit
 		if self.operator == Operators.MINIMUM:
-			return self._cast(val) >= self._cast(self.limit)
+			return val >= self._limit
 		if self.operator == Operators.EQUALS:
-			return self._cast(val) == self._cast(self.limit)
+			return val == self._limit
 		if self.operator == Operators.MATCH:
-			regexp = re.compile(self.limit, re.IGNORECASE)
+			regexp = re.compile(str(self._limit), re.IGNORECASE)
 			if regexp.search( str(val)):
 				return True
 			return False
@@ -55,15 +75,18 @@ class Filter:
 
 
 	def _cast(self, val):
-		"""  Attempt to _cast to number, or just return the original value.  """
+		"""  Attempt to cast to integer, or just return the value as a string.  """
 		try:
-			return float(val)
+			return int(float(val))
 		except ValueError:
 			return str(val)
 
 
 	def _convert_imported_limit(self, val):
-		""" Returns unchanged val by default. Exists to allow easy overriding to convert input limit values. """
+		""" Returns unchanged val by default.
+			Exists to allow easy overriding to convert input limit values.
+			Return None to signify invalid value, and cancel from_obj() build.
+		"""
 		return val
 
 
@@ -75,15 +98,18 @@ class Filter:
 		ret = self._parse_str(key)
 		if not ret:
 			return False
-		self.limit = self._convert_imported_limit(value)
-		if self.limit is None:
+		conv = self._convert_imported_limit(value)
+		if conv is None:
 			return False
+		self.set_limit(conv)
 		return ret
 
 
-	def to_obj(self):
-		""" Convert this source into a data model that can be saved/loaded from Settings. """
-		return {self.field+self._lookup_operator(self.operator, True) : self.limit}
+	def to_keyval(self):
+		""" Convert this source into a data model that can be saved/loaded from Settings.
+			Returns: key, val -> This represents the way this is stored within the "Filters" JSON Object.
+		"""
+		return self.field+self._lookup_operator(self.operator, True), self._limit
 
 
 	def _parse_str(self, str_key):
@@ -93,7 +119,7 @@ class Filter:
 		op = None
 		for k in Operators:
 			v = k.value
-			if v != '' and v in str_key.lower():
+			if v in str_key.lower():
 				op = k
 		if '.' not in str_key:
 			op = Operators.EQUALS
@@ -115,7 +141,17 @@ class Filter:
 
 
 	def __str__(self):
-		return "filter: %s %s %s (%s)" % (self.field, self.operator, self.limit, self.description)
+		lim = self._limit
+		if isinstance(lim, str):
+			lim = '"%s"' % lim
+		return "Filter: %s %s %s (%s)" % (
+			self.field,
+			self.operator.value.replace('.', ''),
+			lim,
+			self.description
+		)
+
+
 
 
 
@@ -204,7 +240,7 @@ if __name__ == '__main__':
 	})
 	print('Loaded Filters:')
 	for f in all_filters:
-		print('\t', f.to_obj())
+		print('\t', f.to_keyval())
 
 	print('\nRunning checks on test:', test_filters)
 	for f in all_filters:
