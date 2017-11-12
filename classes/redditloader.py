@@ -15,7 +15,7 @@ class RedditLoader:
 		""" Grab all RedditElements from all the supplied Sources """
 		self._elements = []
 		for source in sources:
-			stringutil.print_color(Fore.GREEN, 'Downloading from Source: %s' % source.alias)
+			stringutil.print_color(Fore.GREEN, 'Downloading from Source: %s' % source.get_alias())
 			for r in source.get_elements():
 				r.set_source(source)
 				self._elements.append(r)

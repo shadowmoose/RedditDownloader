@@ -96,7 +96,7 @@ class RedditElement(object):
 
 	def set_source(self, source_obj):
 		"""  Sets this Element's source alias by pulling it directly from the object.  """
-		self.source_alias = str(source_obj.alias)
+		self.source_alias = str(source_obj.get_alias())
 
 
 	def get_id(self):
