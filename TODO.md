@@ -5,12 +5,9 @@ Important:
 *  Build genie for adding sources and filters.
 *  Write testing for Sources and Filters
 *  Build more Sources
-   * Subreddit Posts
+   * User-curated Multireddits
      * Sort by new/etc
      * optional time filter
-   * Multireddit Posts
-     * Same as above
-   * User's Post/Comment history
 *  Make sure to chase down all the TODO tags.
 *  Consider switching to a generator provider system for loading elements
 

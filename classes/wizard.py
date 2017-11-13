@@ -68,7 +68,7 @@ def run(settings_file='settings.json'):
 
 		su.print_color(Fore.GREEN, "Well done, it all works!\n"
 								   "Your setup is complete!\n"
-								   "By default, the program has been configured to scan posts and comments you've upvoted/saved.")
+								   "By default, the program has been configured to scan submissions and comments you've upvoted/saved.")
 		if console.confirm('Would you like to set up some other sources?'):
 			source_wizard(settings)
 		else:
@@ -84,7 +84,7 @@ def run(settings_file='settings.json'):
 def source_wizard(settings):
 	""" Used only after base setup to simplify managing Sources and their Filters. Can be run at any time. """
 	print("Source wizard launched.\n"
-		'ABOUT: "Sources" are the places this downloader pulls Posts or Comments from.\n'
+		'ABOUT: "Sources" are the places this downloader pulls Submissions or Comments from.\n'
 		"\tThere are many different places on Reddit that you may want to pull posts from.\n"
 		"\tThis wizard is built to help you easily manage them.\n")
 	while True:
@@ -92,7 +92,7 @@ def source_wizard(settings):
 		opt = console.prompt_list('What would you like to do?',[
 			('Edit my saved account information', 'account'),
 			('Add a new Source', 'add'),
-			('Edit my current Sources', 'edit_source'),
+			('Edit my current Sources (%s)' % len(settings.get_sources()), 'edit_source'),
 			("Save & Exit", "exit")
 		])
 		print('\n\n')
@@ -211,7 +211,6 @@ def _source_editor(settings, source):
 			source.set_alias(name)
 			settings.add_source(source)
 			print('Renamed Source.')
-			break
 
 		if choice == 'delete':
 			if console.confirm('Are you sure you want to delete this Source?', default=False):
@@ -226,7 +225,7 @@ def _source_editor(settings, source):
 			print('To create a filter, select the field to filter by, how it should be compared, '
 				  'and then the value to compare against.')
 			new_filter = console.prompt_list(
-				"What do you want to filter this source's Posts/Comments by?",
+				"What do you want to filter this source's Posts by?",
 				[("%s" % fi.get_description(), fi) for fi in filter.get_filters()],
 				allow_none=True
 			)
@@ -248,6 +247,9 @@ def _source_editor(settings, source):
 
 		if choice == 'remove_filter':
 			filters = source.get_filters()
+			if len(filters) == 0:
+				print('No Filters to remove.')
+				continue
 			rem = console.prompt_list(
 				'Select a Filter to remove:',
 				[(str(fi), fi) for fi in filters],

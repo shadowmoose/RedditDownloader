@@ -52,6 +52,8 @@ class ElementProcessor:
 				if skip and (file is None or os.path.exists(file)):
 					stringutil.print_color(Fore.GREEN, "\t\t+URL already handled in previous run.")
 					reddit_element.add_file(url, file)
+					if file is not None:
+						hashjar.add_hash(file) # Add the existing file hash so we can deduplicate against it.
 					continue
 			base_file, file_info = self.build_file_info(reddit_element)# Build the file information array using this RedditElement's information
 			file_path = self.process_url(url, file_info)

@@ -64,9 +64,9 @@ class RedditElement(object):
 
 
 	def submission(self, post):
-		""" Handle a user's Post. """
+		""" Handle a Submission. """
 		#out("[Post](%s): %s" % (post.subreddit.display_name, post.title) )
-		self.type = 'Post'
+		self.type = 'Submission'
 		self.id = str(post.name)
 		self.title = str(post.title)
 		if post.author is None:

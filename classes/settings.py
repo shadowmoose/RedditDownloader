@@ -139,7 +139,7 @@ class Settings(object):
 			# Version 1->2 saw addition of Sources & Filters.
 			obj['meta-version'] = 2
 			obj['sources'] = {}
-			from sources.upvoted_saved_source import UpvotedSaved
+			from sources.my_upvoted_saved_source import UpvotedSaved
 			us = UpvotedSaved()# This Source doesn't need any extra info, and it simulates original behavior.
 			us.set_alias('default-downloader')
 			obj['sources'].append(us.to_obj())
