@@ -24,7 +24,7 @@ def add_hash(filename):
 
 	is_image, final_hash = _get_best_hash(filename)
 	if not final_hash:
-		stringutil.error("Error hit hashing file, passing file as new.")
+		stringutil.error("Manifest :: Error hit hashing file, passing file as new.")
 		return True, None
 
 	if is_image:
@@ -32,9 +32,9 @@ def add_hash(filename):
 		for h in _image_hashes:
 			dist = _hamming_distance(h, final_hash)
 			if dist < 4:
-				print('\tDistance matches existing file (%s,%s): %s' % (final_hash, h, dist))
+				print('\tManifest :: Distance matches existing file (%s,%s): %s' % (final_hash, h, dist))
 				return False, _image_hashes[h]
-		print('\tFile is unique. Saved successfully.')
+		print('\tManifest :: File is unique. Saved successfully.')
 	elif final_hash in _sha_hashes:
 		return False, _sha_hashes[final_hash]
 
