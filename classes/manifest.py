@@ -24,32 +24,8 @@ class Manifest:
 		while change:
 			change, self.data = self.adapt(self.data)
 		#
-	#
 
-	def adapt(self, obj):
-		""" Adjust the given data to fit the current manifest version.
-			Should be called repeatedly on an object until it not longer returns true.
-			Returns: ( [true/false](If changed), new_obj )
-		"""
-		v = obj['@meta']['version']
-		if v == self.version:
-			return False, obj
 
-		if v <= 1:
-			# We don't adapt from version <= 1, because of missing data.
-			# Still adjusts to 2.0 format, to future-proof the baseline format.
-			return True, {
-				'@meta':{
-					'version': 2.0,
-					'timestamp': time.time(),
-					'finished': 0,
-					'number_completed': 0,
-					'number_found' : 0,
-				},
-				'elements':{'completed':[], 'failed':[]},
-			}
-
-	
 	def build(self, loader):
 		gen = loader.get_elements()
 		
@@ -76,7 +52,6 @@ class Manifest:
 			}
 			outfile.write( json.dumps(obj, sort_keys=True, indent=4, separators=(',', ': ')).encode() )
 			self.data = obj
-	#
 
 
 	def url_completed(self, url):
@@ -90,3 +65,27 @@ class Manifest:
 			if url in e['files']:
 				return True, e['files'][url]
 		return False, None
+
+
+	def adapt(self, obj):
+		""" Adjust the given data to fit the current manifest version.
+			Should be called repeatedly on an object until it not longer returns true.
+			Returns: ( [true/false](If changed), new_obj )
+		"""
+		v = obj['@meta']['version']
+		if v == self.version:
+			return False, obj
+
+		if v <= 1:
+			# We don't adapt from version <= 1, because of missing data.
+			# Still adjusts to 2.0 format, to future-proof the baseline format.
+			return True, {
+				'@meta':{
+					'version': 2.0,
+					'timestamp': time.time(),
+					'finished': 0,
+					'number_completed': 0,
+					'number_found' : 0,
+				},
+				'elements':{'completed':[], 'failed':[]},
+			}

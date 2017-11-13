@@ -60,14 +60,18 @@ class Filter:
 			print('No field: ', self.field)
 			return True
 		val = self._cast(getattr(obj, self.field))
+		lim = self.get_limit()
+		if isinstance(val, str) and isinstance(lim, str): # Case doesn't matter for the basic comparisons.
+			val = val.lower()
+			lim = lim.lower()
 		if self.operator == Operators.MAXIMUM:
-			return val <= self._limit
+			return val <= lim
 		if self.operator == Operators.MINIMUM:
-			return val >= self._limit
+			return val >= lim
 		if self.operator == Operators.EQUALS:
-			return val == self._limit
+			return val == lim
 		if self.operator == Operators.MATCH:
-			regexp = re.compile(str(self._limit), re.IGNORECASE)
+			regexp = re.compile(str(self.get_limit()), re.IGNORECASE)
 			if regexp.search( str(val)):
 				return True
 			return False

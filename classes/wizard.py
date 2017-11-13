@@ -223,6 +223,8 @@ def _source_editor(settings, source):
 
 		if choice == 'add_filter':
 			from filters import filter
+			print('To create a filter, select the field to filter by, how it should be compared, '
+				  'and then the value to compare against.')
 			new_filter = console.prompt_list(
 				"What do you want to filter this source's Posts/Comments by?",
 				[("%s" % fi.get_description(), fi) for fi in filter.get_filters()],
@@ -235,7 +237,6 @@ def _source_editor(settings, source):
 				'How should we compare this field to the value you set?',
 				[(fv.value.replace('.', ''), fv) for fv in filter.Operators]
 			)
-			print(comp)
 			new_filter.set_operator(comp)
 			limit = console.string('Value to compare to', auto_strip=False)
 			if limit is None:

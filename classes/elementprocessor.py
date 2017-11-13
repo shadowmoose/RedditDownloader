@@ -38,7 +38,7 @@ class ElementProcessor:
 	def process_ele(self, reddit_element):
 		""" Accepts a RedditElement of Post/Comment details, then runs through the Handlers loaded from the other directory, attempting to download the url.  """
 		print('%i/%i: ' % (self.loader.count_completed()+1, self.loader.count_total() ), end='')
-		stringutil.print_color(Fore.YELLOW, stringutil.out("[%s](%s): %s" % (reddit_element.type, reddit_element.subreddit, reddit_element.title), False))
+		stringutil.print_color(Fore.LIGHTYELLOW_EX, stringutil.out("[%s](%s): %s" % (reddit_element.type, reddit_element.subreddit, reddit_element.title), False))
 
 		for url in reddit_element.get_urls():
 			print('\tURL: %s' % url)
@@ -49,7 +49,7 @@ class ElementProcessor:
 				continue
 			if self.manifest:
 				skip, file = self.manifest.url_completed(url)
-				if skip:
+				if skip and (file is None or os.path.exists(file)):
 					stringutil.print_color(Fore.GREEN, "\t\t+URL already handled in previous run.")
 					reddit_element.add_file(url, file)
 					continue
