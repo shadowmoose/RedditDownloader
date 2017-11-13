@@ -1,4 +1,4 @@
-__version__ = "1.4"
+__version__ = "1.5"
 
 import argparse
 import sys
@@ -48,6 +48,7 @@ from redditloader import RedditLoader
 from manifest import Manifest
 import reddit
 import wizard
+import console
 
 colorama.init(convert=True)
 

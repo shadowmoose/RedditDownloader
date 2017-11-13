@@ -5,7 +5,7 @@ import reddit
 
 class UpvotedSaved(source.Source):
 	def __init__(self):
-		super().__init__(source_type='personal-upvoted-saved', description="Posts and Comments you've made.")
+		super().__init__(source_type='personal-upvoted-saved', description="Submissions and Comments you've saved or upvoted.")
 		self._elements = []
 
 
@@ -20,4 +20,4 @@ class UpvotedSaved(source.Source):
 
 
 	def get_config_summary(self):
-		return "Scanning all your Posts & Comments."
+		return "Scanning all your Upvoted/Saved Submissions & Comments."

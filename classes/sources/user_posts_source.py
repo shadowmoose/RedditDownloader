@@ -5,12 +5,19 @@ import console
 
 class UserPostsSource(source.Source):
 	def __init__(self):
-		super().__init__(source_type='user-posts-source', description="A User's Post and/or Comment history")
+		super().__init__(source_type='user-posts-source', description="A User's Submission and/or Comment history")
 		self._elements = []
 
 
 	def get_elements(self):
-		return []# TODO: Set this bit up.
+		ret = []
+		for re in reddit.user_posts(
+				username    = self.data['user'],
+				find_submissions= self.data['scan_submissions'],
+				find_comments= self.data['scan_comments']):
+			if self.check_filters(re):
+				ret.append(re)
+		return ret
 
 
 	def setup_wizard(self):
@@ -21,19 +28,19 @@ class UserPostsSource(source.Source):
 			return False
 		self.data['user'] = user
 
-		choice = console.prompt_list('Would you like to scan their Posts or Comments?', [
-			('Only Posts', 0), ('Only Comments', 1), ('Both Posts & Comments', 2)
+		choice = console.prompt_list('Would you like to scan their Submissions or Comments?', [
+			('Only Submissions', 0), ('Only Comments', 1), ('Both Submissions & Comments', 2)
 		])
+		self.data['scan_submissions'] = (choice == 0 or choice == 2)
+		self.data['scan_comments'] = (choice == 1 or choice == 2)
 		feeds = ""
 		if self.data['scan_comments']:
 			feeds+="Comments"
-		if self.data['scan_posts']:
+		if self.data['scan_submissions']:
 			if len(feeds) > 0:
 				feeds+=" & "
-			feeds+="Posts"
+			feeds+="Submissions"
 		self.data['vanity'] = feeds
-		self.data['scan_posts'] = (choice == 0 or choice == 2)
-		self.data['scan_comments'] = (choice == 1 or choice == 2)
 		return True
 
 

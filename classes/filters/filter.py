@@ -6,6 +6,7 @@ import filters
 import os
 import re
 from enum import Enum
+import stringutil
 
 class Operators(Enum):
 	""" Enum for porting around operators. """
@@ -57,7 +58,7 @@ class Filter:
 			Automatically casts numeric values if possible, then compares.
 		"""
 		if not hasattr(obj, self.field):
-			print('No field: ', self.field)
+			stringutil.error('No field: %s' % self.field)
 			return True
 		val = self._cast(getattr(obj, self.field))
 		lim = self.get_limit()
@@ -213,15 +214,15 @@ def get_filter_fields():
 	""" Builds a list of acceptable fields to filter this Element by. """
 	return {
 		'link_count': 'The amount of links found for this element. (#)',
-		'element_type': 'The type of element this is. ("Post" or "Comment")',
-		'title':  'The title of this post containing this element. (Text)',
+		'type': 'The type of post this is. ("Submission" or "Comment")',
+		'title':  'The title of the submission containing this post. (Text)',
 		'author': 'The author of this element. (Text)',
-		'body':  'The text in this element. Blank if a Post without selftext. (Text)',
+		'body':  'The text in this element. Blank if this post is a submission without selftext. (Text)',
 		'subreddit': 'The subreddit this element is from. (Text)',
 		'over_18': 'If this post is age-limited. (True/False)',
 		'created_utc':'The timestamp, in UTC seconds, that this element was posted. (#)',
-		'num_comments': 'The number of comments on this element. (#)',
-		'score': 'The number of net upvotes on this element. (#)',
+		'num_comments': 'The number of comments on this post. (#)',
+		'score': 'The number of net upvotes on this post. (#)',
 	}
 
 

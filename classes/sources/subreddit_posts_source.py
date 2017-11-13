@@ -5,7 +5,7 @@ import console
 
 class UserPostsSource(source.Source):
 	def __init__(self):
-		super().__init__(source_type='subreddit-posts-source', description="The posts in a given subreddit")
+		super().__init__(source_type='subreddit-posts-source', description="The submissions in a given subreddit")
 		self._elements = []
 
 
@@ -35,7 +35,7 @@ class UserPostsSource(source.Source):
 			break
 		print("Selected: %s" % sub)
 		order = console.prompt_list(
-			'How would you like to sort these Posts?',
+			'How would you like to sort these Submissions?',
 			[(r[0], r) for r in reddit.post_orders()]
 		)
 		self.data['order'] = order[0]
@@ -52,6 +52,6 @@ class UserPostsSource(source.Source):
 			lim = 'first %s posts' % lim
 		else:
 			lim = ''
-		return 'Downloading %s %s posts from subreddit "%s", within "%s" time.' % (
+		return 'Downloading %s %s submissions from subreddit "%s", within "%s" time.' % (
 			lim, self.data['order'], self.data['subreddit'], self.data['time']
 		)
