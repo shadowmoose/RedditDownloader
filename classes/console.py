@@ -21,7 +21,7 @@ def number(prompt, min_num = None, max_num = None, round_val=True):
 	:return: The value chosen, or none.
 	"""
 	while True:
-		text = col_input(prompt)
+		text = col_input("%s: " % prompt)
 		if not stringutil.is_numeric(text):
 			continue
 		num = float(text)
@@ -48,7 +48,7 @@ def prompt_list(prompt, options, allow_none=False):
 		options.append(('Cancel', None))
 	for idx, opt in enumerate(options):
 		print("\t%s: %s" % (idx+1, opt[0]) )
-	select = number("Choose an option: ", 1, len(options), round_val=True) - 1
+	select = number("Choose an option", 1, len(options), round_val=True) - 1
 	return options[select][1]
 
 

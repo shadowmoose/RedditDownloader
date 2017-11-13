@@ -96,10 +96,10 @@ class Scraper(object):
 		for s in self.sources:
 			print('Loaded Source: ', s.get_alias())
 
-		self.reddit = RedditLoader()
-		self.reddit.scan(self.sources)
-		self.processor = ElementProcessor(self.reddit, self.settings, self.manifest)
 		try:
+			self.reddit = RedditLoader()
+			self.reddit.scan(self.sources)
+			self.processor = ElementProcessor(self.reddit, self.settings, self.manifest)
 			self.processor.run()
 		except KeyboardInterrupt:
 			print("Interrupted by User.")

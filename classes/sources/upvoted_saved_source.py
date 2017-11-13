@@ -20,4 +20,4 @@ class UpvotedSaved(source.Source):
 
 
 	def get_config_summary(self):
-		return "Scanning your Posts & Comments."
+		return "Scanning all your Posts & Comments."

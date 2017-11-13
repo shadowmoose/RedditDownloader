@@ -24,17 +24,18 @@ class UserPostsSource(source.Source):
 		choice = console.prompt_list('Would you like to scan their Posts or Comments?', [
 			('Only Posts', 0), ('Only Comments', 1), ('Both Posts & Comments', 2)
 		])
+		feeds = ""
+		if self.data['scan_comments']:
+			feeds+="Comments"
+		if self.data['scan_posts']:
+			if len(feeds) > 0:
+				feeds+=" & "
+			feeds+="Posts"
+		self.data['vanity'] = feeds
 		self.data['scan_posts'] = (choice == 0 or choice == 2)
 		self.data['scan_comments'] = (choice == 1 or choice == 2)
 		return True
 
 
 	def get_config_summary(self):
-		feeds = ""
-		if self.data['scan_comments']:
-			feeds+="Comments"
-		if self.data['scan_posts']:
-			if len(feeds) > 0:
-				feeds+="&"
-			feeds+="Posts"
-		return "Scanning User (%s)'s %s." % (self.data['user'], feeds)
+		return "Scanning User (%s)'s %s." % (self.data['user'], self.data['vanity'])
