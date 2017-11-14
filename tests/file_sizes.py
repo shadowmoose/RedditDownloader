@@ -1,4 +1,4 @@
-import os;
+import os
 
 size_list = {'http://imgur.com/a/TPbjI':0,'http://i.imgur.com/uAQwWz3.png':85401,'https://gfycat.com/RegalFrighteningIsabellinewheatear':10064467,'http://imgur.com/a/fNmS3':259480}
 
