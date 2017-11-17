@@ -1,5 +1,6 @@
-#Intro
-So you've decided to give RMD a try, eh? Great! Here are a few things you'll probably want to know.
+# Intro
+So you've decided to give Reddit Media Downloader a try, eh? Great! 
+Here are a few things you'll probably want to know.
 
 Either read through this document or skip to the [Example](#example)
 
@@ -18,15 +19,15 @@ launch a Wizard to simplify the process.
 But before we dive into that, we should cover some terminology:
 
 ### Settings, Sources, & Filters:
-In Reddit Media Downloader, every Comment and Submission (it calls them "posts") comes from a *Source*.
+In Reddit Media Downloader, every Comment and Submission (it calls them "Posts") comes from a *Source*.
 
 As the name implies, a *Source* is simply wherever posts are being pulled from. A Source can be a subreddit,
 your upvoted posts, a user's comment history, or more. RMD comes with quite a few options built in.
 
 The bulk of the setup process for RMD involves simply choosing what Sources you'd like to download from.
 Where possible, Sources have setup options to let you choose how you'd like to sort posts ("Hot", "Top", etc.),
-what period of time you'd like to check posts from ("Last Hour", "Last Week", etc.), and how many posts you'd
-like this Source to scan.
+what period of time you'd like to check posts from ("Last Hour", "Last Week", "All Time", etc.), 
+and how many posts you'd like the Source to scan. You can have as many Sources as you want!
 
 Standing on top of the Sources, RMD provides *Filters*. *Filters* are, as the name implies, tiny bits of logic
 you can add to any Sources to filter out any posts you might not want. They allow you to choose from all manner of
@@ -89,3 +90,12 @@ of adorable kittens from them. We need a way to only download posts with "kitten
 If I wanted to screen it further - say only accepting posts with > 10,000 upvotes - I'd do the same process,
 but select "score", "minimum", and enter "10000". There are tons of options, and you can have as many Filters
 as you want on any given Sources. Play around with it!
+
+
+# Closing Notes:
+There are a few things to take note of, if you're interested in the nitty-gritty.
++ "Unlimited" generally isn't a thing. Reddit limits most resources to the first 1000 results.
+   + RMD will likely be limited to the first 1000 results for any given Source.
++ Due to Reddit API limitations, signing in to RMD is absolutely required.
++ For Filter comparisons, numeric comparison is only done if both values can be converted from Strings.
++ I'm always open to bug reports or feature requests, so hit me up!
