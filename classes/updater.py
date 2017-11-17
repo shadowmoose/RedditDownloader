@@ -45,6 +45,7 @@ class Updater:
 			return []
 
 		print("Checking for new version...")
+		print("If an error occurs that prevents updating, please check manually at https://github.com/%s/%s" % (self._author, self._repo))
 		n_dat = requests.get('https://api.github.com/repos/%s/%s/releases/latest?%s' % (self._author, self._repo, self._client_auth)).json()
 		newest_version = n_dat['tag_name']
 		update_text = n_dat['body']

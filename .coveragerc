@@ -5,6 +5,6 @@ source = .
 omit =
     # omit Wizards, which rely on human input.
     ./classes/wizards/*
-
+    ./classes/console.py
 [report]
 ignore_errors = True
