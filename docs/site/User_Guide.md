@@ -68,7 +68,7 @@ So, for instance, if I wanted to download the **top 100** images from all time i
 1. First I'd go into the Wizard and select *'Add a new Source'*
 2. I would then select *'The submissions in a given subreddit'* from the list provided.
 3. When prompted, I'd enter 'awww' as the subreddit, and choose 'top' from the sort options when prompted.
-4. I'd finish setting the Source up by entering *100* when prompted for the amount of Posts I'd like.
+4. I'd finish setting the Source up by entering '*100*' when prompted for the amount of Posts I'd like.
 5. Finally I just need to name this filter when prompted, and choose something I'll recognise if I need to 
 come back and make changes.
 
@@ -78,7 +78,7 @@ my cute picture archive.
 
 ...But what if I only want **kitten** pictures? Let's say I only want to scan the top 100, and pull any pictures
 of adorable kittens from them. We need a way to only download posts with "kitten" in their title. 
-"How would I do that", you ask? It's time for a *Filter*!
+*"How would I do that"*, you ask? It's time for a *Filter*!
 
 1. First, I need to go back into the Wizard and select "Edit a source", then select the Source I just made.
 2. Once selected, I choose "Add a Filter" from the prompt.
@@ -89,8 +89,8 @@ of adorable kittens from them. We need a way to only download posts with "kitten
 
 *(This could be a far more advanced pattern, but REGEX is outside the scope of this guide.)*
 
-If I wanted to screen it further - say only accepting posts with > 10,000 upvotes - I'd do the same process,
-but select "score", "minimum", and enter "10000". There are tons of options, and you can have as many Filters
+If I wanted to screen it further - say only accepting posts with at least 10,000 upvotes - I'd do the same process,
+but select "score", "minimum", and enter *"10000"*. There are tons of options, and you can have as many Filters
 as you want on any given Sources. Play around with it!
 
 
