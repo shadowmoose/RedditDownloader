@@ -32,7 +32,7 @@ launch this program anywhere - and it's built from the ground-up to make automat
 **Python**: You can download Python for your operating system from [https://www.python.org/downloads/](https://www.python.org/downloads/).
 
 *The program will launch an assistant Wizard to help you set everything up, when run for the first time.*
-Please see [Here](documentation/site/User_Guide.md) for the guide to getting started.
+Please see [Here](docs/site/User_Guide.md) for the guide to getting started.
 
 
 # Issues?
