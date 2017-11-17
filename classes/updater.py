@@ -105,6 +105,7 @@ class Updater:
 				if os.path.exists(f_local):
 					self._delete_file(f_local)
 				if os.path.exists(prev_path):
+					self.make_parent_dirs(f_local)
 					os.rename(prev_path, f_local)
 					print('\t\t+Moved file.')
 				else:
@@ -152,13 +153,7 @@ class Updater:
 
 	def _download(self, url, path, sha_hash=None):
 		""" Downloads the target file. If sha_hash is set, it will validate the download with the provided hash. """
-		if not os.path.exists(os.path.dirname(path)) and os.path.dirname(path) != '':
-			try:
-				os.makedirs(os.path.dirname(path))
-			except OSError as exc: # Guard against race condition
-				import errno
-				if exc.errno != errno.EEXIST:
-					raise
+		self.make_parent_dirs(path)
 		response = requests.get(url,  headers = {'User-Agent': 'RedditDownloader-HandlerUpdater'}, stream=True)
 
 		with open(path, "wb") as f:
@@ -168,12 +163,25 @@ class Updater:
 			assert sha_hash == self._file_hash(path)
 
 
+	def make_parent_dirs(self, path):
+		""" If it does not exist, create the parent directory (and subdirs as needed) to this path. """
+		if not os.path.exists(os.path.dirname(path)) and os.path.dirname(path) != '':
+			try:
+				os.makedirs(os.path.dirname(path))
+				return True
+			except OSError as exc: # Guard against race condition
+				import errno
+				if exc.errno != errno.EEXIST:
+					raise
+		return False
+
+
 	def _pip_update(self):
 		""" Uses the pip module to update all required libs. """
 		print("Attempting to automatically update required external packages. May require root to work properly on some setups.")
 		if os.path.isfile('./requirements.txt'):
-			# I don't really like calling this type of thing, because it can easily fail without root access when it builds.
-			# However, it's a very straightforward way to let people automatically update the ever-shifting packages like YTDL
+			# I don't really like calling this type of thing, because it can fail without root access when it builds.
+			# However, it's a very simple way to let people automatically update the ever-shifting packages like YTDL
 			pip.main(["install", "--upgrade", "-r","requirements.txt"])
 			print("\t+Completed package update.")
 		else:

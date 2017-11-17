@@ -27,6 +27,7 @@ class ElementProcessor:
 		#
 		self.handlers.sort(key=lambda x: x.order, reverse=False)
 		print("Loaded handlers: ", ', '.join([x.tag for x in self.handlers]) )
+		assert len(self.handlers)>0
 	#
 	
 	def run(self):
