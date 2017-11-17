@@ -1,14 +1,16 @@
-Assuming everything's up to date, these are the currently supported sources for Submissions/Comments.
+**Assuming everything's up to date, these are the currently supported sources for Submissions/Comments.**
 
-Since it is possible to have more than one of the same Source Type to track different areas of Reddit, 
+*Since it is possible to have more than one of the same Source Type to track different areas of Reddit, 
 and the unique name you give Sources can be embedded into the path files are saved under, 
-there are plenty of options for manipulating input/output.
+there are plenty of options for manipulating input/output.*
 
 [Back to User Guide](./User_Guide.md)
 
 [Back to Home](../../README.md)
 
-#Supported Sources:
+# Supported Sources:
+
+
 + User-curated MultiReddit.
   + Great for tracking personal or public groups of subs.
   + Provide a username and multireddit name to use.
