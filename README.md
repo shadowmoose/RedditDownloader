@@ -5,7 +5,7 @@ Let's face it: In this day and age, the internet is ephemeral. Anything anybody 
 and gone the next. Websites take down or move their images and videos, posts get hidden or removed, and their
 content is lost. Even more so on Reddit, where accounts are constantly springing into existence -
 and then vanishing as quickly without a trace. How's anybody supposed to keep their cherished cat picture 
-collection around with all this change? Well fear not, my data-hording friend,
+collection around with all this change? Well fear not, my data-hoarding friend,
 because Reddit Media Downloader is here for you!
 
 
@@ -33,12 +33,10 @@ launch this program anywhere - and it's built from the ground-up to make automat
 **Python**: You can download Python for your operating system from [https://www.python.org/downloads/](https://www.python.org/downloads/).
 
 *The program will launch an assistant Wizard to help you set everything up, when run for the first time.*
-Please see [Here](docs/site/User_Guide.md) for the guide to getting started.
+
+**Please see [Here](docs/site/User_Guide.md) for the guide to getting started.**
 
 
 # Issues?
 This program uses multiple Handlers, included in the *handlers* directory, to process the various links it finds. Many are extremely generic to allow for the widest possible site coverage.
 If you hit any links which it does not support, find anything broken, or just need assistance, please open a new request [here](https://github.com/shadowmoose/RedditDownloader/issues/new).
-
-# Supported Python Versions:
-You should be fine with 3.4 up, and maybe even slightly earlier, but you can view the only versions I officially support at [The Travis Build Page](https://travis-ci.org/shadowmoose/RedditDownloader). It automatically checks the most recent commit, and runs through a strict set of tests to make sure nothing's broken.
