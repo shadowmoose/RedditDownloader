@@ -32,7 +32,7 @@ Avoids downloading duplicates of the same file, and will automatically seek to -
 5. Whenever desired, you can automatically update the program and its dependencies by running:
 ```python main.py --update```
 
-See [Here](guides/Arguments.md) for more information on (optional) parameters.
+See [Here](documentation/Arguments.md) for more information on (optional) parameters.
 
 If you're checking this out with Git, I strongly suggest you pull the *latest release*, to assure stability.
 

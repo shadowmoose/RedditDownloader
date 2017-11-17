@@ -250,4 +250,3 @@ if __name__ == '__main__':
 	print('\nRunning checks on test:', test_filters)
 	for f in all_filters:
 		print(f.check(test_filters), '|', f)
-	#TODO: Write a test for a large range of these, and compare the list get_sources returns to make sure they all load.
