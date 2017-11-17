@@ -27,6 +27,7 @@ sys.path.insert(0, './classes')
 sys.path.insert(0, './classes/handlers')
 sys.path.insert(0, './classes/sources')
 sys.path.insert(0, './classes/filters')
+sys.path.insert(0, './classes/wizards')
 
 if args.update or args.update_only:
 	from updater import Updater
@@ -72,7 +73,7 @@ class Scraper(object):
 				stringutil.error('You cannot run the Wizard with pause skipping enabled.')
 				sys.exit(16)
 			print('\n\n')
-			wizard.source_wizard(self.settings)
+			wizard.interact(self.settings)
 			print('Exit after Wizard.')
 			sys.exit(0)
 
@@ -108,7 +109,7 @@ class Scraper(object):
 
 		if self.manifest:
 			if not args.skip_pauses:
-				if 'y' in input("Save Manifest? (y/n): ").lower():
+				if console.confirm("Build manifest?", True):
 					print('Building manifest.')
 					self.manifest.build(self.reddit)
 			else:

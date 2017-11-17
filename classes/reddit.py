@@ -42,8 +42,7 @@ def my_liked_saved():
 	global _user
 	if not _user:
 		raise ConnectionError('User not signed in!')
-	for el in user_liked_saved(_user.name):
-		yield el
+	yield from user_liked_saved(_user.name)
 
 
 def user_liked_saved(username, scan_upvoted=True, scan_saved=True):
@@ -93,24 +92,7 @@ def time_filters():
 def subreddit_posts(sub, order_by='new', limit=None, time='all'):
 	""" Get Posts from the given subreddit, with PRAW-based filtering & sorting options. """
 	global _reddit
-	order = [o for o in post_orders() if o[0] == order_by]
-	assert len(order) > 0 # The order must be a valid value.
-	assert time in time_filters()
-	if limit < 1:
-		limit = None
-	order = order[0]
-	try:
-		sr = _reddit.subreddit(sub) # Build object for query
-		if not order[1]:
-			gen = getattr(sr, order[0])(limit=limit)
-		else:
-			gen = getattr(sr, order[0])(limit=limit, time_filter=time)
-		for g in gen:
-			yield RedditElement(g)
-	except TypeError as e:
-		stringutil.error('Invalid subreddit order configuration! [%s]' % order_by)
-		print(order)
-		print(e)
+	yield from _praw_apply_filter(_reddit.subreddit(sub), order_by, limit, time)
 
 
 def user_posts(username, find_submissions, find_comments):
@@ -125,3 +107,30 @@ def user_posts(username, find_submissions, find_comments):
 				yield RedditElement(c)
 	except prawcore.exceptions.NotFound:
 		stringutil.error('Cannot locate comments or submissions for nonexistent user: %s' % username)
+
+
+def multi_reddit(username, reddit_name, order_by='new', limit=None, time='all'):
+	""" Generator to get Submissions from a User-curated MultiReddit. """
+	global _reddit
+	yield from _praw_apply_filter(_reddit.multireddit(username, reddit_name), order_by, limit, time)
+
+
+def _praw_apply_filter(praw_object, order_by='new', limit=None, time='all'):
+	""" Accepts a Praw object (subreddit/multireddit/user posts/etc) and applies filters to it. Returns a Generator. """
+	order = [o for o in post_orders() if o[0] == order_by]
+	assert len(order) > 0 # The order must be a valid value.
+	assert time in time_filters()
+	if limit < 1:
+		limit = None
+	order = order[0]
+	try:
+		if not order[1]:
+			gen = getattr(praw_object, order[0])(limit=limit)
+		else:
+			gen = getattr(praw_object, order[0])(limit=limit, time_filter=time)
+		for g in gen:
+			yield RedditElement(g)
+	except TypeError as e:
+		stringutil.error('Invalid Praw order configuration! [%s]' % order_by)
+		print(order)
+		print(e)
