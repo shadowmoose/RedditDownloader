@@ -21,13 +21,15 @@ But before we dive into that, we should cover some terminology:
 ### Settings, Sources, & Filters:
 In Reddit Media Downloader, every Comment and Submission (it calls them "Posts") comes from a *Source*.
 
-As the name implies, a *Source* is simply wherever posts are being pulled from. A Source can be a subreddit,
+As the name implies, a [*Source*](Supported_Sources.md) is simply wherever posts are being pulled from. A Source can be a subreddit,
 your upvoted posts, a user's comment history, or more. RMD comes with quite a few options built in.
 
 The bulk of the setup process for RMD involves simply choosing what Sources you'd like to download from.
 Where possible, Sources have setup options to let you choose how you'd like to sort posts ("Hot", "Top", etc.),
 what period of time you'd like to check posts from ("Last Hour", "Last Week", "All Time", etc.), 
-and how many posts you'd like the Source to scan. You can have as many Sources as you want!
+and how many posts you'd like the Source to scan. You can have as many [Sources](Supported_Sources.md) as you want!
+
+[Here's a list of the supported Source Types](Supported_Sources.md)
 
 Standing on top of the Sources, RMD provides *Filters*. *Filters* are, as the name implies, tiny bits of logic
 you can add to any Sources to filter out any posts you might not want. They allow you to choose from all manner of

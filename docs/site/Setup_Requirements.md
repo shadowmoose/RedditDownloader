@@ -1,11 +1,12 @@
 # Setup:
-1. **[Get Python Installed.](https://www.python.org/downloads/)** - Typically the latest version will do. 
++ **[Get Python Installed.](https://www.python.org/downloads/)** - Typically the latest version will do. 
 (See [Supported Versions](#supported-python-versions))
-2. **Download:** Download this program, either using git or by [clicking here](https://github.com/shadowmoose/RedditDownloader/releases/latest) *(Latest Release)*. If you download the zip, unpack it.
-3. **Install dependencies:** launch a terminal inside wherever you saved the program folder, and run the line:
++ **Download:** Download this program, either using git or by [clicking here](https://github.com/shadowmoose/RedditDownloader/releases/latest) *(Latest Release)*. If you download the zip, unpack it.
++ **Install dependencies:** launch a terminal inside wherever you saved the program folder, and run the line:
+
 ```pip install -r requirements.txt```
 
-4. Once the install finishes, launch the program with:
++ Once the install finishes, launch the program with:
 
 ```python main.py```
 

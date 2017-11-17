@@ -24,6 +24,8 @@ you're looking for (*"I only want Submissions with 'Unicorn' in the title, and n
 RMD makes automatically saving things a simple. Built in Python, and running headless (without a GUI), you can
 launch this program anywhere - and it's built from the ground-up to make automation a breeze.
 
+[Check out the different places RMD can scan!](docs/site/Supported_Sources.md)
+
 # RMD Can:
 * Extract links inside comments, links in Submissions, and links within selfpost text.
 * Work with links to most video sites, image hosts, and image blogs.
