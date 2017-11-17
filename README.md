@@ -3,30 +3,31 @@
 
 Let's face it: In this day and age, the internet is ephemeral. Anything anybody posts might be here one day,
 and gone the next. Websites take down or move their images and videos, posts get hidden or removed, and their
-content is lost. Even more so on Reddit, where user's accounts are constantly springing into existence -
-and then vanishing as quickly without a trace. How's anybody supposed to keep their cherished video collection
-around with all this change? Well fear not, my data-hording friend, because Reddit Media Downloader is here for you!
+content is lost. Even more so on Reddit, where accounts are constantly springing into existence -
+and then vanishing as quickly without a trace. How's anybody supposed to keep their cherished cat picture 
+collection around with all this change? Well fear not, my data-hording friend,
+because Reddit Media Downloader is here for you!
 
 
 Reddit Media Downloader is a program built to scan Comments & Submissions from multiple sources on Reddit, 
 and download any media they contain or link to. It can handle scanning posts from your personal 
-Upvoted/Saved lists, Submissions on subreddits of your choice, user-curated multireddits, and more!
+Upvoted/Saved lists, subreddits of your choice, user-curated multireddits, and more!
 When it finds a Comment or Submission from wherever you specify, it will parse the text and links within to
 find any media linked to. It then uses multiple downloaders to save this media locally onto your disk.
 
 
 RMD comes equipped with a suite of options to let it scan just about anywhere you can find media on Reddit.
-Coupled with its powerful built-in Filter options to let you specify exactly what type of posts and comments
+Coupled with its powerful baked-in Filter options to let you specify exactly what type of posts and comments
 you're looking for (*"I only want Submissions with 'Unicorn' in the title, and no less than 1000 upvotes!"*), 
 RMD makes automatically saving things a breeze. Built in Python, and running headless (without a GUI), you can
 launch this program anywhere - and it's built from the ground-up to make automation a breeze.
 
-# A Few Key Points:
-* It works on most video sites, image hosts, and image blogs.
-* It can extract links inside comments, links in Submissions, and links within selfpost text.
-* Avoids saving duplicates of the same file, by using image recognition to compare similar pictures.
-* Can automatically seek to - and resume - where it last left off.
-* Comes with an in-console Wizard to make even the most complex configuration setups simple
+# RMD Can:
+* Extract links inside comments, links in Submissions, and links within selfpost text.
+* Work with links to most video sites, image hosts, and image blogs.
+* Avoid saving duplicates of the same file, by using image recognition to compare similar pictures.
+* Automatically seek to - and resume - where it last left off.
+* Launch an in-console Wizard to make even the most complex configuration setups simple
 
 # Requirements:
 **Python**: You can download Python for your operating system from [https://www.python.org/downloads/](https://www.python.org/downloads/).
