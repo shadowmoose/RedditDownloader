@@ -55,9 +55,9 @@ Filters can be added/removed from a Source by selecting "Edit a Source", and cho
 from the submenu it presents.
 
 Filters are simple logic. They require 3 things:
-+ A field to check from each post the source will find (Upvotes, Title, Time Posted, etc)
-+ A comparator value (Minimum, Maximum, Equal to, or Regex Match)
-  + "Regex Match", while more advanced, is very powerful. It allows you to filter by text values in a powerful way.
++ A field to check from each post. (Upvotes, Title, Time Posted, etc)
++ A comparator value. (Minimum, Maximum, Equal to, or Regex Match)
+  + "Regex Match", while more advanced, is very powerful. It allows you to filter by text values in creative ways.
 + The value to compare against. This is provided by you.
 
 Still sound complicated? Don't worry - I'll provide an example setup to show how simple this really is.
@@ -72,9 +72,9 @@ So, for instance, if I wanted to download the **top 100** images from all time i
 5. Finally I just need to name this filter when prompted, and choose something I'll recognise if I need to 
 come back and make changes.
 
-The Source is now complete!
+**The Source is now complete!**
 I could now exit the Wizard and relaunch the program without the *'-w'* flag, and it would kick off downloading
-my cute picture archive.
+my adorable animal picture archive.
 
 ...But what if I only want **kitten** pictures? Let's say I only want to scan the top 100, and pull any pictures
 of adorable kittens from them. We need a way to only download posts with "kitten" in their title. 
