@@ -21,7 +21,7 @@ find any media linked to. It then uses multiple downloaders to save this media l
 RMD comes equipped with a suite of options to let it scan just about anywhere you can find media on Reddit.
 Coupled with its powerful baked-in Filter options to let you specify exactly what type of posts and comments
 you're looking for (*"I only want Submissions with 'Unicorn' in the title, and no less than 1000 upvotes!"*), 
-RMD makes automatically saving things a breeze. Built in Python, and running headless (without a GUI), you can
+RMD makes automatically saving things a simple. Built in Python, and running headless (without a GUI), you can
 launch this program anywhere - and it's built from the ground-up to make automation a breeze.
 
 # RMD Can:
@@ -29,12 +29,12 @@ launch this program anywhere - and it's built from the ground-up to make automat
 * Work with links to most video sites, image hosts, and image blogs.
 * Avoid saving duplicates of the same file, by using image recognition to compare similar pictures.
 * Automatically seek to - and resume - where it last left off.
-* Launch an in-console Wizard to make even the most complex configuration setups simple
+* Launch an in-console [Wizard](/docs/site/User_Guide.md#the-wizard) to make even the most complex configuration setups simple
 
 # Requirements:
 **Python**: You can download Python for your operating system from [https://www.python.org/downloads/](https://www.python.org/downloads/).
 
-*The program will launch an assistant Wizard to help you set everything up, when run for the first time.*
+*The program will launch an assistant [Wizard](/docs/site/User_Guide.md#the-wizard) to help you set everything up, when run for the first time.*
 
 **Please see [Here](https://shadowmoose.github.io/RedditDownloader/docs/site/User_Guide.html) for the guide to getting started.**
 
