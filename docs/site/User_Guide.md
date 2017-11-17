@@ -52,11 +52,11 @@ Sources can be added from a list it will display, and are fairly straightforward
 Filters can be added/removed from a Source by selecting "Edit a Source", and choosing the appropriate action
 from the submenu it presents.
 
-+ Filters are simple logic. They require 3 things:
-  + A field to check from each post the source will find (Upvotes, Title, Time Posted, etc)
-  + A comparator value (Minimum, Maximum, Equal to, or Regex Match)
-    + "Regex Match", while more advanced, is very powerful. It allows you to filter by text values in a powerful way.
-  + The value to compare against. This is provided by you.
+Filters are simple logic. They require 3 things:
++ A field to check from each post the source will find (Upvotes, Title, Time Posted, etc)
++ A comparator value (Minimum, Maximum, Equal to, or Regex Match)
+  + "Regex Match", while more advanced, is very powerful. It allows you to filter by text values in a powerful way.
++ The value to compare against. This is provided by you.
 
 Still sound complicated? Don't worry - I'll provide an example setup to show how simple this really is.
 
@@ -83,9 +83,9 @@ of adorable kittens from them. We need a way to only download posts with "kitten
 3. From the new list, I'll choose "title"
 4. In the next prompt, I pick "match", to perform a more in-depth text check.
 5. Finally, I'm going to enter the simple pattern of "kitten" to match against. 
-   + This could be a far more advanced pattern, but REGEX is outside the scope of this guide.
 6. Save and exit. When relaunched again, it will screen out any posts not matching my new Kitten Filter!
 
+*(This could be a far more advanced pattern, but REGEX is outside the scope of this guide.)*
 
 If I wanted to screen it further - say only accepting posts with > 10,000 upvotes - I'd do the same process,
 but select "score", "minimum", and enter "10000". There are tons of options, and you can have as many Filters

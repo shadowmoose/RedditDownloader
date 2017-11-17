@@ -1,7 +1,7 @@
 # Reddit Media Downloader 
 [![Build Status](https://travis-ci.org/shadowmoose/RedditDownloader.svg?branch=master)](https://travis-ci.org/shadowmoose/RedditDownloader) [![Coverage Status](https://coveralls.io/repos/github/shadowmoose/RedditDownloader/badge.svg?branch=master)](https://coveralls.io/github/shadowmoose/RedditDownloader?branch=master)
 
-[Click here to visit the documentation site!](https://shadowmoose.github.io/RedditDownloader/docs/site/User_Guide.md)
+[Click here to visit the documentation site!](https://shadowmoose.github.io/RedditDownloader/docs/site/User_Guide.html)
 
 Let's face it: In this day and age, the internet is ephemeral. Anything anybody posts might be here one day,
 and gone the next. Websites take down or move their images and videos, posts get hidden or removed, and their
@@ -36,7 +36,7 @@ launch this program anywhere - and it's built from the ground-up to make automat
 
 *The program will launch an assistant Wizard to help you set everything up, when run for the first time.*
 
-**Please see [Here](docs/site/User_Guide.md) for the guide to getting started.**
+**Please see [Here](https://shadowmoose.github.io/RedditDownloader/docs/site/User_Guide.html) for the guide to getting started.**
 
 
 # Issues?
