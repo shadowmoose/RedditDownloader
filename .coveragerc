@@ -2,6 +2,9 @@
 [run]
 branch = False
 source = .
+omit =
+    # omit Wizards, which rely on human input.
+    ./classes/wizards/*
 
 [report]
 ignore_errors = True

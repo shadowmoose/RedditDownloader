@@ -1,3 +1,6 @@
+"""
+	The main setup Wizard.
+"""
 import stringutil as su
 from colorama import Fore
 import webbrowser
@@ -6,6 +9,8 @@ import prawcore
 import sys
 from settings import Settings
 import console
+import source_wizard
+import wizard_functions
 
 def run(settings_file='settings.json'):
 	client_setup = {'secret':None, 'id':None}
@@ -70,7 +75,7 @@ def run(settings_file='settings.json'):
 								   "Your setup is complete!\n"
 								   "By default, the program has been configured to scan submissions and comments you've upvoted/saved.")
 		if console.confirm('Would you like to set up some other sources?'):
-			source_wizard(settings)
+			interact(settings)
 		else:
 			su.print_color(Fore.GREEN, "Everything's good to go, then! Just relaunch the script to start downloading!")
 			sys.exit(0)
@@ -81,7 +86,7 @@ def run(settings_file='settings.json'):
 
 
 
-def source_wizard(settings):
+def interact(settings):
 	""" Used only after base setup to simplify managing Sources and their Filters. Can be run at any time. """
 	print("Source wizard launched.\n"
 		'ABOUT: "Sources" are the places this downloader pulls Submissions or Comments from.\n'
@@ -163,7 +168,7 @@ def _add_source(settings):
 		if s.type == choice:
 			if s.setup_wizard():
 				print('\nAdding new source...')
-				name = _get_unique_alias(settings)
+				name = wizard_functions.get_unique_alias(settings)
 				if not name:
 					print('Aborted building Source at User request.')
 					return
@@ -179,111 +184,10 @@ def _add_source(settings):
 
 def _source_editor(settings, source):
 	""" The editor screen for a specific Source. """
-	while True:
-		print('\n\n\n')
-		su.print_color(su.Fore.GREEN, 'Editing Source: "%s" -> %s' % (source.get_alias(), source.get_config_summary()) )
-		filters = source.get_filters()
-		if len(filters) > 0:
-			for f in filters:
-				print('\t-%s' % f)
-
-		choice = console.prompt_list('What would you like to do with this Source?',[
-			('Edit this Source', 'edit'),
-			('Rename', 'rename'),
-			('Delete this Source', 'delete'),
-			('Add a Filter', 'add_filter'),
-			('Remove a Filter', 'remove_filter'),
-			('Nothing', 'exit')
-		])
-		print('\n')
-
-		if choice == 'edit':
-			if source.setup_wizard():
-				_save_source(settings, source)
-			else:
-				print('Edit failed.')
-
-		if choice == 'rename':
-			name = _get_unique_alias(settings)
-			if name is None:
-				break
-			settings.remove_source(source)
-			source.set_alias(name)
-			settings.add_source(source)
-			print('Renamed Source.')
-
-		if choice == 'delete':
-			if console.confirm('Are you sure you want to delete this Source?', default=False):
-				settings.remove_source(source)
-				print('Source deleted.')
-				return
-			else:
-				print('Source not removed.')
-
-		if choice == 'add_filter':
-			from filters import filter
-			print('To create a filter, select the field to filter by, how it should be compared, '
-				  'and then the value to compare against.')
-			new_filter = console.prompt_list(
-				"What do you want to filter this source's Posts by?",
-				[("%s" % fi.get_description(), fi) for fi in filter.get_filters()],
-				allow_none=True
-			)
-			if new_filter is None:
-				print('Not adding Filter.')
-				continue
-			comp = console.prompt_list(
-				'How should we compare this field to the value you set?',
-				[(fv.value.replace('.', ''), fv) for fv in filter.Operators]
-			)
-			new_filter.set_operator(comp)
-			limit = console.string('Value to compare to', auto_strip=False)
-			if limit is None:
-				print('Aborted filter setup.')
-				continue
-			new_filter.set_limit(limit)
-			source.add_filter(new_filter)
-			_save_source(settings, source)
-
-		if choice == 'remove_filter':
-			filters = source.get_filters()
-			if len(filters) == 0:
-				print('No Filters to remove.')
-				continue
-			rem = console.prompt_list(
-				'Select a Filter to remove:',
-				[(str(fi), fi) for fi in filters],
-				allow_none=True
-			)
-			if rem is None:
-				print("Removing nothing.")
-				continue
-			source.remove_filter(rem)
-			_save_source(settings, source)
-
-		if choice == 'exit':
-			break
-
-
-def _get_unique_alias(settings):
-	""" Prompts the user for a unique Source Alias, or None if they cancel. """
-	while True:
-		name = console.string("Choose a unique, descriptive name for this Source")
-		if name is None:
-			return None
-		if settings.has_source_alias(name):
-			print('A source with that name already exists. It must be unique!')
-			continue
-		return name
-
-
-def _save_source(settings, source):
-	""" Shuffle the source to re-write changes to file. """
-	settings.remove_source(source)
-	settings.add_source(source)
+	source_wizard.SourceEditor(source, settings).run()
 
 
 if __name__ == '__main__':
 	sys.path.insert(0, './sources')
 	sys.path.insert(0, './filters')
-	source_wizard(Settings('../settings.json', can_load=True, can_save=False))
+	interact(Settings('../settings.json', can_load=True, can_save=False))
