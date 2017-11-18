@@ -20,6 +20,7 @@ def run(settings_file='settings.json'):
 	su.print_color(Fore.YELLOW, '\tThis program will help you automatically set everything up in a few steps.')
 
 	su.print_color(Fore.CYAN, "To start, we need to register this script with reddit.")
+	su.print_color(Fore.CYAN, "I'll walk you through this, & the visual guide can be found here: https://goo.gl/ox6PmA")
 	su.print_color(Fore.YELLOW, "\tReddit requires that any program accessing it is registered.")
 	su.print_color(Fore.YELLOW, "\tFor your account's security, you need to do this yourself.")
 

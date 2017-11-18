@@ -3,24 +3,24 @@ __version__ = "1.5"
 import argparse
 import sys
 import os
-parser = argparse.ArgumentParser(description="Save all Media Upvoted & Saved on Reddit - https://goo.gl/V99Ccs")
+parser = argparse.ArgumentParser(description="Save all Media Upvoted & Saved on Reddit - https://goo.gl/hgBxN4")
 parser.add_argument('--wizard', '-w', help="Run the Setup Wizard to simplify editing settings.", action="store_true")
-parser.add_argument("--settings", help="path to custom Settings file.", type=str, metavar='')
-parser.add_argument("--test", help="launch in Test Mode. Only used for TravisCI testing.",action="store_true")
+parser.add_argument("--settings", help="Path to custom Settings file.", type=str, metavar='')
+parser.add_argument("--test", help="Launch in Test Mode. Only used for TravisCI testing.",action="store_true")
 parser.add_argument("--update", help="Update the program.", action="store_true")
 parser.add_argument("--update_only", help="Update the program and exit.", action="store_true")
 parser.add_argument("--skip_pauses", help="Skip all skippable pauses.", action="store_true")
 parser.add_argument('--duplicate','-nd', help='Skip deduplicating similar files.', action="store_true")
 parser.add_argument('--skip_manifest', help='Skip using manifest to prevent rechecking existing downloads.', action="store_true")
-parser.add_argument("--username", help="account username.", type=str, metavar='')
-parser.add_argument("--password", help="account password.", type=str, metavar='')
+parser.add_argument("--username", help="Reddit account username.", type=str, metavar='')
+parser.add_argument("--password", help="Reddit account password.", type=str, metavar='')
 parser.add_argument("--c_id", help="Reddit client id.", type=str, metavar='')
 parser.add_argument("--c_secret", help="Reddit client secret.", type=str, metavar='')
 parser.add_argument("--agent", help="String to use for User-Agent.", type=str, metavar='')
 
-parser.add_argument("--base_dir", help="override base directory.", type=str, metavar='')
-parser.add_argument("--file_pattern", help="override filename output pattern", type=str, metavar='')
-parser.add_argument("--subdir_pattern", help="override subdirectory name pattern", type=str, metavar='')
+parser.add_argument("--base_dir", help="Override base directory.", type=str, metavar='')
+parser.add_argument("--file_pattern", help="Override filename output pattern", type=str, metavar='')
+parser.add_argument("--subdir_pattern", help="Override subdirectory name pattern", type=str, metavar='')
 args = parser.parse_args()
 
 sys.path.insert(0, './classes')
