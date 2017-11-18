@@ -5,13 +5,15 @@ Here are a few things you'll probably want to know.
 Either read through this document or skip to the [Example](#example)
 
 ### Setup:
-The full setup guide can be found [here](./Setup_Requirements.md).
+[**The full setup guide can be found here**](./Setup_Requirements.md).
 
 Once you've installed the requirements, you can launch RMD using the command:
 
 ```python main.py```
 
 In a terminal opened inside the folder you've saved RMD to (the directory with "main.py").
+
+*Note: You can open a terminal in the folder by holding shift and right-clicking the folder (not the files inside it), then selecting "Open Window Here"*
 
 The first time you run the program, you will be prompted to set details and (optionally)
 launch a Wizard to simplify the process.

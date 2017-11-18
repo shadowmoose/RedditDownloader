@@ -3,7 +3,7 @@ __version__ = "1.5"
 import argparse
 import sys
 import os
-parser = argparse.ArgumentParser(description="Save all Media Upvoted & Saved on Reddit - https://goo.gl/hgBxN4")
+parser = argparse.ArgumentParser(description="Tool for scanning Reddit and downloading media - Guide @ https://goo.gl/hgBxN4")
 parser.add_argument('--wizard', '-w', help="Run the Setup Wizard to simplify editing settings.", action="store_true")
 parser.add_argument("--settings", help="Path to custom Settings file.", type=str, metavar='')
 parser.add_argument("--test", help="Launch in Test Mode. Only used for TravisCI testing.",action="store_true")
