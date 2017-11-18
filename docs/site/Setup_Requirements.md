@@ -6,7 +6,7 @@
 
 ```pip install -r requirements.txt```
 
-*Note: You can open a terminal in the folder by holding shift and right-clicking the folder (not the files inside it), then selecting "Open Window Here"*
+*Windows Note: You can open a terminal in the folder by holding shift and right-clicking the folder (not the files inside it), then selecting "Open Window Here"*
 
 
 + Once the install finishes, launch the program with:
@@ -20,7 +20,7 @@ Reddit requires that you have an authenticated app key to use their API. For thi
 
 You'll be prompted for all of this by the Wizard, but this section will explain how to get that information anyways.
 
-+ First, navigate to: https://www.reddit.com/prefs/apps
++ First, navigate to: [https://www.reddit.com/prefs/apps](https://www.reddit.com/prefs/apps)
 + **Sign in on the same account you'll be scraping with** & click "Create and App" at the bottom of the page.
 + Name it whatever you'd like, so you'll remember what it's created for.
 + Select "Script" from the options.

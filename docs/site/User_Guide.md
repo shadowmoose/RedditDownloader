@@ -13,7 +13,7 @@ Once you've installed the requirements, you can launch RMD using the command:
 
 In a terminal opened inside the folder you've saved RMD to (the directory with "main.py").
 
-*Note: You can open a terminal in the folder by holding shift and right-clicking the folder (not the files inside it), then selecting "Open Window Here"*
+*Windows Note: You can open a terminal in the folder by holding shift and right-clicking the folder (not the files inside it), then selecting "Open Window Here"*
 
 The first time you run the program, you will be prompted to set details and (optionally)
 launch a Wizard to simplify the process.
