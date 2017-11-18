@@ -5,7 +5,7 @@ Here are a few things you'll probably want to know.
 Either read through this document or skip to the [Example](#example)
 
 ### Setup:
-[**The full setup guide can be found here**](./Setup_Requirements.md).
+[**The full setup guide can be found** here](./Setup_Requirements.md).
 
 Once you've installed the requirements, you can launch RMD using the command:
 

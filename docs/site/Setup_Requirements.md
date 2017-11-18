@@ -6,6 +6,9 @@
 
 ```pip install -r requirements.txt```
 
+*Note: You can open a terminal in the folder by holding shift and right-clicking the folder (not the files inside it), then selecting "Open Window Here"*
+
+
 + Once the install finishes, launch the program with:
 
 ```python main.py```
