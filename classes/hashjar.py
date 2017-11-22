@@ -3,6 +3,9 @@
 	It is used by the Element Processor to deduplicated downloaded files.
 
 	Though not a flawless solution (files are still downloaded locally first), it's better than nothing.
+
+	Fueled by code from https://github.com/JohannesBuchner/imagehash,
+	so please head there and read their licence/thank them!
 """
 import hashlib
 from PIL import Image
@@ -105,6 +108,7 @@ def _hash_gif(image):
 def _dhash(image, hash_size = 8):
 	"""
 	Generates a Visual Difference Hash of the given Image Object.
+	Credit to: https://github.com/JohannesBuchner/imagehash
 	"""
 	# Grayscale and shrink the image in one step.
 	image = image.convert('L').resize(
