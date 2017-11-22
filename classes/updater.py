@@ -48,7 +48,7 @@ class Updater:
 		print("If an error occurs that prevents updating, please check manually at https://github.com/%s/%s" % (self._author, self._repo))
 		n_dat = requests.get('https://api.github.com/repos/%s/%s/releases/latest?%s' % (self._author, self._repo, self._client_auth)).json()
 		newest_version = n_dat['tag_name']
-		update_text = n_dat['body']
+		update_text = n_dat['body'].replace('[','').replace(']','')
 		update_title = n_dat['name']
 
 		if '-' in newest_version or float(self._version) >= float(newest_version):
@@ -139,9 +139,14 @@ class Updater:
 		""" Get the string hash of this filepath. """
 		if not os.path.exists(path):
 			return None
-		with open(path, 'r') as f:
-			data=f.read()
-		return self._git_hash(data)
+		try:
+			with open(path, 'r') as f:
+				data=f.read()
+			return self._git_hash(data)
+		except FileNotFoundError as fnf:
+			print("Oops, a local file doesn't exist that we were expecting to check!")
+			print("Assuming it's gone. This is probably correctable.")
+			return None
 
 
 	def _git_hash(self, data):
@@ -179,12 +184,19 @@ class Updater:
 
 	def _pip_update(self):
 		""" Uses the pip module to update all required libs. """
-		print("Attempting to automatically update required external packages. May require root to work properly on some setups.")
+		print("\nAttempting to automatically update required external packages...")
+		print("(THIS MAY REQUIRE ROOT/ADMIN TO WORK PROPERLY ON SOME SETUPS)\n\n")
 		if os.path.isfile('./requirements.txt'):
 			# I don't really like calling this type of thing, because it can fail without root access when it builds.
 			# However, it's a very simple way to let people automatically update the ever-shifting packages like YTDL
-			pip.main(["install", "--upgrade", "-r","requirements.txt"])
-			print("\t+Completed package update.")
+			try:
+				val = pip.main(["install", "--upgrade", "-r","requirements.txt"])
+				if val == 2:
+					raise PermissionError
+				print("\t+Completed package update.")
+			except PermissionError:
+				print("\nERROR: Could not auto-update your packages - This script lacks the permissions to do so!")
+				print("For package updating, Make sure you're launching this script from an console running as Administrator or Root!")
 		else:
 			print("\t! Couldn't locate a requirements.txt file. Cannot update dependencies.")
 		#
