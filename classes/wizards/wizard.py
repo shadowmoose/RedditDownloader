@@ -67,7 +67,7 @@ def run(settings_file='settings.json'):
 			"client_id": client_setup['id'],
 			"client_secret": client_setup['secret'],
 			"password": user_setup['password'],
-			"user_agent": "RMD-"+random.random(),
+			"user_agent": "RMD-%s" % random.random(),
 			"username": user_setup['username']
 		})
 		settings.save()
