@@ -1,4 +1,4 @@
-__version__ = "1.52"
+__version__ = "1.53"
 
 import argparse
 import sys
@@ -37,6 +37,18 @@ if args.update or args.update_only:
 	if args.update_only:
 		print('Exit after update.')
 		sys.exit(0)
+	else:
+		# The update process can actually update this main file, so we need to totally reload here.
+		# This is handled in a simple exec() to avoid any crazy process starting.
+		args = sys.argv[1:]
+		for a in args:
+			# Strip "update" commands before relaunching.
+			if 'update' in a.lower():
+				sys.argv.remove(a)
+		with open(__file__) as source_file:
+			exec(source_file.read())
+			print("Exiting following update bootstrap.")
+			sys.exit(0)
 
 import time
 import colorama
@@ -48,7 +60,7 @@ from elementprocessor import ElementProcessor
 from redditloader import RedditLoader
 from manifest import Manifest
 import reddit
-import wizard
+import wizards.wizard as wizard
 import console
 
 colorama.init(convert=True)
