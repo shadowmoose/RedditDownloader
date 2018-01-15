@@ -43,7 +43,6 @@ if args.update or args.update_only:
 		args = sys.argv[1:]
 		for a in args:
 			# Strip "update" commands before relaunching.
-			print(a)
 			if '--update' == a.lower():
 				sys.argv.remove(a)
 		with open(__file__) as source_file:
