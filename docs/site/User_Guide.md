@@ -101,5 +101,5 @@ There are a few things to take note of, if you're interested in the nitty-gritty
 + "Unlimited" generally isn't a thing. Reddit limits most resources to the first 1000 results.
    + RMD will likely be limited to the first 1000 results for any given Source.
 + Due to Reddit API limitations, signing in to RMD is absolutely required.
-+ For Filter comparisons, numeric comparison is only done if both values can be converted from Strings.
++ For Filter comparisons, numeric comparison (for "min"/"max") is only done if both values can be converted to numbers.
 + I'm always open to bug reports or feature requests, so hit me up!

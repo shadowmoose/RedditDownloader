@@ -31,6 +31,7 @@ class Filter:
 		self.operator = None
 		self._limit = None
 		self.description = description
+		self.accepts_operator = True
 
 
 	def set_operator(self, op):
@@ -76,6 +77,7 @@ class Filter:
 			if regexp.search( str(val)):
 				return True
 			return False
+		print("Invalid comparator for Filter!")
 		assert False # This should never happen.
 
 
@@ -219,7 +221,7 @@ def get_filter_fields():
 		'author': 'The author of this element. (Text)',
 		'body':  'The text in this element. Blank if this post is a submission without selftext. (Text)',
 		'subreddit': 'The subreddit this element is from. (Text)',
-		'over_18': 'If this post is age-limited. (True/False)',
+		'over_18': 'If this post is age-limited, AKA "NSFW". (True/False)',
 		'created_utc':'The timestamp, in UTC seconds, that this element was posted. (#)',
 		'num_comments': 'The number of comments on this post. (#)',
 		'score': 'The number of net upvotes on this post. (#)',

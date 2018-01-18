@@ -4,7 +4,7 @@
 
 import console
 import stringutil as su
-import wizard_functions
+import wizards.wizard_functions as wizard_functions
 
 class SourceEditor:
 	def __init__(self, source, settings):
@@ -88,11 +88,12 @@ class SourceEditor:
 		if new_filter is None:
 			print('Not adding Filter.')
 			return
-		comp = console.prompt_list(
-			'How should we compare this field to the value you set?',
-			[(fv.value.replace('.', ''), fv) for fv in filter.Operators]
-		)
-		new_filter.set_operator(comp)
+		if new_filter.accepts_operator:
+			comp = console.prompt_list(
+				'How should we compare this field to the value you set?',
+				[(fv.value.replace('.', ''), fv) for fv in filter.Operators]
+			)
+			new_filter.set_operator(comp)
 		limit = console.string('Value to compare to', auto_strip=False)
 		if limit is None:
 			print('Aborted filter setup.')

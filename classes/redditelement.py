@@ -1,5 +1,6 @@
 import stringutil
 import praw.models
+import copy
 
 class RedditElement(object):
 	"""
@@ -94,24 +95,34 @@ class RedditElement(object):
 			self._urls.append(url)
 
 
+	def remove_url(self, url):
+		if url in self._urls:
+			self._urls.remove(url)
+		else:
+			print("Cannot remove:", url)
+		if url in self._file_map:
+			del self._file_map[url]
+
+
 	def set_source(self, source_obj):
 		"""  Sets this Element's source alias by pulling it directly from the object.  """
 		self.source_alias = str(source_obj.get_alias())
 
 
 	def get_id(self):
-		"""get this element's ID. """
+		""" Get this element's ID. """
 		return self.id
 
 
 	def get_urls(self):
-		""" returns a list of all this element's UNIQUE urls. """
-		return self._urls
+		""" Returns a list of all this element's UNIQUE urls. """
+		return self._urls[:]
 
 
 	def get_completed_files(self):
-		""" Returns the [url]=[files] array build for the completed URLs of this element. """
-		return self._file_map
+		""" Returns deep copy of the [url]=[files] dict built for the completed URLs of this element.
+		Can be a bit expensive to call. """
+		return copy.deepcopy(self._file_map)
 
 
 	def get_json_url(self):
@@ -121,13 +132,12 @@ class RedditElement(object):
 
 	def contains_url(self, url):
 		""" if this element contains the given URL. """
-		return url in self.get_completed_files()
+		return url in self._file_map
 
 
 	def contains_file(self, file_name):
 		""" if this element contains the given file name. """
-		files = self.get_completed_files()
-		return any(file_name in str(files[key]) for key in files)
+		return any(file_name in str(self._file_map[key]) for key in self._file_map)
 
 
 	def remap_file(self, filename_old, filename_new):
@@ -146,7 +156,7 @@ class RedditElement(object):
 			'id': self.id,
 			'title': self.title,
 			'author': self.author,
-			'urls': self._urls,
+			'urls': self.get_urls(),
 			'source_alias': self.source_alias,
 		}
 		return ob
