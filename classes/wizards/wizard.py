@@ -9,8 +9,8 @@ import prawcore
 import sys
 from settings import Settings
 import console
-import source_wizard
-import wizard_functions
+import wizards.source_wizard as source_wizard
+import wizards.wizard_functions as wizard_functions
 
 def run(settings_file='settings.json'):
 	client_setup = {'secret':None, 'id':None}
@@ -45,9 +45,9 @@ def run(settings_file='settings.json'):
 	su.print_color(Fore.YELLOW, "\t(This is your client_secret)")
 	client_setup['secret'] = console.string("Paste or type your client Secret here")
 
-	su.print_color(Fore.RED, "Excellent!\nNow, finally, this script will need the username and password of the account you'd like to scan.")
-	su.print_color(Fore.RED, "\tYour credentials will be stored locally, and never sent anywhere - don't worry;")
-	su.print_color(Fore.RED, "\tThe whole point of the last few steps was to keep your information safe!")
+	su.print_color(Fore.GREEN, "Excellent!\nNow, finally, this script will need the username and password of the account that registered this script.")
+	su.print_color(Fore.GREEN, "\tYour credentials will be stored locally, and never sent anywhere - don't worry;")
+	su.print_color(Fore.GREEN, "\tThe whole point of the last few steps was to keep your information safe!")
 
 	user_setup['username'] = console.string('Enter your username')
 	user_setup['password'] = console.string('Enter your password')
@@ -82,7 +82,9 @@ def run(settings_file='settings.json'):
 			sys.exit(0)
 	except prawcore.exceptions.ResponseException:
 		su.print_color(Fore.RED, "There was an error authenticating you.")
-		su.print_color(Fore.RED, "Please retry these steps and assure you've gotten everything correct.")
+		su.print_color(Fore.RED, "Edit or delete the 'Settings.ini' file just created, then")
+		su.print_color(Fore.RED, "retry these steps and assure you've gotten everything correct.")
+
 		sys.exit(1)
 
 

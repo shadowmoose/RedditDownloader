@@ -33,7 +33,6 @@ class Updater:
 
 	def _get_latest_file_tree(self):
 		""" Connect to Github and pull the latest information manifest for the repository. Caches result. """
-
 		if self._file_tree is not None:
 			return self._file_tree
 		self._file_tree = []

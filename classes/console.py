@@ -78,6 +78,7 @@ def string(prompt, auto_strip=True):
 def pause():
 	""" Prompts the User to press any button to continue. """
 	stringutil.print_color(Fore.GREEN, '[Press Enter to continue]')
+	input()
 
 
 if __name__ == '__main__':

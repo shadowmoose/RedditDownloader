@@ -36,8 +36,9 @@ class Settings(object):
 		self.settings_file = file
 		if can_load and not os.path.isfile(self.settings_file):
 			self.save()# Save defaults.
-			if 'y' in input('Would you like to launch the first-time setup assistant? (y/n): ').lower():
-				import wizard
+			import console
+			if console.confirm('Would you like to launch the first-time setup assistant?', True):
+				import wizards.wizard as wizard
 				print('\n\n')
 				wizard.run(file)
 			else:

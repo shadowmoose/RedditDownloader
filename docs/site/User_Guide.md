@@ -4,6 +4,8 @@ Here are a few things you'll probably want to know.
 
 Either read through this document or skip to the [Example](#example)
 
+For information about the Arguments RMD accepts, check [Arguments.md](../Arguments.md)
+
 ### Setup:
 [**The full setup guide can be found** here](./Setup_Requirements.md).
 

@@ -1,4 +1,4 @@
-__version__ = "1.53"
+__version__ = "1.6"
 
 import argparse
 import sys
@@ -21,6 +21,7 @@ parser.add_argument("--agent", help="String to use for User-Agent.", type=str, m
 parser.add_argument("--base_dir", help="Override base directory.", type=str, metavar='')
 parser.add_argument("--file_pattern", help="Override filename output pattern", type=str, metavar='')
 parser.add_argument("--subdir_pattern", help="Override subdirectory name pattern", type=str, metavar='')
+parser.add_argument("--source", '-s', help="Run each loaded Source only if alias matches the given pattern. Can pass multiple patterns.", type=str, action='append', metavar='')
 args = parser.parse_args()
 
 sys.path.insert(0, './classes')
@@ -28,6 +29,7 @@ sys.path.insert(0, './classes/handlers')
 sys.path.insert(0, './classes/sources')
 sys.path.insert(0, './classes/filters')
 sys.path.insert(0, './classes/wizards')
+
 
 if args.update or args.update_only:
 	from updater import Updater
@@ -51,6 +53,7 @@ if args.update or args.update_only:
 			sys.exit(0)
 
 import time
+import re
 import colorama
 from colorama import Fore
 
@@ -94,22 +97,24 @@ class Scraper(object):
 			self.manifest = Manifest(self.settings, True)
 		else:
 			print('Not using manifest.')
+
+		self.sources = self.load_sources()
+		self.reddit = None
+		self.processor = None
 		
 		# Authenticate and prepare to scan:
-		info = self.settings.get('auth')
-		if not info:
+		auth_info = self.settings.get('auth')
+		if not auth_info:
 			print('Error loading authentication information!')
 			return
 		self.settings.set('last_started', time.time())
 
-		reddit.init(client_id=info['client_id'], client_secret=info['client_secret'],
-					password=info['password'], user_agent=info['user_agent'], username=info['username'])
+		reddit.init(client_id=auth_info['client_id'], client_secret=auth_info['client_secret'],
+					password=auth_info['password'], user_agent=auth_info['user_agent'], username=auth_info['username'])
 		reddit.login()
 
-		self.sources = self.settings.get_sources()
-		for s in self.sources:
-			print('Loaded Source: ', s.get_alias())
 
+	def run(self):
 		try:
 			self.reddit = RedditLoader()
 			self.reddit.scan(self.sources)
@@ -133,6 +138,33 @@ class Scraper(object):
 				input("Press Enter to exit.")
 		print('Download complete!')
 	#
+
+
+	def load_sources(self):
+		sources = []
+		settings_sources = self.settings.get_sources()
+		if args.source is None:
+			for s in settings_sources:
+				print('Loaded Source: ', s.get_alias())
+				sources.append(s)
+		else:
+			for so in args.source:
+				regexp = re.compile(str(so), re.IGNORECASE)
+				for s in settings_sources:
+					if regexp.search( str(s.get_alias()) ):
+						print('Matched Source: ', s.get_alias() )
+						sources.append(s)
+						break
+
+		if len(sources) == 0:
+			if len(settings_sources) == 0:
+				stringutil.error('No sources were found from the settings file.')
+			else:
+				stringutil.error('No sources were found from the settings file matching the supplied patterns.')
+			sys.exit(20)
+		return sources
+
+
 #
 
 
@@ -181,10 +213,14 @@ if args.skip_manifest:
 
 # If no settings were specified, pass 'None' to stick completely with default, auto-saving file values.
 if len(custom_settings) == 0:
-	print('Using file values.')
+	print('Loading all settings from file.')
 	custom_settings = None
 
 p = Scraper(settings, custom_settings)
+p.run()
+
+
+
 
 if args.test:
 	# Run some extremely basic tests to be sure (mostly) everything's working.

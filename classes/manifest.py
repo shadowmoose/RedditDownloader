@@ -83,7 +83,7 @@ class Manifest:
 				'@meta':{
 					'version': 2.0,
 					'timestamp': time.time(),
-					'finished': 0,
+					'finished': False,
 					'number_completed': 0,
 					'number_found' : 0,
 				},

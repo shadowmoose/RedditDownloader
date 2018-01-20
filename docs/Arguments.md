@@ -10,7 +10,8 @@ All arguments are optional, but some must be supplied in a group (and are groupe
 
 **--settings** -        path to custom Settings file.
 
-**--test** -            launch in Test Mode. Only used for TravisCI testing. *Will not operate outside of the testing environment.*
+**--test** -            launch in Test Mode. Only used for TravisCI testing. 
+*Will not operate outside of the testing environment.*
 
 **--update**  -         Update modules if this is supplied. *[Check TravisCI](https://travis-ci.org/shadowmoose/RedditDownloader/branches)
 to be sure the latest build works before updating.*
@@ -19,11 +20,15 @@ to be sure the latest build works before updating.*
 
 **--skip_pauses** -     If supplied, skips any pauses for confirmation, by auto-accepting prompts. Useful for automation.
 
-**--duplicate, -nd** - On by default, this prevents the program from removing duplicate copies of files it downloads.
+**--duplicate, -nd** - The program automatically removes duplicate files when it detects an existing copy from another 
+Post. Pass this to disable that behavior. If CPU/RAM usage is an issue, disabling deduplication may help.
 
 **--skip_manifest** - The Manifest generated is used to rapidly skip files downloaded in previous runs. 
 If you download a lot of shifting content, such as constantly-updated imgur albums, use this to ignore the manifest.
 
+**--source, -s** - If specified, only sources - loaded from the settings file - with aliases matches a supplied pattern 
+will be checked. This argument can be passed multiple times, to specify multiple patterns. 
+*(EX: "main.py -s filter1 -s filter2 ...etc")*
 
 #### Pass login parameters through arguments:
 (All are required to be passed at once)
@@ -35,7 +40,8 @@ If you download a lot of shifting content, such as constantly-updated imgur albu
 
 + **--c_secret**  -       Reddit client secret.  *See above note.*
 
-+ **--agent**   -         String to use for User-Agent.  *A string that identifies your client to Reddit. This can be whatever you want.*
++ **--agent**   -         String to use for User-Agent.  *A string that identifies your client to Reddit. 
+This can be whatever you want.*
 
 #### Output Format:
 The patterns aren't required, but changing either requires that you first also supply the **base_dir** parameter.
