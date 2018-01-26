@@ -54,17 +54,32 @@ def filename(f_name):
 	return ''.join(c for c in f_name if c in valid_chars)
 
 
-def normalize_file(str_file):
+def normalize_file(str_file, trim_length = False):
 	""" Standardize all paths. Needed in a few spots. """
-	return os.path.normpath(str_file)
+	str_path = os.path.normpath(str_file)
+	if trim_length:
+		max_len = 1000
+		if os.name == 'nt':
+			max_len = 240
+		# This is an (expensive) loop, which attempts to fix max file path limitations.
+		while len(os.path.abspath(str_path))> max_len:
+			# Trim final filename in, leaving space for any file extension.
+			parts = os.path.normpath(str_path).split(os.sep)
+			base = parts[-1]
+			nb = ''.join(base[:-1])
+			if nb == '':
+				error("\t\tFailed to trim file path to acceptable length for Operating System!")
+				return None
+			parts[-1] = nb
+			str_path = os.path.join(*parts)
+	return str_path
 
 
 def insert_vars(str_path, ele):
 	""" Replace the [tagged] ele fields in the given string. Sanitizes inserted values to be filename-compatible. """
 	for k,v in ele.to_obj().items():
-		str_path = str_path.replace('[%s]' % str(k), fit(filename(str(v)), 254) )
-	str_path = normalize_file(str_path)
-	return str_path
+		str_path = str_path.replace('[%s]' % str(k),fit(filename(str(v)), 250) )
+	return normalize_file(str_path, True)
 
 
 def is_numeric(s):

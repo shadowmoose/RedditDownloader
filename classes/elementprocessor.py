@@ -56,7 +56,9 @@ class ElementProcessor:
 					if file is not None:
 						hashjar.add_hash(file) # Add the existing file hash so we can deduplicate against it.
 					continue
-			base_file, file_info = self.build_file_info(reddit_element)# Build the file information array using this RedditElement's information
+			file_info = self.build_file_info(reddit_element)# Build the file information dict using this RedditElement's information
+			if file_info is None:
+				continue # If an error occurs during the generation of this file information.
 			file_path = self.process_url(url, file_info)
 			reddit_element.add_file(url, self.check_duplicates(file_path))
 	#
@@ -90,12 +92,17 @@ class ElementProcessor:
 
 
 	def build_file_info(self, reddit_element):
-		""" Generates an array of file locations and element data that is passed down to every handler, so they can choose where best to save for themselves. """
+		""" Generates a dict of file locations and element data that is passed down to every handler, so they can choose where best to save for themselves. """
 		dir_pattern  = '%s/%s' % ( self.settings.save_base() , self.settings.save_subdir() )
 		file_pattern = '%s/%s' % ( dir_pattern, self.settings.save_filename())
 		
-		basedir = stringutil.normalize_file(stringutil.insert_vars(dir_pattern, reddit_element))
+		basedir = stringutil.insert_vars(dir_pattern, reddit_element)
 		basefile = stringutil.insert_vars(file_pattern, reddit_element)
+
+		if basedir is None or basefile is None:
+			stringutil.error("\tCannot download this file, because the file path generated for it is too long!")
+			stringutil.error("\tTry cutting back on the subdirectory length!")
+			return None
 		
 		og = basefile
 		i=2
@@ -107,7 +114,7 @@ class ElementProcessor:
 			print('')
 
 		# Build an array of pre-generated possible locations & important data for handlers to have access to.
-		return basefile, {
+		return {
 			'parent_dir'	: basedir,			# Some handlers will need to build the parent directory for their single file first. This simplifies parsing.
 			'single_file'	: basefile+"%s",	# If this handler can output a single file, it will use this path.
 			'multi_dir' 	: basefile+"/",		# If the handler is going to download multiple files, it will save them under this directory.

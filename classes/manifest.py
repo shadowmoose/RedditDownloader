@@ -18,7 +18,7 @@ class Manifest:
 				with gzip.GzipFile(self.file, 'rb') as data_file:
 					self.data = json.loads(data_file.read().decode('utf8'))
 			except:
-				stringutil.print_color(Fore.RED, 'Failed to load Manifest at [%s]. Probably corrupt. Try removing the file.' % self.file)
+				stringutil.error('Failed to load Manifest at [%s]. Probably corrupt. Try removing the file.' % self.file)
 				raise
 		change, self.data = self.adapt(self.data)
 		while change:
