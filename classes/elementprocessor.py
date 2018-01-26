@@ -58,15 +58,16 @@ class ElementProcessor:
 					continue
 			file_info = self.build_file_info(reddit_element)# Build the file information dict using this RedditElement's information
 			if file_info is None:
-				continue # If an error occurs during the generation of this file information.
-			file_path = self.process_url(url, file_info)
+				file_path = False # If an error occurs during the generation of this file information.
+			else:
+				file_path = self.process_url(url, file_info)
 			reddit_element.add_file(url, self.check_duplicates(file_path))
 	#
 
 
 	def process_url(self, url, info):
 		""" Accepts a URL and the array of file info generated for it by this class, and then attempts to download it using any possible handler.
-			Returns whatever the handlers do, which should be a path to the file itself or the contianing directory for an album.
+			Returns whatever the handlers do, which should be a path to the file itself or the containing directory for an album.
 				+Also returns False or None if no appropriate handler was found, or if the handler told us not to download anything.
 		"""
 		ret_val = False # Default to 'False', meaning no file was located by a handler.
@@ -128,10 +129,10 @@ class ElementProcessor:
 		""" Check the given file path to see if another file like it already exists. Purges worse copies.
 			Returns the filename that the file exists under.
 		"""
+		if not file_path:
+			return file_path
 		if not self.settings.get('deduplicate_files', True):
 			# Deduplication disabled.
-			return file_path
-		if not file_path:
 			return file_path
 		was_new, existing_path = hashjar.add_hash(file_path) # Check if the file exists already.
 		if not was_new:
