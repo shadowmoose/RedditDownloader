@@ -62,14 +62,12 @@ def normalize_file(str_file):
 def insert_vars(str_path, ele):
 	""" Replace the [tagged] ele fields in the given string. Sanitizes inserted values to be filename-compatible. """
 	max_len = 1000
-	str_path = './[a]/[b]/[c].ext'
-	test_vars = {'a':'aaaaaaaaaa', 'b':'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb', 'c':'ccccccccccccccccccccccccccccccc1'}
 	if os.name == 'nt':
 		max_len = 230 # We need to leave some headroom for longer (Unknown) extensions and/or naming.
-	length = min(max_len, max(len(v) for k,v in test_vars.items()) )
+	length = min(max_len, max(len(v) for k,v in ele.to_obj().items()) )
 	while True:
 		ret_str = str_path
-		for k,v in test_vars.items():
+		for k,v in ele.to_obj().items():
 			ret_str = ret_str.replace('[%s]' % str(k),''.join(filename(str(v))[0:length]).strip() )
 
 		if len(os.path.abspath(ret_str) ) < max_len:
