@@ -13,10 +13,12 @@ All arguments are optional, but some must be supplied in a group (and are groupe
 **--test** -            launch in Test Mode. Only used for TravisCI testing. 
 *Will not operate outside of the testing environment.*
 
-**--update**  -         Update modules if this is supplied. *[Check TravisCI](https://travis-ci.org/shadowmoose/RedditDownloader/branches)
-to be sure the latest build works before updating.*
+**--update**  -         Attempt to update all program files and required packages, based off the latest RMD release.
+This is convenience functionality built in for the sake of simple automation, or users not familiar with Python/Git.
+*On some systems, the process of updating Python packages will require Root/Administrator to work.*
 
-**--update_only** -     Only update modules and exit. *See above note.*
+**--update_only** -     Same as *--update*, only the script will stop afterwords without scanning for posts. 
+*See above note.*
 
 **--skip_pauses** -     If supplied, skips any pauses for confirmation, by auto-accepting prompts. Useful for automation.
 

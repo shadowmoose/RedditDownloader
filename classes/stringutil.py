@@ -54,32 +54,30 @@ def filename(f_name):
 	return ''.join(c for c in f_name if c in valid_chars)
 
 
-def normalize_file(str_file, trim_length = False):
+def normalize_file(str_file):
 	""" Standardize all paths. Needed in a few spots. """
-	str_path = os.path.normpath(str_file)
-	if trim_length:
-		max_len = 1000
-		if os.name == 'nt':
-			max_len = 240
-		# This is an (expensive) loop, which attempts to fix max file path limitations.
-		while len(os.path.abspath(str_path))> max_len:
-			# Trim final filename in, leaving space for any file extension.
-			parts = os.path.normpath(str_path).split(os.sep)
-			base = parts[-1]
-			nb = ''.join(base[:-1])
-			if nb == '':
-				error("\t\tFailed to trim file path to acceptable length for Operating System!")
-				return None
-			parts[-1] = nb
-			str_path = os.path.join(*parts)
-	return str_path
+	return os.path.normpath(str_file)
 
 
 def insert_vars(str_path, ele):
 	""" Replace the [tagged] ele fields in the given string. Sanitizes inserted values to be filename-compatible. """
-	for k,v in ele.to_obj().items():
-		str_path = str_path.replace('[%s]' % str(k),fit(filename(str(v)), 250) )
-	return normalize_file(str_path, True)
+	max_len = 1000
+	str_path = './[a]/[b]/[c].ext'
+	test_vars = {'a':'aaaaaaaaaa', 'b':'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb', 'c':'ccccccccccccccccccccccccccccccc1'}
+	if os.name == 'nt':
+		max_len = 230 # We need to leave some headroom for longer (Unknown) extensions and/or naming.
+	length = min(max_len, max(len(v) for k,v in test_vars.items()) )
+	while True:
+		ret_str = str_path
+		for k,v in test_vars.items():
+			ret_str = ret_str.replace('[%s]' % str(k),''.join(filename(str(v))[0:length]).strip() )
+
+		if len(os.path.abspath(ret_str) ) < max_len:
+			return normalize_file(ret_str)
+		length -=1
+		if length <= 0:
+			error("\t\tFailed to trim file path to acceptable length for Operating System!")
+			return None
 
 
 def is_numeric(s):
