@@ -59,10 +59,10 @@ from colorama import Fore
 
 from settings import Settings
 import stringutil
-from elementprocessor import ElementProcessor
-from redditloader import RedditLoader
+from processing.elementprocessor import ElementProcessor
+from reddit.redditloader import RedditLoader
 from manifest import Manifest
-import reddit
+import reddit.reddit as reddit
 import wizards.wizard as wizard
 import console
 
@@ -126,9 +126,12 @@ class Scraper(object):
 
 		if self.manifest:
 			if not args.skip_pauses:
-				if console.confirm("Build manifest?", True):
-					print('Building manifest.')
-					self.manifest.build(self.reddit)
+				try:
+					if console.confirm("Build manifest?", True):
+						print('Building manifest.')
+						self.manifest.build(self.reddit)
+				except KeyboardInterrupt:
+					pass
 			else:
 				print('Automatically building manifest.')
 				self.manifest.build(self.reddit)
@@ -136,7 +139,7 @@ class Scraper(object):
 			print('Manifest not built.')
 			if not args.skip_pauses:
 				input("Press Enter to exit.")
-		print('Download complete!')
+		print('Finished processing!')
 	#
 
 

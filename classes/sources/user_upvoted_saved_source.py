@@ -1,5 +1,5 @@
 from sources import source
-import reddit
+import reddit.reddit as reddit
 
 class UserUpvotedSaved(source.Source):
 	def __init__(self):

@@ -1,5 +1,5 @@
 from sources import source
-import reddit
+import reddit.reddit as reddit
 import console
 
 
