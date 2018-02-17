@@ -31,13 +31,13 @@ def add_hash(filename):
 		return True, None
 
 	if is_image:
-		print("\tHashCheck :: Fingerprinting new image...", end='\r')
+		#print("\tHashCheck :: Fingerprinting new image...", end='\r')
 		for h in _image_hashes:
 			dist = _hamming_distance(h, final_hash)
 			if dist < 4:
-				print('\tHashCheck :: Distance matches existing file (%s,%s): %s' % (final_hash, h, dist))
+				#print('\tHashCheck :: Distance matches existing file (%s,%s): %s' % (final_hash, h, dist))
 				return False, _image_hashes[h]
-		print('\tHashCheck :: File is unique. Saved successfully.')
+		#print('\tHashCheck :: File is unique. Saved successfully.')
 	elif final_hash in _sha_hashes:
 		return False, _sha_hashes[final_hash]
 

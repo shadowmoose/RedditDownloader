@@ -159,7 +159,7 @@ class ImgurAlbumDownloader:
 					#urllib.request.urlretrieve(image_url, path)
 					r = requests.get(image_url, headers = {'User-Agent': self.user_agent}, stream=True)
 					if r.status_code != 200:
-						stringutil.error("Failed to download image! [%i]" % r.status_code )
+						stringutil.error("IMGUR: Failed to download image! [%i]" % r.status_code )
 						raise ImgurAlbumException("Error reading Imgur Image: Error Code %d" % r.status_code)
 					with open(path, 'wb') as f:
 						r.raw.decode_content = True
@@ -167,7 +167,7 @@ class ImgurAlbumDownloader:
 				except KeyboardInterrupt:
 					raise
 				except:
-					print ("Imgur Download failed.")
+					stringutil.error("IMGUR: Imgur Download failed.")
 					if os.path.isfile(path):
 						os.remove(path)
 					raise
@@ -178,7 +178,7 @@ class ImgurAlbumDownloader:
 
 
 # Return filename/directory name of created file(s), False if a failure is reached, or None if there was no issue, but there are no files.
-def handle(url, data, guess=True):
+def handle(url, data, log, guess=True):
 	if 'imgur' not in url:
 		return False
 		
@@ -191,13 +191,13 @@ def handle(url, data, guess=True):
 			if 'i.img' in req.url:
 				# Redirected to valid Image.
 				url = req.url
-				print("\t\t+Auto-corrected Imgur URL: %s" % url)
+				log.out(1,("+Auto-corrected Imgur URL: %s" % url))
 			else:
 				# Load the page and parse for image.
 				for u in stringutil.html_elements(req.text, 'img', 'src'):
 					if base_img in u:
 						u = urllib.parse.urljoin('https://i.imgur.com/', u)
-						print("\t\t+Corrected Imgur URL: %s" % u)
+						log.out(1, ("+Corrected Imgur URL: %s" % u))
 						url = u
 						break
 		
@@ -212,14 +212,14 @@ def handle(url, data, guess=True):
 					content_type = r.headers['content-type']
 					ext = mimetypes.guess_extension(content_type)
 					if 'gifv' in url:
-						print('\t\t-Allowing YTDL Handler to download animations.')
+						log.out(1,'-Allowing YTDL Handler to download animations.')
 						return False# Let Youtube-dl module convert animations.
 					if not ext or ext=='':
-						stringutil.error('\t\tError locating file MIME Type: %s' % url)
+						stringutil.error('IMGUR: Error locating file MIME Type: %s' % url)
 						if guess:
 							# Attempt to download this image (missing a file ext) as a png.
 							# It's last-ditch, but works in some cases.
-							return handle(url+'.png', data, False)
+							return handle(url+'.png', data, log, guess=False)
 						else:
 							return False
 					
@@ -229,7 +229,7 @@ def handle(url, data, guess=True):
 					
 					if not os.path.isfile(path):
 						if not os.path.isdir(data['parent_dir']):
-							print("\t\t+Building dir: %s" % data['parent_dir'])
+							log.out(1,("+Building dir: %s" % data['parent_dir']) )
 							os.makedirs(data['parent_dir'])# Parent dir for the full filepath is supplied already.
 						
 						with open(path, 'wb') as f:
@@ -239,16 +239,16 @@ def handle(url, data, guess=True):
 					else:
 						return path
 				else:
-					stringutil.error('\t\tError Reading Image: %s responded with code %i!' % (url, r.status_code) )
+					stringutil.error('IMGUR: Error Reading Image: %s responded with code %i!' % (url, r.status_code) )
 					return False
 			except KeyboardInterrupt:
 				raise
 			except Exception as e:
-				stringutil.error("\t\t"+str(e) )
-				stringutil.error("\t\tError downloading direct Image: [%s] to path [%s]" % (url, path))
+				stringutil.error("IMGUR: Exception: "+str(e) )
+				stringutil.error("IMGUR: Error downloading direct Image: [%s] to path [%s]" % (url, path))
 				if path and os.path.isfile(path):
 					os.remove(path)
-			stringutil.error('\t\tSomething strange failed with direct Imgur download...')
+			stringutil.error('IMGUR: Something strange failed with direct Imgur download...')
 			return False
 	else:
 		if 'i.' in url:
@@ -259,7 +259,7 @@ def handle(url, data, guess=True):
 	try:
 		# Fire up the class:
 		downloader = ImgurAlbumDownloader(url, data['user_agent'])
-		print(("\t\tFound {0} images in album".format(downloader.num_images())))
+		log.out(0, "Found {0} images in album".format(downloader.num_images()) )
 		
 		ret = data['multi_dir']# Create with a default value, assumes we're getting multiple files.
 		targ_dir = data['multi_dir']# We're either downloading to a multi-dir, or the parent "subreddit" dir.
@@ -269,12 +269,12 @@ def handle(url, data, guess=True):
 		
 		def print_image_progress(index, img_url, dest):
 			crop = stringutil.fit(dest, 75)
-			print("\t\tDownloading Image %d	%s >> %s" % (index, img_url, crop), end='\r')
+			log.out(1, ("Downloading Image %d	%s >> %s" % (index, img_url, crop)))
 		#
 		downloader.on_image_download(print_image_progress)
 		
 		downloader.save_images(targ_dir)
-		print("\n\t\tImgur download complete!")
+		log.out(1, "Imgur download complete!")
 		if downloader.num_images() == 1:
 			# if there's only a single image, the downloader auto-modifies this to include
 			# the image extension after saving the single file.
@@ -282,5 +282,5 @@ def handle(url, data, guess=True):
 
 		return ret
 	except ImgurAlbumException as e:
-		stringutil.error("\t\tImgur Error: "+e.msg)
+		stringutil.error("IMGUR: Imgur Error: "+e.msg)
 	return False
