@@ -5,7 +5,7 @@ class Logger:
 	def __init__(self, max_lines = 3, padding = 0):
 		self.max_lines = max_lines
 		self._lines = [None] * self.max_lines
-		self.padding = 0
+		self.padding = padding
 		self.lock = threading.RLock()
 
 
@@ -20,7 +20,7 @@ class Logger:
 			Clears the sub-values after this line.
 		"""
 		with self.lock:
-			idx = min(self.max_lines-1, idx)
+			idx = max(0, min(self.max_lines-1, idx))
 			self._lines[idx] = txt.strip()
 			for i in range(idx+1, self.max_lines):
 				self._lines[i] = None
@@ -34,7 +34,7 @@ class Logger:
 			out = ''
 			for idx, l in enumerate(self._lines):
 				if l is None:
-					break
+					l = ''
 				if 0 <= limit <= idx:
 					break
 				line = ''

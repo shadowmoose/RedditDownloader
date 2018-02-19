@@ -66,6 +66,9 @@ import reddit.reddit as reddit
 import wizards.wizard as wizard
 import console
 
+#import logging
+#logging.basicConfig(filename='errors.log',level=logging.CRITICAL)
+
 colorama.init(convert=True)
 
 stringutil.print_color(Fore.GREEN, """
@@ -122,6 +125,7 @@ class Scraper(object):
 			self.processor.run()
 		except KeyboardInterrupt:
 			print("Interrupted by User.")
+			self.processor.stop_process()
 		
 
 		if self.manifest:
@@ -129,6 +133,7 @@ class Scraper(object):
 				try:
 					if console.confirm("Build manifest?", True):
 						print('Building manifest.')
+						#TODO: Cancelling should still check the existing manifest and copy known files to the new one.
 						self.manifest.build(self.reddit)
 				except KeyboardInterrupt:
 					pass

@@ -1,5 +1,5 @@
 import threading
-import time
+import queue
 import os
 import pkgutil
 
@@ -17,7 +17,7 @@ class HandlerThread(threading.Thread):
 		threading.Thread.__init__(self)
 		self.name = name
 		self.log = processing.logger.Logger(2, padding=1)
-		self.handler_log = processing.logger.Logger(3, padding=2)
+		self.handler_log = processing.logger.Logger(2, padding=2)
 		self.handlers = []
 
 		self.settings = settings
@@ -25,16 +25,28 @@ class HandlerThread(threading.Thread):
 		self.manifest = manifest
 		self.queue = queue
 		self.load_handlers()
+		self.keep_running = True
 
 
 	def run(self):
 		self.log.out(0, 'Starting up.')
-		while True:
+		while self.keep_running:
 			self.log.out(0, "Waiting for queue...")
-			item = self.queue.get()
-			if item:
-				self.process_ele(item)
-			self.queue.task_done()
+			self.handler_log.clear()
+			try:
+				item = self.queue.get(False)
+				try:
+					self.process_ele(item)
+				finally:
+					self.queue.task_done()
+			except queue.Empty:
+				self.keep_running = False
+				print("Exited thread %s" % self.name)
+				break
+		self.log.out(0,'Completed.')
+		self.handler_log.clear()
+		self.keep_running = False
+
 
 
 
@@ -75,7 +87,8 @@ class HandlerThread(threading.Thread):
 			file_info = el['info']
 
 			file_path = self.process_url(url, file_info)# The meat and potatos here, doesn't need the Lock.
-
+			if not self.keep_running:
+				return # Kill the thread after a potentially long-running download, if the program has terminated.
 			with HandlerThread.ele_lock:
 				reddit_element.add_file(url, self.check_duplicates(file_path))
 			# exit lock
@@ -99,7 +112,8 @@ class HandlerThread(threading.Thread):
 			i=2
 			while basefile in HandlerThread.used_files:
 				#Use local list of filenames used here, since used filenames won't be updated until done otherwise.
-				basefile = og+' . '+str(i)+' '
+				basefile = og+' . '+str(i)
+				basefile = stringutil.normalize_file(basefile)
 				i+=1
 			HandlerThread.used_files.append(basefile)
 
@@ -123,7 +137,7 @@ class HandlerThread(threading.Thread):
 		ret_val = False # Default to 'False', meaning no file was located by a handler.
 		for h in self.handlers:
 			self.log.out(1,"Checking handler: %s" % h.tag)
-			ret = h.handle(url, info, self.handler_log)# TODO: change how all handlers output.
+			ret = h.handle(url, info, self.handler_log)
 			if ret is None:
 				# None is returned when the handler specifically wants this URL to be "finished", but not added to the files list.
 				ret_val = None

@@ -159,7 +159,7 @@ class ImgurAlbumDownloader:
 					#urllib.request.urlretrieve(image_url, path)
 					r = requests.get(image_url, headers = {'User-Agent': self.user_agent}, stream=True)
 					if r.status_code != 200:
-						stringutil.error("IMGUR: Failed to download image! [%i]" % r.status_code )
+						#stringutil.error("IMGUR: Failed to download image! [%i]" % r.status_code )
 						raise ImgurAlbumException("Error reading Imgur Image: Error Code %d" % r.status_code)
 					with open(path, 'wb') as f:
 						r.raw.decode_content = True
@@ -167,7 +167,7 @@ class ImgurAlbumDownloader:
 				except KeyboardInterrupt:
 					raise
 				except:
-					stringutil.error("IMGUR: Imgur Download failed.")
+					#stringutil.error("IMGUR: Imgur Download failed.")
 					if os.path.isfile(path):
 						os.remove(path)
 					raise
@@ -181,7 +181,7 @@ class ImgurAlbumDownloader:
 def handle(url, data, log, guess=True):
 	if 'imgur' not in url:
 		return False
-		
+	log.out(0, "Preparing Imgur Handler...")
 	# Not a gallery, so we have to do our best to manually find/format this image.
 	if not any(x in url for x in ['gallery', '/a/']):
 		# If we've got a non-gallery, and missing the direct image url, correct to the direct image link.
@@ -197,7 +197,7 @@ def handle(url, data, log, guess=True):
 				for u in stringutil.html_elements(req.text, 'img', 'src'):
 					if base_img in u:
 						u = urllib.parse.urljoin('https://i.imgur.com/', u)
-						log.out(1, ("+Corrected Imgur URL: %s" % u))
+						log.out(0, ("+Located direct Imgur URL: %s" % u))
 						url = u
 						break
 		
@@ -215,7 +215,7 @@ def handle(url, data, log, guess=True):
 						log.out(1,'-Allowing YTDL Handler to download animations.')
 						return False# Let Youtube-dl module convert animations.
 					if not ext or ext=='':
-						stringutil.error('IMGUR: Error locating file MIME Type: %s' % url)
+						#stringutil.error('IMGUR: Error locating file MIME Type: %s' % url)
 						if guess:
 							# Attempt to download this image (missing a file ext) as a png.
 							# It's last-ditch, but works in some cases.
@@ -239,16 +239,16 @@ def handle(url, data, log, guess=True):
 					else:
 						return path
 				else:
-					stringutil.error('IMGUR: Error Reading Image: %s responded with code %i!' % (url, r.status_code) )
+					#stringutil.error('IMGUR: Error Reading Image: %s responded with code %i!' % (url, r.status_code) )
 					return False
 			except KeyboardInterrupt:
 				raise
 			except Exception as e:
-				stringutil.error("IMGUR: Exception: "+str(e) )
-				stringutil.error("IMGUR: Error downloading direct Image: [%s] to path [%s]" % (url, path))
+				#stringutil.error("IMGUR: Exception: "+str(e) )
+				#stringutil.error("IMGUR: Error downloading direct Image: [%s] to path [%s]" % (url, path))
 				if path and os.path.isfile(path):
 					os.remove(path)
-			stringutil.error('IMGUR: Something strange failed with direct Imgur download...')
+			#stringutil.error('IMGUR: Something strange failed with direct Imgur download...')
 			return False
 	else:
 		if 'i.' in url:
@@ -282,5 +282,6 @@ def handle(url, data, log, guess=True):
 
 		return ret
 	except ImgurAlbumException as e:
-		stringutil.error("IMGUR: Imgur Error: "+e.msg)
+		#stringutil.error("IMGUR: Imgur Error: "+e.msg)
+		pass
 	return False
