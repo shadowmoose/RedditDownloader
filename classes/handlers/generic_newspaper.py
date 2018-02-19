@@ -19,7 +19,10 @@ def handle(url, data, log):
 	try:
 		config = Config()
 		config.browser_user_agent = data['user_agent']
+		config.memoize_articles = False
+		config.verbose = False
 		article = Article(url, config)
+		log.out(0,'Downloading article...')
 		article.download()
 		article.parse()
 		if article.top_image:

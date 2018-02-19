@@ -4,6 +4,7 @@
 *.json
 *.gz
 *.iml
+*.log
 
 /reference
 /download

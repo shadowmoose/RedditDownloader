@@ -15,21 +15,7 @@ class ElementProcessor:
 		self.settings = settings
 		self.manifest = manifest
 		self.handlers = []
-		self.load_handlers()
-	#
-	
-	def load_handlers(self):
-		""" Loads all the available handlers from the handler directory. """
-		self.handlers = []
-		for mod in os.listdir('classes/handlers'):
-			if mod == '__init__.py' or mod[-3:] != '.py':
-				continue
-			lib = __import__(mod[:-3], locals(), globals())
-			self.handlers.append(lib)
-		#
-		self.handlers.sort(key=lambda x: x.order, reverse=False)
-		print("Loaded handlers: ", ', '.join([x.tag for x in self.handlers]) )
-		assert len(self.handlers)>0
+		self.threads = []
 	#
 	
 	def run(self):
@@ -37,28 +23,34 @@ class ElementProcessor:
 		for ele in self.gen:
 			q.put(ele)
 
-		threads = []
 		#start threads
 		for i in range(5):# TODO: Setting for thread count
 			ht = HandlerThread('Handler - %s' % (i+1), self.settings, self.manifest, self.loader, q)
 			ht.daemon = True
 			ht.start()
-			threads.append(ht)
-
-		while not q.empty():
-			out = colorama.ansi.clear_screen()
-			out+=("Waiting for queue... (~%s)" % q.qsize())+"\n"
-			#TODO: Display thread progress here.
-			for th in threads:
-				out+=th.name+"\n"
-				out+=th.log.render()
-				out+=th.handler_log.render()
-				out+="\n"
-			print(out)
-			time.sleep(1) # TODO: Setting for refresh rate?
-		print("Completing queue")
-		q.join()
-		print("Queue finished!")
+			self.threads.append(ht)
+		try:
+			while any([t.keep_running for t in self.threads]):
+				out = colorama.ansi.clear_screen()
+				out+=("Waiting for queue... (~%s)" % q.qsize())+"\n"
+				#TODO: Display thread progress here.
+				for th in self.threads:
+					out+=th.name+"\n"
+					out+=th.log.render()
+					out+=th.handler_log.render()
+					out+="\n"
+				print(out)
+				time.sleep(1) # TODO: Setting for refresh rate?
+			#print("Completing queue...")
+			#q.join()
+			print("Queue finished!")
+		except:
+			self.stop_process()
+			raise
 	#
 
-	# TODO: Split out the below code into more clean functional logic, and move to Thread object.
+
+	def stop_process(self):
+		""" Signal any running threads that they should exit. """
+		for th in self.threads:
+			th.keep_running = False
