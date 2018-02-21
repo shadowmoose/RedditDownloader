@@ -41,7 +41,7 @@ class Logger:
 				line = ''
 				line+= ' ' * ((self.padding+idx)*4) # 4 spaces per line indent.
 				line+= l.strip()
-				if 0 < max_width < len(line):
+				if 0 < max_width <= len(line)-2:
 					line = str(line[0:max_width-5])
 					line+='...'
 				line+= stringutil.Style.RESET_ALL + '\n'
