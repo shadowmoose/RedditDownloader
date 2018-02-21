@@ -2,6 +2,7 @@ import threading
 import queue
 import os
 import pkgutil
+import sys
 
 import stringutil
 import processing.logger
@@ -43,7 +44,7 @@ class HandlerThread(threading.Thread):
 				self.keep_running = False
 				print("Exited thread %s" % self.name)
 				break
-		self.log.out(0,'Completed.')
+		self.log.out(0,stringutil.color('Completed.', stringutil.Fore.GREEN))
 		self.handler_log.clear()
 		self.keep_running = False
 
@@ -85,8 +86,7 @@ class HandlerThread(threading.Thread):
 		for el in todo:
 			url = el['url']
 			file_info = el['info']
-
-			file_path = self.process_url(url, file_info)# The meat and potatos here, doesn't need the Lock.
+			file_path = self.process_url(url, file_info)# The important bit is here, & doesn't need the Lock.
 			if not self.keep_running:
 				return # Kill the thread after a potentially long-running download, if the program has terminated.
 			with HandlerThread.ele_lock:
@@ -136,8 +136,16 @@ class HandlerThread(threading.Thread):
 		"""
 		ret_val = False # Default to 'False', meaning no file was located by a handler.
 		for h in self.handlers:
-			self.log.out(1,"Checking handler: %s" % h.tag)
-			ret = h.handle(url, info, self.handler_log)
+			self.log.out(1,stringutil.color("Checking handler: %s" % h.tag, stringutil.Fore.CYAN))
+			ret = False
+
+			# noinspection PyBroadException
+			try:
+				ret = h.handle(url, info, self.handler_log)
+			except Exception:# There are too many possible exceptions between all handlers to catch properly.
+				print(sys.exc_info()[0])
+				pass
+
 			if ret is None:
 				# None is returned when the handler specifically wants this URL to be "finished", but not added to the files list.
 				ret_val = None

@@ -30,12 +30,16 @@ def error(string_output, **kwargs):
 	print_color(Fore.RED, string_output, **kwargs)
 
 
+def color(string_out, text_color):
+	""" Color the given string and return it. """
+	return text_color + string_out + Style.RESET_ALL
+
 def print_color(fore_color, string_output, **kwargs):
 	""" Print() the given string colored as desired. """
-	print(fore_color+string_output+Style.RESET_ALL, **kwargs)
+	print(fore_color + string_output + Style.RESET_ALL, **kwargs)
 
 
-def out(obj, print_val=True, color=None):
+def out(obj, print_val=True, text_color=None):
 	""" Prints out the given object in the shitty format the Windows Charmap supports. """
 	if isinstance(obj, str):
 		val = str(obj.encode('ascii', 'ignore').decode('ascii') )
@@ -43,8 +47,8 @@ def out(obj, print_val=True, color=None):
 		val = str(obj)
 	else:
 		val = str(pformat(vars(obj)).encode('ascii', 'ignore').decode('ascii') )
-	if color is not None:
-		val = color+str(val)+Style.RESET_ALL
+	if text_color is not None:
+		val = text_color+str(val)+Style.RESET_ALL
 	if print_val:
 		print(val)
 	return val
