@@ -1,5 +1,6 @@
 # Logger object to simplify Thread logging.
 import threading
+import stringutil
 
 class Logger:
 	def __init__(self, max_lines = 3, padding = 0):
@@ -39,10 +40,11 @@ class Logger:
 					break
 				line = ''
 				line+= ' ' * ((self.padding+idx)*4) # 4 spaces per line indent.
-				line+= l.strip()+"\n"
+				line+= l.strip()
 				if 0 < max_width < len(line):
-					line = str(line[0:max_width-4])
-					line+='...\n'
+					line = str(line[0:max_width-5])
+					line+='...'
+				line+= stringutil.Style.RESET_ALL + '\n'
 				out+=line
 			return out
 

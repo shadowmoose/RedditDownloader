@@ -13,7 +13,7 @@ default_settings = {
 	"build_manifest": True,
 	"deduplicate_files": True,
 	"last_started": 0,
-	"meta-version": 2,
+	"meta-version": 3,
 	"output": {
 		"base_dir": "./download/",
 		"subdir_pattern": "/[subreddit]/",
@@ -26,7 +26,12 @@ default_settings = {
 			"filters": {},
 			"type": "personal-upvoted-saved"
 		}
-	]
+	],
+	"threading":{
+		"max_handler_threads":5,
+		"display_clear_screen":True,
+		"display_refresh_rate":5
+	}
 }
 
 class Settings(object):
@@ -145,4 +150,14 @@ class Settings(object):
 			us.set_alias('default-downloader')
 			obj['sources'].append(us.to_obj())
 			print("Adapted from Settings version 1 -> 2!")
+
+		if version == 2:
+			# Version 2->3 sees addition of display config, for Threading.
+			obj['meta-version'] = 3
+			obj['threading'] = {
+				"max_handler_threads":5,# TODO: Could maybe set to 1, to preserve old behavior.
+				"display_clear_screen":True,
+				"display_refresh_rate":5
+			}
+
 		return obj

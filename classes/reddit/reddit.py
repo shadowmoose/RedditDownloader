@@ -31,10 +31,10 @@ def login():
 	if not _credentials:
 		raise ConnectionError('Credentials not set!')
 
-	stringutil.print_color(Fore.YELLOW, "Authenticating via OAuth...")
+	stringutil.print_color(Fore.LIGHTYELLOW_EX, "Authenticating via OAuth...")
 	_reddit = praw.Reddit(**_credentials)
 	_user = _reddit.user.me()
-	stringutil.print_color(Fore.YELLOW, "Authenticated as [%s]\n" % _user.name)
+	stringutil.print_color(Fore.LIGHTYELLOW_EX, "Authenticated as [%s]\n" % _user.name)
 
 
 def my_liked_saved():
