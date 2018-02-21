@@ -1,4 +1,4 @@
-__version__ = "1.54"
+__version__ = "2.0"
 
 import argparse
 import sys
