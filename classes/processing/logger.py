@@ -1,6 +1,7 @@
 # Logger object to simplify Thread logging.
 import threading
-import stringutil
+from util import stringutil
+
 
 class Logger:
 	def __init__(self, max_lines = 3, padding = 0):
@@ -47,6 +48,7 @@ class Logger:
 				line+= stringutil.Style.RESET_ALL + '\n'
 				out+=line
 			return out
+
 
 
 if __name__ == '__main__':

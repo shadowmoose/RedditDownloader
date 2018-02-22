@@ -1,5 +1,5 @@
 import youtube_dl
-import stringutil
+from util import stringutil
 
 tag = 'ytdl'
 order = 100

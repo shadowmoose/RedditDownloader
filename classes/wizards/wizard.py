@@ -1,14 +1,13 @@
 """
 	The main setup Wizard.
 """
-import stringutil as su
 from colorama import Fore
 import webbrowser
 import praw
 import prawcore
 import sys
-from settings import Settings
-import console
+from util.settings import Settings
+from util import console, stringutil as su
 import wizards.source_wizard as source_wizard
 import wizards.wizard_functions as wizard_functions
 
@@ -97,7 +96,7 @@ def interact(settings):
 		"\tThis wizard is built to help you easily manage them.\n")
 	while True:
 		su.print_color(Fore.GREEN, '=== Config Wizard Home ===')
-		opt = console.prompt_list('What would you like to do?',[
+		opt = console.prompt_list('What would you like to do?', [
 			('Edit my saved account information', 'account'),
 			('Add a new Source', 'add'),
 			('Edit my current Sources (%s)' % len(settings.get_sources()), 'edit_source'),
@@ -128,7 +127,7 @@ def _edit_account(settings):
 	auth = settings.get('auth')
 	print('Leave any lines blank to leave setting unchange:')
 	for k, v in auth.items():
-		new_val = console.string('\tEnter your new %s' % (k.replace('_', ' ')) )
+		new_val = console.string('\tEnter your new %s' % (k.replace('_', ' ')))
 		if new_val is not None:
 			auth[k] = new_val
 	if console.confirm('Save these changed values?', False):

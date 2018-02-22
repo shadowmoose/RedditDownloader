@@ -14,7 +14,7 @@ class UserUpvotedSaved(source.Source):
 
 	def setup_wizard(self):
 		print('Setup wizard for %s' % self.get_alias())
-		import console
+		from util import console
 		user = console.string('Name of the User to scan')
 		if user is None:
 			print('Aborting setup.')

@@ -1,10 +1,9 @@
 import json
 import time
-from colorama import Fore
 import os.path
 import gzip
 
-import stringutil
+from util import stringutil
 
 
 class Manifest:
@@ -12,7 +11,7 @@ class Manifest:
 		""" Prepare the Manifest Builder. Optionally load information from the given file. """
 		self.version = 2.0
 		self.data = {'@meta':{'version': 0}}# Default to no version, which will be converted.
-		self.file = stringutil.normalize_file(settings.save_base()+'/Manifest.json.gz')
+		self.file = stringutil.normalize_file(settings.save_base() + '/Manifest.json.gz')
 		if load and os.path.isfile(self.file):
 			try:
 				with gzip.GzipFile(self.file, 'rb') as data_file:

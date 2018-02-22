@@ -1,7 +1,8 @@
 """
 	A few functions for all Wizards, packaged.
 """
-import console
+from util import console
+
 
 def get_unique_alias(settings):
 	""" Prompts the user for a unique Source Alias, or None if they cancel. """

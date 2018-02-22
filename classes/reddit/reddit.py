@@ -4,7 +4,7 @@
 """
 import praw
 import prawcore
-import stringutil
+from util import stringutil
 from colorama import Fore
 from reddit.redditelement import RedditElement
 

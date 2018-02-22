@@ -1,5 +1,5 @@
 import colorama
-import stringutil
+from util import stringutil
 import shutil
 import queue
 from processing.handlerthread import HandlerThread
@@ -77,13 +77,13 @@ class ElementProcessor:
 		if not clear:
 			print('\n\n\n\n')
 
-		out+=stringutil.color("Processing Posts: (~%s in queue)" % processing_queue.qsize(), colorama.Fore.CYAN)+"\n"
+		out+= stringutil.color("Processing Posts: (~%s in queue)" % processing_queue.qsize(), colorama.Fore.CYAN) + "\n"
 		for th in self.threads:
 			if th.keep_running:
 				head_color = stringutil.Fore.GREEN
 			else:
 				head_color = stringutil.Fore.LIGHTYELLOW_EX
-			out+=stringutil.color(th.name, head_color)+"\n"
+			out+= stringutil.color(th.name, head_color) + "\n"
 			out+=th.log.render(limit=2, max_width=width)
 			out+=th.handler_log.render(limit=lines_per-2, max_width=width)
 		print(out.rstrip(), end='')
