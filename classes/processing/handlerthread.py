@@ -4,10 +4,9 @@ import os
 import pkgutil
 import sys
 
-import stringutil
 import processing.logger
 import handlers
-import hashjar
+from util import hashjar, stringutil
 
 
 class HandlerThread(threading.Thread):
@@ -44,7 +43,7 @@ class HandlerThread(threading.Thread):
 				self.keep_running = False
 				print("Exited thread %s" % self.name)
 				break
-		self.log.out(0,stringutil.color('Completed.', stringutil.Fore.GREEN))
+		self.log.out(0, stringutil.color('Completed.', stringutil.Fore.GREEN))
 		self.handler_log.clear()
 		self.keep_running = False
 
@@ -58,12 +57,12 @@ class HandlerThread(threading.Thread):
 		self.handler_log.clear()
 		with HandlerThread.ele_lock:
 			self.log.out(0,
-				 stringutil.out(
+						 stringutil.out(
 					 "[%s](%s): %s" % (reddit_element.type, reddit_element.subreddit, reddit_element.title),
 					 False,
 					 stringutil.Fore.LIGHTYELLOW_EX
 				 )
-			 )
+						 )
 			for url in reddit_element.get_urls():
 				file = self.loader.url_exists(url)
 				if file:
@@ -136,7 +135,7 @@ class HandlerThread(threading.Thread):
 		"""
 		ret_val = False # Default to 'False', meaning no file was located by a handler.
 		for h in self.handlers:
-			self.log.out(1,stringutil.color("Checking handler: %s" % h.tag, stringutil.Fore.CYAN))
+			self.log.out(1, stringutil.color("Checking handler: %s" % h.tag, stringutil.Fore.CYAN))
 			ret = False
 
 			# noinspection PyBroadException

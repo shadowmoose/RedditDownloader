@@ -9,7 +9,7 @@
 """
 import hashlib
 from PIL import Image
-import stringutil
+from util import stringutil
 import os.path
 
 _sha_hashes = {}

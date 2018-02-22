@@ -2,8 +2,7 @@
 	Wizard for handling Source editing.
 """
 
-import console
-import stringutil as su
+from util import console, stringutil as su
 import wizards.wizard_functions as wizard_functions
 
 class SourceEditor:
@@ -21,7 +20,7 @@ class SourceEditor:
 				for f in filters:
 					print('\t-%s' % f)
 
-			choice = console.prompt_list('What would you like to do with this Source?',[
+			choice = console.prompt_list('What would you like to do with this Source?', [
 				('Edit this Source', 'edit'),
 				('Rename', 'rename'),
 				('Delete this Source', 'delete'),

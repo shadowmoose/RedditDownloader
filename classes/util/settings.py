@@ -41,7 +41,7 @@ class Settings(object):
 		self.settings_file = file
 		if can_load and not os.path.isfile(self.settings_file):
 			self.save()# Save defaults.
-			import console
+			from util import console
 			if console.confirm('Would you like to launch the first-time setup assistant?', True):
 				import wizards.wizard as wizard
 				print('\n\n')
@@ -136,7 +136,7 @@ class Settings(object):
 		return self.get_save_location('file_name_pattern')
 
 
-	def adapt(self, obj):
+	def adapt(self, obj): #!cover
 		version = 1
 		if 'meta-version' in obj:
 			version = obj['meta-version']

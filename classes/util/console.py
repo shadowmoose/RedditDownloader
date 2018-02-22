@@ -1,8 +1,8 @@
 """
 	Package for getting & validating user input in various ways, via the console.
 """
-import stringutil
-from stringutil import Fore
+from util import stringutil
+from util.stringutil import Fore
 
 
 def col_input(prompt, color=Fore.LIGHTYELLOW_EX):

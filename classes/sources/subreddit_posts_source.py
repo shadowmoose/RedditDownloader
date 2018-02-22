@@ -1,6 +1,6 @@
 from sources import source
 import reddit.reddit as reddit
-import console
+from util import console
 
 
 class UserPostsSource(source.Source):

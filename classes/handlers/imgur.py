@@ -6,7 +6,7 @@ import requests
 import mimetypes
 import shutil
 import urllib.parse
-import stringutil
+from util import stringutil
 
 tag = 'imgur'
 order = 1

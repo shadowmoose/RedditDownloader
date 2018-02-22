@@ -32,7 +32,7 @@ sys.path.insert(0, './classes/wizards')
 
 
 if args.update or args.update_only:
-	from updater import Updater
+	from util.updater import Updater
 	upd = Updater('shadowmoose', 'RedditDownloader', __version__, args.skip_pauses) # Pull from the latest release
 	upd.run()
 
@@ -57,14 +57,13 @@ import re
 import colorama
 from colorama import Fore
 
-from settings import Settings
-import stringutil
+from util.settings import Settings
 from processing.elementprocessor import ElementProcessor
 from reddit.redditloader import RedditLoader
-from manifest import Manifest
+from util.manifest import Manifest
 import reddit.reddit as reddit
 import wizards.wizard as wizard
-import console
+from util import console, stringutil
 
 #import logging
 #logging.basicConfig(filename='errors.log',level=logging.CRITICAL)

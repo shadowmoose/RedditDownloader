@@ -1,4 +1,4 @@
-import stringutil
+from util import stringutil
 from colorama import Fore
 
 class RedditLoader:

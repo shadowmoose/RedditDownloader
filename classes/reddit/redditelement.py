@@ -1,4 +1,4 @@
-import stringutil
+from util import stringutil
 import praw.models
 import copy
 

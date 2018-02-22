@@ -6,7 +6,8 @@ import filters
 import os
 import re
 from enum import Enum
-import stringutil
+from util import stringutil
+
 
 class Operators(Enum):
 	""" Enum for porting around operators. """
