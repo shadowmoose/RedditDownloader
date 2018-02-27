@@ -18,5 +18,5 @@ def run_test(re):
 				continue
 			#print("'%s':%i," % (u, os.path.getsize(f) ));
 			if u not in size_list or os.path.getsize(f) != size_list[u]:
-				return 'Invalid URL filesize: [%s]!=[%i]' % (u, os.path.getsize(f)), 1
+				return 'Invalid URL filesize: [%s]!=[%i]' % (u, os.path.getsize(f)), 1 #!cover
 	return '', 0

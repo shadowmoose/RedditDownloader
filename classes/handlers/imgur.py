@@ -228,7 +228,7 @@ def handle(url, data, log, guess=True):
 					path = data['single_file'] % ext
 					
 					if not os.path.isfile(path):
-						if not os.path.isdir(data['parent_dir']):
+						if not os.path.isdir(data['parent_dir']): #!cover
 							log.out(1,("+Building dir: %s" % data['parent_dir']) )
 							os.makedirs(data['parent_dir'])# Parent dir for the full filepath is supplied already.
 						
@@ -237,8 +237,8 @@ def handle(url, data, log, guess=True):
 							shutil.copyfileobj(r.raw, f)
 							return path
 					else:
-						return path
-				else:
+						return path #!cover
+				else: #!cover
 					#stringutil.error('IMGUR: Error Reading Image: %s responded with code %i!' % (url, r.status_code) )
 					return False
 			except KeyboardInterrupt:
@@ -249,7 +249,7 @@ def handle(url, data, log, guess=True):
 				if path and os.path.isfile(path):
 					os.remove(path)
 			#stringutil.error('IMGUR: Something strange failed with direct Imgur download...')
-			return False
+			return False #!cover
 	else:
 		if 'i.' in url:
 			# Sometimes people include 'i.imgur' in album releases, which is incorrect.

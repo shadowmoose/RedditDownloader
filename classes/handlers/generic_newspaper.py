@@ -20,7 +20,7 @@ def handle(url, data, log):
 		log.out(0,'Downloading article...')
 		resp = requests.get(url, headers = {'User-Agent': data['user_agent']})
 		if resp.status_code != 200:
-			return False
+			return False #!cover
 
 		config = Config()
 		config.memoize_articles = False
@@ -33,7 +33,7 @@ def handle(url, data, log):
 		article.parse()
 		if article.top_image:
 			src = article.top_image
-			if 'http' not in src:
+			if 'http' not in src: #!cover
 				if 'https' in url:
 					src = 'https://' + src.lstrip('/ ').strip()
 				else:
@@ -44,26 +44,26 @@ def handle(url, data, log):
 			if r.status_code == 200:
 				content_type = r.headers['content-type']
 				ext = mimetypes.guess_extension(content_type)
-				if not ext or ext=='':
+				if not ext or ext=='': #!cover
 					log.out(1, 'NewsPaper Error locating file MIME Type: %s' % url)
 					return False
 				if '.jp' in ext:
-					ext = '.jpg'
+					ext = '.jpg' #!cover
 				path = data['single_file'] % ext
 				if not os.path.isfile(path):
-					if not os.path.isdir(data['parent_dir']):
+					if not os.path.isdir(data['parent_dir']): #!cover
 						log.out(1, ("+Building dir: %s" % data['parent_dir']))
 						os.makedirs(data['parent_dir'])# Parent dir for the full filepath is supplied already.
 					with open(path, 'wb') as f:
 						r.raw.decode_content = True
 						shutil.copyfileobj(r.raw, f)
 				return path
-			else:
+			else: #!cover
 				log.out(0,('\t\tError Reading Image: %s responded with code %i!' % (url, r.status_code) ))
 				return False
 	except Exception as e:
 		log.out(0, ('"Newspaper" Generic handler failed. '+(str(e).strip()) ) )
-	return False
+	return False #!cover
 
 
 if __name__ == '__main__':

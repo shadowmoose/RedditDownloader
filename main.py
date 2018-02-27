@@ -31,7 +31,7 @@ sys.path.insert(0, './classes/filters')
 sys.path.insert(0, './classes/wizards')
 
 
-if args.update or args.update_only:
+if args.update or args.update_only: #!cover
 	from util.updater import Updater
 	upd = Updater('shadowmoose', 'RedditDownloader', __version__, args.skip_pauses) # Pull from the latest release
 	upd.run()
@@ -85,7 +85,7 @@ class Scraper(object):
 			for k,v in c_settings.items():
 				self.settings.set(k, v)
 		#
-		if args.wizard:
+		if args.wizard: #!cover
 			if args.wizard and args.skip_pauses:
 				stringutil.error('You cannot run the Wizard with pause skipping enabled.')
 				sys.exit(16)
@@ -98,7 +98,7 @@ class Scraper(object):
 		if self.settings.get('build_manifest', True):
 			self.manifest = Manifest(self.settings, True)
 		else:
-			print('Not using manifest.')
+			print('Not using manifest.') #!cover
 
 		self.sources = self.load_sources()
 		self.reddit = None
@@ -106,7 +106,7 @@ class Scraper(object):
 		
 		# Authenticate and prepare to scan:
 		auth_info = self.settings.get('auth')
-		if not auth_info:
+		if not auth_info: #!cover
 			print('Error loading authentication information!')
 			return
 		self.settings.set('last_started', time.time())
@@ -128,7 +128,7 @@ class Scraper(object):
 		
 
 		if self.manifest:
-			if not args.skip_pauses:
+			if not args.skip_pauses: #!cover
 				try:
 					if console.confirm("Build manifest?", True):
 						print('Building manifest.')
@@ -139,7 +139,7 @@ class Scraper(object):
 			else:
 				print('Automatically building manifest.')
 				self.manifest.build(self.reddit)
-		else:
+		else: #!cover
 			print('Manifest not built.')
 			if not args.skip_pauses:
 				input("Press Enter to exit.")
@@ -147,7 +147,7 @@ class Scraper(object):
 	#
 
 
-	def load_sources(self):
+	def load_sources(self): #!cover
 		sources = []
 		settings_sources = self.settings.get_sources()
 		if args.source is None:
@@ -177,7 +177,7 @@ class Scraper(object):
 
 settings = 'settings.json'
 if args.settings:
-	settings = args.settings
+	settings = args.settings #!cover
 if args.test:
 	print("Test Mode running")
 #
@@ -187,7 +187,7 @@ if args.test:
 # Simply pop key->value replacements into this obj to override those key->value pairs when the Scraper launches.
 custom_settings = {}
 
-if args.base_dir:
+if args.base_dir: #!cover
 	mod = Settings(settings, False).get('output')# get default output format from a non-saving Settings object.
 	mod['base_dir'] = args.base_dir
 	if args.file_pattern:
@@ -198,7 +198,7 @@ if args.base_dir:
 
 user_settings = [args.c_id , args.c_secret , args.password , args.agent , args.username]
 if any(user_settings):
-	if not all(user_settings):
+	if not all(user_settings): #!cover
 		print('You must set all the Client, User, and User-Agent parameters to do that!')
 		sys.exit(5)
 	auth = {
@@ -211,15 +211,15 @@ if any(user_settings):
 	print('Using command-line authorization details!')
 	custom_settings['auth'] = auth
 
-if args.duplicate:
+if args.duplicate: #!cover
 	custom_settings['deduplicate_files'] = False
 
-if args.skip_manifest:
+if args.skip_manifest: #!cover
 	custom_settings['build_manifest'] = False
 
 
 # If no settings were specified, pass 'None' to stick completely with default, auto-saving file values.
-if len(custom_settings) == 0:
+if len(custom_settings) == 0: #!cover
 	print('Loading all settings from file.')
 	custom_settings = None
 
@@ -233,7 +233,7 @@ if args.test:
 	# Run some extremely basic tests to be sure (mostly) everything's working.
 	# Uses data specific to a test user account. This functionality is useless outside of building.
 	stringutil.print_color(Fore.YELLOW, "Checking against prearranged data...")
-	if not os.path.isdir('tests'):
+	if not os.path.isdir('tests'): #!cover
 		stringutil.print_color(Fore.RED, 'No tests directory found.')
 		sys.exit(1)
 	
@@ -252,7 +252,7 @@ if args.test:
 			name = "tests." + name
 			test = __import__(name, fromlist=[''])
 			msg,val = test.run_test(p.reddit)
-			if val != 0:
+			if val != 0: #!cover
 				stringutil.print_color(Fore.RED, 'FAIL: %s' % str(msg))
 				exit_values.append(1000+i)  #use a unique error code for potential help debugging.
 			else:
@@ -260,7 +260,7 @@ if args.test:
 		except Exception as e:
 			stringutil.print_color(Fore.RED, 'EXCEPTION: %s' % e)
 			exit_values.append(i)
-	if max(exit_values) > 0:
+	if max(exit_values) > 0: #!cover
 		stringutil.print_color(Fore.RED, "Failed testing!")
 		sys.exit( max(exit_values) )
 	stringutil.print_color(Fore.GREEN, 'Passed all tests!')
