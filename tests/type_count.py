@@ -1,4 +1,4 @@
-submissions = 4
+submissions = 5
 comments = 1
 
 # Checks how many, and which types, of posts/comments we've found.

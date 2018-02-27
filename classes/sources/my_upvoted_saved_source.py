@@ -13,11 +13,11 @@ class UpvotedSaved(source.Source):
 		return [ele for ele in reddit.my_liked_saved() if self.check_filters(ele)]# Use filters.
 
 
-	def setup_wizard(self):
+	def setup_wizard(self): #!cover
 		print('Setup wizard for %s' % self.get_alias())
 		print('This source requires no additional information.')
 		return True
 
 
-	def get_config_summary(self):
+	def get_config_summary(self): #!cover
 		return "Scanning all your Upvoted/Saved Submissions & Comments."

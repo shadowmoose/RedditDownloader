@@ -28,7 +28,7 @@ class RedditLoader:
 		return self.total_count
 
 
-	def count_remaining(self):
+	def count_remaining(self): #!cover
 		""" Returns the total number of remaining elements to process. """
 		return self.count_total() -  self.count_completed()
 
@@ -52,17 +52,17 @@ class RedditLoader:
 		""" Returns the file name if the given URL has already been processed before. """
 		for ele in self.completed:
 			if ele.contains_url(url):
-				return ele.get_completed_files()[url]
+				return ele.get_completed_files()[url] #!cover
 		#
 		return None
 
 
-	def file_exists(self, file_name):
+	def file_exists(self, file_name): #!cover
 		""" Returns True if the given filename is already used by an Element. """
 		return any(ele.contains_file(file_name) for ele in self.completed)
 
 
-	def get_elements_for_file(self, file_name):
+	def get_elements_for_file(self, file_name): #!cover
 		""" Gets a list of elements that contain the given filename. """
 		return [ele for ele in self.completed if ele.contains_file(file_name)]
 	

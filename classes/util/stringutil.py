@@ -5,10 +5,10 @@ import string
 from pprint import pformat
 import os.path
 
-def fit(input_string, desired_len):
+def fit(input_string, desired_len): #!cover
 	""" Shrinks the given string to fit within the desired_len by collapsing the middle. """
 	if desired_len<=3:
-		return input_string
+		return input_string #!cover
 	if len(input_string)>desired_len:
 		# Trim the input_string to a reasonable length for output:
 		h = math.floor(len(input_string)/2)
@@ -26,7 +26,7 @@ def html_elements(html_string, tag='a', tag_val='href'):
 	return urls
 
 
-def error(string_output, **kwargs):
+def error(string_output, **kwargs): #!cover
 	print_color(Fore.RED, string_output, **kwargs)
 
 
@@ -39,7 +39,7 @@ def print_color(fore_color, string_output, **kwargs):
 	print(fore_color + string_output + Style.RESET_ALL, **kwargs)
 
 
-def out(obj, print_val=True, text_color=None):
+def out(obj, print_val=True, text_color=None): #!cover
 	""" Prints out the given object in the shitty format the Windows Charmap supports. """
 	if isinstance(obj, str):
 		val = str(obj.encode('ascii', 'ignore').decode('ascii') )
@@ -69,7 +69,7 @@ def insert_vars(str_path, ele):
 	""" Replace the [tagged] ele fields in the given string. Sanitizes inserted values to be filename-compatible. """
 	max_len = 1000
 	if os.name == 'nt':
-		max_len = 230 # We need to leave some headroom for longer (Unknown) extensions and/or naming.
+		max_len = 230 # We need to leave some headroom for longer (Unknown) extensions and/or naming. !cover
 	length = min(max_len, max(len(v) for k,v in ele.to_obj().items()) )
 	while True:
 		ret_str = str_path
@@ -78,13 +78,14 @@ def insert_vars(str_path, ele):
 
 		if len(os.path.abspath(ret_str) ) < max_len:
 			return normalize_file(ret_str)
-		length -=1
-		if length <= 0:
-			error("\t\tFailed to trim file path to acceptable length for Operating System!")
-			return None
+		else: #!cover
+			length -=1
+			if length <= 0:
+				error("\t\tFailed to trim file path to acceptable length for Operating System!")
+				return None
 
 
-def is_numeric(s):
+def is_numeric(s): #!cover
 	""" Check if the given string is numeric """
 	try:
 		float(s)
