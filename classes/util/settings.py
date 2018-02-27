@@ -39,7 +39,7 @@ class Settings(object):
 		self.vals = default_settings
 		self.can_save = can_save
 		self.settings_file = file
-		if can_load and not os.path.isfile(self.settings_file):
+		if can_load and not os.path.isfile(self.settings_file): #!cover
 			self.save()# Save defaults.
 			from util import console
 			if console.confirm('Would you like to launch the first-time setup assistant?', True):
@@ -51,7 +51,7 @@ class Settings(object):
 				print('Fill in your username/password, and register an app here: https://www.reddit.com/prefs/apps \n'
 					  'Fill the app\'s client information in as well.')
 				sys.exit(1)
-		if can_load and os.path.isfile(self.settings_file):
+		if can_load and os.path.isfile(self.settings_file): #!cover
 			with open(self.settings_file) as json_data:
 				self.vals = self.adapt(json.load(json_data))
 
@@ -64,21 +64,21 @@ class Settings(object):
 	def save(self):
 		if not self.can_save:
 			return
-		with open(self.settings_file, 'w') as outfile:
+		with open(self.settings_file, 'w') as outfile: #!cover
 			json.dump(self.vals, outfile, sort_keys=True, indent=4, separators=(',', ': '))
 
 	
 	def get(self, key, default_val=None):
 		if key in self.vals:
 			return self.vals[key]
-		return default_val
+		return default_val #!cover
 
 	
 	def get_save_location(self, sub):
 		""" Used for internal fast access to the save path patterns. """
 		out = self.get('output')
-		if not out:
-			print('!Malformed output settings. Using defaults.')
+		if not out: #!cover
+			print('!Malformed output settings. Using defaults.')#TODO: Error logging
 			return default_settings['output']
 		return out[sub]
 
@@ -89,7 +89,7 @@ class Settings(object):
 		return source.get_sources( self.get('sources', []) )
 
 
-	def has_source_alias(self, alias):
+	def has_source_alias(self, alias): #!cover - no sources yet
 		""" Check if the given source alias exists. """
 		sources = self.get_sources()
 		for s in sources:
@@ -98,7 +98,7 @@ class Settings(object):
 		return False
 
 
-	def add_source(self, new_source):
+	def add_source(self, new_source): #!cover - no sources yet
 		""" Adds the given source to the JSON-encoded Settings data. Will not add a duplicate Source alias.
 			Returns if the Source was added
 		"""
@@ -110,13 +110,13 @@ class Settings(object):
 		return True
 
 
-	def remove_source(self, source):
+	def remove_source(self, source): #!cover - no sources yet
 		""" Removes the given Source from the list of sources, and resaves. """
 		new_sources = [s for s in self.get_sources() if s.get_alias() != source.get_alias()]
 		self._set_source_list(new_sources)
 
 
-	def _set_source_list(self, s_list):
+	def _set_source_list(self, s_list): #!cover - no sources yet
 		""" Internal, saves the given list of sources to JSON format. """
 		self.set('sources', [s.to_obj() for s in s_list])
 

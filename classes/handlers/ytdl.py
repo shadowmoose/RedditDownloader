@@ -9,10 +9,11 @@ class Logger(object):
 		pass
 
 	def warning(self, msg):
-		pass
+		pass #!cover
 
 	def error(self, msg):
-		pass#if 'Unsupported' not in msg:
+		pass #!cover
+		# if 'Unsupported' not in msg:
 			#if ';' in msg:
 			#	msg = msg.split(';')[0].strip()
 			#stringutil.error("\t\tYTDL :: %s" % msg)

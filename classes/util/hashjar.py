@@ -26,7 +26,7 @@ def add_hash(filename):
 		return True, None
 
 	is_image, final_hash = _get_best_hash(filename)
-	if not final_hash:
+	if not final_hash: #!cover
 		stringutil.error("HashCheck :: Error hit hashing file, passing file as new.")
 		return True, None
 
@@ -39,7 +39,7 @@ def add_hash(filename):
 				return False, _image_hashes[h]
 		#print('\tHashCheck :: File is unique. Saved successfully.')
 	elif final_hash in _sha_hashes:
-		return False, _sha_hashes[final_hash]
+		return False, _sha_hashes[final_hash] #!cover
 
 	if is_image:
 		_image_hashes[final_hash] = filename
@@ -56,7 +56,7 @@ def _get_best_hash(filename):
 	"""
 	try:
 		image = Image.open(filename)
-		if _is_animated(image):
+		if _is_animated(image): #!cover
 			#best_hash = _hash_gif(image)
 			# Could dhash gifs to compare them, but that's a lot of memory for little likely gain.
 			best_hash = _sha_hash(filename)
@@ -71,7 +71,7 @@ def _get_best_hash(filename):
 	return is_image, best_hash
 
 
-def _is_animated(image):
+def _is_animated(image): #!cover
 	"""
 	Checks if the given Image object is an animated GIF
 	"""
@@ -83,7 +83,7 @@ def _is_animated(image):
 		return True
 
 
-def _hash_gif(image):
+def _hash_gif(image): #!cover
 	"""
 	Build a hash for animated gif objects.
 	"""

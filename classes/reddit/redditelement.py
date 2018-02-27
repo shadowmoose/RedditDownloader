@@ -44,7 +44,7 @@ class RedditElement(object):
 		elif type(obj) == praw.models.reddit.comment.Comment:
 			self.comment(obj)
 		else:
-			print('Unknown Element Type: '+str(type(obj)) )
+			print('Unknown Element Type: '+str(type(obj)) ) #!cover
 	#
 	
 	
@@ -57,7 +57,7 @@ class RedditElement(object):
 		if c.author:
 			self.author = str(c.author.name)
 		else:
-			self.author = 'Deleted'
+			self.author = 'Deleted' #!cover
 		self.body = c.body
 		for url in stringutil.html_elements(c.body_html, 'a', 'href'):
 			self.add_url(url)
@@ -95,7 +95,7 @@ class RedditElement(object):
 			self._urls.append(url)
 
 
-	def remove_url(self, url):
+	def remove_url(self, url): #!cover
 		if url in self._urls:
 			self._urls.remove(url)
 		else:
@@ -109,7 +109,7 @@ class RedditElement(object):
 		self.source_alias = str(source_obj.get_alias())
 
 
-	def get_id(self):
+	def get_id(self): #!cover
 		""" Get this element's ID. """
 		return self.id
 
@@ -125,7 +125,7 @@ class RedditElement(object):
 		return copy.deepcopy(self._file_map)
 
 
-	def get_json_url(self):
+	def get_json_url(self): #!cover
 		""" Returns the API access point for this comment's JSON. """
 		return 'https://www.reddit.com/api/info.json?id=%s' % self.id
 
@@ -140,7 +140,7 @@ class RedditElement(object):
 		return any(file_name in str(self._file_map[key]) for key in self._file_map)
 
 
-	def remap_file(self, filename_old, filename_new):
+	def remap_file(self, filename_old, filename_new): #!cover
 		""" Remap an old filename to a new one. """
 		for f in self._file_map:
 			if self._file_map[f] == filename_old:

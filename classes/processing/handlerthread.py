@@ -65,12 +65,12 @@ class HandlerThread(threading.Thread):
 						 )
 			for url in reddit_element.get_urls():
 				file = self.loader.url_exists(url)
-				if file:
+				if file: #!cover
 					reddit_element.add_file(url, file)
 					continue
 				if self.manifest:
 					skip, file = self.manifest.url_completed(url)
-					if skip and (file is None or os.path.exists(file)):
+					if skip and (file is None or os.path.exists(file)): #!cover
 						reddit_element.add_file(url, file)
 						if file is not None:
 							hashjar.add_hash(file) # Add the existing file hash so we can deduplicate against it.
@@ -87,7 +87,7 @@ class HandlerThread(threading.Thread):
 			file_info = el['info']
 			file_path = self.process_url(url, file_info)# The important bit is here, & doesn't need the Lock.
 			if not self.keep_running:
-				return # Kill the thread after a potentially long-running download, if the program has terminated.
+				return # Kill the thread after a potentially long-running download if the program has terminated. !cover
 			with HandlerThread.ele_lock:
 				reddit_element.add_file(url, self.check_duplicates(file_path))
 			# exit lock
@@ -105,7 +105,7 @@ class HandlerThread(threading.Thread):
 
 			if basedir is None or basefile is None:
 				#Cannot download this file, because the file path generated for it is too long
-				return None
+				return None #!cover
 
 			og = basefile
 			i=2
@@ -145,7 +145,7 @@ class HandlerThread(threading.Thread):
 				print(sys.exc_info()[0])
 				pass
 
-			if ret is None:
+			if ret is None: #!cover
 				# None is returned when the handler specifically wants this URL to be "finished", but not added to the files list.
 				ret_val = None
 				break
@@ -161,11 +161,11 @@ class HandlerThread(threading.Thread):
 			Returns the filename that the file exists under.
 		"""
 		if not file_path:
-			return file_path
+			return file_path #!cover
 		with HandlerThread.ele_lock:
 			if not self.settings.get('deduplicate_files', True):
 				# Deduplication disabled.
-				return file_path
+				return file_path #!cover
 			was_new, existing_path = hashjar.add_hash(file_path) # Check if the file exists already.
 			if not was_new:
 				# Quick and dirty comparison, assumes larger filesize means better quality.
@@ -186,8 +186,6 @@ class HandlerThread(threading.Thread):
 		""" Loads all the available handlers from the handler directory. """
 		self.handlers = []
 		for _,name,_ in pkgutil.iter_modules([os.path.dirname(handlers.__file__)]):
-			if '_init_' in name:
-				continue
 			fi = __import__(name, fromlist=[''])
 			self.handlers.append(fi)
 		self.handlers.sort(key=lambda x: x.order, reverse=False)

@@ -39,7 +39,7 @@ class ElementProcessor:
 			while any([t.keep_running for t in self.threads]):
 				self.redraw(clear, q)
 				# Sleep...
-				if refresh_rate > 5:
+				if refresh_rate > 5: #!cover
 					steps = max(1, int(refresh_rate/5))
 					for t in range(steps):
 						# Break custom output delay down, so we can exit early if finished.
@@ -71,7 +71,10 @@ class ElementProcessor:
 		out = ''
 
 		lines_per = max(2, int((height - 2)/(max_threads+1)) )
-		if clear and lines_per >= 3: # 4 lines = thread name+two levels of info + newline.
+		if lines_per < 3: # 4 lines = thread name+two levels of info + newline.
+			clear = False
+
+		if clear:
 			out = colorama.ansi.clear_screen()
 
 		if not clear:
@@ -93,5 +96,5 @@ class ElementProcessor:
 
 	def stop_process(self):
 		""" Signal any running threads that they should exit. Non-blocking. """
-		for th in self.threads:
+		for th in self.threads: #!cover
 			th.keep_running = False

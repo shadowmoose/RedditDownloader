@@ -12,7 +12,7 @@ class Manifest:
 		self.version = 2.0
 		self.data = {'@meta':{'version': 0}}# Default to no version, which will be converted.
 		self.file = stringutil.normalize_file(settings.save_base() + '/Manifest.json.gz')
-		if load and os.path.isfile(self.file):
+		if load and os.path.isfile(self.file): #!cover
 			try:
 				with gzip.GzipFile(self.file, 'rb') as data_file:
 					self.data = json.loads(data_file.read().decode('utf8'))
@@ -59,7 +59,7 @@ class Manifest:
 		"""
 		assert 'elements' in self.data
 		assert 'completed' in self.data['elements']
-		for e in self.data['elements']['completed']:
+		for e in self.data['elements']['completed']: #!cover
 			assert 'files' in e
 			if url in e['files']:
 				return True, e['files'][url]

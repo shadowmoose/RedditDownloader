@@ -24,7 +24,7 @@ Copyright Alex Gisby <alex@solution10.com>
 # Pulled from: https://github.com/alexgisby/imgur-album-downloader and modified.
 
 class ImgurAlbumException(Exception):
-	def __init__(self, msg='Error'):
+	def __init__(self, msg='Error'): #!cover
 		self.msg = msg
 
 
@@ -80,14 +80,14 @@ class ImgurAlbumDownloader:
 		return len(self.imageIDs)
 
 
-	def list_extensions(self):
+	def list_extensions(self): #!cover
 		"""
 		Returns list with occurrences of extensions in descending order.
 		"""  
 		return self.cnt.most_common()
 
 
-	def album_key(self):
+	def album_key(self): #!cover
 		"""
 		Returns the key of this album. Helpful if you plan on generating your own
 		folder names.
@@ -111,7 +111,7 @@ class ImgurAlbumDownloader:
 		self.image_callbacks.append(callback)
 
 
-	def on_complete(self, callback):
+	def on_complete(self, callback): #!cover
 		"""
 		Allows you to bind onto the end of the process, displaying any lovely messages
 		to your users, or carrying on with the rest of the program. Whichever.
@@ -128,7 +128,7 @@ class ImgurAlbumDownloader:
 		# Try and create the album folder:
 		if foldername:
 			album_folder = foldername
-		else:
+		else: #!cover
 			album_folder = self.album_key
 
 		if not os.path.exists(album_folder):
@@ -173,7 +173,7 @@ class ImgurAlbumDownloader:
 					raise
 
 		# Run the complete callbacks:
-		for fn in self.complete_callbacks:
+		for fn in self.complete_callbacks: #!cover
 			fn()
 
 
@@ -211,10 +211,10 @@ def handle(url, data, log, guess=True):
 				if r.status_code == 200:
 					content_type = r.headers['content-type']
 					ext = mimetypes.guess_extension(content_type)
-					if 'gifv' in url:
+					if 'gifv' in url: #!cover
 						log.out(1,'-Allowing YTDL Handler to download animations.')
 						return False# Let Youtube-dl module convert animations.
-					if not ext or ext=='':
+					if not ext or ext=='': #!cover
 						#stringutil.error('IMGUR: Error locating file MIME Type: %s' % url)
 						if guess:
 							# Attempt to download this image (missing a file ext) as a png.
@@ -224,7 +224,7 @@ def handle(url, data, log, guess=True):
 							return False
 					
 					if '.jp' in ext:
-						ext = '.jpg'
+						ext = '.jpg' #!cover
 					path = data['single_file'] % ext
 					
 					if not os.path.isfile(path):
@@ -254,7 +254,7 @@ def handle(url, data, log, guess=True):
 		if 'i.' in url:
 			# Sometimes people include 'i.imgur' in album releases, which is incorrect.
 			# Imgur redirects this, but we correct for posterity.
-			url = url.replace('i.', '')
+			url = url.replace('i.', '') #!cover
 	#
 	try:
 		# Fire up the class:
@@ -284,4 +284,4 @@ def handle(url, data, log, guess=True):
 	except ImgurAlbumException as e:
 		#stringutil.error("IMGUR: Imgur Error: "+e.msg)
 		pass
-	return False
+	return False #!cover
