@@ -81,9 +81,8 @@ def run(settings_file='settings.json'):
 			sys.exit(0)
 	except prawcore.exceptions.ResponseException:
 		su.print_color(Fore.RED, "There was an error authenticating you.")
-		su.print_color(Fore.RED, "Edit or delete the 'Settings.ini' file just created, then")
-		su.print_color(Fore.RED, "retry these steps and assure you've gotten everything correct.")
-
+		su.print_color(Fore.RED, "Edit or delete the 'Settings.ini' file just created,")
+		su.print_color(Fore.RED, "then retry these steps and assure you've gotten everything correct.")
 		sys.exit(1)
 
 
