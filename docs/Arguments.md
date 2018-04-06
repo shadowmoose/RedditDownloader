@@ -52,7 +52,7 @@ The patterns allow for data insertion, based off the currently-processing post.
 
 To insert them, include *'[tag_name]'* in the path. EG: *'/custom/[subreddit]/[user]/'*
 
-**Available tags:** type *('Post'/'Comment')*, id, title, author, subreddit, source_alias
+**Available tags:** type *(will be 'Post'/'Comment')*, id, title, author, subreddit, source_alias
 
 __Files are saved as:__ *base_dir/subdir_pattern/file_pattern*
 

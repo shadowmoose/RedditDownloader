@@ -1,8 +1,10 @@
 **Assuming everything's up to date, these are the currently supported sources for Submissions/Comments.**
 
-*Since it is possible to have more than one of the same Source Type to track different areas of Reddit, 
-and the unique name you give Sources can be embedded into the path files are saved under, 
-there are plenty of options for manipulating input/output.*
+*Note that it is possible to have more than one of the same type of source.*
+
+*Sources are given an alias when you set them up, and - if you desire - this alias can be embedded into 
+the final file output paths [(See "Output Format" Arguments)](../Arguments.md) to further differentiate 
+the various sources.*
 
 [Back to User Guide](./User_Guide.md)
 
@@ -10,10 +12,15 @@ there are plenty of options for manipulating input/output.*
 
 # Supported Sources:
 
++ Subreddit Submissions
+  + Scan Submissions from the target subreddit.
+  + As with many sources, supports sorting by "Hot/Top/Etc"
+  + Also supports sorting by time. (Last Hour/Day/Month/All Time/Etc)
 
-+ User-curated MultiReddit.
-  + Great for tracking personal or public groups of subs.
-  + Provide a username and multireddit name to use.
+
++ Your Reddit Front Page
+  + Supports all standard methods of sorting.
+  + Personalized to the authorized account.
 
 
 + Your Upvoted and/or Saved Posts & Comments
@@ -30,10 +37,9 @@ there are plenty of options for manipulating input/output.*
   + I suggest using this one on personal accounts instead, if you need advanced configuration.
 
 
-+ Subreddit Submissions
-  + Scan Submissions from the target subreddit.
-  + As with many sources, supports sorting by "Hot/Top/Etc"
-  + Also supports sorting by time. (Last Hour/Day/Month/All Time/Etc)
++ User-curated MultiReddit.
+  + Great for tracking personal or public groups of subs.
+  + Provide a username and multireddit name to use.
 
 
 + User's Submission & Comment History
