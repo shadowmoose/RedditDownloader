@@ -124,7 +124,8 @@ class Scraper(object):
 			self.processor.run()
 		except KeyboardInterrupt:
 			print("Interrupted by User.")
-			self.processor.stop_process()
+			if self.processor:
+				self.processor.stop_process()
 		
 
 		if self.manifest:

@@ -37,7 +37,8 @@ class SourceEditor:
 				self._rename()
 
 			if choice == 'delete':
-				self._delete()
+				if self._delete():
+					break
 
 			if choice == 'add_filter':
 				self._add_filter()
@@ -70,9 +71,10 @@ class SourceEditor:
 		if console.confirm('Are you sure you want to delete this Source?', default=False):
 			self.settings.remove_source(self.source)
 			print('Source deleted.')
-			return
+			return True
 		else:
 			print('Source not removed.')
+			return False
 
 
 	def _add_filter(self):

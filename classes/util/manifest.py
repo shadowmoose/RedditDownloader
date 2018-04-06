@@ -66,6 +66,17 @@ class Manifest:
 		return False, None
 
 
+	def id_completed(self, post_id): #!cover
+		""" Checks if the given ID exists in the manifest. """
+		assert 'elements' in self.data
+		assert 'completed' in self.data['elements']
+		for e in self.data['elements']['completed']+ self.data['elements']['failed']:
+			assert 'id' in e
+			if e['id'] == post_id:
+				return True, e
+		return False, None
+
+
 	def adapt(self, obj):
 		""" Adjust the given data to fit the current manifest version.
 			Should be called repeatedly on an object until it not longer returns true.

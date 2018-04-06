@@ -37,6 +37,25 @@ def login():
 	stringutil.print_color(Fore.LIGHTYELLOW_EX, "Authenticated as [%s]\n" % _user.name)
 
 
+def post_orders():
+	""" Returns a list of tuples, indicating acceptable Order values and if they accept Time limits or not. """
+	return [
+		('top', True),
+		('new', False),
+		('hot', False),
+		('controversial', True),
+		('gilded', False),
+		('rising', False),
+	]
+
+
+def time_filters():
+	""" Returns a list of valid Reddit timespans, which can be applied to most ListingGenerators """
+	return [
+		'all', 'hour', 'day', 'week', 'month', 'year'
+	]
+
+
 def my_liked_saved():
 	""" Get the upvoted/saved posts & comments for the signed-in user. """
 	global _user
@@ -70,29 +89,16 @@ def user_liked_saved(username, scan_upvoted=True, scan_saved=True):
 		stringutil.error('Cannot load Upvoted/Saved Posts from the User "%s", because they are private!' % username)
 
 
-def post_orders():
-	""" Returns a list of tuples, indicating acceptable Order values and if they accept Time limits or not. """
-	return [
-		('top', True),
-		('new', False),
-		('hot', False),
-		('controversial', True),
-		('gilded', False),
-		('rising', False),
-	]
-
-
-def time_filters():
-	""" Returns a list of valid Reddit timespans, which can be applied to most ListingGenerators """
-	return [
-		'all', 'hour', 'day', 'week', 'month', 'year'
-	]
-
-
 def subreddit_posts(sub, order_by='new', limit=None, time='all'):
 	""" Get Posts from the given subreddit, with PRAW-based filtering & sorting options. """
 	global _reddit
 	yield from _praw_apply_filter(_reddit.subreddit(sub), order_by, limit, time)
+
+
+def frontpage_posts(order_by='new', limit=None, time='all'):
+	""" Get Posts from the authed account's front page, with PRAW-based filtering & sorting options. """
+	global _reddit
+	yield from _praw_apply_filter(_reddit.front, order_by, limit, time)
 
 
 def user_posts(username, find_submissions, find_comments):

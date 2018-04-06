@@ -5,6 +5,7 @@
 *.gz
 *.iml
 *.log
+*.html
 
 /reference
 /download

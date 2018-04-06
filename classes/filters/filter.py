@@ -152,6 +152,8 @@ class Filter:
 		lim = self._limit
 		if isinstance(lim, str):
 			lim = '"%s"' % lim
+		if self.operator is None or lim is None:
+			return "Filter: %s (%s)" % (self.field, self.description)
 		return "Filter: %s %s %s (%s)" % (
 			self.field,
 			self.operator.value.replace('.', ''),
@@ -166,7 +168,7 @@ class Filter:
 def get_filters(filter_dict=None):
 	""" Get a list of all availale Filter objects.
 		If passed a dict of {'field.operator':val} - as specified by the filter settings syntax -
-			it will return loaded filters objects.
+			it will return loaded filter objects.
 	"""
 	pkg_path = os.path.dirname(filters.__file__)
 	loaded = []
@@ -214,7 +216,7 @@ def _module_classes(module_trg):
 
 
 def get_filter_fields():
-	""" Builds a list of acceptable fields to filter this Element by. """
+	""" Builds a list of acceptable fields to filter Elements by. """
 	return {
 		'link_count': 'The amount of links found for this element. (#)',
 		'type': 'The type of post this is. ("Submission" or "Comment")',
@@ -238,18 +240,23 @@ if __name__ == '__main__':
 	print()
 	print("Loading...")
 
-	test_filters = {'created_utc':99, 'title': 'Test Title'}
+	class TestPost: # Dummy Post object.
+		def __init__(self):
+			self.created_utc = 99
+			self.title = 'Test Title'
+
+	test_post = TestPost()
 	all_filters = get_filters({
-		'created_utc.min':'10/10/2015',
+		'created_utc.min':0,
 		'created_utc.max':100,
 		'created_utc': 99,
-		'created_utc.regex': '99',
-		'title.regex':'Test'
+		'created_utc.match': '99',
+		'title.match':'Test'
 	})
 	print('Loaded Filters:')
 	for f in all_filters:
 		print('\t', f.to_keyval())
 
-	print('\nRunning checks on test:', test_filters)
+	print('\nRunning checks on test:', test_post)
 	for f in all_filters:
-		print(f.check(test_filters), '|', f)
+		print(f.check(test_post), '|', f)
