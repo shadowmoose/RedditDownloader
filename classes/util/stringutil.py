@@ -57,12 +57,12 @@ def out(obj, print_val=True, text_color=None): #!cover
 def filename(f_name):
 	""" Format the given string into an acceptable filename. """
 	valid_chars = "-_.() %s%s[]&" % (string.ascii_letters, string.digits)
-	return ''.join(c for c in f_name if c in valid_chars)
+	return str(''.join(c for c in f_name if c in valid_chars)).strip(' .\n\t').replace('..','.').replace('..','.')
 
 
 def normalize_file(str_file):
 	""" Standardize all paths. Needed in a few spots. """
-	return os.path.normpath(str_file.strip(' .\n\t').replace('..','.').replace('..','.'))
+	return os.path.normpath(str_file.rstrip(' .\n\t'))
 
 
 def insert_vars(str_path, ele):
