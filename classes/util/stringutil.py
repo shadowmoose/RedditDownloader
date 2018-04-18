@@ -62,7 +62,7 @@ def filename(f_name):
 
 def normalize_file(str_file):
 	""" Standardize all paths. Needed in a few spots. """
-	return os.path.normpath(str_file.rstrip(' .\n\t'))
+	return os.path.normpath(str_file.strip(' .\n\t').replace('..','.').replace('..','.'))
 
 
 def insert_vars(str_path, ele):
