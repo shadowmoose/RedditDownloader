@@ -28,7 +28,7 @@ Post. Pass this to disable that behavior. If CPU/RAM usage is an issue, disablin
 **--skip_manifest** - The Manifest generated is used to rapidly skip files downloaded in previous runs. 
 If you download a lot of shifting content, such as constantly-updated imgur albums, use this to ignore the manifest.
 
-**--source, -s** - If specified, only sources - loaded from the settings file - with aliases matches a supplied pattern 
+**--source, -s** - If specified, only sources - loaded from the settings file - with aliases matching a supplied pattern 
 will be checked. This argument can be passed multiple times, to specify multiple patterns. 
 *(EX: "main.py -s filter1 -s filter2 ...etc")*
 
@@ -45,7 +45,7 @@ will be checked. This argument can be passed multiple times, to specify multiple
 + **--agent**   -         String to use for User-Agent.  *A string that identifies your client to Reddit. 
 This can be whatever you want.*
 
-#### Output Format:
+## Output Format:
 The patterns aren't required, but changing either requires that you first also supply the **base_dir** parameter.
 
 The patterns allow for data insertion, based off the currently-processing post.
