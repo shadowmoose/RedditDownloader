@@ -48,7 +48,7 @@ class RedditLoader:
 			self.completed.append(ele)
 
 
-	def url_exists(self, url):
+	def url_already_processed(self, url):
 		""" Returns the file name if the given URL has already been processed before. """
 		for ele in self.completed:
 			if ele.contains_url(url):

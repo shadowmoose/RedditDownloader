@@ -13,7 +13,7 @@ class HandlerThread(threading.Thread):
 	ele_lock = threading.RLock()
 	used_files = []
 
-	def __init__(self, name, settings, manifest, loader, queue):
+	def __init__(self, name, settings, manifest, loader, e_queue):
 		threading.Thread.__init__(self)
 		self.name = name
 		self.log = processing.logger.Logger(2, padding=1)
@@ -23,7 +23,7 @@ class HandlerThread(threading.Thread):
 		self.settings = settings
 		self.loader = loader
 		self.manifest = manifest
-		self.queue = queue
+		self.queue = e_queue
 		self.load_handlers()
 		self.keep_running = True
 
@@ -48,8 +48,6 @@ class HandlerThread(threading.Thread):
 		self.keep_running = False
 
 
-
-
 	def process_ele(self, reddit_element):
 		""" Accepts a RedditElement of Post/Comment details, then runs through the Handlers loaded from the other directory, attempting to download the url.  """
 		todo = []
@@ -64,8 +62,8 @@ class HandlerThread(threading.Thread):
 				 )
 			)
 			for url in reddit_element.get_urls():
-				file = self.loader.url_exists(url)
-				if file: #!cover
+				file = self.loader.url_already_processed(url)
+				if file is not None: #!cover
 					reddit_element.add_file(url, file)
 					continue
 				if self.manifest:
@@ -90,6 +88,10 @@ class HandlerThread(threading.Thread):
 				return # Kill the thread after a potentially long-running download if the program has terminated. !cover
 			with HandlerThread.ele_lock:
 				reddit_element.add_file(url, self.check_duplicates(file_path))
+			# exit lock
+		if self.manifest:
+			with HandlerThread.ele_lock:
+				self.manifest.push_ele(reddit_element) # Update Manifest with completed ele.
 			# exit lock
 	#
 

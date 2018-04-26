@@ -15,6 +15,7 @@ def run_test(re):
 	
 	# Really basic filename check to make sure the given downloads were named properly.
 	compare = sorted( [hashlib.sha1(s.encode('utf-8')).hexdigest() for s in files] ) == compare_list
-	if not compare:
+	if not compare: #!cover
+		print(files)
 		return "File list did not match expectations: "+str(sorted( [hashlib.sha1(s.encode('utf-8')).hexdigest() for s in files] )) , 1 #!cover
 	return '', 0
