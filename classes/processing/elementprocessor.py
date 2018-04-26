@@ -65,7 +65,7 @@ class ElementProcessor:
 		:param depth: The times this function has recursively called. Max limit of one.
 		:return:
 		"""
-		assert depth < 1
+		assert depth <= 1
 		max_threads = len(self.threads)
 		dim = shutil.get_terminal_size((0,0))
 		width = dim.columns
