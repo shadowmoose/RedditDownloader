@@ -57,7 +57,10 @@ def out(obj, print_val=True, text_color=None): #!cover
 def filename(f_name):
 	""" Format the given string into an acceptable filename. """
 	valid_chars = "-_.() %s%s[]&" % (string.ascii_letters, string.digits)
-	return str(''.join(c for c in f_name if c in valid_chars)).strip(' .\n\t').replace('..','.').replace('..','.')
+	ret = str(''.join(c for c in f_name if c in valid_chars)).strip(' .\n\t').replace('..','.').replace('..','.')
+	if len(ret.strip()) == 0:
+		return '-'
+	return ret
 
 
 def normalize_file(str_file):
