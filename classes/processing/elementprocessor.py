@@ -57,13 +57,15 @@ class ElementProcessor:
 	#
 
 
-	def redraw(self, clear, processing_queue):
+	def redraw(self, clear, processing_queue, depth=0):
 		""" Redraws the current Thread process.
 		:param clear: If the screen should be cleared before redrawing.
 				(Ignored automatically if not supported/possible.)
 		:param processing_queue: The queue being worked on.
+		:param depth: The times this function has recursively called. Max limit of one.
 		:return:
 		"""
+		assert depth < 1
 		max_threads = len(self.threads)
 		dim = shutil.get_terminal_size((0,0))
 		width = dim.columns
@@ -89,7 +91,11 @@ class ElementProcessor:
 			out+= stringutil.color(th.name, head_color) + "\n"
 			out+=th.log.render(limit=2, max_width=width)
 			out+=th.handler_log.render(limit=lines_per-2, max_width=width)
-		print(out.rstrip(), end='')
+		# noinspection PyBroadException
+		try:
+			print(out.rstrip(), end='')
+		except:
+			self.redraw(False, processing_queue, depth+1)
 		if not clear:
 			print('\n\n')
 

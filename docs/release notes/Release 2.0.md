@@ -14,4 +14,6 @@ RMD is now capable of concurrently downloading media files, massively shortening
   + The printout will attempt to dynamically resize to fit supported consoles. *(beta)*
   + Non-refreshing functionality - similar to the original - can be enabled in the settings.
 
-**Note:** For anybody having issues with renaming/deleting files created on certain Windows platforms, a tool has been included (in */classes/tools/win_file_fixer*) to automatically repair these files. I've made sure to sanitize all filenames so similar bugs can't happen in the future.
+**Note:** For anybody having issues with renaming/deleting files created on certain Windows platforms, 
+a tool has been included (in */classes/tools/win_file_fixer*) to automatically repair these files. 
+I've made sure to sanitize all filenames so similar bugs can't happen in the future.
