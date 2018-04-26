@@ -1,9 +1,9 @@
 import math
 from bs4 import BeautifulSoup
 from colorama import Fore, Style
-import string
 from pprint import pformat
 import os.path
+import pathvalidate
 
 def fit(input_string, desired_len): #!cover
 	""" Shrinks the given string to fit within the desired_len by collapsing the middle. """
@@ -56,11 +56,15 @@ def out(obj, print_val=True, text_color=None): #!cover
 
 def filename(f_name):
 	""" Format the given string into an acceptable filename. """
-	valid_chars = "-_.() %s%s[]&" % (string.ascii_letters, string.digits)
-	ret = str(''.join(c for c in f_name if c in valid_chars)).strip(' .\n\t').replace('..','.').replace('..','.')
-	if len(ret.strip()) == 0:
-		return '-'
-	return ret
+	ret = f_name
+	# noinspection PyBroadException
+	try:
+		ret = pathvalidate.sanitize_filename(ret, '_')
+	except:
+		ret = '_'
+	if len(ret.strip(' .')) == 0:
+		return '_'
+	return ret.replace('..','.').replace('..','.')
 
 
 def normalize_file(str_file):

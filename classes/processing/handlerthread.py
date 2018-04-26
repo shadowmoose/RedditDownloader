@@ -62,7 +62,7 @@ class HandlerThread(threading.Thread):
 					 False,
 					 stringutil.Fore.LIGHTYELLOW_EX
 				 )
-						 )
+			)
 			for url in reddit_element.get_urls():
 				file = self.loader.url_exists(url)
 				if file: #!cover

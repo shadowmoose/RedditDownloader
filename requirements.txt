@@ -7,3 +7,4 @@ youtube_dl
 beautifulsoup4
 colorama
 Pillow
+pathvalidate
