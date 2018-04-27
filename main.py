@@ -94,11 +94,12 @@ class Scraper(object):
 			print('Exit after Wizard.')
 			sys.exit(0)
 
-		self.manifest = None
+		self.manifest = Manifest(self.settings.save_base())
 		if self.settings.get('build_manifest', True):
-			self.manifest = Manifest(self.settings, True)
-		else:
-			print('Not using manifest.') #!cover
+			self.manifest.build('manifest.sqldb')
+		else: #!cover
+			self.manifest.build(':memory:')
+			print('Not saving manifest.')
 
 		self.sources = self.load_sources()
 		self.reddit = None
@@ -133,7 +134,6 @@ class Scraper(object):
 				try:
 					if console.confirm("Build manifest?", True):
 						print('Building manifest.')
-						#TODO: Cancelling should still check the existing manifest and copy known files to the new one.
 						self.manifest.build(self.reddit)
 				except KeyboardInterrupt:
 					pass
