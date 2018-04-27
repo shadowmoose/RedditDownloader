@@ -8,9 +8,12 @@
 	so please head there and read their licence/thank them!
 """
 import hashlib
+import os.path
 from PIL import Image
 from util import stringutil
-import os.path
+from util import manifest
+
+#TODO: Rewrite to use Manifest for storage.
 
 def add_hash(filename):
 	"""

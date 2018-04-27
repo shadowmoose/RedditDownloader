@@ -60,7 +60,7 @@ from colorama import Fore
 from util.settings import Settings
 from processing.elementprocessor import ElementProcessor
 from reddit.redditloader import RedditLoader
-from util.manifest import Manifest
+import util.manifest as manifest
 import reddit.reddit as reddit
 import wizards.wizard as wizard
 from util import console, stringutil
@@ -94,11 +94,10 @@ class Scraper(object):
 			print('Exit after Wizard.')
 			sys.exit(0)
 
-		self.manifest = Manifest(self.settings.save_base())
 		if self.settings.get('build_manifest', True):
-			self.manifest.build('manifest.sqldb')
+			manifest.create('manifest.sqldb', self.settings.save_base())
 		else: #!cover
-			self.manifest.build(':memory:')
+			manifest.create(':memory:')
 			print('Not saving manifest.')
 
 		self.sources = self.load_sources()
