@@ -12,9 +12,6 @@ from PIL import Image
 from util import stringutil
 import os.path
 
-_sha_hashes = {}
-_image_hashes = {}
-
 def add_hash(filename):
 	"""
 	Add the given hash to the Hash jar.
