@@ -3,7 +3,7 @@ python:
   - "3.4"
   - "3.5"
   - "3.6"
-  - "nightly"
+#  - "nightly"
 # install dependencies
 install:
   - pip install -r requirements.txt

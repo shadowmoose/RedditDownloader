@@ -5,6 +5,10 @@ __version__ = "2.2"
 import argparse
 import sys
 import os
+import time
+import datetime
+import re
+
 parser = argparse.ArgumentParser(description="Tool for scanning Reddit and downloading media - Guide @ https://goo.gl/hgBxN4")
 parser.add_argument('--wizard', '-w', help="Run the Setup Wizard to simplify editing settings.", action="store_true")
 parser.add_argument("--settings", help="Path to custom Settings file.", type=str, metavar='')
@@ -54,11 +58,9 @@ if args.update or args.update_only: #!cover
 			print("Exiting following update bootstrap.")
 			sys.exit(0)
 
-import time
-import re
+
 import colorama
 from colorama import Fore
-
 from util.settings import Settings
 from processing.elementprocessor import ElementProcessor
 from reddit.redditloader import RedditLoader
@@ -119,6 +121,7 @@ class Scraper(object):
 
 
 	def run(self):
+		_start_time = time.time()
 		try:
 			self.reddit = RedditLoader(args.test)
 			self.reddit.scan(self.sources) # Starts the scanner thread.
@@ -128,24 +131,8 @@ class Scraper(object):
 			print("Interrupted by User.")
 			if self.processor:
 				self.processor.stop_process()
-		
-
-	'''	if self.manifest:
-			if not args.skip_pauses: #!cover
-				try:
-					if console.confirm("Build manifest?", True):
-						print('Building manifest.')
-						self.manifest.build(self.reddit)
-				except KeyboardInterrupt:
-					pass
-			else:
-				print('Automatically building manifest.')
-				self.manifest.build(self.reddit)
-		else: #!cover
-			print('Manifest not built.')
-			if not args.skip_pauses:
-				input("Press Enter to exit.")'''
-	print('Finished processing!')
+		_total_time = str( datetime.timedelta(seconds= round(time.time() - _start_time)) )
+		print('Finished processing in %s.' % _total_time)
 	#
 
 
