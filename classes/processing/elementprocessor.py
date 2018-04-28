@@ -43,7 +43,7 @@ class ElementProcessor:
 				else:
 					time.sleep(refresh_rate)
 			self.redraw(clear)
-			print("Queue finished! (Total Processed: %s)" % self._loader.count_total())
+			print("\r\nQueue finished! (Total Processed: %s)" % self._loader.count_total())
 		except:
 			self.stop_process()
 			raise
@@ -57,7 +57,6 @@ class ElementProcessor:
 		:param depth: The times this function has recursively called. Max limit of one.
 		:return:
 		"""
-		assert depth <= 1
 		max_threads = len(self.threads)
 		dim = shutil.get_terminal_size((0,0))
 		width = dim.columns
@@ -74,7 +73,8 @@ class ElementProcessor:
 		if not clear:
 			print('\n\n\n\n')
 
-		out+= stringutil.color("Processing Posts: (~%s in queue)" % self._loader.count_remaining(), colorama.Fore.CYAN)
+		out+= stringutil.color("Processing Posts: (~%s in queue, %s total)"
+							   % (self._loader.count_remaining(), self._loader.count_total()), colorama.Fore.CYAN )
 		out+= "\n"
 		for th in self.threads:
 			if th.keep_running:
@@ -88,7 +88,11 @@ class ElementProcessor:
 		try:
 			print(out.rstrip(), end='')
 		except:
-			self.redraw(False, depth+1)
+			if depth <= 1:
+				self.redraw(False, depth+1)
+				return
+			else:
+				raise
 		if not clear:
 			print('\n\n')
 
