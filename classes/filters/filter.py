@@ -78,8 +78,7 @@ class Filter:
 			if regexp.search( str(val)):
 				return True
 			return False
-		print("Invalid comparator for Filter!")
-		assert False # This should never happen.
+		raise Exception("Invalid comparator for Filter!") #!cover
 
 
 	def _cast(self, val):
@@ -148,7 +147,7 @@ class Filter:
 		return False
 
 
-	def __str__(self):
+	def __str__(self): #!cover
 		lim = self._limit
 		if isinstance(lim, str):
 			lim = '"%s"' % lim

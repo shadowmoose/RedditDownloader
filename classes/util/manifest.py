@@ -51,16 +51,17 @@ def create(file, base_dir = None):
 				cur.execute('''CREATE TABLE metadata (
 					meta_key text PRIMARY KEY, meta_val text
 				)''')
+				conn.commit()
 			with closing(conn.cursor()) as cur:
 				cur.execute('INSERT INTO metadata VALUES (?,?)', ('version', '1.0'))
 				cur.execute('INSERT INTO metadata VALUES (?,?)', ('author', 'ShadowMoose'))
 				cur.execute('INSERT INTO metadata VALUES (?,?)', ('website', 'https://goo.gl/hgBxN4'))
-			conn.commit()
+				conn.commit()
 			print("Built DB.")
 	print('Connected to DB.')
 
 
-def _adapt(obj):
+def _adapt(obj): #!cover
 	""" Adjust the given data to fit the current manifest version.
 		Should be called repeatedly on an object until it not longer returns true.
 		Returns: ( [true/false](If changed), new_obj )
@@ -84,7 +85,7 @@ def _adapt(obj):
 		}
 
 
-def get_metadata(key, default=None):
+def get_metadata(key, default=None): #!cover
 	"""  Simple function for looking up DB metadata.  """
 	with lock('r'), closing(conn.cursor()) as cur:
 		cur.execute('SELECT meta_val FROM metadata WHERE meta_key=:k', {'k':key})
@@ -94,7 +95,7 @@ def get_metadata(key, default=None):
 		return ret[0]
 
 
-def set_metadata(key, value):
+def set_metadata(key, value): #!cover
 	"""  Simple function for setting DB metadata.  """
 	with lock('w'), closing(conn.cursor()) as cur:
 		cur.execute('INSERT OR REPLACE INTO metadata VALUES (?,?)', (key, str(value) ))
@@ -118,7 +119,7 @@ def insert_post(reddit_ele):
 def get_url_info(url):
 	""" Returns any information about the given URL, if the Manifest has downloaded it before. """
 	dat = _select_fancy('urls', ['url', 'post_id', 'file_path'], 'url = :ur', {'ur':url})
-	if dat:
+	if dat: #!cover
 		if dat['file_path'] == 'False':
 			dat['file_path'] = False
 		if dat['file_path'] == 'None':
@@ -128,14 +129,14 @@ def get_url_info(url):
 
 def remap_filepath(old_path, new_filepath):
 	""" Called if a better version of a file is found, this updates them all to the new location. """
-	with lock('w'), closing(conn.cursor()) as cur:
+	with lock('w'), closing(conn.cursor()) as cur: #!cover
 		cur.execute('UPDATE urls SET file_path=:nfp WHERE file_path = :ofp', {'nfp':new_filepath, 'ofp':old_path})
 		conn.commit()
 
 
 def _select_fancy(table, cols, where = '', arg_dict=()):
 	""" A boilerplate DB method for requesting specific fields, and getting a named dict back. """
-	with lock('r'), closing(conn.cursor()) as cur:
+	with lock('r'), closing(conn.cursor()) as cur: #!cover
 		cur.execute('SELECT %s FROM %s WHERE %s' % (','.join(cols), table, where), arg_dict)
 		ret = cur.fetchone()
 		if not ret:
@@ -160,7 +161,7 @@ def hash_iterator(hash_len):
 			_exit = (yield ret)
 	#print('iterator closed.')
 	if _exit is not None:
-		yield None
+		yield None #!cover
 
 
 def get_file_hash(f_path):
