@@ -36,7 +36,9 @@ def create(file, base_dir = None):
 		if base_dir is not None:
 			file = stringutil.normalize_file(base_dir + '/' + file)
 		build =  file == ':memory:' or not os.path.isfile(file)
-		conn = sqlite3.connect(file)
+		if not os.path.isdir(base_dir):
+			os.makedirs(base_dir)
+		conn = sqlite3.connect(file, check_same_thread=False)
 		if build:
 			with closing(conn.cursor()) as cur:
 				cur.execute('''CREATE TABLE posts (
@@ -48,23 +50,14 @@ def create(file, base_dir = None):
 				cur.execute('''CREATE TABLE hashes (
 					file_path text PRIMARY KEY, lastmtime int, hash text
 				)''')
+				cur.execute('''CREATE TABLE metadata (
+					meta_key text PRIMARY KEY, meta_val text
+				)''')
+			with closing(conn.cursor()) as cur:
+				cur.execute('INSERT INTO metadata VALUES (?,?)', ('version', '1.0'))
 			conn.commit()
 			print("Built DB.")
 	print('Connected to DB.')
-
-
-def push_ele(ele, cleanup = True):
-	""" Checks if the given element is considered "done" or "failed", and pushes them to the relevant list.
-		If "cleanup" is True, also removes this element from the loaded manifest list.
-	"""
-	#TODO
-
-
-def url_completed(url):
-	""" Checks if the manifest knows of an existing completed file for this URL.
-		Returns ([true/false](exists or not), [file_path])
-	"""
-	#TODO
 
 
 def _adapt(obj):
@@ -91,17 +84,52 @@ def _adapt(obj):
 		}
 
 
-def insert(eles):
-	""" Inserts a given list of elements into the database. """
+def get_metadata(key, default=None):
+	"""  Simple function for looking up DB metadata.  """
+	with lock('r'), closing(conn.cursor()) as cur:
+		cur.execute('SELECT meta_val FROM metadata WHERE meta_key=:k', {'k':key})
+		ret = cur.fetchone()
+		if ret is None:
+			ret = default
+		return ret[0]
+
+
+def set_metadata(key, value):
+	"""  Simple function for setting DB metadata.  """
 	with lock('w'), closing(conn.cursor()) as cur:
-		for ele in eles:
-			cur.execute('INSERT OR REPLACE INTO posts VALUES (?,?,?,?,?,?)',
-				(ele['id'], ele['author'], ele['source_alias'], ele['subreddit'], ele['title'], ele['type'])
-			)
-			print(ele)
-			cur.execute('DELETE FROM urls WHERE post_id = :id', {'id':ele['id']})
-			for k,v in ele['files'].items():
-				cur.execute('INSERT INTO urls VALUES (?,?,?)', (ele['id'], k, str(v) ))
+		cur.execute('INSERT OR REPLACE INTO metadata VALUES (?,?)', (key, str(value) ))
+		conn.commit()
+
+
+def insert_post(reddit_ele):
+	""" Inserts a given list of elements into the database. """
+	ele = reddit_ele.to_obj()
+	with lock('w'), closing(conn.cursor()) as cur:
+		cur.execute('INSERT OR REPLACE INTO posts VALUES (?,?,?,?,?,?)',
+			(ele['id'], ele['author'], ele['source_alias'], ele['subreddit'], ele['title'], ele['type'])
+		)
+		#print(ele)
+		cur.execute('DELETE FROM urls WHERE post_id = :id', {'id':ele['id']})
+		for k,v in ele['files'].items():
+			cur.execute('INSERT INTO urls VALUES (?,?,?)', (ele['id'], k, str(v) ))
+		conn.commit()
+
+
+def get_url_info(url):
+	""" Returns any information about the given URL, if the Manifest has downloaded it before. """
+	dat = _select_fancy('urls', ['url', 'post_id', 'file_path'], 'url = :ur', {'ur':url})
+	if dat:
+		if dat['file_path'] == 'False':
+			dat['file_path'] = False
+		if dat['file_path'] == 'None':
+			dat['file_path'] = None
+	return dat
+
+
+def remap_filepath(old_path, new_filepath):
+	""" Called if a better version of a file is found, this updates them all to the new location. """
+	with lock('w'), closing(conn.cursor()) as cur:
+		cur.execute('UPDATE urls SET file_path=:nfp WHERE file_path = :ofp', {'nfp':new_filepath, 'ofp':old_path})
 		conn.commit()
 
 
@@ -115,17 +143,20 @@ def _select_fancy(table, cols, where = '', arg_dict=()):
 		return dict(zip(cols, ret))
 
 
-def hash_iterator():
+def hash_iterator(hash_len):
 	""" Opens an iterator that will cycle through all known file Hashes.
 		Use gen.send(True) to kill early, otherwise be sure to iterate all the way through.
 	"""
 	_exit = None
 	with lock('r'), closing(conn.cursor()) as cur:
-		cur.execute('SELECT lastmtime, hash, file_path FROM hashes') #SELECT * FROM urls
+		#Test: SELECT * FROM urls
+		cur.execute('SELECT lastmtime, hash, file_path FROM hashes WHERE length(hash) = :hash', {'hash':hash_len})
 		while _exit is None:
 			ret = cur.fetchone()
 			if ret is None:
 				break
+			if ret:
+				ret = dict(zip(['lastmtime', 'hash', 'file_path'], ret))
 			_exit = (yield ret)
 	#print('iterator closed.')
 	if _exit is not None:

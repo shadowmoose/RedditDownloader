@@ -8,12 +8,10 @@ import time
 class ElementProcessor:
 	""" The heavy-lifting bit. Handles processing all the Elements provided to it via the generator it's created with, by finding the most appropriate Handler for each Element. """
 	
-	def __init__(self, reddit_loader, settings, manifest):
+	def __init__(self, reddit_loader, settings):
 		""" Creates and prepares the Processor object, with the given RedditLoader to provide RedditElements. Takes a loaded Settings object to find the configured save path. """
-		self.loader = reddit_loader
-		self.gen = self.loader.get_elements()
+		self.gen = reddit_loader.get_elements()
 		self.settings = settings
-		self.manifest = manifest
 		self.handlers = []
 		self.threads = []
 	#
@@ -28,7 +26,7 @@ class ElementProcessor:
 
 		#start threads
 		for i in range(max_threads):
-			ht = HandlerThread('Handler - %s' % (i+1), self.settings, self.manifest, self.loader, q)
+			ht = HandlerThread('Handler - %s' % (i+1), self.settings, q)
 			ht.daemon = True
 			ht.start()
 			self.threads.append(ht)
@@ -65,6 +63,7 @@ class ElementProcessor:
 		:param depth: The times this function has recursively called. Max limit of one.
 		:return:
 		"""
+		#return#TODO: fix temp loggin changes
 		assert depth <= 1
 		max_threads = len(self.threads)
 		dim = shutil.get_terminal_size((0,0))

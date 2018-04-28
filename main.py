@@ -1,4 +1,4 @@
-__version__ = "2.01"
+__version__ = "2.2"
 
 import argparse
 import sys
@@ -120,7 +120,7 @@ class Scraper(object):
 		try:
 			self.reddit = RedditLoader()
 			self.reddit.scan(self.sources)
-			self.processor = ElementProcessor(self.reddit, self.settings, self.manifest)
+			self.processor = ElementProcessor(self.reddit, self.settings)
 			self.processor.run()
 		except KeyboardInterrupt:
 			print("Interrupted by User.")
@@ -128,7 +128,7 @@ class Scraper(object):
 				self.processor.stop_process()
 		
 
-		if self.manifest:
+	'''	if self.manifest:
 			if not args.skip_pauses: #!cover
 				try:
 					if console.confirm("Build manifest?", True):
@@ -142,8 +142,8 @@ class Scraper(object):
 		else: #!cover
 			print('Manifest not built.')
 			if not args.skip_pauses:
-				input("Press Enter to exit.")
-		print('Finished processing!')
+				input("Press Enter to exit.")'''
+	print('Finished processing!')
 	#
 
 

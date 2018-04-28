@@ -52,7 +52,7 @@ class RedditElement(object):
 		""" Handle a Comment object. """
 		#out("[Comment](%s): %s" % (c.subreddit.display_name, c.link_title) )
 		self.type = 'Comment'
-		self.id = str(c.link_id)
+		self.id = str(c.name)
 		self.title = str(c.link_title)
 		if c.author:
 			self.author = str(c.author.name)

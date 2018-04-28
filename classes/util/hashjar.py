@@ -13,38 +13,45 @@ from PIL import Image
 from util import stringutil
 from util import manifest
 
-#TODO: Rewrite to use Manifest for storage.
 
 def add_hash(filename):
 	"""
-	Add the given hash to the Hash jar.
+	Add the given file to the Hash jar.
 	:param filename: The path to the file to add.
 	:return: ([Is New File], existing_file_path)
 	"""
-	if not os.path.exists(filename) or os.path.isdir(filename):
+	if not filename or not os.path.exists(filename) or os.path.isdir(filename):
 		# Skip directories.
 		return True, None
 
-	is_image, final_hash = _get_best_hash(filename)
+	pre = manifest.get_file_hash(filename)
+	lmt = os.path.getmtime(filename)
+	if pre:
+		if lmt == pre['lastmtime']:
+			# Hash already exists and file hasn't changed since.
+			#print('Hashjar: File unchanged: %s' % filename)
+			return False, filename
+
+	#print('Hashjar: Hashing file: %s' % filename)
+	#manifest.set_metadata('hashed_files', int(manifest.get_metadata('hashed_files', '0')) + 1)
+	#manifest.set_metadata(filename, '%s | %s' % (pre['lastmtime'] if pre else None, lmt))
+
+	_, final_hash = _get_best_hash(filename)
 	if not final_hash: #!cover
 		stringutil.error("HashCheck :: Error hit hashing file, passing file as new.")
 		return True, None
 
-	if is_image:
-		#print("\tHashCheck :: Fingerprinting new image...", end='\r')
-		for h in _image_hashes:
-			dist = _hamming_distance(h, final_hash)
-			if dist < 4:
-				#print('\tHashCheck :: Distance matches existing file (%s,%s): %s' % (final_hash, h, dist))
-				return False, _image_hashes[h]
-		#print('\tHashCheck :: File is unique. Saved successfully.')
-	elif final_hash in _sha_hashes:
-		return False, _sha_hashes[final_hash] #!cover
+	#print("\tHashCheck :: Fingerprinting new image...", end='\r')
+	_it = manifest.hash_iterator(len(final_hash) )
+	for h in _it:
+		dist = _hamming_distance(h['hash'], final_hash)
+		if dist < 4:
+			#print('\tHashCheck :: Distance matches existing file (%s,%s): %s' % (final_hash, h, dist))
+			_it.send(True) # Release DB generator.
+			return False, h['file_path']
+	#print('\tHashCheck :: File is unique. Saved successfully.')
 
-	if is_image:
-		_image_hashes[final_hash] = filename
-	else:
-		_sha_hashes[final_hash] = filename
+	manifest.put_file_hash(filename, final_hash, lmt)
 	return True, None
 
 
