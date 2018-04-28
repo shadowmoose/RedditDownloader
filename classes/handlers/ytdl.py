@@ -1,4 +1,5 @@
 import youtube_dl
+import os
 from util import stringutil
 
 tag = 'ytdl'
@@ -30,7 +31,7 @@ class YTDLWrapper:
 			self.log.out(0, 'Downloading video...')
 			self.log.out(1,"+ Downloading:: %s" % d['_percent_str'])
 		if 'filename' in d:
-			self.file = d['filename']
+			self.file = str(d['filename'])
 		if 'status' in d and d['status'] == 'finished':
 			self.log.out(1, '+ Done downloading, now converting ...')
 
@@ -44,6 +45,12 @@ class YTDLWrapper:
 		}
 		with youtube_dl.YoutubeDL(ydl_opts) as ydl:
 			ydl.download([url])
+
+		if self.file and str(self.file).endswith('.unknown_video'):
+			self.log.out(0, "File downloaded as unknown type! Failure!")
+			if os.path.isfile(self.file):
+				os.remove(self.file)
+			return False
 		self.log.out(0, "Completed YouTube-DL Download successfully! File: [%s]" % stringutil.fit(self.file, 75))
 		return self.file
 

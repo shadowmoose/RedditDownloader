@@ -7,22 +7,22 @@ import sys
 import processing.logger
 import handlers
 from util import hashjar, stringutil
+from util import manifest
 
 
 class HandlerThread(threading.Thread):
 	ele_lock = threading.RLock()
 	used_files = []
 
-	def __init__(self, name, settings, manifest, loader, e_queue):
+	def __init__(self, name, settings, e_queue):
 		threading.Thread.__init__(self)
 		self.name = name
 		self.log = processing.logger.Logger(2, padding=1)
 		self.handler_log = processing.logger.Logger(2, padding=2)
 		self.handlers = []
+		self.release_filenames = []
 
 		self.settings = settings
-		self.loader = loader
-		self.manifest = manifest
 		self.queue = e_queue
 		self.load_handlers()
 		self.keep_running = True
@@ -41,7 +41,7 @@ class HandlerThread(threading.Thread):
 					self.queue.task_done()
 			except queue.Empty:
 				self.keep_running = False
-				print("Exited thread %s" % self.name)
+				#print("Exited thread %s" % self.name)
 				break
 		self.log.out(0, stringutil.color('Completed.', stringutil.Fore.GREEN))
 		self.handler_log.clear()
@@ -50,50 +50,46 @@ class HandlerThread(threading.Thread):
 
 	def process_ele(self, reddit_element):
 		""" Accepts a RedditElement of Post/Comment details, then runs through the Handlers loaded from the other directory, attempting to download the url.  """
-		todo = []
 		self.log.out(0, 'Processing new ele...')
 		self.handler_log.clear()
-		with HandlerThread.ele_lock:
-			self.log.out(0,
-						 stringutil.out(
-					 "[%s](%s): %s" % (reddit_element.type, reddit_element.subreddit, reddit_element.title),
-					 False,
-					 stringutil.Fore.LIGHTYELLOW_EX
-				 )
-			)
-			for url in reddit_element.get_urls():
-				file = self.loader.url_already_processed(url)
-				if file is not None: #!cover
+		#print('\n\n\nProcessing ele: %s' % reddit_element.to_obj())
+		self.log.out(0,
+					 stringutil.out(
+						 "[%s](%s): %s" % (reddit_element.type, reddit_element.subreddit, reddit_element.title),
+						 False,
+						 stringutil.Fore.LIGHTYELLOW_EX
+					 )
+		)
+		for url in reddit_element.get_urls():
+			#print('Handling URL: %s' % url)
+			url_info  = manifest.get_url_info(url)
+			#print('URL Info:', url_info)
+			if url_info:
+				file = url_info['file_path']
+				if file and os.path.exists(file):
+					#print('URL already handled.')
 					reddit_element.add_file(url, file)
+					hashjar.add_hash(file) # Update hash, just in case it doesn't have this file.
 					continue
-				if self.manifest:
-					skip, file = self.manifest.url_completed(url)
-					if skip and (file is None or os.path.exists(file)): #!cover
-						reddit_element.add_file(url, file)
-						if file is not None:
-							hashjar.add_hash(file) # Add the existing file hash so we can deduplicate against it.
-						continue
-				file_info = self.build_file_info(reddit_element)# Build the file information dict using this RedditElement's information
-				if file_info is None:
-					reddit_element.add_file(url, False)
-				else:
-					todo.append({'url':url, 'info':file_info})
-		#exit lock
-
-		for el in todo:
-			url = el['url']
-			file_info = el['info']
-			file_path = self.process_url(url, file_info)# The important bit is here, & doesn't need the Lock.
-			if not self.keep_running:
-				return # Kill the thread after a potentially long-running download if the program has terminated. !cover
-			with HandlerThread.ele_lock:
+			#print('This URL has not been handled. Downloading...')
+			file_info = self.build_file_info(reddit_element)# Build the file information dict using this RedditElement's information
+			if file_info is None:
+				reddit_element.add_file(url, False)
+			else:
+				file_path = self.process_url(url, file_info)# The important bit is here, & doesn't need the Lock.
+				if file_path:
+					file_path = stringutil.normalize_file(file_path) # Normalize for all DB storage.
+				if not self.keep_running:
+					return # Kill the thread after a potentially long-running download if the program has terminated. !cover
 				reddit_element.add_file(url, self.check_duplicates(file_path))
-			# exit lock
-		if self.manifest:
-			with HandlerThread.ele_lock:
-				self.manifest.push_ele(reddit_element) # Update Manifest with completed ele.
-			# exit lock
-	#
+
+		manifest.insert_post(reddit_element) # Update Manifest with completed ele.
+
+		with HandlerThread.ele_lock:
+			# Clear blacklisted filename list, just to release the memory.
+			for r in self.release_filenames:
+				HandlerThread.used_files.remove(r)
+			self.release_filenames = []
 
 
 	def build_file_info(self, reddit_element):
@@ -116,7 +112,8 @@ class HandlerThread(threading.Thread):
 				basefile = og+' . '+str(i)
 				basefile = stringutil.normalize_file(basefile)
 				i+=1
-			HandlerThread.used_files.append(basefile)
+			HandlerThread.used_files.append(basefile) # blacklist this base name while we download.
+			self.release_filenames.append(basefile)
 
 			# Build an array of pre-generated possible locations & important data for handlers to have access to.
 			return {
@@ -127,7 +124,7 @@ class HandlerThread(threading.Thread):
 				'post_subreddit': reddit_element.subreddit,		# The subreddit this post came from.
 				'user_agent'	: self.settings.get('auth', None)['user_agent'],
 			}
-		# exit lock.
+	# exit lock.
 
 
 	def process_url(self, url, info):
@@ -144,7 +141,7 @@ class HandlerThread(threading.Thread):
 			try:
 				ret = h.handle(url, info, self.handler_log)
 			except Exception:# There are too many possible exceptions between all handlers to catch properly.
-				print(sys.exc_info()[0])
+				#print(sys.exc_info()[0])
 				pass
 
 			if ret is None: #!cover
@@ -160,7 +157,7 @@ class HandlerThread(threading.Thread):
 
 	def check_duplicates(self, file_path):
 		""" Check the given file path to see if another file like it already exists. Purges worse copies.
-			Returns the filename that the file exists under.
+			Returns the filename that the file now exists under.
 		"""
 		if not file_path:
 			return file_path #!cover
@@ -169,19 +166,18 @@ class HandlerThread(threading.Thread):
 				# Deduplication disabled.
 				return file_path #!cover
 			was_new, existing_path = hashjar.add_hash(file_path) # Check if the file exists already.
-			if not was_new:
+			if not was_new and existing_path != file_path:
 				# Quick and dirty comparison, assumes larger filesize means better quality.
 				if os.path.isfile(file_path) and os.path.isfile(existing_path):
 					if os.path.getsize(file_path) > os.path.getsize(existing_path):
 						os.remove(existing_path)
-						for ele in self.loader.get_elements_for_file(existing_path):
-							ele.remap_file(existing_path, file_path)
+						manifest.remap_filepath(existing_path, file_path)
 						return file_path
 					else:
 						os.remove(file_path)
 						return existing_path
 			return file_path
-		# exit lock
+	# exit lock
 
 
 	def load_handlers(self):
@@ -191,6 +187,6 @@ class HandlerThread(threading.Thread):
 			fi = __import__(name, fromlist=[''])
 			self.handlers.append(fi)
 		self.handlers.sort(key=lambda x: x.order, reverse=False)
-		print("Loaded handlers: ", ', '.join([x.tag for x in self.handlers]) )
+		#print("Loaded handlers: ", ', '.join([x.tag for x in self.handlers]) )
 		assert len(self.handlers)>0
 #
