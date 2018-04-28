@@ -8,6 +8,7 @@ omit =
     ./classes/util/console.py
     ./classes/util/updater.py
     ./classes/util/win_file_fixer.py
+    ./tests/
 [report]
 exclude_lines =
     pragma: no cover
