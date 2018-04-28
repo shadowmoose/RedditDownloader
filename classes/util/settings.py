@@ -78,8 +78,7 @@ class Settings(object):
 		""" Used for internal fast access to the save path patterns. """
 		out = self.get('output')
 		if not out: #!cover
-			print('!Malformed output settings. Using defaults.')#TODO: Error logging
-			return default_settings['output']
+			raise Exception('!Malformed output settings. Using defaults.')
 		return out[sub]
 
 
@@ -155,7 +154,7 @@ class Settings(object):
 			# Version 2->3 sees addition of display config, for Threading.
 			obj['meta-version'] = 3
 			obj['threading'] = {
-				"max_handler_threads":5,# TODO: Could maybe set to 1, to preserve old behavior.
+				"max_handler_threads":5,
 				"display_clear_screen":True,
 				"display_refresh_rate":5
 			}

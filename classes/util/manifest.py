@@ -1,7 +1,5 @@
-import json
 import time
 import os.path
-import gzip
 import sqlite3
 from contextlib import closing
 
@@ -55,6 +53,8 @@ def create(file, base_dir = None):
 				)''')
 			with closing(conn.cursor()) as cur:
 				cur.execute('INSERT INTO metadata VALUES (?,?)', ('version', '1.0'))
+				cur.execute('INSERT INTO metadata VALUES (?,?)', ('author', 'ShadowMoose'))
+				cur.execute('INSERT INTO metadata VALUES (?,?)', ('website', 'https://goo.gl/hgBxN4'))
 			conn.commit()
 			print("Built DB.")
 	print('Connected to DB.')
@@ -180,7 +180,7 @@ def put_file_hash(f_path, f_hash, f_lastmtime):
 
 
 if __name__ == '__main__':
-	print('Testing Manifest - hardcoded paths mean this will probably only work for ShadowMoose.')
+	print('Testing Manifest...')
 
 	#if os.path.isfile('./test.sqldb'):
 	#	os.remove('./test.sqldb')
@@ -193,7 +193,7 @@ if __name__ == '__main__':
 	print('Fake Hash:', get_file_hash('fake-2'))
 
 	print('\nIterating Hashes:')
-	_hgen = hash_iterator()
+	_hgen = hash_iterator(10)
 	i = 1
 	for h in _hgen:
 		print('\tRet [%s]: ' % i, h)
