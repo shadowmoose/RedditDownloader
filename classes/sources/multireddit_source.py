@@ -10,7 +10,6 @@ class MultiRedditSource(source.Source):
 
 
 	def get_elements(self):
-		ret = []
 		for p in reddit.multi_reddit(
 				username    = self.data['owner'],
 				reddit_name = self.data['multi_name'],
@@ -18,8 +17,7 @@ class MultiRedditSource(source.Source):
 				limit    = self.data['limit'],
 				time     = self.data['time']):
 			if self.check_filters(p):
-				ret.append(p)
-		return ret
+				yield p
 
 
 	def setup_wizard(self):

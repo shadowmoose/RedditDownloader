@@ -29,7 +29,7 @@ class Source:
 
 
 	def get_elements(self): #!cover
-		"""  Tells this Source to build and return a list of RedditElements. """
+		"""  Tells this Source to build and return a generator for RedditElements. """
 		pass
 
 
