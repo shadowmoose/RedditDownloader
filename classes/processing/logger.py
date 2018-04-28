@@ -23,7 +23,7 @@ class Logger:
 		"""
 		with self.lock:
 			idx = max(0, min(self.max_lines-1, idx))
-			self._lines[idx] = txt.strip()
+			self._lines[idx] = txt.replace('\n','').strip()
 			for i in range(idx+1, self.max_lines):
 				self._lines[i] = None
 

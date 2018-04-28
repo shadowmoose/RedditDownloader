@@ -120,7 +120,7 @@ class Scraper(object):
 
 	def run(self):
 		try:
-			self.reddit = RedditLoader()
+			self.reddit = RedditLoader(args.test)
 			self.reddit.scan(self.sources) # Starts the scanner thread.
 			self.processor = ElementProcessor(self.reddit, self.settings)
 			self.processor.run()
@@ -262,6 +262,7 @@ if args.test:
 		except Exception as e:
 			stringutil.print_color(Fore.RED, 'EXCEPTION: %s' % e)
 			exit_values.append(i)
+			raise
 	if max(exit_values) > 0: #!cover
 		stringutil.print_color(Fore.RED, "Failed testing!")
 		sys.exit( max(exit_values) )
