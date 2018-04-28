@@ -6,7 +6,6 @@ import filters
 import os
 import re
 from enum import Enum
-from util import stringutil
 
 
 class Operators(Enum):
@@ -35,7 +34,7 @@ class Filter:
 		self.accepts_operator = True
 
 
-	def set_operator(self, op):
+	def set_operator(self, op): #!cover
 		""" Sets this Filter's Operator. """
 		if self._lookup_operator(op):
 			self.operator = op
@@ -60,8 +59,7 @@ class Filter:
 			Automatically casts numeric values if possible, then compares.
 		"""
 		if not hasattr(obj, self.field):
-			stringutil.error('No field: %s' % self.field)
-			return True
+			raise Exception('No field: %s' % self.field) #!cover
 		val = self._cast(getattr(obj, self.field))
 		lim = self.get_limit()
 		if isinstance(val, str) and isinstance(lim, str): # Case doesn't matter for the basic comparisons.
@@ -129,12 +127,11 @@ class Filter:
 			if v in str_key.lower():
 				op = k
 		if '.' not in str_key:
-			op = Operators.EQUALS
+			op = Operators.EQUALS #!cover
 		if self._lookup_operator(op):
 			self.operator = op
 		else:
-			print('Unable to parse operator for Filter: %s' % self.field)
-			return False
+			raise Exception('Unable to parse operator for Filter: %s' % self.field) #!cover
 		return True
 
 
