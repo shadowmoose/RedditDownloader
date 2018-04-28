@@ -8,8 +8,9 @@ class UserUpvotedSaved(source.Source):
 
 
 	def get_elements(self):
-		gen = reddit.user_liked_saved(self.data['user'], self.data['scan_upvoted'], self.data['scan_saved'])
-		return [ele for ele in gen if self.check_filters(ele)]# Use filters.
+		for ele in reddit.user_liked_saved(self.data['user'], self.data['scan_upvoted'], self.data['scan_saved']):
+			if self.check_filters(ele):
+				yield ele
 
 
 	def setup_wizard(self):

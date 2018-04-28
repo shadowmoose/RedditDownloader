@@ -2,7 +2,6 @@ import threading
 import queue
 import os
 import pkgutil
-import sys
 
 import processing.logger
 import handlers
@@ -23,7 +22,7 @@ class HandlerThread(threading.Thread):
 		self.release_filenames = []
 
 		self.settings = settings
-		self.queue = e_queue
+		self._loader = e_queue
 		self.load_handlers()
 		self.keep_running = True
 
@@ -34,14 +33,13 @@ class HandlerThread(threading.Thread):
 			self.log.out(0, "Waiting for queue...")
 			self.handler_log.clear()
 			try:
-				item = self.queue.get(False)
-				try:
-					self.process_ele(item)
-				finally:
-					self.queue.task_done()
+				item = self._loader.next_ele()
+				if item is None:
+					continue
+				self.process_ele(item)
 			except queue.Empty:
 				self.keep_running = False
-				#print("Exited thread %s" % self.name)
+				# An exception is raised when queue is empty and loading is done.
 				break
 		self.log.out(0, stringutil.color('Completed.', stringutil.Fore.GREEN))
 		self.handler_log.clear()

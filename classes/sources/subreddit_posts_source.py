@@ -10,15 +10,13 @@ class UserPostsSource(source.Source):
 
 
 	def get_elements(self):
-		ret = []
 		for p in reddit.subreddit_posts(
 				sub      = self.data['subreddit'],
 				order_by = self.data['order'],
 				limit    = self.data['limit'],
 				time     = self.data['time']):
 			if self.check_filters(p):
-				ret.append(p)
-		return ret
+				yield p
 
 
 	def setup_wizard(self):

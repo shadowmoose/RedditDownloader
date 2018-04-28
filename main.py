@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 __version__ = "2.2"
 
 import argparse
@@ -63,7 +65,7 @@ from reddit.redditloader import RedditLoader
 import util.manifest as manifest
 import reddit.reddit as reddit
 import wizards.wizard as wizard
-from util import console, stringutil
+from util import stringutil
 
 #import logging
 #logging.basicConfig(filename='errors.log',level=logging.CRITICAL)
@@ -119,7 +121,7 @@ class Scraper(object):
 	def run(self):
 		try:
 			self.reddit = RedditLoader()
-			self.reddit.scan(self.sources)
+			self.reddit.scan(self.sources) # Starts the scanner thread.
 			self.processor = ElementProcessor(self.reddit, self.settings)
 			self.processor.run()
 		except KeyboardInterrupt:
