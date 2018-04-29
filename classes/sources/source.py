@@ -1,8 +1,8 @@
 """
 	Generic Source class, all actual sources should override this.
 """
-from filters import filter
-import sources
+from classes.filters import filter
+from classes import sources
 
 class Source:
 	"""
@@ -29,7 +29,7 @@ class Source:
 
 
 	def get_elements(self): #!cover
-		"""  Tells this Source to build and return a list of RedditElements. """
+		"""  Tells this Source to build and return a generator for RedditElements. """
 		pass
 
 
@@ -122,7 +122,7 @@ def get_sources(source_list=None):
 	for _,name,_ in pkgutil.iter_modules([pkg_path]):
 		if '_source' not in name:
 			continue
-		fi = __import__(name, fromlist=[''])
+		fi = __import__('classes.sources.%s' % name, fromlist=[''])
 		for clazz in _module_classes(fi):
 			if source_list is not None:
 				for obj in source_list:

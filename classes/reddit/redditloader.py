@@ -1,68 +1,75 @@
-from util import stringutil
 from colorama import Fore
+import queue
+import threading
+from classes.util import stringutil
 
-class RedditLoader:
-	def __init__(self):
+class RedditLoader(threading.Thread):
+	def __init__(self, testing=False):
 		""" Initializes a connector object to the given Reddit account, which instantly attempts to login.
 			The script will hang on creating this connection, until the user is signed in.
 		"""
-		self._elements = []
-		self.completed = []
-		self.total_count = 0
-	#
+		threading.Thread.__init__(self)
+		self.sources = []
+		self._testing_cache = None if not testing else []
+		self._c_lock = threading.Lock()
+		self._total_count = 0
+		self._queue = queue.Queue(maxsize= 1000)
+		self._running = True
+		self.daemon = True
+
 	
-	def scan(self, sources):
-		""" Grab all RedditElements from all the supplied Sources """
-		self._elements = []
-		for source in sources:
+	def run(self):
+		""" Threaded loading of elements. """
+		for source in self.sources:
 			stringutil.print_color(Fore.GREEN, 'Downloading from Source: %s' % source.get_alias())
 			for r in source.get_elements():
 				r.set_source(source)
-				self._elements.append(r)
-		self.total_count = len(self._elements)
-		print("Element loading complete.\n")
+				self._queue.put(r)
+
+				# Extra tracking stuff below:
+				with self._c_lock:
+					self._total_count+= 1
+				if self._testing_cache is not None:
+					self._testing_cache.append(r)
+		#print("Element loading complete.\n")
+		self._running = False
+
+
+	def scan(self, sources):
+		""" Grab all RedditElements from all the supplied Sources """
+		self.sources = sources
+		self.start()
+
+
+	def is_running(self):
+		""" Check if this Loader is still running. """
+		return self._running
+
+
+	def count_remaining(self):
+		""" Approximate the remaining elements in the queue. """
+		return self._queue.qsize()
 
 
 	def count_total(self):
-		""" Return the total count of elements. """
-		return self.total_count
+		""" Total amount of posts loaded. """
+		with self._c_lock: # I can't believe I implemented a lock for a counter. Safety first, I guess...
+			return self._total_count
 
 
-	def count_remaining(self): #!cover
-		""" Returns the total number of remaining elements to process. """
-		return self.count_total() -  self.count_completed()
-
-
-	def count_completed(self):
-		""" Returns the number of elements already processed. """
-		return len(self.completed)
+	def next_ele(self):
+		""" Gets the next element in the list. Returns Null on timeout, or raises Empty when finished. """
+		try:
+			ret = self._queue.get(block = True, timeout=0.5)
+			self._queue.task_done()
+			return ret
+		except queue.Empty:
+			if not self.is_running():
+				raise
+			else:
+				return None
 
 
 	def get_elements(self):
-		""" Generator to return the loaded RedditElements one-by-one, and automatically add them to the "completed" list on finish. Skips duplicates. """
-		self._elements.extend(self.completed)# Shuffle back, so this function could be rerun multiple times.
-		self.completed = []
-		while len(self._elements)>0:
-			ele = self._elements.pop(0)
-			yield ele
-			self.completed.append(ele)
-
-
-	def url_already_processed(self, url):
-		""" Returns the file name if the given URL has already been processed before. """
-		for ele in self.completed:
-			if ele.contains_url(url):
-				return ele.get_completed_files()[url] #!cover
-		#
-		return None
-
-
-	def file_exists(self, file_name): #!cover
-		""" Returns True if the given filename is already used by an Element. """
-		return any(ele.contains_file(file_name) for ele in self.completed)
-
-
-	def get_elements_for_file(self, file_name): #!cover
-		""" Gets a list of elements that contain the given filename. """
-		return [ele for ele in self.completed if ele.contains_file(file_name)]
-	
+		""" If testing was enabled, returns the cache of all loaded RedditElements. """
+		return self._testing_cache

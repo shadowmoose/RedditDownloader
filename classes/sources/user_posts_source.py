@@ -1,6 +1,6 @@
-from sources import source
-import reddit.reddit as reddit
-from util import console
+from classes.sources import source
+import classes.reddit.reddit as reddit
+from classes.util import console
 
 
 class UserPostsSource(source.Source):
@@ -10,14 +10,12 @@ class UserPostsSource(source.Source):
 
 
 	def get_elements(self):
-		ret = []
 		for re in reddit.user_posts(
 				username    = self.data['user'],
 				find_submissions= self.data['scan_submissions'],
 				find_comments= self.data['scan_comments']):
 			if self.check_filters(re):
-				ret.append(re)
-		return ret
+				yield re
 
 
 	def setup_wizard(self):

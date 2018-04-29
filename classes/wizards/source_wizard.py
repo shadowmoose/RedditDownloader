@@ -2,8 +2,9 @@
 	Wizard for handling Source editing.
 """
 
-from util import console, stringutil as su
-import wizards.wizard_functions as wizard_functions
+from classes.util import console, stringutil as su
+import classes.wizards.wizard_functions as wizard_functions
+from classes.filters import filter
 
 class SourceEditor:
 	def __init__(self, source, settings):
@@ -78,7 +79,6 @@ class SourceEditor:
 
 
 	def _add_filter(self):
-		from filters import filter
 		print('To create a filter, select the field to filter by, how it should be compared, '
 			  'and then the value to compare against.')
 		new_filter = console.prompt_list(

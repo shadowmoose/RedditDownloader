@@ -1,6 +1,6 @@
-from sources import source
-import reddit.reddit as reddit
-from util import console
+from classes.sources import source
+import classes.reddit.reddit as reddit
+from classes.util import console
 
 
 class UserPostsSource(source.Source):
@@ -10,14 +10,12 @@ class UserPostsSource(source.Source):
 
 
 	def get_elements(self):
-		ret = []
 		for p in reddit.frontpage_posts(
 				order_by = self.data['order'],
 				limit    = self.data['limit'],
 				time     = self.data['time']):
 			if self.check_filters(p):
-				ret.append(p)
-		return ret
+				yield p
 
 
 	def setup_wizard(self):

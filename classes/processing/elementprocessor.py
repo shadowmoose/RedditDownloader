@@ -1,34 +1,28 @@
 import colorama
-from util import stringutil
-import shutil
-import queue
-from processing.handlerthread import HandlerThread
 import time
+import shutil
+from classes.processing.handlerthread import HandlerThread
+from classes.util import stringutil
+
 
 class ElementProcessor:
 	""" The heavy-lifting bit. Handles processing all the Elements provided to it via the generator it's created with, by finding the most appropriate Handler for each Element. """
 	
-	def __init__(self, reddit_loader, settings, manifest):
+	def __init__(self, reddit_loader, settings):
 		""" Creates and prepares the Processor object, with the given RedditLoader to provide RedditElements. Takes a loaded Settings object to find the configured save path. """
-		self.loader = reddit_loader
-		self.gen = self.loader.get_elements()
+		self._loader = reddit_loader
 		self.settings = settings
-		self.manifest = manifest
 		self.handlers = []
 		self.threads = []
-	#
-	
-	def run(self):
-		q = queue.Queue()
-		for ele in self.gen:
-			q.put(ele)
 
+
+	def run(self):
 		conf = self.settings.get('threading')# Grab the 'threading' user config object.
 		max_threads = conf['max_handler_threads']
 
 		#start threads
 		for i in range(max_threads):
-			ht = HandlerThread('Handler - %s' % (i+1), self.settings, self.manifest, self.loader, q)
+			ht = HandlerThread('Handler - %s' % (i+1), self.settings, self._loader)
 			ht.daemon = True
 			ht.start()
 			self.threads.append(ht)
@@ -37,7 +31,7 @@ class ElementProcessor:
 			refresh_rate = max(0.1, conf['display_refresh_rate'])
 
 			while any([t.keep_running for t in self.threads]):
-				self.redraw(clear, q)
+				self.redraw(clear)
 				# Sleep...
 				if refresh_rate > 5: #!cover
 					steps = max(1, int(refresh_rate/5))
@@ -49,23 +43,21 @@ class ElementProcessor:
 					time.sleep(refresh_rate % 5) # Add any extra time on there, to be precise.
 				else:
 					time.sleep(refresh_rate)
-			self.redraw(clear, q)
-			print("Queue finished!")
+			self.redraw(clear)
+			print("\r\nQueue finished! (Total Processed: %s)" % self._loader.count_total())
 		except:
 			self.stop_process()
 			raise
 	#
 
 
-	def redraw(self, clear, processing_queue, depth=0):
+	def redraw(self, clear, depth=0):
 		""" Redraws the current Thread process.
 		:param clear: If the screen should be cleared before redrawing.
 				(Ignored automatically if not supported/possible.)
-		:param processing_queue: The queue being worked on.
 		:param depth: The times this function has recursively called. Max limit of one.
 		:return:
 		"""
-		assert depth <= 1
 		max_threads = len(self.threads)
 		dim = shutil.get_terminal_size((0,0))
 		width = dim.columns
@@ -82,7 +74,12 @@ class ElementProcessor:
 		if not clear:
 			print('\n\n\n\n')
 
-		out+= stringutil.color("Processing Posts: (~%s in queue)" % processing_queue.qsize(), colorama.Fore.CYAN) + "\n"
+		out+= stringutil.color("Processing Posts: (~%s in queue, %s %s)" % (
+			self._loader.count_remaining(),
+			self._loader.count_total(),
+			'found so far' if self._loader.is_running() else 'Total'
+		), colorama.Fore.CYAN )
+		out+= "\n"
 		for th in self.threads:
 			if th.keep_running:
 				head_color = stringutil.Fore.GREEN
@@ -95,7 +92,11 @@ class ElementProcessor:
 		try:
 			print(out.rstrip(), end='')
 		except:
-			self.redraw(False, processing_queue, depth+1)
+			if depth <= 1:
+				self.redraw(False, depth+1)
+				return
+			else:
+				raise
 		if not clear:
 			print('\n\n')
 

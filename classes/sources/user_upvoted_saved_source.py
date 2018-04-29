@@ -1,5 +1,6 @@
-from sources import source
-import reddit.reddit as reddit
+from classes.sources import source
+import classes.reddit.reddit as reddit
+from classes.util import console
 
 class UserUpvotedSaved(source.Source):
 	def __init__(self):
@@ -8,13 +9,13 @@ class UserUpvotedSaved(source.Source):
 
 
 	def get_elements(self):
-		gen = reddit.user_liked_saved(self.data['user'], self.data['scan_upvoted'], self.data['scan_saved'])
-		return [ele for ele in gen if self.check_filters(ele)]# Use filters.
+		for ele in reddit.user_liked_saved(self.data['user'], self.data['scan_upvoted'], self.data['scan_saved']):
+			if self.check_filters(ele):
+				yield ele
 
 
 	def setup_wizard(self):
 		print('Setup wizard for %s' % self.get_alias())
-		from util import console
 		user = console.string('Name of the User to scan')
 		if user is None:
 			print('Aborting setup.')

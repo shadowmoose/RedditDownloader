@@ -4,9 +4,9 @@
 """
 import praw
 import prawcore
-from util import stringutil
 from colorama import Fore
-from reddit.redditelement import RedditElement
+from classes.util import stringutil
+from classes.reddit.redditelement import RedditElement
 
 _credentials = None
 _user = None
@@ -73,13 +73,13 @@ def user_liked_saved(username, scan_upvoted=True, scan_saved=True):
 		else:
 			redditor = _reddit.redditor(username)
 		if scan_saved:
-			stringutil.print_color(Fore.CYAN, '\tLoading %s\'s Saved Posts...' % redditor.name)
+			#stringutil.print_color(Fore.CYAN, '\tLoading %s\'s Saved Posts...' % redditor.name)
 			for saved in redditor.saved(limit=None):
 				re = RedditElement(saved)
 				yield re
 
 		if scan_upvoted:
-			stringutil.print_color(Fore.CYAN, '\tLoading %s\'s Upvoted Posts...' % redditor.name)
+			#stringutil.print_color(Fore.CYAN, '\tLoading %s\'s Upvoted Posts...' % redditor.name)
 			for upvoted in redditor.upvoted(limit=None):
 				re = RedditElement(upvoted)
 				yield re

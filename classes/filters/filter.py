@@ -2,11 +2,10 @@
 	Filter class and static methods to access all available filters.
 """
 import pkgutil
-import filters
 import os
 import re
 from enum import Enum
-from util import stringutil
+from classes import filters
 
 
 class Operators(Enum):
@@ -35,7 +34,7 @@ class Filter:
 		self.accepts_operator = True
 
 
-	def set_operator(self, op):
+	def set_operator(self, op): #!cover
 		""" Sets this Filter's Operator. """
 		if self._lookup_operator(op):
 			self.operator = op
@@ -60,8 +59,7 @@ class Filter:
 			Automatically casts numeric values if possible, then compares.
 		"""
 		if not hasattr(obj, self.field):
-			stringutil.error('No field: %s' % self.field)
-			return True
+			raise Exception('No field: %s' % self.field) #!cover
 		val = self._cast(getattr(obj, self.field))
 		lim = self.get_limit()
 		if isinstance(val, str) and isinstance(lim, str): # Case doesn't matter for the basic comparisons.
@@ -78,8 +76,7 @@ class Filter:
 			if regexp.search( str(val)):
 				return True
 			return False
-		print("Invalid comparator for Filter!")
-		assert False # This should never happen.
+		raise Exception("Invalid comparator for Filter!") #!cover
 
 
 	def _cast(self, val):
@@ -130,12 +127,11 @@ class Filter:
 			if v in str_key.lower():
 				op = k
 		if '.' not in str_key:
-			op = Operators.EQUALS
+			op = Operators.EQUALS #!cover
 		if self._lookup_operator(op):
 			self.operator = op
 		else:
-			print('Unable to parse operator for Filter: %s' % self.field)
-			return False
+			raise Exception('Unable to parse operator for Filter: %s' % self.field) #!cover
 		return True
 
 
@@ -148,7 +144,7 @@ class Filter:
 		return False
 
 
-	def __str__(self):
+	def __str__(self): #!cover
 		lim = self._limit
 		if isinstance(lim, str):
 			lim = '"%s"' % lim
@@ -177,7 +173,7 @@ def get_filters(filter_dict=None):
 	for _,name,_ in pkgutil.iter_modules([pkg_path]):
 		if '_filter' not in name:
 			continue
-		fi = __import__(name, fromlist=[''])
+		fi = __import__('classes.filters.%s' % name, fromlist=[''])
 		for clazz in _module_classes(fi):
 			if filter_dict is not None:
 				for k, v in filter_dict.items():

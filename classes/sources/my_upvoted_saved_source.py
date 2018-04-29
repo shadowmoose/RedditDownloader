@@ -1,5 +1,5 @@
-from sources import source
-import reddit.reddit as reddit
+from classes.sources import source
+import classes.reddit.reddit as reddit
 
 
 
@@ -10,7 +10,9 @@ class UpvotedSaved(source.Source):
 
 
 	def get_elements(self):
-		return [ele for ele in reddit.my_liked_saved() if self.check_filters(ele)]# Use filters.
+		for ele in reddit.my_liked_saved():
+			if self.check_filters(ele):
+				yield ele
 
 
 	def setup_wizard(self): #!cover

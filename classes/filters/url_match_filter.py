@@ -1,4 +1,4 @@
-from filters import filter
+from classes.filters import filter
 import re
 
 class URLFilter(filter.Filter):

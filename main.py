@@ -1,8 +1,14 @@
-__version__ = "2.01"
+#!/usr/bin/env python3
+
+__version__ = "2.2"
 
 import argparse
 import sys
 import os
+import time
+import datetime
+import re
+
 parser = argparse.ArgumentParser(description="Tool for scanning Reddit and downloading media - Guide @ https://goo.gl/hgBxN4")
 parser.add_argument('--wizard', '-w', help="Run the Setup Wizard to simplify editing settings.", action="store_true")
 parser.add_argument("--settings", help="Path to custom Settings file.", type=str, metavar='')
@@ -24,11 +30,13 @@ parser.add_argument("--subdir_pattern", help="Override subdirectory name pattern
 parser.add_argument("--source", '-s', help="Run each loaded Source only if alias matches the given pattern. Can pass multiple patterns.", type=str, action='append', metavar='')
 args = parser.parse_args()
 
+'''
 sys.path.insert(0, './classes')
 sys.path.insert(0, './classes/handlers')
 sys.path.insert(0, './classes/sources')
 sys.path.insert(0, './classes/filters')
 sys.path.insert(0, './classes/wizards')
+'''
 
 
 if args.update or args.update_only: #!cover
@@ -52,18 +60,16 @@ if args.update or args.update_only: #!cover
 			print("Exiting following update bootstrap.")
 			sys.exit(0)
 
-import time
-import re
+
 import colorama
 from colorama import Fore
-
-from util.settings import Settings
-from processing.elementprocessor import ElementProcessor
-from reddit.redditloader import RedditLoader
-from util.manifest import Manifest
-import reddit.reddit as reddit
-import wizards.wizard as wizard
-from util import console, stringutil
+from classes.util.settings import Settings
+from classes.processing.elementprocessor import ElementProcessor
+from classes.reddit.redditloader import RedditLoader
+import classes.util.manifest as manifest
+import classes.reddit.reddit as reddit
+import classes.wizards.wizard as wizard
+from classes.util import stringutil
 
 #import logging
 #logging.basicConfig(filename='errors.log',level=logging.CRITICAL)
@@ -94,11 +100,11 @@ class Scraper(object):
 			print('Exit after Wizard.')
 			sys.exit(0)
 
-		self.manifest = None
 		if self.settings.get('build_manifest', True):
-			self.manifest = Manifest(self.settings, True)
-		else:
-			print('Not using manifest.') #!cover
+			manifest.create('manifest.sqldb', self.settings.save_base())
+		else: #!cover
+			manifest.create(':memory:')
+			print('Not saving manifest.')
 
 		self.sources = self.load_sources()
 		self.reddit = None
@@ -117,34 +123,18 @@ class Scraper(object):
 
 
 	def run(self):
+		_start_time = time.time()
 		try:
-			self.reddit = RedditLoader()
-			self.reddit.scan(self.sources)
-			self.processor = ElementProcessor(self.reddit, self.settings, self.manifest)
+			self.reddit = RedditLoader(args.test)
+			self.reddit.scan(self.sources) # Starts the scanner thread.
+			self.processor = ElementProcessor(self.reddit, self.settings)
 			self.processor.run()
 		except KeyboardInterrupt:
 			print("Interrupted by User.")
 			if self.processor:
 				self.processor.stop_process()
-		
-
-		if self.manifest:
-			if not args.skip_pauses: #!cover
-				try:
-					if console.confirm("Build manifest?", True):
-						print('Building manifest.')
-						#TODO: Cancelling should still check the existing manifest and copy known files to the new one.
-						self.manifest.build(self.reddit)
-				except KeyboardInterrupt:
-					pass
-			else:
-				print('Automatically building manifest.')
-				self.manifest.build(self.reddit)
-		else: #!cover
-			print('Manifest not built.')
-			if not args.skip_pauses:
-				input("Press Enter to exit.")
-		print('Finished processing!')
+		_total_time = str( datetime.timedelta(seconds= round(time.time() - _start_time)) )
+		print('Finished processing in %s.' % _total_time)
 	#
 
 
@@ -261,6 +251,7 @@ if args.test:
 		except Exception as e:
 			stringutil.print_color(Fore.RED, 'EXCEPTION: %s' % e)
 			exit_values.append(i)
+			raise
 	if max(exit_values) > 0: #!cover
 		stringutil.print_color(Fore.RED, "Failed testing!")
 		sys.exit( max(exit_values) )

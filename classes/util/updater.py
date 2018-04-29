@@ -1,14 +1,28 @@
 import os
 from hashlib import sha1
-import pip
 import shutil
+
+# Prepare for the grossest import ever:
+# noinspection PyBroadException
+try:
+	from pip import main as pipmain
+except:
+	# noinspection PyBroadException
+	try:
+		# noinspection PyUnresolvedReferences,PyProtectedMember
+		from pip._internal import main as pipmain
+	except:
+		print('WARNING: Cannot find pip module, needed to auto-update requirements.')
+
 
 try:
 	import requests
 except ImportError:
-	print('Bootstrapping "requests" package... ')
-	pip.main(["install", "--upgrade", "requests"])
-	import requests
+	if pipmain:
+		print('Bootstrapping "requests" package... ')
+		pipmain(["install", "--upgrade", "requests"])
+		import requests
+
 
 class Updater:
 	def __init__(self, author, repo, version, skip_prompt=False):
@@ -33,6 +47,7 @@ class Updater:
 
 	def _get_latest_file_tree(self):
 		""" Connect to Github and pull the latest information manifest for the repository. Caches result. """
+
 		if self._file_tree is not None:
 			return self._file_tree
 		self._file_tree = []
@@ -188,14 +203,18 @@ class Updater:
 		if os.path.isfile('./requirements.txt'):
 			# I don't really like calling this type of thing, because it can fail without root access when it builds.
 			# However, it's a very simple way to let people automatically update the ever-shifting packages like YTDL
+			# noinspection PyBroadException
 			try:
-				val = pip.main(["install", "--upgrade", "-r","requirements.txt"])
+				val = pipmain(["install", "--upgrade", "-r","requirements.txt"])
 				if val == 2:
 					raise PermissionError
 				print("\t+Completed package update.")
 			except PermissionError:
 				print("\nERROR: Could not auto-update your packages - This script lacks the permissions to do so!")
 				print("For package updating, Make sure you're launching this script from an console running as Administrator or Root!")
+			except:
+				print('ERROR UPDATING PACKAGES: Please manually update from requirements.txt! This program may not work otherwise.')
+				print('This may be solvable by running: "python pip install --upgrade -r requirements.txt"')
 		else:
 			print("\t! Couldn't locate a requirements.txt file. Cannot update dependencies.")
-		#
+	#

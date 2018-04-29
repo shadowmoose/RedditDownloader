@@ -6,10 +6,10 @@ import webbrowser
 import praw
 import prawcore
 import sys
-from util.settings import Settings
-from util import console, stringutil as su
-import wizards.source_wizard as source_wizard
-import wizards.wizard_functions as wizard_functions
+from classes.util.settings import Settings
+from classes.util import console, stringutil as su
+import classes.wizards.source_wizard as source_wizard
+import classes.wizards.wizard_functions as wizard_functions
 
 def run(settings_file='settings.json'):
 	client_setup = {'secret':None, 'id':None}
@@ -157,7 +157,7 @@ def _edit_sources(settings):
 
 def _add_source(settings):
 	""" Prompts the user for a new Source to add. """
-	from sources import source
+	from classes.sources import source
 	all_sources = source.get_sources()
 	choice = console.prompt_list(
 		"What would you like to download?",
