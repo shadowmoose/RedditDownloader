@@ -1,6 +1,6 @@
 # Logger object to simplify Thread logging.
 import threading
-from util import stringutil
+from classes.util import stringutil
 
 
 class Logger:

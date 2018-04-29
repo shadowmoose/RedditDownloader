@@ -10,8 +10,8 @@
 import hashlib
 import os.path
 from PIL import Image
-from util import stringutil
-from util import manifest
+from classes.util import stringutil
+from classes.util import manifest
 
 def add_hash(filename):
 	"""

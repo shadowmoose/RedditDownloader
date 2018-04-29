@@ -2,10 +2,10 @@
 	Filter class and static methods to access all available filters.
 """
 import pkgutil
-import filters
 import os
 import re
 from enum import Enum
+from classes import filters
 
 
 class Operators(Enum):
@@ -173,7 +173,7 @@ def get_filters(filter_dict=None):
 	for _,name,_ in pkgutil.iter_modules([pkg_path]):
 		if '_filter' not in name:
 			continue
-		fi = __import__(name, fromlist=[''])
+		fi = __import__('classes.filters.%s' % name, fromlist=[''])
 		for clazz in _module_classes(fi):
 			if filter_dict is not None:
 				for k, v in filter_dict.items():

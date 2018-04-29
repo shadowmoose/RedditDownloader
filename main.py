@@ -30,11 +30,13 @@ parser.add_argument("--subdir_pattern", help="Override subdirectory name pattern
 parser.add_argument("--source", '-s', help="Run each loaded Source only if alias matches the given pattern. Can pass multiple patterns.", type=str, action='append', metavar='')
 args = parser.parse_args()
 
+'''
 sys.path.insert(0, './classes')
 sys.path.insert(0, './classes/handlers')
 sys.path.insert(0, './classes/sources')
 sys.path.insert(0, './classes/filters')
 sys.path.insert(0, './classes/wizards')
+'''
 
 
 if args.update or args.update_only: #!cover
@@ -61,13 +63,13 @@ if args.update or args.update_only: #!cover
 
 import colorama
 from colorama import Fore
-from util.settings import Settings
-from processing.elementprocessor import ElementProcessor
-from reddit.redditloader import RedditLoader
-import util.manifest as manifest
-import reddit.reddit as reddit
-import wizards.wizard as wizard
-from util import stringutil
+from classes.util.settings import Settings
+from classes.processing.elementprocessor import ElementProcessor
+from classes.reddit.redditloader import RedditLoader
+import classes.util.manifest as manifest
+import classes.reddit.reddit as reddit
+import classes.wizards.wizard as wizard
+from classes.util import stringutil
 
 #import logging
 #logging.basicConfig(filename='errors.log',level=logging.CRITICAL)

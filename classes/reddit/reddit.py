@@ -4,9 +4,9 @@
 """
 import praw
 import prawcore
-from util import stringutil
 from colorama import Fore
-from reddit.redditelement import RedditElement
+from classes.util import stringutil
+from classes.reddit.redditelement import RedditElement
 
 _credentials = None
 _user = None

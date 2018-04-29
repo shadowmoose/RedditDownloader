@@ -1,7 +1,7 @@
 """
 	A few functions for all Wizards, packaged.
 """
-from util import console
+from classes.util import console
 
 
 def get_unique_alias(settings):

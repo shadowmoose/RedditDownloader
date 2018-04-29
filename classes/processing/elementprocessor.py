@@ -1,8 +1,9 @@
 import colorama
-from util import stringutil
-import shutil
-from processing.handlerthread import HandlerThread
 import time
+import shutil
+from classes.processing.handlerthread import HandlerThread
+from classes.util import stringutil
+
 
 class ElementProcessor:
 	""" The heavy-lifting bit. Handles processing all the Elements provided to it via the generator it's created with, by finding the most appropriate Handler for each Element. """

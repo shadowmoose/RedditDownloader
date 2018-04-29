@@ -1,5 +1,5 @@
-from sources import source
-import reddit.reddit as reddit
+from classes.sources import source
+import classes.reddit.reddit as reddit
 
 
 

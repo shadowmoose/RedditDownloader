@@ -1,6 +1,6 @@
-from sources import source
-import reddit.reddit as reddit
-from util import console
+from classes.sources import source
+import classes.reddit.reddit as reddit
+from classes.util import console
 
 
 class UserPostsSource(source.Source):
