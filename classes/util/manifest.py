@@ -129,6 +129,8 @@ def get_url_info(url):
 
 def remap_filepath(old_path, new_filepath):
 	""" Called if a better version of a file is found, this updates them all to the new location. """
+	old_path = stringutil.normalize_file(old_path)
+	new_filepath = stringutil.normalize_file(new_filepath)
 	with lock('w'), closing(conn.cursor()) as cur: #!cover
 		cur.execute('UPDATE urls SET file_path=:nfp WHERE file_path = :ofp', {'nfp':new_filepath, 'ofp':old_path})
 		conn.commit()
@@ -166,11 +168,13 @@ def hash_iterator(hash_len):
 
 def get_file_hash(f_path):
 	""" Returns a dictionary of the given Hash info for the file, or None. """
+	f_path = stringutil.normalize_file(f_path)
 	return _select_fancy('hashes', ['lastmtime', 'hash'], 'file_path = :fname', {'fname':f_path})
 
 
 def put_file_hash(f_path, f_hash, f_lastmtime):
 	""" Adds the given hash data for the given filename. """
+	f_path = stringutil.normalize_file(f_path)
 	with lock('w'), closing(conn.cursor()) as cur:
 		cur.execute('INSERT OR REPLACE INTO hashes (file_path, lastmtime, hash) VALUES (?,?,?)',
 			(f_path, f_lastmtime, f_hash)
@@ -178,6 +182,12 @@ def put_file_hash(f_path, f_hash, f_lastmtime):
 		conn.commit()
 
 
+def remove_file_hash(f_path):
+	""" Remove any hashes for the given path. """
+	f_path = stringutil.normalize_file(f_path)
+	with lock('w'), closing(conn.cursor()) as cur:
+		cur.execute('DELETE FROM hashes WHERE file_path=:fp',{'fp':f_path})
+		conn.commit()
 
 
 if __name__ == '__main__':

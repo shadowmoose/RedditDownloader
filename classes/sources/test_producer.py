@@ -14,23 +14,23 @@ class TestPostProducer(source.Source):
 				limit    = 30,
 				time     = 'all'):
 			if self.check_filters(p):
-				yield p
+				yield p #!cover
 		for p in reddit.subreddit_posts(
 				sub      = 'funny',
 				order_by = 'controversial',
 				limit    = 20,
 				time     = 'week'):
 			if self.check_filters(p):
-				yield p
+				yield p #!cover
 		for re in reddit.user_posts(
 				username   = 'test_reddit_scraper',
 				find_submissions= True,
 				find_comments= True):
 			if self.check_filters(re):
-				yield re
+				yield re #!cover
 		for ele in reddit.user_liked_saved('test_reddit_scraper', True, True):
 			if self.check_filters(ele):
-				yield ele
+				yield ele #!cover
 		for p in reddit.multi_reddit(# https://www.reddit.com/user/Lapper/m/depthhub/
 				username    = 'Lapper',
 				reddit_name = 'depthhub',
@@ -38,7 +38,7 @@ class TestPostProducer(source.Source):
 				limit    = 10,
 				time     = 'all'):
 			if self.check_filters(p):
-				yield p
+				yield p #!cover
 
 
 	def apply_filters(self, new_filters):
@@ -46,9 +46,9 @@ class TestPostProducer(source.Source):
 		self.filters = new_filters
 
 
-	def setup_wizard(self):
+	def setup_wizard(self): #!cover
 		return
 
 
-	def get_config_summary(self):
+	def get_config_summary(self): #!cover
 		return 'Downloading random, test Post data.'

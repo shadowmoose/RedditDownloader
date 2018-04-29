@@ -13,45 +13,44 @@ from PIL import Image
 from util import stringutil
 from util import manifest
 
-
 def add_hash(filename):
 	"""
 	Add the given file to the Hash jar.
 	:param filename: The path to the file to add.
 	:return: ([Is New File], existing_file_path)
 	"""
+	if filename:
+		filename = stringutil.normalize_file(filename) # Normalize for safety.
+
 	if not filename or not os.path.exists(filename) or os.path.isdir(filename):
 		# Skip directories.
 		return True, None
 
-	pre = manifest.get_file_hash(filename)
+	pre = manifest.get_file_hash(filename) # Start with a simple lookup to see if this path's hash is stored already.
 	lmt = os.path.getmtime(filename)
 	if pre:
 		if lmt == pre['lastmtime']:
-			# Hash already exists and file hasn't changed since.
-			#print('Hashjar: File unchanged: %s' % filename)
+			# Hash already exists and file hasn't changed since its last storage.
 			return False, filename
 
-	#print('Hashjar: Hashing file: %s' % filename)
-	#manifest.set_metadata('hashed_files', int(manifest.get_metadata('hashed_files', '0')) + 1)
-	#manifest.set_metadata(filename, '%s | %s' % (pre['lastmtime'] if pre else None, lmt))
-
-	_, final_hash = _get_best_hash(filename)
+	_, final_hash = _get_best_hash(filename) # If we didn't find the hash, or this file has been modified, re-hash.
 	if not final_hash: #!cover
 		stringutil.error("HashCheck :: Error hit hashing file, passing file as new.")
 		return True, None
 
-	#print("\tHashCheck :: Fingerprinting new image...", end='\r')
+	manifest.put_file_hash(filename, final_hash, lmt) # Store the hash of every file processed.
+	# NOTE: Now that this file is stored, it's up to anything that deletes an archived file to also remove the hash.
+
 	_it = manifest.hash_iterator(len(final_hash) )
 	for h in _it:
+		if h['file_path'] == filename:
+			continue # Since we've just added this file's hash, we don't want to match with it!
 		dist = _hamming_distance(h['hash'], final_hash)
 		if dist < 4:
 			#print('\tHashCheck :: Distance matches existing file (%s,%s): %s' % (final_hash, h, dist))
 			_it.send(True) # Release DB generator.
 			return False, h['file_path']
 	#print('\tHashCheck :: File is unique. Saved successfully.')
-
-	manifest.put_file_hash(filename, final_hash, lmt)
 	return True, None
 
 

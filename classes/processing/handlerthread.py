@@ -11,7 +11,7 @@ from util import manifest
 
 class HandlerThread(threading.Thread):
 	ele_lock = threading.RLock()
-	used_files = []
+	used_files = [] # A shared list of used base filenames, to avoid duplicating files until they're written and stored.
 
 	def __init__(self, name, settings, e_queue):
 		threading.Thread.__init__(self)
@@ -19,7 +19,7 @@ class HandlerThread(threading.Thread):
 		self.log = processing.logger.Logger(2, padding=1)
 		self.handler_log = processing.logger.Logger(2, padding=2)
 		self.handlers = []
-		self.release_filenames = []
+		self.release_filenames = [] # Each thread keeps a list of base filenames it's currently using, to avoid dupes.
 
 		self.settings = settings
 		self._loader = e_queue
@@ -69,11 +69,13 @@ class HandlerThread(threading.Thread):
 					reddit_element.add_file(url, file)
 					hashjar.add_hash(file) # Update hash, just in case it doesn't have this file.
 					continue
-			#print('This URL has not been handled. Downloading...')
+
+			# This URL hasn't been handled yet! Time to download it:
 			file_info = self.build_file_info(reddit_element)# Build the file information dict using this RedditElement's information
 			if file_info is None:
-				reddit_element.add_file(url, False)
+				reddit_element.add_file(url, False) # This mostly happens if the filename can't be generated.
 			else:
+				# Download file from new url, using the loaded Handlers:
 				file_path = self.process_url(url, file_info)# The important bit is here, & doesn't need the Lock.
 				if file_path:
 					file_path = stringutil.normalize_file(file_path) # Normalize for all DB storage.
@@ -140,7 +142,7 @@ class HandlerThread(threading.Thread):
 				ret = h.handle(url, info, self.handler_log)
 			except Exception:# There are too many possible exceptions between all handlers to catch properly.
 				#print(sys.exc_info()[0])
-				pass
+				raise # TODO: Report and stop thread, probably. I want to see errors reported.
 
 			if ret is None: #!cover
 				# None is returned when the handler specifically wants this URL to be "finished", but not added to the files list.
@@ -160,6 +162,8 @@ class HandlerThread(threading.Thread):
 		if not file_path:
 			return file_path #!cover
 		with HandlerThread.ele_lock:
+			# The IO here could cause issues if multiple Threads tried to delete the same files, so safety lock.
+			# Files currently downloading won't exist in the hashjar yet, so there's no risk of catching one in progress.
 			if not self.settings.get('deduplicate_files', True):
 				# Deduplication disabled.
 				return file_path #!cover
@@ -168,10 +172,12 @@ class HandlerThread(threading.Thread):
 				# Quick and dirty comparison, assumes larger filesize means better quality.
 				if os.path.isfile(file_path) and os.path.isfile(existing_path):
 					if os.path.getsize(file_path) > os.path.getsize(existing_path):
+						manifest.remove_file_hash(existing_path) #TODO: This should callback through HashJar, just to keep it centralized. Also, this should probably call *before* the file deletion, to avoid tracking nonexistant files (in event of crash between deletion and removal)
 						os.remove(existing_path)
 						manifest.remap_filepath(existing_path, file_path)
 						return file_path
 					else:
+						manifest.remove_file_hash(file_path) #TODO: This should callback through HashJar, just to keep it centralized.
 						os.remove(file_path)
 						return existing_path
 			return file_path

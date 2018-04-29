@@ -31,7 +31,7 @@ class RedditLoader(threading.Thread):
 					self._total_count+= 1
 				if self._testing_cache is not None:
 					self._testing_cache.append(r)
-		print("Element loading complete.\n")
+		#print("Element loading complete.\n")
 		self._running = False
 
 
