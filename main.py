@@ -40,7 +40,7 @@ sys.path.insert(0, './classes/wizards')
 
 
 if args.update or args.update_only: #!cover
-	from util.updater import Updater
+	from classes.util.updater import Updater
 	upd = Updater('shadowmoose', 'RedditDownloader', __version__, args.skip_pauses) # Pull from the latest release
 	upd.run()
 

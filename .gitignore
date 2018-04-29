@@ -11,6 +11,8 @@
 /reference
 /download
 .idea/
+/dist
+/build
 
 
 # Byte-compiled / optimized / DLL files
