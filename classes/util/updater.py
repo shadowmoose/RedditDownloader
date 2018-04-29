@@ -9,6 +9,7 @@ try:
 except:
 	# noinspection PyBroadException
 	try:
+		# noinspection PyUnresolvedReferences,PyProtectedMember
 		from pip._internal import main as pipmain
 	except:
 		print('WARNING: Cannot find pip module, needed to auto-update requirements.')

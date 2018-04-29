@@ -41,9 +41,9 @@ class Settings(object):
 		self.settings_file = file
 		if can_load and not os.path.isfile(self.settings_file): #!cover
 			self.save()# Save defaults.
-			from util import console
+			from classes.util import console
 			if console.confirm('Would you like to launch the first-time setup assistant?', True):
-				import wizards.wizard as wizard
+				import classes.wizards.wizard as wizard
 				print('\n\n')
 				wizard.run(file)
 			else:
@@ -84,7 +84,7 @@ class Settings(object):
 
 	def get_sources(self):
 		""" Builds and then returns a list of the Sources in this Settings config. """
-		from sources import source
+		from classes.sources import source
 		return source.get_sources( self.get('sources', []) )
 
 
@@ -144,7 +144,7 @@ class Settings(object):
 			# Version 1->2 saw addition of Sources & Filters.
 			obj['meta-version'] = 2
 			obj['sources'] = {}
-			from sources.my_upvoted_saved_source import UpvotedSaved
+			from classes.sources.my_upvoted_saved_source import UpvotedSaved
 			us = UpvotedSaved()# This Source doesn't need any extra info, and it simulates original behavior.
 			us.set_alias('default-downloader')
 			obj['sources'].append(us.to_obj())

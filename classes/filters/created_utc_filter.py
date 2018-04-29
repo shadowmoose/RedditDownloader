@@ -1,5 +1,5 @@
-from filters import filter
-from util import stringutil
+from classes.filters import filter
+from classes.util import stringutil
 
 
 class UTCFilter(filter.Filter):

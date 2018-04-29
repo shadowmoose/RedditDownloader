@@ -73,5 +73,5 @@ if __name__ == '__main__':
 		'parent_dir':'../',
 		'user_agent':'test-agent'
 	}
-	import processing.logger as logger
+	import classes.processing.logger as logger
 	print('Result:', handle(url_t, data_t, logger.Logger())   )

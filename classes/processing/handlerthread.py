@@ -3,10 +3,10 @@ import queue
 import os
 import pkgutil
 
-import processing.logger
-import handlers
-from util import hashjar, stringutil
-from util import manifest
+import classes.processing.logger as logger
+import classes.handlers as handlers
+from classes.util import hashjar, stringutil
+from classes.util import manifest
 
 
 class HandlerThread(threading.Thread):
@@ -16,8 +16,8 @@ class HandlerThread(threading.Thread):
 	def __init__(self, name, settings, e_queue):
 		threading.Thread.__init__(self)
 		self.name = name
-		self.log = processing.logger.Logger(2, padding=1)
-		self.handler_log = processing.logger.Logger(2, padding=2)
+		self.log = logger.Logger(2, padding=1)
+		self.handler_log = logger.Logger(2, padding=2)
 		self.handlers = []
 		self.release_filenames = [] # Each thread keeps a list of base filenames it's currently using, to avoid dupes.
 
@@ -188,7 +188,7 @@ class HandlerThread(threading.Thread):
 		""" Loads all the available handlers from the handler directory. """
 		self.handlers = []
 		for _,name,_ in pkgutil.iter_modules([os.path.dirname(handlers.__file__)]):
-			fi = __import__(name, fromlist=[''])
+			fi = __import__('classes.handlers.%s' % name, fromlist=[''])
 			self.handlers.append(fi)
 		self.handlers.sort(key=lambda x: x.order, reverse=False)
 		#print("Loaded handlers: ", ', '.join([x.tag for x in self.handlers]) )

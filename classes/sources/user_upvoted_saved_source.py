@@ -1,5 +1,6 @@
-from sources import source
-import reddit.reddit as reddit
+from classes.sources import source
+import classes.reddit.reddit as reddit
+from classes.util import console
 
 class UserUpvotedSaved(source.Source):
 	def __init__(self):
@@ -15,7 +16,6 @@ class UserUpvotedSaved(source.Source):
 
 	def setup_wizard(self):
 		print('Setup wizard for %s' % self.get_alias())
-		from util import console
 		user = console.string('Name of the User to scan')
 		if user is None:
 			print('Aborting setup.')

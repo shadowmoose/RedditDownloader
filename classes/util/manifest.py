@@ -3,8 +3,8 @@ import os.path
 import sqlite3
 from contextlib import closing
 
-from util import stringutil
-from util import rwlock
+from classes.util import stringutil
+from classes.util import rwlock
 
 
 
