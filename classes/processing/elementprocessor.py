@@ -73,8 +73,11 @@ class ElementProcessor:
 		if not clear:
 			print('\n\n\n\n')
 
-		out+= stringutil.color("Processing Posts: (~%s in queue, %s total)"
-							   % (self._loader.count_remaining(), self._loader.count_total()), colorama.Fore.CYAN )
+		out+= stringutil.color("Processing Posts: (~%s in queue, %s %s)" % (
+			self._loader.count_remaining(),
+			self._loader.count_total(),
+			'found so far' if self._loader.is_running() else 'Total'
+		), colorama.Fore.CYAN )
 		out+= "\n"
 		for th in self.threads:
 			if th.keep_running:
