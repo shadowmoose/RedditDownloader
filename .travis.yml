@@ -6,6 +6,8 @@ python:
 install:
 - pip install -r requirements.txt
 - pip install coveralls
+- pip install pycryptodome
+- python ./classes/tools/encryptor.py decrypt ./tests/test-settings.json.enc ./tests/test-settings.json
 script:
 - coverage run main.py --test --update_only --skip_pauses
 - coverage run main.py --test --skip_pauses
@@ -21,6 +23,3 @@ notifications:
     on_start: change
     on_cancel: never
     on_error: change
-before_install:
-- openssl aes-256-cbc -K $encrypted_935c8e1a24cb_key -iv $encrypted_935c8e1a24cb_iv
-  -in test-settings.json.enc -out ./tests/test-settings.json -d
