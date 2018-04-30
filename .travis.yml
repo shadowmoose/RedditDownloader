@@ -23,4 +23,4 @@ notifications:
     on_error: change
 before_install:
 - openssl aes-256-cbc -K $encrypted_935c8e1a24cb_key -iv $encrypted_935c8e1a24cb_iv
-  -in ./tests/test-settings.json.enc -out ./tests/test-settings.json -d
+  -in test-settings.json.enc -out ./tests/test-settings.json -d
