@@ -1,26 +1,26 @@
 language: python
 python:
-  - "3.4"
-  - "3.5"
-  - "3.6"
-#  - "nightly"
-# install dependencies
+- '3.4'
+- '3.5'
+- '3.6'
 install:
-  - pip install -r requirements.txt
-  - pip install coveralls
-# command to run tests
+- pip install -r requirements.txt
+- pip install coveralls
 script:
-  - coverage run main.py --test --update_only --skip_pauses --username=$username --password=$password --c_id=$client_id --c_secret=$client_secret --agent="TestUpdaterAgent"
-  - coverage run main.py --test --skip_pauses --username=$username --password=$password --c_id=$client_id --c_secret=$client_secret --agent="TestUpdaterAgent"
+- coverage run main.py --test --update_only --skip_pauses
+- coverage run main.py --test --skip_pauses
 after_script:
-  - COVERALLS_PARALLEL=true coveralls
+- COVERALLS_PARALLEL=true coveralls
 notifications:
   email: false
-  webhooks: 
+  webhooks:
     urls:
-      - https://hook.rofl.wtf/
+    - https://hook.rofl.wtf/
     on_success: change
     on_failure: change
     on_start: change
     on_cancel: never
     on_error: change
+before_install:
+- openssl aes-256-cbc -K $encrypted_935c8e1a24cb_key -iv $encrypted_935c8e1a24cb_iv
+  -in ./tests/test-settings.json.enc -out ./tests/test-settings.json -d

@@ -30,13 +30,6 @@ parser.add_argument("--subdir_pattern", help="Override subdirectory name pattern
 parser.add_argument("--source", '-s', help="Run each loaded Source only if alias matches the given pattern. Can pass multiple patterns.", type=str, action='append', metavar='')
 args = parser.parse_args()
 
-'''
-sys.path.insert(0, './classes')
-sys.path.insert(0, './classes/handlers')
-sys.path.insert(0, './classes/sources')
-sys.path.insert(0, './classes/filters')
-sys.path.insert(0, './classes/wizards')
-'''
 
 
 if args.update or args.update_only: #!cover
@@ -71,8 +64,6 @@ import classes.reddit.reddit as reddit
 import classes.wizards.wizard as wizard
 from classes.util import stringutil
 
-#import logging
-#logging.basicConfig(filename='errors.log',level=logging.CRITICAL)
 
 colorama.init(convert=True)
 
@@ -86,7 +77,11 @@ stringutil.print_color(Fore.GREEN, """
 
 class Scraper(object):
 	def __init__(self, settings_file, c_settings=None):
-		self.settings = Settings(settings_file, can_save=(c_settings is None), can_load=(not args.test) )
+		if not args.test:
+			self.settings = Settings(settings_file, can_save=(c_settings is None), can_load=(not args.test) )
+		else:
+			self.settings = Settings('./tests/test-settings.json', can_save=False, can_load=True)
+			print('Loaded test file.')
 		if c_settings:
 			for k,v in c_settings.items():
 				self.settings.set(k, v)
