@@ -2,14 +2,14 @@ import classes.sources.test_producer as test_source
 import classes.filters.filter as filters
 import time
 
-# Tests loading Posts from Sources, and filtering them.
+# Tests general Filter capability loading Filters from a JSON-style dict, then filtering Posts from the Test Source.
 start_time = time.time()
 
 filter_dict = {
 	"created_utc.max": start_time,
 	"score.min": 1000,
 	"title.match": "re",
-	"url_pattern.match":'.com'
+	"url_pattern.match":'\.com'
 }
 
 
@@ -30,12 +30,12 @@ def run_test(re):
 	for p in loaded_posts:
 		#print(p.title)
 		if p.created_utc > start_time:
-			return 'Invalid parsed time!', 1 # Shouldn't happen, but that's why we test.
+			return 'Invalid parsed time!', 1
 		if 're' not in p.title.lower():
 			return 'Invalid title!', 2
 		if p.score < 1000:
 			return 'Invalid score: %s' % p.score, 3
-		if not any('.com' in url.lower() for url in p.get_urls()):
+		if any('.com' not in url.lower() for url in p.get_urls()):
 			return 'Invalid URL found in Post.', 4
 
 	return '', 0
