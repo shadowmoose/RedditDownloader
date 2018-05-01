@@ -7,16 +7,13 @@ from classes.util import stringutil
 from classes.util import rwlock
 
 
-
-""" Prepare the Manifest Builder. Optionally load information from the given file. """
-version = None
-_completed = []
-_failed = []
+version = '1.0'
 
 conn = None
 lock = rwlock.RWLock() # Custom Read/Write lock, with Writer priority.
 
-''''# TODO: Change adapting to checking metadata table.
+#TODO: Change adapting to checking metadata table.
+''''
 change, data = _adapt(data)
 while change:
 	change, data = _adapt(data)
@@ -28,14 +25,11 @@ og_count = len(data['elements']['completed']+ data['elements']['failed'])
 '''
 
 
-def create(file, base_dir = None):
-	global conn
+def create(file):
+	global conn, version
 	with lock('w'):
-		if base_dir is not None:
-			file = stringutil.normalize_file(base_dir + '/' + file)
+		file = stringutil.normalize_file(file)
 		build =  file == ':memory:' or not os.path.isfile(file)
-		if not os.path.isdir(base_dir):
-			os.makedirs(base_dir)
 		conn = sqlite3.connect(file, check_same_thread=False)
 		if build:
 			with closing(conn.cursor()) as cur:
@@ -53,7 +47,7 @@ def create(file, base_dir = None):
 				)''')
 				conn.commit()
 			with closing(conn.cursor()) as cur:
-				cur.execute('INSERT INTO metadata VALUES (?,?)', ('version', '1.0'))
+				cur.execute('INSERT INTO metadata VALUES (?,?)', ('version', version))
 				cur.execute('INSERT INTO metadata VALUES (?,?)', ('author', 'ShadowMoose'))
 				cur.execute('INSERT INTO metadata VALUES (?,?)', ('website', 'https://goo.gl/hgBxN4'))
 				conn.commit()
@@ -137,7 +131,7 @@ def remap_filepath(old_path, new_filepath):
 
 
 def _select_fancy(table, cols, where = '', arg_dict=()):
-	""" A boilerplate DB method for requesting specific fields, and getting a named dict back. """
+	""" A boilerplate DB method for requesting specific fields, and getting a named dict back. Not injection-proof. """
 	with lock('r'), closing(conn.cursor()) as cur: #!cover
 		cur.execute('SELECT %s FROM %s WHERE %s' % (','.join(cols), table, where), arg_dict)
 		ret = cur.fetchone()
@@ -190,13 +184,19 @@ def remove_file_hash(f_path):
 		conn.commit()
 
 
+def _expose_testing_cursor():
+	"""
+		This function exists ONLY FOR TESTING USES, where rolling functions may not make sense.
+		It is decidedly not thread-safe, and will wreck everything if any Threads are still running.
+	"""
+	return conn.cursor()
+
+
 if __name__ == '__main__':
+	os.chdir(input('Enter a base dir: '))
 	print('Testing Manifest...')
 
-	#if os.path.isfile('./test.sqldb'):
-	#	os.remove('./test.sqldb')
-
-	create('test.sqldb', './')
+	create('manifest.sqldb')
 	# noinspection PyProtectedMember
 	#insert(_all_eles())
 
@@ -212,4 +212,24 @@ if __name__ == '__main__':
 		if i> 10:
 			print('Test killing gen.')
 			_hgen.send(True)
+
+	print('\nTesting Files:')
+	_c = _expose_testing_cursor()
+	_c.execute('SELECT post_id, file_path FROM urls')
+	_failed = 0
+	_invalid = 0
+	_total = 0
+	for r in _c.fetchall():
+		_pid = r[0]
+		_file = r[1]
+		_total+=1
+		if _file == 'None' or _file == 'False':
+			_failed+=1
+			continue
+		if not os.path.exists(_file):
+			print(_pid, _file)
+			_invalid+=1
+	print('%s total files.' % _total)
+	print('%s invalid file paths.' % _invalid)
+	print('%s failed files.' % _failed)
 	print('Test done.')

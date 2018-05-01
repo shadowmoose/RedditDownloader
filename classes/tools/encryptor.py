@@ -1,5 +1,5 @@
 
-""" Basic encryption implementation. """
+"""  Basic encryption implementation. Should work cross-platform for any testing environment.  """
 
 from Crypto.Cipher import AES
 from Crypto.Random import get_random_bytes
@@ -40,15 +40,18 @@ class Cryptor:
 
 
 	def decrypt(self, file, file_out):
-		file_in = open(file, "rb")
-		nonce, tag, ciphertext = [ file_in.read(x) for x in (16, 16, -1) ]
-
-		# let's assume that the key is somehow available again
-		cipher = AES.new(self.key, AES.MODE_EAX, nonce)
-		data = cipher.decrypt_and_verify(ciphertext, tag)
-		with open(file_out, 'wb') as o:
-			o.write(data)
-		return data.decode()
+		# noinspection PyBroadException
+		try:
+			file_in = open(file, "rb")
+			nonce, tag, ciphertext = [ file_in.read(x) for x in (16, 16, -1) ]
+			cipher = AES.new(self.key, AES.MODE_EAX, nonce)
+			data = cipher.decrypt_and_verify(ciphertext, tag)
+			with open(file_out, 'wb') as o:
+				o.write(data)
+			return data.decode()
+		except:
+			print('Failed decryption.')
+			sys.exit(1)
 
 
 if __name__ == '__main__':

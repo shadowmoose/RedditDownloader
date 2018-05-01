@@ -38,7 +38,7 @@ class Settings(object):
 	def __init__(self, file, can_save=True, can_load=True):
 		self.vals = default_settings
 		self.can_save = can_save
-		self.settings_file = file
+		self.settings_file = os.path.abspath(file)
 		if can_load and not os.path.isfile(self.settings_file): #!cover
 			self.save()# Save defaults.
 			from classes.util import console

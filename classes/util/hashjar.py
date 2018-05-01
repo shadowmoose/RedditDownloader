@@ -33,6 +33,7 @@ def add_hash(filename):
 			# Hash already exists and file hasn't changed since its last storage.
 			return False, filename
 
+	#manifest.set_metadata(filename, 'hashed') # Debugging only.
 	_, final_hash = _get_best_hash(filename) # If we didn't find the hash, or this file has been modified, re-hash.
 	if not final_hash: #!cover
 		stringutil.error("HashCheck :: Error hit hashing file, passing file as new.")

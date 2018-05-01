@@ -95,7 +95,7 @@ class HandlerThread(threading.Thread):
 	def build_file_info(self, reddit_element):
 		""" Generates a dict of file locations and element data that is passed down to every handler, so they can choose where best to save for themselves. """
 		with HandlerThread.ele_lock:
-			dir_pattern  = '%s/%s' % ( self.settings.save_base() , self.settings.save_subdir() )
+			dir_pattern  = './%s' % self.settings.save_subdir()
 			file_pattern = '%s/%s' % ( dir_pattern, self.settings.save_filename())
 
 			basedir = stringutil.insert_vars(dir_pattern, reddit_element)
@@ -108,7 +108,7 @@ class HandlerThread(threading.Thread):
 			og = basefile
 			i=2
 			while basefile in HandlerThread.used_files:
-				#Use local list of filenames used here, since used filenames won't be updated until done otherwise.
+				# Use local list of filenames used here, since used filenames won't be updated until done otherwise.
 				basefile = og+' . '+str(i)
 				basefile = stringutil.normalize_file(basefile)
 				i+=1
@@ -140,9 +140,11 @@ class HandlerThread(threading.Thread):
 			# noinspection PyBroadException
 			try:
 				ret = h.handle(url, info, self.handler_log)
-			except Exception:# There are too many possible exceptions between all handlers to catch properly.
+			except Exception as e:# There are too many possible exceptions between all handlers to catch properly.
 				#print(sys.exc_info()[0])
-				raise # TODO: Report and stop thread, probably. I want to see errors reported.
+				self.keep_running = False
+				self.log.out(0, str(e))
+				raise # Report and stop thread, probably. I want to see errors reported.
 
 			if ret is None: #!cover
 				# None is returned when the handler specifically wants this URL to be "finished", but not added to the files list.

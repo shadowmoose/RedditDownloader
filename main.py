@@ -85,7 +85,11 @@ class Scraper(object):
 		if c_settings:
 			for k,v in c_settings.items():
 				self.settings.set(k, v)
-		#
+
+		if not os.path.isdir(self.settings.save_base()):
+			os.makedirs(os.path.abspath(self.settings.save_base()) )
+		os.chdir(self.settings.save_base()) # Hop into base dir, so all file work can be relative.
+
 		if args.wizard: #!cover
 			if args.wizard and args.skip_pauses:
 				stringutil.error('You cannot run the Wizard with pause skipping enabled.')
@@ -96,7 +100,7 @@ class Scraper(object):
 			sys.exit(0)
 
 		if self.settings.get('build_manifest', True):
-			manifest.create('manifest.sqldb', self.settings.save_base())
+			manifest.create('manifest.sqldb')
 		else: #!cover
 			manifest.create(':memory:')
 			print('Not saving manifest.')
@@ -219,9 +223,6 @@ if args.test:
 	# Run some extremely basic tests to be sure (mostly) everything's working.
 	# Uses data specific to a test user account. This functionality is useless outside of building.
 	stringutil.print_color(Fore.YELLOW, "Checking against prearranged data...")
-	if not os.path.isdir('tests'): #!cover
-		stringutil.print_color(Fore.RED, 'No tests directory found.')
-		sys.exit(1)
 	
 	# Import all the testing modules.
 	import os.path

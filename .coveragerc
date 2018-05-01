@@ -7,7 +7,8 @@ omit =
     ./classes/wizards/*
     ./classes/util/console.py
     ./classes/util/updater.py
-    ./classes/util/win_file_fixer.py
+    ./classes/util/tools/win_file_fixer.py
+    ./classes/util/tools/encryptor.py
     ./tests/*
 [report]
 exclude_lines =
