@@ -1,0 +1,8 @@
+a {
+    color: dodgerblue;
+    cursor: pointer;
+}
+
+a:hover {
+    font-weight: bold;
+}
