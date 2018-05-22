@@ -56,7 +56,7 @@ To insert them, include *'[tag_name]'* in the path. EG: *'/custom/[subreddit]/[u
 
 __Files are saved as:__ *base_dir/subdir_pattern/file_pattern*
 
-+ **--base_dir**  -       override base directory. This changes where the files are saved, and can be absolute or relative.
++ **--base_dir**  -       override base directory. This changes where the files are saved, and can be absolute or relative. Cannot contain inserted data.
 
 + **--file_pattern** -    override filename output pattern. *Leave extension out.*
   + URLs pointing to albums or groups of multiple files will save file_pattern as a directory, containing the incrementally-named files.
