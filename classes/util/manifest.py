@@ -33,7 +33,7 @@ def create(file):
 		if build:
 			with closing(conn.cursor()) as cur:
 				cur.execute('''CREATE TABLE posts (
-					id text PRIMARY KEY, author text, source_alias text, subreddit text, title text, type text
+					id text PRIMARY KEY, author text, source_alias text, subreddit text, title text, type text, parent text, body text
 				)''')
 				cur.execute('''CREATE TABLE urls (
 					post_id text, url text, file_path text
@@ -57,7 +57,7 @@ def create(file):
 def check_legacy(base_dir):
 	""" Moves elements from legacy manifest, if one exists, to the new DB. """
 	if os.path.exists('./Manifest.json.gz'):
-		print('\n\nCONVERTING LEGACY MANIFEST...')
+		stringutil.print_color(stringutil.Fore.GREEN,'\n\nCONVERTING LEGACY MANIFEST...')
 		from classes.tools import manifest_converter as mc
 		data = mc.load('./Manifest.json.gz')
 		mc.convert(base_dir, data)
@@ -82,11 +82,12 @@ def set_metadata(key, value): #!cover
 		conn.commit()
 
 
-def direct_insert_post(_id, author, source_alias, subreddit, title, _type, files):
+def direct_insert_post(_id, author, source_alias, subreddit, title, _type, files, parent, body):
 	""" For legacy conversions, expose direct access to element insertion. """
 	with lock('w'), closing(conn.cursor()) as cur:
-		cur.execute('INSERT OR REPLACE INTO posts VALUES (?,?,?,?,?,?)',
-					(_id, author, source_alias, subreddit, title, _type)
+		cur.execute('INSERT OR REPLACE INTO posts (id, author, source_alias, subreddit, title, type, parent, body) '
+					'VALUES (?,?,?,?,?,?,?,?)',
+					(_id, author, source_alias, subreddit, title, _type, parent, body)
 		)
 		#print(ele)
 		cur.execute('DELETE FROM urls WHERE post_id = :id', {'id':_id})
@@ -97,7 +98,7 @@ def direct_insert_post(_id, author, source_alias, subreddit, title, _type, files
 def insert_post(reddit_ele):
 	""" Inserts a given list of elements into the database. """
 	ele = reddit_ele.to_obj()
-	direct_insert_post(ele['id'], ele['author'], ele['source_alias'], ele['subreddit'], ele['title'], ele['type'], ele['files'])
+	direct_insert_post(ele['id'], ele['author'], ele['source_alias'], ele['subreddit'], ele['title'], ele['type'], ele['files'], ele['parent'], ele['body'])
 
 
 def get_url_info(url):

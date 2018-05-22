@@ -77,7 +77,7 @@ def insert_vars(str_path, ele):
 	max_len = 1000
 	if os.name == 'nt':
 		max_len = 230 # We need to leave some headroom for longer (Unknown) extensions and/or naming. !cover
-	length = min(max_len, max(len(v) for k,v in ele.to_obj().items()) )
+	length = min(max_len, max(len(str(v)) for k,v in ele.to_obj().items()) )
 	while True:
 		ret_str = str_path
 		for k,v in ele.to_obj().items():

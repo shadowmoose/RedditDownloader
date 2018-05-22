@@ -12,6 +12,8 @@ class RedditElement(object):
 			title: A string representing the title of the Post belonging to this element.
 			author: string representing the author of this element.
 			_urls: A String Array of urls parsed for this post/comment.
+			body: The body of text iin this Post.
+			parent: The ID of this Post's parent Submission, if this Element is a Comment. Otherwise NULL.
 	"""
 
 	def __init__(self, obj):
@@ -23,6 +25,7 @@ class RedditElement(object):
 		self.title = None
 		self.author = None
 		self.body = None
+		self.parent = None
 		self.subreddit = str(obj.subreddit.display_name)
 		self.detect_type(obj)
 
@@ -53,6 +56,7 @@ class RedditElement(object):
 		#out("[Comment](%s): %s" % (c.subreddit.display_name, c.link_title) )
 		self.type = 'Comment'
 		self.id = str(c.name)
+		self.parent = str(c.link_id)
 		self.title = str(c.link_title)
 		if c.author:
 			self.author = str(c.author.name)
@@ -71,7 +75,7 @@ class RedditElement(object):
 		self.id = str(post.name)
 		self.title = str(post.title)
 		if post.author is None:
-			self.author = 'Deleted'
+			self.author = 'Deleted' #!cover
 		else:
 			self.author = str(post.author.name)
 		self.body = post.selftext
@@ -154,9 +158,11 @@ class RedditElement(object):
 			'subreddit': self.subreddit,
 			'type': self.type,
 			'id': self.id,
+			'parent': self.parent,
 			'title': self.title,
 			'author': self.author,
 			'urls': self.get_urls(),
 			'source_alias': self.source_alias,
+			'body': self.body
 		}
 		return ob
