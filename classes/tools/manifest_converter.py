@@ -6,6 +6,7 @@ from classes.util import manifest
 from classes.reddit import reddit as rd
 
 _verbose = False
+_converted = 0  # For testing.
 
 def load(file):
 	with gzip.GzipFile(file, 'rb') as data_file:
@@ -29,6 +30,7 @@ def find_comment(e):
 
 
 def convert(save_base, data):
+	global _converted
 	elems = data['elements']
 	base = stringutil.normalize_file(save_base + '/')
 	broken = 0
@@ -60,6 +62,7 @@ def convert(save_base, data):
 		if _verbose:
 			print(e)
 		manifest.direct_insert_post(e['id'], e['author'], e['source_alias'], e['subreddit'], e['title'], e['type'], e['files'], e['parent'], body)
+		_converted += 1
 	print('Comments that cannot be converted: %s' % broken)
 
 
