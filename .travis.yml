@@ -8,6 +8,7 @@ install:
 - pip install coveralls
 - pip install pycryptodome
 - python ./classes/tools/encryptor.py decrypt ./tests/test-settings.json.enc ./tests/test-settings.json
+- python ./classes/tools/encryptor.py decrypt ./tests/Legacy-Manifest.json.gz.enc ./download/Manifest.json.gz
 script:
 - coverage run main.py --test --update_only --skip_pauses
 - coverage run main.py --test --skip_pauses

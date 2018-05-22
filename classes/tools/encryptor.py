@@ -46,9 +46,9 @@ class Cryptor:
 			nonce, tag, ciphertext = [ file_in.read(x) for x in (16, 16, -1) ]
 			cipher = AES.new(self.key, AES.MODE_EAX, nonce)
 			data = cipher.decrypt_and_verify(ciphertext, tag)
+			os.makedirs(os.path.dirname(file_out), exist_ok=True)
 			with open(file_out, 'wb') as o:
 				o.write(data)
-			return data.decode()
 		except:
 			print('Failed decryption.')
 			sys.exit(1)
