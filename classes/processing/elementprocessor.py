@@ -15,6 +15,10 @@ class ElementProcessor:
 		self.handlers = []
 		self.threads = []
 
+		self.total_urls = 0
+		self.total_posts = 0
+		self.failed_urls = 0
+
 
 	def run(self):
 		conf = self.settings.get('threading')# Grab the 'threading' user config object.
@@ -43,6 +47,9 @@ class ElementProcessor:
 					time.sleep(refresh_rate % 5) # Add any extra time on there, to be precise.
 				else:
 					time.sleep(refresh_rate)
+				self.total_posts = sum(th.total_new_posts for th in self.threads)
+				self.total_urls = sum(th.total_new_urls for th in self.threads)
+				self.failed_urls = sum(th.total_failed_urls for th in self.threads)
 			self.redraw(clear)
 			print("\r\nQueue finished! (Total Processed: %s)" % self._loader.count_total())
 		except:

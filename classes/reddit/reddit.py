@@ -121,6 +121,15 @@ def multi_reddit(username, reddit_name, order_by='new', limit=None, time='all'):
 	yield from _praw_apply_filter(_reddit.multireddit(username, reddit_name), order_by, limit, time)
 
 
+def get_submission_comments(t3_id):
+	""" Implemented initially for converting invalid IDs, returns a generator of top comments from the given Submission. """
+	assert t3_id.startswith('t3_')
+	t3_id = t3_id.lstrip('t3_')  # Convert to expected format.
+	submission = _reddit.submission(id=t3_id)
+	for top_level_comment in submission.comments:
+		yield top_level_comment
+
+
 def _praw_apply_filter(praw_object, order_by='new', limit=None, time='all'):
 	""" Accepts a Praw object (subreddit/multireddit/user posts/etc) and applies filters to it. Returns a Generator. """
 	order = [o for o in post_orders() if o[0] == order_by]

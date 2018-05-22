@@ -1,4 +1,3 @@
-import time
 import os.path
 import sqlite3
 from contextlib import closing
@@ -7,7 +6,7 @@ from classes.util import stringutil
 from classes.util import rwlock
 
 
-version = '1.0'
+version = '2.0'
 
 conn = None
 lock = rwlock.RWLock() # Custom Read/Write lock, with Writer priority.
@@ -55,28 +54,15 @@ def create(file):
 	print('Connected to DB.')
 
 
-def _adapt(obj): #!cover
-	""" Adjust the given data to fit the current manifest version.
-		Should be called repeatedly on an object until it not longer returns true.
-		Returns: ( [true/false](If changed), new_obj )
-	"""
-	v = obj['@meta']['version']
-	if v == version:
-		return False, obj
-
-	if v <= 1:
-		# We don't adapt from version <= 1, because of missing data.
-		# Still adjusts to 2.0 format, to future-proof the baseline format.
-		return True, {
-			'@meta':{
-				'version': 2.0,
-				'timestamp': time.time(),
-				'finished': False,
-				'number_completed': 0,
-				'number_found' : 0,
-			},
-			'elements':{'completed':[], 'failed':[]},
-		}
+def check_legacy(base_dir):
+	""" Moves elements from legacy manifest, if one exists, to the new DB. """
+	if os.path.exists('./Manifest.json.gz'):
+		print('\n\nCONVERTING LEGACY MANIFEST...')
+		from classes.tools import manifest_converter as mc
+		data = mc.load('./Manifest.json.gz')
+		mc.convert(base_dir, data)
+		os.rename('./Manifest.json.gz', './Legacy - Manifest.json.gz')
+		print('Finished conversion.\n\n')
 
 
 def get_metadata(key, default=None): #!cover
@@ -96,18 +82,22 @@ def set_metadata(key, value): #!cover
 		conn.commit()
 
 
+def direct_insert_post(_id, author, source_alias, subreddit, title, _type, files):
+	""" For legacy conversions, expose direct access to element insertion. """
+	with lock('w'), closing(conn.cursor()) as cur:
+		cur.execute('INSERT OR REPLACE INTO posts VALUES (?,?,?,?,?,?)',
+					(_id, author, source_alias, subreddit, title, _type)
+		)
+		#print(ele)
+		cur.execute('DELETE FROM urls WHERE post_id = :id', {'id':_id})
+		for k,v in files.items():
+			cur.execute('INSERT INTO urls VALUES (?,?,?)', (_id, k, str(v) ))
+		conn.commit()
+
 def insert_post(reddit_ele):
 	""" Inserts a given list of elements into the database. """
 	ele = reddit_ele.to_obj()
-	with lock('w'), closing(conn.cursor()) as cur:
-		cur.execute('INSERT OR REPLACE INTO posts VALUES (?,?,?,?,?,?)',
-			(ele['id'], ele['author'], ele['source_alias'], ele['subreddit'], ele['title'], ele['type'])
-		)
-		#print(ele)
-		cur.execute('DELETE FROM urls WHERE post_id = :id', {'id':ele['id']})
-		for k,v in ele['files'].items():
-			cur.execute('INSERT INTO urls VALUES (?,?,?)', (ele['id'], k, str(v) ))
-		conn.commit()
+	direct_insert_post(ele['id'], ele['author'], ele['source_alias'], ele['subreddit'], ele['title'], ele['type'], ele['files'])
 
 
 def get_url_info(url):

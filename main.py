@@ -83,7 +83,7 @@ class Scraper(object):
 			self.settings = Settings('./tests/test-settings.json', can_save=False, can_load=True)
 			print('Loaded test file.')
 		if c_settings:
-			for k,v in c_settings.items():
+			for k,v in c_settings.items():  # TODO: Pass args in instead, and have Settings parse them.
 				self.settings.set(k, v)
 
 		if not os.path.isdir(self.settings.save_base()):
@@ -120,6 +120,8 @@ class Scraper(object):
 					password=auth_info['password'], user_agent=auth_info['user_agent'], username=auth_info['username'])
 		reddit.login()
 
+		manifest.check_legacy(self.settings.save_base())  # Convert away from legacy Manifest.
+
 
 	def run(self):
 		_start_time = time.time()
@@ -133,6 +135,8 @@ class Scraper(object):
 			if self.processor:
 				self.processor.stop_process()
 		_total_time = str( datetime.timedelta(seconds= round(time.time() - _start_time)) )
+		print('Found %s Posts missing files, with %s new URLs downloaded - and %s URLs that cannot be found.' %
+			  (self.processor.total_posts, self.processor.total_urls, self.processor.failed_urls))
 		print('Finished processing in %s.' % _total_time)
 	#
 

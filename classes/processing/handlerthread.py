@@ -25,6 +25,9 @@ class HandlerThread(threading.Thread):
 		self._loader = e_queue
 		self.load_handlers()
 		self.keep_running = True
+		self.total_new_urls = 0  # Counter for stat display.
+		self.total_new_posts = 0
+		self.total_failed_urls = 0
 
 
 	def run(self):
@@ -58,18 +61,20 @@ class HandlerThread(threading.Thread):
 						 stringutil.Fore.LIGHTYELLOW_EX
 					 )
 		)
+		was_new_ele = False
 		for url in reddit_element.get_urls():
-			#print('Handling URL: %s' % url)
+			was_new_url = True
 			url_info  = manifest.get_url_info(url)
-			#print('URL Info:', url_info)
 			if url_info:
+				was_new_url = False  # The manifest has seen this URL before. It may have failed last time, though.
 				file = url_info['file_path']
 				if file and os.path.exists(file):
-					#print('URL already handled.')
+					#  This URL has already been handled, and its file still exists.
 					reddit_element.add_file(url, file)
-					hashjar.add_hash(file) # Update hash, just in case it doesn't have this file.
+					hashjar.add_hash(file) # Update hash, just in case it doesn't have this file. (from legacy)
 					continue
 
+			was_new_ele = True
 			# This URL hasn't been handled yet! Time to download it:
 			file_info = self.build_file_info(reddit_element)# Build the file information dict using this RedditElement's information
 			if file_info is None:
@@ -79,11 +84,17 @@ class HandlerThread(threading.Thread):
 				file_path = self.process_url(url, file_info)# The important bit is here, & doesn't need the Lock.
 				if file_path:
 					file_path = stringutil.normalize_file(file_path) # Normalize for all DB storage.
+					if was_new_url:
+						self.total_new_urls += 1
+				else:
+					self.total_failed_urls += 1
 				if not self.keep_running:
 					return # Kill the thread after a potentially long-running download if the program has terminated. !cover
 				reddit_element.add_file(url, self.check_duplicates(file_path))
 
 		manifest.insert_post(reddit_element) # Update Manifest with completed ele.
+		if was_new_ele:
+			self.total_new_posts += 1
 
 		with HandlerThread.ele_lock:
 			# Clear blacklisted filename list, just to release the memory.
@@ -140,11 +151,8 @@ class HandlerThread(threading.Thread):
 			# noinspection PyBroadException
 			try:
 				ret = h.handle(url, info, self.handler_log)
-			except Exception as e:# There are too many possible exceptions between all handlers to catch properly.
-				#print(sys.exc_info()[0])
-				self.keep_running = False
-				self.log.out(0, str(e))
-				raise # Report and stop thread, probably. I want to see errors reported.
+			except Exception:  # There are too many possible exceptions between all handlers to catch properly.
+				pass  # Maybe consider stopping thread. I want to see errors reported, but don't want to interrupt users.
 
 			if ret is None: #!cover
 				# None is returned when the handler specifically wants this URL to be "finished", but not added to the files list.
