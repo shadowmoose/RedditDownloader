@@ -135,10 +135,9 @@ class Scraper(object):
 			if self.processor:
 				self.processor.stop_process()
 		_total_time = str( datetime.timedelta(seconds= round(time.time() - _start_time)) )
-		print('Found %s Posts missing files, with %s new URLs downloaded - and %s URLs that cannot be found.' %
+		print('Found %s posts missing files - with %s new files downloaded - and %s files that cannot be found.' %
 			  (self.processor.total_posts, self.processor.total_urls, self.processor.failed_urls))
 		print('Finished processing in %s.' % _total_time)
-	#
 
 
 	def load_sources(self): #!cover
