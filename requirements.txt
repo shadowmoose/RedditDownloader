@@ -7,4 +7,4 @@ beautifulsoup4
 colorama
 Pillow
 pathvalidate
-pip install Eel==0.9.7
+eel==0.9.7
