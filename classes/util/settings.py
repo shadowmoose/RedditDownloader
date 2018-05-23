@@ -158,5 +158,7 @@ class Settings(object):
 				"display_clear_screen":True,
 				"display_refresh_rate":5
 			}
-
+		# TODO: Settings shouldn't save user/password anymore - instead store a refresh token.
+		# TODO: Build a Token Wizard that prompts for user/pass, or skips the prompts if passed credentials (ask for pass anyways if they use 2FA)
+		# TODO: Move from meta-version 3 into 4, and pass account credentials to Token Wizard to skip some prompting.
 		return obj
