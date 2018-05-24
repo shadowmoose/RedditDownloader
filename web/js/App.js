@@ -24,7 +24,7 @@ class Main extends React.Component {
 				<ul className="header">
 					<li><a onClick={this.openPage.bind(this, <Home />)}>Home</a></li>
 					<li><a onClick={this.openPage.bind(this, <Sources />)}>Sources</a></li>
-					<li><a onClick={this.openPage.bind(this, <Account />)}>Account</a></li>
+					<li><a onClick={this.openPage.bind(this, <Settings />)}>Settings</a></li>
 				</ul>
 				<div className="content">
 					{this.state.page}

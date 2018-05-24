@@ -169,9 +169,10 @@ add("threading", Setting("display_clear_screen", True, desc="If it's okay to cle
 add("threading", Setting("display_refresh_rate", 5, desc="How often the UI should update progress.", etype="int"))
 
 add("interface", Setting("start_server", True, desc="If the WebUI should automatically start.", etype="bool"))
-add("interface", Setting("open_browser", True, desc="If the WebUI should open the browser on startup.", etype="bool"))
+add("interface", Setting("browser", 'chrome-app', desc="Browser mode to open UI in. Set to 'off' to disable auto-open, or 'default' for default system browser.", etype="str"))
+add("interface", Setting("keep_open", False, desc="If True, the WebUI will keep running as a webserver.", etype='bool'))
 add("interface", Setting("port", 8000, desc="The port to open the WebUI on.", etype="int"))
-add("interface", Setting("socket", 'localhost', desc="The interface to bind on."))
+add("interface", Setting("host", 'localhost', desc="The host to bind on."))
 
 add(None, Setting("meta-version", 4, etype="int", public=False))
 add(None, Setting("sources", [{'alias': 'default-downloader', 'data': {}, 'filters': {}, 'type': 'personal-upvoted-saved'}], etype="list", public=False))
