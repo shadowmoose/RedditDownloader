@@ -10,3 +10,17 @@ a {
 a:hover {
     font-weight: bold;
 }
+
+summary{
+    font-weight: bold;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+summary:focus {
+    outline-style: none;
+}
+
+summary::-webkit-details-marker {
+    display: none;
+}

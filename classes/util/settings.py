@@ -121,13 +121,14 @@ def save_filename():
 
 
 class Setting(object):
-	def __init__(self, name, value, desc='', etype='str', public=True):
+	def __init__(self, name, value, desc='', etype='str', public=True, opts=None):
 		self.name = name
 		self.value = None
 		self.type = str( etype )
 		self.category = None
 		self.public = public
 		self.description = desc
+		self.opts = self.set_opts(opts)
 		self.set(value)
 
 	def val(self):
@@ -136,10 +137,22 @@ class Setting(object):
 	def set(self, val):
 		if val.__class__.__name__ != self.type:
 			raise TypeError('Invalid type for new setting value! %s != %s' % (self.type, type(val.__class__.__name__)))
+		if self.opts and val not in [x[0] for x in self.opts]:
+			raise ValueError('Invalid value for setting [%s]! Value is not within given keys.' % val)
 		self.value = val
 
 	def set_cat(self, cat):
 		self.category = cat.lower()
+
+	def set_opts(self, opts):
+		ret = None
+		if opts:
+			ret = []
+			for o in opts:
+				if not isinstance(o, tuple):
+					o = (o, '')
+				ret.append(o)
+		return ret
 
 	def to_obj(self):
 		obj = {}
@@ -169,7 +182,7 @@ add("threading", Setting("display_clear_screen", True, desc="If it's okay to cle
 add("threading", Setting("display_refresh_rate", 5, desc="How often the UI should update progress.", etype="int"))
 
 add("interface", Setting("start_server", True, desc="If the WebUI should automatically start.", etype="bool"))
-add("interface", Setting("browser", 'chrome-app', desc="Browser mode to open UI in. Set to 'off' to disable auto-open, or 'default' for default system browser.", etype="str"))
+add("interface", Setting("browser", 'chrome-app', desc="Browser mode to open UI in.", etype="str", opts=[('chrome-app','Chrome Application Mode'), 'default browser', 'off']))
 add("interface", Setting("keep_open", False, desc="If True, the WebUI will keep running as a webserver.", etype='bool'))
 add("interface", Setting("port", 8000, desc="The port to open the WebUI on.", etype="int"))
 add("interface", Setting("host", 'localhost', desc="The host to bind on."))
