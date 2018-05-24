@@ -69,12 +69,23 @@ def api_get_settings():
 
 @eel.expose
 def api_save_settings(settings_obj):
-	pass  # TODO: Implement this.
+	print('WebUI wants to change settings:', settings_obj)
+	# noinspection PyBroadException
+	try:
+		for k, v in settings_obj.items():
+			settings.put(k, v, save_after=False)
+		settings.save()
+	except Exception:
+		import traceback
+		traceback.print_exc()
+		return False
+	return True
 
 
 
 
 if __name__ == '__main__':
+	settings.load('test-webui-settings.json')
 	start('../../web/', '../../../download')
 	while True:
 		eel.sleep(60)
