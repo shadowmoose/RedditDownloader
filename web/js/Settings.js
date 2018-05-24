@@ -24,9 +24,18 @@ class Settings extends React.Component {
 
 	/** Trigger save event for all settings compontents. */
 	saveSettings(){
+		if(Object.keys(this.changes).length === 0) {
+			alertify.closeLogOnClick(true).delay(1000).log("No settings have been changed!");
+			return;
+		}
 		console.log('Saving all settings...');
 		eel.api_save_settings(this.changes)(n => {
 			console.log('Got this from Python: ', n);
+			if(n){
+				alertify.closeLogOnClick(true).success("Saved settings!")
+			}else{
+				alertify.closeLogOnClick(true).error("Saved settings!")
+			}
 			this.changes = {}
 		});
 	}
