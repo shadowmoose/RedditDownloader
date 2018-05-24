@@ -28,7 +28,6 @@ def get(key, full_obj=False, cat=None):
 
 
 def put(key, value):
-	print(f'Setting setting: {key, value}')
 	s = get(key, full_obj=True)
 	s.set(value)
 	save()
@@ -53,7 +52,7 @@ def save():
 	print('/nSAVE FILE:')
 	out = to_obj(save_format=True, include_private=True)
 	s = json.dumps(out, indent=4, sort_keys=True, separators=(',', ': '))
-	print(s)
+	# print(s)
 	# TODO: actually Save
 
 
@@ -215,7 +214,6 @@ def _adapt(obj): #!cover
 		for r in rm:
 			del obj[r]
 		print("Adapted from Settings version 3 -> 4!")
-		print(json.dumps(obj, indent=4, sort_keys=True, separators=(',', ': ')))
 
 	return obj
 
