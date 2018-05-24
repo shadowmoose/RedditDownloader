@@ -1,6 +1,7 @@
 import eel
 import sys
 import os
+from classes.util import settings
 
 
 _file_dir = None
@@ -17,20 +18,33 @@ def start(web_dir, file_dir):
 	global _file_dir, _web_dir
 	_file_dir = os.path.abspath(file_dir)
 	_web_dir = os.path.abspath(web_dir)
+	browser = settings.get('interface.browser').lower().strip()
+	browser = None if browser == 'off' else browser
+	options = {
+		'mode': browser,
+		'host': settings.get('interface.host'),
+		'port': settings.get('interface.port'),
+		'chromeFlags': []
+	}
 
 	eel.init(web_dir)
-	eel.start('index.html', block=False)
+	eel.start('index.html', options=options, block=False)
+	# interface.port
 	print('Started WebUI!')
+	if browser:
+		print('Awaiting connection from browser...')
+	else:
+		print('Browser auto-opening is disabled! Please open a browser to http://%s:%s/index.html !' %
+			  (options['host'], options['port']))
 
 
 def _websocket_close():
-	# a websocket just closed
-	# TODO: user definable behavior here
-	print('Websocket closed.')
+	print('A WebUI just closed.')
 	eel.sleep(1.0)
-	if len(eel._websockets) == 0:
-		print('Out of websockets. Terminating...')
+	if len(eel._websockets) == 0 and not settings.get('interface.keep_open'):
+		print('WebUI keep_open is disabled, and all open clients have closed.\nExiting.')
 		sys.exit()
+eel._websocket_close = _websocket_close
 
 
 @eel.btl.route('/file')
@@ -43,8 +57,19 @@ def _downloaded_files():
 	return eel.btl.static_file(file_path, root=_file_dir)
 
 
-eel._websocket_close = _websocket_close
+# ======  JS->Python API functions:  ======
+@eel.expose
+def api_current_status(a, b):
+	print('Eel api call:', a, b, a + b)  # TODO: once WebUI is passed 'main', implement progress status here.
+	return a + b
 
+@eel.expose
+def api_get_settings():
+	return settings.to_obj(save_format=False, include_private=False)
+
+@eel.expose
+def api_save_settings(settings_obj):
+	pass  # TODO: Implement this.
 
 
 
@@ -52,4 +77,4 @@ eel._websocket_close = _websocket_close
 if __name__ == '__main__':
 	start('../../web/', '../../../download')
 	while True:
-		eel.sleep(2)
+		eel.sleep(60)
