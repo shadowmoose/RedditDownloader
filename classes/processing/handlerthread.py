@@ -7,13 +7,14 @@ import classes.processing.logger as logger
 import classes.handlers as handlers
 from classes.util import hashjar, stringutil
 from classes.util import manifest
+from classes.util import settings
 
 
 class HandlerThread(threading.Thread):
 	ele_lock = threading.RLock()
 	used_files = [] # A shared list of used base filenames, to avoid duplicating files until they're written and stored.
 
-	def __init__(self, name, settings, e_queue):
+	def __init__(self, name, e_queue):
 		threading.Thread.__init__(self)
 		self.name = name
 		self.log = logger.Logger(2, padding=1)
@@ -21,7 +22,6 @@ class HandlerThread(threading.Thread):
 		self.handlers = []
 		self.release_filenames = [] # Each thread keeps a list of base filenames it's currently using, to avoid dupes.
 
-		self.settings = settings
 		self._loader = e_queue
 		self.load_handlers()
 		self.keep_running = True
@@ -106,8 +106,8 @@ class HandlerThread(threading.Thread):
 	def build_file_info(self, reddit_element):
 		""" Generates a dict of file locations and element data that is passed down to every handler, so they can choose where best to save for themselves. """
 		with HandlerThread.ele_lock:
-			dir_pattern  = './%s' % self.settings.save_subdir()
-			file_pattern = '%s/%s' % ( dir_pattern, self.settings.save_filename())
+			dir_pattern  = './%s' % settings.save_subdir()
+			file_pattern = '%s/%s' % ( dir_pattern, settings.save_filename())
 
 			basedir = stringutil.insert_vars(dir_pattern, reddit_element)
 			basefile = stringutil.insert_vars(file_pattern, reddit_element)
@@ -133,7 +133,7 @@ class HandlerThread(threading.Thread):
 				'multi_dir' 	: basefile+"/",		# If the handler is going to download multiple files, it will save them under this directory.
 				'post_title'	: reddit_element.title,			# The title of the Reddit post.
 				'post_subreddit': reddit_element.subreddit,		# The subreddit this post came from.
-				'user_agent'	: self.settings.get('auth', None)['user_agent'],
+				'user_agent'	: settings.get('auth.user_agent'),
 			}
 	# exit lock.
 
@@ -174,7 +174,7 @@ class HandlerThread(threading.Thread):
 		with HandlerThread.ele_lock:
 			# The IO here could cause issues if multiple Threads tried to delete the same files, so safety lock.
 			# Files currently downloading won't exist in the hashjar yet, so there's no risk of catching one in progress.
-			if not self.settings.get('deduplicate_files', True):
+			if not settings.get('output.deduplicate_files'):
 				# Deduplication disabled.
 				return file_path #!cover
 			was_new, existing_path = hashjar.add_hash(file_path) # Check if the file exists already.
