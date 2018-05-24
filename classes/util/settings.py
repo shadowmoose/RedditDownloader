@@ -162,9 +162,9 @@ add("auth", Setting("username", 'Your_Username', desc="TODO"))
 add("output", Setting("base_dir", './download/', desc="The base directory to save to. Cannot contain tags."))
 add("output", Setting("subdir_pattern", '/[subreddit]/', desc="The directory path, within the base_dir, to save files to."))
 add("output", Setting("file_name_pattern", '[title] - ([author])', desc="The ouput file name."))
-add("output", Setting("deduplicate_files", True, desc="Check all files to assure they're unique. Also deduplicates similar-looking images.", etype="bool"))
+add("output", Setting("deduplicate_files", True, desc="Remove downloaded files if another copy already exists. Also compares images for visual similarity.", etype="bool"))
 
-add("threading", Setting("max_handler_threads", 5, desc="How many threads can download posts at once.", etype="int"))
+add("threading", Setting("max_handler_threads", 5, desc="How many threads can download media at once.", etype="int"))
 add("threading", Setting("display_clear_screen", True, desc="If it's okay to clear the terminal while running.", etype="bool"))
 add("threading", Setting("display_refresh_rate", 5, desc="How often the UI should update progress.", etype="int"))
 
