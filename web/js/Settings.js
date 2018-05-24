@@ -52,6 +52,7 @@ class Settings extends React.Component {
 				val = parseInt(val);
 				break;
 		}
+		console.log('Changed: ', event.target.id, val);
 		this.changes[event.target.id] = val;
 	}
 
@@ -96,8 +97,12 @@ class SettingsGroup extends React.Component {
 			return (null); // Render nothing if this group is empty.
 		}
 		return <form className={"settings_group"}>
-			<h2 className="settings_group_title">{this.titleCase(this.name)}</h2>
-			{this.state.elems}
+			<details open='open'>
+				<summary>
+					{this.titleCase(this.name)}
+				</summary>
+				{this.state.elems}
+			</details>
 		</form>
 	}
 }
@@ -115,6 +120,14 @@ class SettingsField extends React.Component {
 	}
 
 	parse_type(){
+		if(this.obj.opts){
+			let opts = this.obj.opts.map((o) =>{
+				return <option value={o[0]} title={o[1]} key={o[0]}>{o[0]}</option>
+			});
+			return <select id={this.ele_id} defaultValue={this.state.value} onChange={this.changeVal} className='settings_input'>
+				{opts}
+			</select>
+		}
 		switch(this.obj.type){
 			case 'int':
 				return <input type="number" id={this.ele_id} className='settings_input' defaultValue={this.state.value} onChange={this.changeVal}/>;
