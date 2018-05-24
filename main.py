@@ -15,21 +15,9 @@ parser.add_argument("--test", help="Launch in Test Mode. Only used for TravisCI 
 parser.add_argument("--update", help="Update the program.", action="store_true")
 parser.add_argument("--update_only", help="Update the program and exit.", action="store_true")
 parser.add_argument("--skip_pauses", help="Skip all skippable pauses.", action="store_true")
-parser.add_argument('--duplicate','-nd', help='Skip deduplicating similar files.', action="store_true")
-parser.add_argument('--skip_manifest', help='Skip using manifest to prevent rechecking existing downloads.', action="store_true")
-parser.add_argument("--username", help="Reddit account username.", type=str, metavar='')
-parser.add_argument("--password", help="Reddit account password.", type=str, metavar='')
-parser.add_argument("--c_id", help="Reddit client id.", type=str, metavar='')
-parser.add_argument("--c_secret", help="Reddit client secret.", type=str, metavar='')
-parser.add_argument("--agent", help="String to use for User-Agent.", type=str, metavar='')
-
-parser.add_argument("--base_dir", help="Override base directory.", type=str, metavar='')
-parser.add_argument("--file_pattern", help="Override filename output pattern", type=str, metavar='')
-parser.add_argument("--subdir_pattern", help="Override subdirectory name pattern", type=str, metavar='')
 parser.add_argument("--source", '-s', help="Run each loaded Source only if alias matches the given pattern. Can pass multiple patterns.", type=str, action='append', metavar='')
-args = parser.parse_args()
-
-
+parser.add_argument("--category.setting", help="Override the given setting.", action="store_true")
+args, unknown_args = parser.parse_known_args()
 
 if args.update or args.update_only: #!cover
 	from classes.util.updater import Updater
@@ -74,13 +62,7 @@ stringutil.print_color(Fore.GREEN, """
 
 
 class Scraper(object):
-	def __init__(self, _settings_file):
-		if args.test:
-			print('Using test settings file.')
-		settings.load(_settings_file if not args.test else './tests/test-settings.json')
-
-		# TODO: New way of passing args to settings.
-
+	def __init__(self,):
 		if not os.path.isdir(settings.save_base()):
 			os.makedirs(os.path.abspath(settings.save_base()) )
 		os.chdir(settings.save_base()) # Hop into base dir, so all file work can be relative.
@@ -141,15 +123,28 @@ class Scraper(object):
 		return sources
 
 
-#
-
-
 settings_file = 'settings.json'
 if args.settings:
-	settings = args.settings #!cover
+	settings_file = args.settings #!cover
 if args.test:
 	print("Test Mode running")
-#
+	print('Using test settings file.')
+
+_loaded = settings.load(settings_file if not args.test else './tests/test-settings.json')
+if not _loaded:
+	stringutil.error('Failed to load settings file!')
+	print('A settings file has been created for you as "%s". Please customize it.' % settings_file)
+	# TODO: Prompt for WebUI instead.
+	sys.exit(1)
+
+for ua in unknown_args:
+	k = ua.split('=')[0].strip('- ')
+	v = ua.split('=', 2)[1].strip()
+	try:
+		settings.put(k, v, save_after=False)
+	except KeyError:
+		print('Unknown setting: %s' % k)
+		sys.exit(50)
 '''
 # Though the settings file can be manually edited, 
 # Using the format default listed in 'settings', we allow the user to override most of them with command-line args.
@@ -193,7 +188,7 @@ if len(custom_settings) == 0: #!cover
 	custom_settings = None
 '''
 
-p = Scraper(settings_file)
+p = Scraper()
 p.run()
 
 
