@@ -77,23 +77,24 @@ class SettingsField extends React.Component {
 		super(props);
 		this.obj = props.obj;
 		this.type = this.parse_type();
+		this.ele_id = this.obj.name + '_input';
 		console.log(this.obj)
 	}
 
 	parse_type(){
 		switch(this.obj.type){
 			case 'int':
-				return <input type="number" id={this.obj.name} className='settings_input' defaultValue={this.obj.value} />;
+				return <input type="number" id={this.ele_id} className='settings_input' defaultValue={this.obj.value} />;
 			case 'bool':
-				return <input type="checkbox" id={this.obj.name} className='settings_input' defaultChecked={this.obj.value}/>;
+				return <input type="checkbox" id={this.ele_id} className='settings_input' defaultChecked={this.obj.value}/>;
 			default:
-				return <input type="text" id={this.obj.name} className='settings_input' defaultValue={this.obj.value}/>;
+				return <input type="text" id={this.ele_id} className='settings_input' defaultValue={this.obj.value}/>;
 		}
 	}
 
 	render(){
 		return <div className='settings_input_wrapper' title={this.obj.description}>
-			<label htmlFor={this.obj.name} className='settings_label'>{this.obj.name.replace(/_/g, ' ')}:</label>
+			<label htmlFor={this.ele_id} className='settings_label'>{this.obj.name.replace(/_/g, ' ')}:</label>
 			{this.parse_type()}
 		</div>
 	}
