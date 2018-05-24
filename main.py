@@ -10,7 +10,6 @@ import datetime
 import re
 
 parser = argparse.ArgumentParser(description="Tool for scanning Reddit and downloading media - Guide @ https://goo.gl/hgBxN4")
-parser.add_argument('--wizard', '-w', help="Run the Setup Wizard to simplify editing settings.", action="store_true")
 parser.add_argument("--settings", help="Path to custom Settings file.", type=str, metavar='')
 parser.add_argument("--test", help="Launch in Test Mode. Only used for TravisCI testing.",action="store_true")
 parser.add_argument("--update", help="Update the program.", action="store_true")
@@ -56,12 +55,11 @@ if args.update or args.update_only: #!cover
 
 import colorama
 from colorama import Fore
-from classes.util.settings import Settings
+from classes.util import settings
 from classes.processing.elementprocessor import ElementProcessor
 from classes.reddit.redditloader import RedditLoader
 import classes.util.manifest as manifest
 import classes.reddit.reddit as reddit
-import classes.wizards.wizard as wizard
 from classes.util import stringutil
 
 
@@ -76,51 +74,29 @@ stringutil.print_color(Fore.GREEN, """
 
 
 class Scraper(object):
-	def __init__(self, settings_file, c_settings=None):
-		if not args.test:
-			self.settings = Settings(settings_file, can_save=(c_settings is None), can_load=(not args.test) )
-		else:
-			self.settings = Settings('./tests/test-settings.json', can_save=False, can_load=True)
-			print('Loaded test file.')
-		if c_settings:
-			for k,v in c_settings.items():  # TODO: Pass args in instead, and have Settings parse them.
-				self.settings.set(k, v)
+	def __init__(self, _settings_file):
+		if args.test:
+			print('Using test settings file.')
+		settings.load(_settings_file if not args.test else './tests/test-settings.json')
 
-		if not os.path.isdir(self.settings.save_base()):
-			os.makedirs(os.path.abspath(self.settings.save_base()) )
-		os.chdir(self.settings.save_base()) # Hop into base dir, so all file work can be relative.
+		# TODO: New way of passing args to settings.
 
-		if args.wizard: #!cover
-			if args.wizard and args.skip_pauses:
-				stringutil.error('You cannot run the Wizard with pause skipping enabled.')
-				sys.exit(16)
-			print('\n\n')
-			wizard.interact(self.settings)
-			print('Exit after Wizard.')
-			sys.exit(0)
+		if not os.path.isdir(settings.save_base()):
+			os.makedirs(os.path.abspath(settings.save_base()) )
+		os.chdir(settings.save_base()) # Hop into base dir, so all file work can be relative.
 
-		if self.settings.get('build_manifest', True):
-			manifest.create('manifest.sqldb')
-		else: #!cover
-			manifest.create(':memory:')
-			print('Not saving manifest.')
+		manifest.create('manifest.sqldb')
 
 		self.sources = self.load_sources()
 		self.reddit = None
 		self.processor = None
 		
 		# Authenticate and prepare to scan:
-		auth_info = self.settings.get('auth')
-		if not auth_info: #!cover
-			print('Error loading authentication information!')
-			return
-		self.settings.set('last_started', time.time())
-
-		reddit.init(client_id=auth_info['client_id'], client_secret=auth_info['client_secret'],
-					password=auth_info['password'], user_agent=auth_info['user_agent'], username=auth_info['username'])
+		reddit.init(client_id=settings.get('auth.client_id'), client_secret=settings.get('auth.client_secret'),
+					password=settings.get('auth.password'), user_agent=settings.get('auth.user_agent'), username=settings.get('auth.username'))
 		reddit.login()
 
-		manifest.check_legacy(self.settings.save_base())  # Convert away from legacy Manifest.
+		manifest.check_legacy(settings.save_base())  # Convert away from legacy Manifest.
 
 
 	def run(self):
@@ -128,7 +104,7 @@ class Scraper(object):
 		try:
 			self.reddit = RedditLoader(args.test)
 			self.reddit.scan(self.sources) # Starts the scanner thread.
-			self.processor = ElementProcessor(self.reddit, self.settings)
+			self.processor = ElementProcessor(self.reddit)
 			self.processor.run()
 		except KeyboardInterrupt:
 			print("Interrupted by User.")
@@ -142,7 +118,7 @@ class Scraper(object):
 
 	def load_sources(self): #!cover
 		sources = []
-		settings_sources = self.settings.get_sources()
+		settings_sources = settings.get_sources()
 		if args.source is None:
 			for s in settings_sources:
 				print('Loaded Source: ', s.get_alias())
@@ -168,13 +144,13 @@ class Scraper(object):
 #
 
 
-settings = 'settings.json'
+settings_file = 'settings.json'
 if args.settings:
 	settings = args.settings #!cover
 if args.test:
 	print("Test Mode running")
 #
-
+'''
 # Though the settings file can be manually edited, 
 # Using the format default listed in 'settings', we allow the user to override most of them with command-line args.
 # Simply pop key->value replacements into this obj to override those key->value pairs when the Scraper launches.
@@ -215,8 +191,9 @@ if args.skip_manifest: #!cover
 if len(custom_settings) == 0: #!cover
 	print('Loading all settings from file.')
 	custom_settings = None
+'''
 
-p = Scraper(settings, custom_settings)
+p = Scraper(settings_file)
 p.run()
 
 

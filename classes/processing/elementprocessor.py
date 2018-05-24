@@ -3,15 +3,15 @@ import time
 import shutil
 from classes.processing.handlerthread import HandlerThread
 from classes.util import stringutil
+from classes.util import settings
 
 
 class ElementProcessor:
 	""" The heavy-lifting bit. Handles processing all the Elements provided to it via the generator it's created with, by finding the most appropriate Handler for each Element. """
 	
-	def __init__(self, reddit_loader, settings):
+	def __init__(self, reddit_loader):
 		""" Creates and prepares the Processor object, with the given RedditLoader to provide RedditElements. Takes a loaded Settings object to find the configured save path. """
 		self._loader = reddit_loader
-		self.settings = settings
 		self.handlers = []
 		self.threads = []
 
@@ -21,18 +21,17 @@ class ElementProcessor:
 
 
 	def run(self):
-		conf = self.settings.get('threading')# Grab the 'threading' user config object.
-		max_threads = conf['max_handler_threads']
+		max_threads = settings.get('threading.max_handler_threads')
 
 		#start threads
 		for i in range(max_threads):
-			ht = HandlerThread('Handler - %s' % (i+1), self.settings, self._loader)
+			ht = HandlerThread('Handler - %s' % (i+1), self._loader)
 			ht.daemon = True
 			ht.start()
 			self.threads.append(ht)
 		try:
-			clear = conf['display_clear_screen']
-			refresh_rate = max(0.1, conf['display_refresh_rate'])
+			clear = settings.get('threading.display_clear_screen')
+			refresh_rate = max(0.1, settings.get('threading.display_refresh_rate'))
 
 			while any([t.keep_running for t in self.threads]):
 				self.redraw(clear)
