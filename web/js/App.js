@@ -1,7 +1,7 @@
 class Main extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = {page: <Home />};
+		this.state = {page: <Settings />};
 
 		// This binding is necessary to make `this` work in the callback
 		this.openPage = this.openPage.bind(this);
