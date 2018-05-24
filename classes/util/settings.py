@@ -3,9 +3,36 @@ import json
 import os
 
 
-_file = None
+_file = ''
 _settings = dict()
 _default_cat = 'misc'
+
+
+
+def save():
+	out = to_obj(save_format=True, include_private=True)
+	with open(_file, 'w') as o:
+		o.write(json.dumps(out, indent=4, sort_keys=True, separators=(',', ': ')))
+	print('Saved Settings.')
+
+
+def load(filename):
+	global _file
+	_file = os.path.abspath(filename)
+	try:
+		with open(_file, 'r') as json_data:
+			loaded, converted = _adapt(json.load(json_data))
+	except IOError:
+		return False
+	for cat, sets in loaded.items():
+		for ky, val in sets.items():
+			st = get(ky, cat=cat, full_obj=True)
+			st.set(val)
+	print('Loaded settings file [%s].' % filename)
+	if converted:
+		print('Had to convert from older settings, so saving updated version!')
+		save()
+	return True
 
 
 def add(cat, st):
@@ -24,13 +51,14 @@ def get(key, full_obj=False, cat=None):
 	if cat in _settings and key in _settings[cat]:
 		rs = _settings[cat][key]
 		return rs.val() if not full_obj else rs
-	raise KeyError(f'The given setting ({key}) does not exist!')
+	raise KeyError('The given setting (%s) does not exist!' % key)
 
 
-def put(key, value):
+def put(key, value, save_after=True):
 	s = get(key, full_obj=True)
 	s.set(value)
-	save()
+	if save_after:
+		save()
 
 
 def to_obj(save_format=False, include_private=True):
@@ -47,25 +75,6 @@ def to_obj(save_format=False, include_private=True):
 				obj[cat].append(opt.to_obj())
 	return obj
 
-
-def save():
-	print('/nSAVE FILE:')
-	out = to_obj(save_format=True, include_private=True)
-	s = json.dumps(out, indent=4, sort_keys=True, separators=(',', ': '))
-	# print(s)
-	# TODO: actually Save
-
-
-def load(filename):
-	global _file
-	_file = os.path.abspath(filename)
-	with open(_file) as json_data:
-		loaded = _adapt(json.load(json_data))
-	for cat, sets in loaded.items():
-		for ky, val in sets.items():
-			st = get(ky, cat=cat, full_obj=True)
-			st.set(val)
-	print(f'Loaded settings file [{filename}].')
 
 
 def get_sources():
@@ -126,7 +135,7 @@ class Setting(object):
 
 	def set(self, val):
 		if val.__class__.__name__ != self.type:
-			raise TypeError(f'Invalid type for new setting value! {self.type} != {type(val.__class__.__name__)}')
+			raise TypeError('Invalid type for new setting value! %s != %s' % (self.type, type(val.__class__.__name__)))
 		self.value = val
 
 	def set_cat(self, cat):
@@ -173,6 +182,7 @@ add(None, Setting("sources", [{'alias': 'default-downloader', 'data': {}, 'filte
 def _adapt(obj): #!cover
 	""" Convert old versions of the Settings files up to the newest version. """
 	version = 1
+	converted = False
 	if 'meta-version' in obj:
 		version = obj['meta-version']
 	elif _default_cat in obj and 'meta-version' in obj[_default_cat]:
@@ -188,6 +198,7 @@ def _adapt(obj): #!cover
 		obj['sources'].append(us.to_obj())
 		version = 2
 		print("Adapted from Settings version 1 -> 2!")
+		converted = True
 
 	if version == 2:
 		# Version 2->3 sees addition of display config, for Threading.
@@ -199,6 +210,7 @@ def _adapt(obj): #!cover
 		}
 		version = 3
 		print("Adapted from Settings version 2 -> 3!")
+		converted = True
 
 	if version == 3:
 		obj[_default_cat] = {}
@@ -214,12 +226,13 @@ def _adapt(obj): #!cover
 		for r in rm:
 			del obj[r]
 		print("Adapted from Settings version 3 -> 4!")
+		converted = True
 
-	return obj
+	return obj, converted
 
 
 if __name__ == '__main__':
 	for _k, _v in _settings.items():
-		print(f'{_k.title()}:')
+		print(_k.title()+ ':')
 		for _key, stt in _v.items():
-			print(f'\t{_key}: {stt}')
+			print('\t%s: %s' % (_key, stt))
