@@ -1,7 +1,6 @@
 from classes.sources import source
 import classes.reddit.reddit as reddit
-from classes.util import console
-
+from classes.util.settings import Setting
 
 class MultiRedditSource(source.Source):
 	def __init__(self):
@@ -20,34 +19,12 @@ class MultiRedditSource(source.Source):
 				yield p
 
 
-	def setup_wizard(self):
-		print('Setup wizard for %s' % self.get_alias())
-		while True:
-			owner = console.string('Name of the redditor who curates the MultiReddit')
-			if owner is None:
-				print('Aborting setup.')
-				return False
-			if 'u/' in owner:
-				print('Please only include the subreddit name, after the "/u/".')
-				continue
-			self.data['owner'] = owner
-			break
-		mr = console.string("Enter the name of this user's multireddit")
-		if not mr:
-			print("Setup canceled.")
-			return False
-		self.data['multi_name'] = mr
-
-		order = console.prompt_list(
-			'How would you like to sort these Submissions?',
-			[(r[0], r) for r in reddit.post_orders()]
-		)
-		self.data['order'] = order[0]
-		self.data['time'] = 'all'
-		if order[1]:
-			self.data['time'] = console.prompt_list('Select a time span to filter by:', reddit.time_filters())
-		self.data['limit'] = console.number('How many would you like to download? (0 for no limit)')
-		return True
+	def get_settings(self):
+		yield Setting('owner', '', etype='str', desc='Username of this multireddit owner:')
+		yield Setting('multi_name', '', etype='str', desc='Name of this user\'s multireddit:')
+		yield Setting('order', None, etype='str', desc='Order submissions by:', opts=reddit.post_orders())
+		yield Setting('time', None, etype='str', desc='Select a time span to filter by:', opts=reddit.time_filters())
+		yield Setting('limit', 0, etype='int', desc='How many would you like to download? (0 for no limit):')
 
 
 	def get_config_summary(self):

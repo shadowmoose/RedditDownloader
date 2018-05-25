@@ -1,6 +1,6 @@
 from classes.sources import source
 import classes.reddit.reddit as reddit
-from classes.util import console
+from classes.util.settings import Setting
 
 
 class UserPostsSource(source.Source):
@@ -18,19 +18,13 @@ class UserPostsSource(source.Source):
 				yield re
 
 
-	def setup_wizard(self):
-		print('Setup wizard for %s' % self.get_alias())
-		user = console.string('Name of the User to scan')
-		if user is None:
-			print('Aborting setup.')
-			return False
-		self.data['user'] = user
+	def get_settings(self):
+		yield Setting('user', '', etype='str', desc='Target username:')
+		yield Setting('scan_comments', False, etype='bool', desc='Scan their comments?')
+		yield Setting('scan_submissions', False, etype='bool', desc='Scan their submissions?')
 
-		choice = console.prompt_list('Would you like to scan their Submissions or Comments?', [
-			('Only Submissions', 0), ('Only Comments', 1), ('Both Submissions & Comments', 2)
-		])
-		self.data['scan_submissions'] = (choice == 0 or choice == 2)
-		self.data['scan_comments'] = (choice == 1 or choice == 2)
+
+	def get_config_summary(self):
 		feeds = ""
 		if self.data['scan_comments']:
 			feeds+="Comments"
@@ -38,9 +32,4 @@ class UserPostsSource(source.Source):
 			if len(feeds) > 0:
 				feeds+=" & "
 			feeds+="Submissions"
-		self.data['vanity'] = feeds
-		return True
-
-
-	def get_config_summary(self):
-		return "Scanning User (%s)'s %s." % (self.data['user'], self.data['vanity'])
+		return "Scanning User (%s)'s %s." % (self.data['user'], feeds)

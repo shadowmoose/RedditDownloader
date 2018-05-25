@@ -11,7 +11,7 @@ class Source:
 	OVERRIDES:
 		init() !- To set type
 		get_elements() !- To return the values from this Source
-		setup_wizard() !- The function that takes control of prompting the user for the data this Source will need.
+		get_settings() !- Returns a list/iterator/etc of Settings objects required for this Source.
 		get_config_summary() !- The function to return a user-friendly setup status.
 	"""
 	def __init__(self, source_type, description):
@@ -27,7 +27,6 @@ class Source:
 		self.filters = []
 		self.data = {}
 
-
 	def get_elements(self): #!cover
 		"""  Tells this Source to build and return a generator for RedditElements. """
 		pass
@@ -38,11 +37,11 @@ class Source:
 		return "No status"
 
 
-	def setup_wizard(self): #!cover
+	def get_settings(self): #!cover
 		"""  Make this Souce object prompt the user for the information it needs to retrieve data.
 			Returns if the Source was properly set up or not.
 		"""
-		return False
+		return []
 
 
 	def available_filters(self): #!cover
@@ -66,6 +65,14 @@ class Source:
 			if not fi.check(ele):
 				return False
 		return True
+
+
+	def get_settings_obj(self):
+		""" Builds an object of the Settings this Source needs. For WebUI use. """
+		obj = []
+		for _s in self.get_settings():
+			obj.append(_s.to_obj())
+		return obj
 
 
 	def get_filters(self): #!cover
@@ -93,12 +100,14 @@ class Source:
 		return True
 
 
-	def to_obj(self): #!cover
+	def to_obj(self, include_settings=False): #!cover
 		"""  Convert this Source into a data model that can be output to the Settings file.  """
 		out = {'type':self.type, 'filters':{}, 'data':self.data, 'alias':self._alias}
 		for fi in self.get_filters():
 			k, v = fi.to_keyval()
 			out['filters'][k] = v
+		if include_settings:
+			out['settings'] = self.get_settings_obj()
 		return out
 
 

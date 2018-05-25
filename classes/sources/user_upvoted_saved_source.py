@@ -1,6 +1,6 @@
 from classes.sources import source
 import classes.reddit.reddit as reddit
-from classes.util import console
+from classes.util.settings import Setting
 
 class UserUpvotedSaved(source.Source):
 	def __init__(self):
@@ -14,19 +14,13 @@ class UserUpvotedSaved(source.Source):
 				yield ele
 
 
-	def setup_wizard(self):
-		print('Setup wizard for %s' % self.get_alias())
-		user = console.string('Name of the User to scan')
-		if user is None:
-			print('Aborting setup.')
-			return False
-		self.data['user'] = user
+	def get_settings(self):
+		yield Setting('user', '', etype='str', desc='Target username:')
+		yield Setting('scan_upvoted', False, etype='bool', desc='Scan their comments?')
+		yield Setting('scan_saved', False, etype='bool', desc='Scan their submissions?')
 
-		choice = console.prompt_list('Would you like to scan the Posts they\'ve Upvoted or Saved?', [
-			('Only Upvoted Posts', 0), ('Only Saved Posts', 1), ('Both Upvoted & Saved Posts', 2)
-		])
-		self.data['scan_upvoted'] = (choice == 0 or choice == 2)
-		self.data['scan_saved'] = (choice == 1 or choice == 2)
+
+	def get_config_summary(self):
 		feeds = ""
 		if self.data['scan_upvoted']:
 			feeds+="Upvoted"
@@ -34,9 +28,4 @@ class UserUpvotedSaved(source.Source):
 			if len(feeds) > 0:
 				feeds+=" & "
 			feeds+="Saved"
-		self.data['vanity'] = feeds
-		return True
-
-
-	def get_config_summary(self):
-		return 'Scanning all the Posts the Redditor "%s" has %s.' % (self.data['user'], self.data['vanity'])
+		return 'Scanning all the Posts the Redditor "%s" has %s.' % (self.data['user'], feeds)

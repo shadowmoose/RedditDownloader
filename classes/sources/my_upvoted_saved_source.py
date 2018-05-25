@@ -15,10 +15,8 @@ class UpvotedSaved(source.Source):
 				yield ele
 
 
-	def setup_wizard(self): #!cover
-		print('Setup wizard for %s' % self.get_alias())
-		print('This source requires no additional information.')
-		return True
+	def get_settings(self): #!cover
+		return []
 
 
 	def get_config_summary(self): #!cover
