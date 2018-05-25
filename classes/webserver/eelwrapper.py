@@ -3,6 +3,7 @@ import sys
 import os
 from classes.util import settings
 from classes.sources import source
+from classes.filters import filter
 
 
 _file_dir = None
@@ -84,11 +85,14 @@ def api_save_settings(settings_obj):
 
 @eel.expose
 def api_get_sources():
-	ret = {'available':[], 'active':[]}
+	ret = {'available': [], 'active': [], 'filters': {}}
 	for s in source.get_sources():
-		ret['available'].append(s.to_obj(include_settings=True))
+		ret['available'].append(s.to_obj(for_webui=True))
 	for s in settings.get_sources():
-		ret['active'].append(s.to_obj(include_settings=True))
+		ret['active'].append(s.to_obj(for_webui=True))
+	ret['filters']['available'] = [f.to_js_obj() for f in filter.get_filters()]
+	ret['filters']['operators'] = [f.value for f in filter.Operators]
+	print(ret)
 	return ret
 
 

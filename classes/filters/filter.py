@@ -62,9 +62,9 @@ class Filter:
 			raise Exception('No field: %s' % self.field) #!cover
 		val = self._cast(getattr(obj, self.field))
 		lim = self.get_limit()
-		if isinstance(val, str) and isinstance(lim, str): # Case doesn't matter for the basic comparisons.
-			val = val.lower()
-			lim = lim.lower()
+		if isinstance(val, str) or isinstance(lim, str): # Case doesn't matter for the basic comparisons.
+			val = str(val).lower()
+			lim = str(lim).lower()
 		if self.operator == Operators.MAXIMUM:
 			return val <= lim
 		if self.operator == Operators.MINIMUM:
@@ -109,12 +109,24 @@ class Filter:
 		self.set_limit(conv)
 		return ret
 
+	def to_js_obj(self):
+		""" Build an object that represents this Filter. Used by WebUI. """
+		return {
+			'field': self.field,
+			'operator': self.operator.value if self.operator else None,
+			'accepts_operator': self.accepts_operator,
+			'limit': self._limit,
+			'description': self.description
+		}
 
 	def to_keyval(self):
 		""" Convert this source into a data model that can be saved/loaded from Settings.
 			Returns: key, val -> This represents the way this is stored within the "Filters" JSON Object.
 		"""
-		return self.field+self._lookup_operator(self.operator, True), self._limit
+		op = self._lookup_operator(self.operator, True)
+		if not op:
+			op = ''
+		return self.field+op, self._limit
 
 
 	def _parse_str(self, str_key):
