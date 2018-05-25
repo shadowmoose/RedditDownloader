@@ -4,7 +4,7 @@ from classes.util.settings import Setting
 
 class UserUpvotedSaved(source.Source):
 	def __init__(self):
-		super().__init__(source_type='user-upvoted-saved', description="Submissions and Comments a Redditor has Upvoted or Saved")
+		super().__init__(source_type='user-upvoted-saved', description="Submissions and Comments a Redditor has Upvoted or Saved.")
 		self._elements = []
 
 
@@ -16,8 +16,8 @@ class UserUpvotedSaved(source.Source):
 
 	def get_settings(self):
 		yield Setting('user', '', etype='str', desc='Target username:')
-		yield Setting('scan_upvoted', False, etype='bool', desc='Scan their comments?')
-		yield Setting('scan_saved', False, etype='bool', desc='Scan their submissions?')
+		yield Setting('scan_upvoted', False, etype='bool', desc='Scan the posts they\'ve upvoted?')
+		yield Setting('scan_saved', False, etype='bool', desc='Scan the postst they\'ve saved?')
 
 
 	def get_config_summary(self):

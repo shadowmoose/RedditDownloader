@@ -29,3 +29,7 @@ summary:focus {
 summary::-webkit-details-marker {
     display: none;
 }
+
+.description {
+    color: gray;
+}
