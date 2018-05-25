@@ -2,6 +2,7 @@ import eel
 import sys
 import os
 from classes.util import settings
+from classes.sources import source
 
 
 _file_dir = None
@@ -80,6 +81,15 @@ def api_save_settings(settings_obj):
 		traceback.print_exc()
 		return False
 	return True
+
+@eel.expose
+def api_get_sources():
+	ret = {'available':[], 'active':[]}
+	for s in source.get_sources():
+		ret['available'].append(s.to_obj(include_settings=True))
+	for s in settings.get_sources():
+		ret['active'].append(s.to_obj(include_settings=True))
+	return ret
 
 
 

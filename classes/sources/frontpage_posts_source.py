@@ -1,6 +1,6 @@
 from classes.sources import source
 import classes.reddit.reddit as reddit
-from classes.util import console
+from classes.util.settings import Setting
 
 
 class UserPostsSource(source.Source):
@@ -18,18 +18,10 @@ class UserPostsSource(source.Source):
 				yield p
 
 
-	def setup_wizard(self):
-		print('Setup wizard for %s' % self.get_alias())
-		order = console.prompt_list(
-			'How would you like to sort these Submissions?',
-			[(r[0], r) for r in reddit.post_orders()]
-		)
-		self.data['order'] = order[0]
-		self.data['time'] = 'all'
-		if order[1]:
-			self.data['time'] = console.prompt_list('Select a time span to filter by:', reddit.time_filters())
-		self.data['limit'] = console.number('How many would you like to download? (0 for no limit)')
-		return True
+	def get_settings(self):
+		yield Setting('order', None, etype='str', desc='Order submissions by:', opts=reddit.post_orders())
+		yield Setting('time', None, etype='str', desc='Select a time span to filter by:', opts=reddit.time_filters())
+		yield Setting('limit', 0, etype='int', desc='How many would you like to download? (0 for no limit):',)
 
 
 	def get_config_summary(self):

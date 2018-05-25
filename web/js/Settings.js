@@ -122,7 +122,7 @@ class SettingsField extends React.Component {
 	parse_type(){
 		if(this.obj.opts){
 			let opts = this.obj.opts.map((o) =>{
-				return <option value={o[0]} title={o[1]} key={o[0]}>{o[0]}</option>
+				return <option value={o[0]} title={o[1].toString()} key={o[0]}>{o[0]}</option>
 			});
 			return <select id={this.ele_id} defaultValue={this.state.value} onChange={this.changeVal} className='settings_input'>
 				{opts}
@@ -139,7 +139,7 @@ class SettingsField extends React.Component {
 	}
 
 	render(){
-		return <div className='settings_input_wrapper' title={this.obj.description}>
+		return <div className='settings_input_wrapper' title={this.obj.description.toString()}>
 			<label htmlFor={this.ele_id} className='settings_label'>{this.obj.name.replace(/_/g, ' ')}:</label>
 			{this.parse_type()}
 		</div>

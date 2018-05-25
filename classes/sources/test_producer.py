@@ -46,8 +46,8 @@ class TestPostProducer(source.Source):
 		self.filters = new_filters
 
 
-	def setup_wizard(self): #!cover
-		return
+	def get_settings(self): #!cover
+		return []
 
 
 	def get_config_summary(self): #!cover

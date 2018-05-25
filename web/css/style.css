@@ -11,6 +11,11 @@ a:hover {
     font-weight: bold;
 }
 
+label{
+    color: gray;
+    padding-right: 5px;
+}
+
 summary{
     font-weight: bold;
     font-size: 20px;

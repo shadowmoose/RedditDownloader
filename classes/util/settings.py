@@ -135,8 +135,10 @@ class Setting(object):
 		return copy.deepcopy(self.value)
 
 	def set(self, val):
-		if val.__class__.__name__ != self.type:
-			raise TypeError('Invalid type for new setting value! %s != %s' % (self.type, type(val.__class__.__name__)))
+		if val is None and len(self.opts) > 0:
+			val = self.opts[0][0]  # Default to first opt value, if opts are set.
+		if self.type not in val.__class__.__name__:
+			raise TypeError('Invalid type for new setting value! %s != %s' % (self.type, val.__class__.__name__))
 		if self.opts and val not in [x[0] for x in self.opts]:
 			raise ValueError('Invalid value for setting [%s]! Value is not within given keys.' % val)
 		self.value = val
