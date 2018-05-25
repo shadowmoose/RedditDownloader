@@ -29,7 +29,6 @@ class Sources extends React.Component {
 		);
 		return (
 			<div>
-				<h2>Sources:</h2>
 				{sources}
 			</div>
 		);
@@ -90,6 +89,7 @@ class Source extends React.Component {
 				<summary>
 					{this.state.alias ? this.state.alias : '[blank]'}
 				</summary>
+				<div className='description'>{this.state.description}</div>
 				{sf}
 			</details>
 		</div>

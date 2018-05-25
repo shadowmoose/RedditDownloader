@@ -108,6 +108,7 @@ class Source:
 			out['filters'][k] = v
 		if include_settings:
 			out['settings'] = self.get_settings_obj()
+			out['description'] = self.description
 		return out
 
 
