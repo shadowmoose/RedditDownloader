@@ -100,15 +100,18 @@ class Source:
 		return True
 
 
-	def to_obj(self, include_settings=False): #!cover
+	def to_obj(self, for_webui=False): #!cover
 		"""  Convert this Source into a data model that can be output to the Settings file.  """
 		out = {'type':self.type, 'filters':{}, 'data':self.data, 'alias':self._alias}
 		for fi in self.get_filters():
 			k, v = fi.to_keyval()
 			out['filters'][k] = v
-		if include_settings:
+		if for_webui:
 			out['settings'] = self.get_settings_obj()
 			out['description'] = self.description
+			out['filters'] = []
+			for fi in self.get_filters():
+				out['filters'].append(fi.to_js_obj())
 		return out
 
 

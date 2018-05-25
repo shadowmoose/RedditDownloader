@@ -1,7 +1,7 @@
 class Sources extends React.Component {
 	constructor(props){
 		super(props);
-		this.state = {available:[], active:[]}
+		this.state = {available:[], active:[], filters: {}}
 	}
 
 	componentDidMount() {
@@ -15,7 +15,8 @@ class Sources extends React.Component {
 		run().then((r)=>{
 			this.setState({
 				available: r['available'],
-				active: r['active']
+				active: r['active'],
+				filters: r['filters']
 			});
 			console.log('Sources state:');
 			console.log(this.state)
@@ -25,7 +26,7 @@ class Sources extends React.Component {
 
 	render() {
 		let sources = this.state.available.map((s) => //TODO: Switch to "active"
-			<Source obj={s} key={s.alias}/>
+			<Source obj={s} key={s.alias} filterOptions={this.state.filters}/>
 		);
 		return (
 			<div>
@@ -42,6 +43,7 @@ class Source extends React.Component {
 		this.state = props.obj;
 		this._save = this.saveSettings.bind(this);
 		this._change = this.changeSetting.bind(this);
+		this._changeFilter = this.changeFilter.bind(this);
 	}
 
 	saveSettings(){
@@ -53,7 +55,7 @@ class Source extends React.Component {
 			alias: this.state.alias,
 			type: this.state.type,
 			data: Object.assign({}, this.state.data),
-		};
+		}
 	}
 
 	changeSetting(evt){
@@ -79,18 +81,21 @@ class Source extends React.Component {
 		}
 	}
 
+	changeFilter(obj){
+	}
+
 	render() {
 		console.log('Redrew:', this.state.alias);
 		console.log('New Data:', this.state.data);
 		console.log('Output Object:', this.getObj());
-		let sf = <SourceSettingsGroup name={this.state.alias} type={this.state.type} list={this.state.settings} save={this._save} change={this._change}/>;
 		return <div>
 			<details open='open'>
 				<summary>
 					{this.state.alias ? this.state.alias : '[blank]'}
 				</summary>
 				<div className='description'>{this.state.description}</div>
-				{sf}
+				<SourceSettingsGroup name={this.state.alias} type={this.state.type} list={this.state.settings} save={this._save} change={this._change}/>
+				<SourceFilterGroup filters={this.state.filters} change={this._changeFilter} filterOptions={this.props.filterOptions}/>
 			</details>
 		</div>
 	}
@@ -113,5 +118,87 @@ class SourceSettingsGroup extends React.Component {
 			<input type={'text'} id='alias' value={this.props.name} onChange={this.props.change} title='Rename this Source!'/>
 			{fields}
 		</form>
+	}
+}
+
+
+class SourceFilterGroup extends React.Component {
+	constructor(props) {
+		super(props);
+		this._update = this.update.bind(this);
+		this.state = {filter: props.filterOptions.available[0]}
+	}
+
+	update(evt, prop){
+		let val = evt.target.value;
+		console.log('Group is Updating Filter: ', prop, '->', val);
+		if(prop === 'field'){
+			let flt = false;
+			this.props.filterOptions.available.forEach((f)=>{
+				if(f.field === val)flt = JSON.parse(JSON.stringify(f));
+			});
+			if(flt){
+				this.setState({filter: flt});
+				console.log('Swapped filters.')
+			}else{
+				alertify.error('Error finding matching Filter!');
+				console.error('Error finding matching filter.');
+			}
+		}else{
+			let nf = JSON.parse(JSON.stringify(this.state.filter));
+			nf[prop] = val;
+			this.setState({filter: nf});
+		}
+	}
+
+	format_operator(op){
+		return String(op).replace('.','').replace('match', 'matches')
+	}
+
+	render(){
+		console.log('Filter Group Rerender:', this.state.filter);
+		let filter = this.state.filter;
+
+		let opts = this.props.filterOptions.operators.map((o)=>{
+			return <option key={o} value={o}>{this.format_operator(o)}</option>
+		});
+		let operator = <select className='filter_operator' onChange={(e) => this._update(e, 'operator')} defaultValue={filter.operator} disabled={!filter.accepts_operator}>{opts}</select>;
+
+
+		let fieldOpts = this.props.filterOptions.available.map((o)=>{
+			return <option key={o.field} value={o.field} title={o.description}>{o.field}</option>
+		});
+		let fieldSelect = <select className='filter_field' onChange={(e) => this._update(e, 'field')} defaultValue={filter.field} title={filter.description}>{fieldOpts}</select>;
+
+
+		let limit = <input type='text' className='filter_limit' onChange={(e) => this._update(e, 'limit')} value={filter.limit ? filter.limit : ''}/>;
+
+		let filters = this.props.filterOptions.available.map((field) => //TODO: Should be props.filters.
+			<FilterField key={field.field+field.limit} obj={field}/>
+		);
+
+		return <form className={"source_filter_group"}>
+			<div><b>Filter Group:</b></div>
+			{fieldSelect}
+			{operator}
+			{limit}
+			<button>Add Filter</button>
+			<ul className="source_filter_list">
+				{filters}
+			</ul>
+		</form>
+	}
+}
+
+
+class FilterField extends React.Component {
+	constructor(props) {
+		super(props);
+	}
+
+	render(){
+		return <li className="source_filter_field">
+			{JSON.stringify(this.props.obj)}
+		</li>
 	}
 }
