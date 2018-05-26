@@ -20,6 +20,9 @@ def start(web_dir, file_dir):
 	global _file_dir, _web_dir
 	_file_dir = os.path.abspath(file_dir)
 	_web_dir = os.path.abspath(web_dir)
+	if not settings.get('interface.start_server'):
+		print('WebUI is disabled by settings.')
+		return False
 	browser = settings.get('interface.browser').lower().strip()
 	browser = None if browser == 'off' else browser
 	options = {
@@ -38,6 +41,7 @@ def start(web_dir, file_dir):
 	else:
 		print('Browser auto-opening is disabled! Please open a browser to http://%s:%s/index.html !' %
 			  (options['host'], options['port']))
+	return True
 
 
 def _websocket_close():
@@ -92,30 +96,38 @@ def api_get_sources():
 		ret['active'].append(s.to_obj(for_webui=True))
 	ret['filters']['available'] = [f.to_js_obj() for f in filter.get_filters()]
 	ret['filters']['operators'] = [f.value for f in filter.Operators]
-	print(ret)
 	return ret
 
 @eel.expose
 def api_save_sources(new_obj):
-	# import json
-	# print(json.dumps(new_obj, indent=4, sort_keys=True, separators=(',', ': ')))
+	print('Saving new source list:')
+	output_settings = []
 	for so in new_obj:
-		print('Type:', so['type'], 'Alias:', so['alias'])
-		print('\tData:')
-		for k, v in so['data'].items():
-			print('\t\t%s = %s' % (k, v))
-		print('\tFilters:')
-		for f in so['filters']:
-			pattern = ['%s%s' % (f['field'], f['operator']), f['limit']]
-			print('\t\t', pattern)
-
-	return True
-	# TODO: Copy wizard text->obj here: https://github.com/shadowmoose/RedditDownloader/blob/master/classes/wizards/wizard.py
+		print('\tType:', so['type'], 'Alias:', so['alias'])
+		all_sources = source.get_sources()
+		for s in all_sources:
+			if s.type == so['type']:
+				s.set_alias(so['alias'])
+				for k, v in so['data'].items():
+					s.insert_data(k, v)
+				for f in so['filters']:
+					for fi in filter.get_filters():
+						if f['field'] == fi.field:
+							fi.set_operator(f['operator'])
+							fi.set_limit(f['limit'])
+							s.add_filter(fi)
+							break
+				output_settings.append(s)
+	for s in settings.get_sources():
+		settings.remove_source(s, save_after=False)
+	for s in output_settings:
+		settings.add_source(s, prevent_duplicate=False, save_after=False)
+	return settings.save()
 
 
 
 if __name__ == '__main__':
 	settings.load('test-webui-settings.json')
-	start('../../web/', '../../../download')
-	while True:
+	opened = start('../../web/', '../../../download')
+	while opened:
 		eel.sleep(60)
