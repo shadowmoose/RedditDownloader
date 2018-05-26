@@ -60,7 +60,6 @@ def put(key, value, save_after=True):
 	if save_after:
 		save()
 
-
 def to_obj(save_format=False, include_private=True):
 	obj = dict()
 	for cat, sets in _settings.items():
@@ -75,6 +74,11 @@ def to_obj(save_format=False, include_private=True):
 				obj[cat].append(opt.to_obj())
 	return obj
 
+def get_all():
+	""" Get all Setting objects. Used for the help printout. """
+	for __k, __v in _settings.items():
+		for __key, _stt in __v.items():
+			yield _stt
 
 
 def get_sources():
@@ -137,8 +141,9 @@ class Setting(object):
 	def set(self, val):
 		if val is None and len(self.opts) > 0:
 			val = self.opts[0][0]  # Default to first opt value, if opts are set.
+		val = self.attempt_convert(val)
 		if self.type not in val.__class__.__name__:
-			raise TypeError('Invalid type for new setting value! %s != %s' % (self.type, val.__class__.__name__))
+			raise TypeError('Invalid type for setting [%s]! %s != %s' % (self.name, self.type, val.__class__.__name__))
 		if self.opts and val not in [x[0] for x in self.opts]:
 			raise ValueError('Invalid value for setting [%s]! Value is not within given keys.' % val)
 		self.value = val
@@ -147,6 +152,7 @@ class Setting(object):
 		self.category = cat.lower()
 
 	def set_opts(self, opts):
+		""" Parse the given opts array into this setting's Options, a named list of (value, description) pairs. """
 		ret = None
 		if opts:
 			ret = []
@@ -163,16 +169,29 @@ class Setting(object):
 				obj[k] = v
 		return obj
 
+	def attempt_convert(self, val):
+		if self.type == 'int':
+			try:
+				return int(float(val))
+			except ValueError:
+				pass
+		if self.type == 'bool':
+			accept = {True: ['1', 'true', 'yes'], False: ['0', 'none', 'false', 'no']}
+			for k, v in accept.items():
+				if any(str(val).lower() in x for x in v):
+					return k
+		return val
+
 	def __str__(self):
 		return str(self.to_obj())
 
 
 # =========  DEFAULT SETTINGS  =========
-add("auth", Setting("client_id", 'ID_From_Registering_app', desc="TODO"))
-add("auth", Setting("client_secret", 'Secret_from_registering_app', desc="TODO"))
-add("auth", Setting("password", 'Your_password', desc="TODO"))
-add("auth", Setting("user_agent", 'USE_A_RANDOM_ID_HERE', desc="TODO"))
-add("auth", Setting("username", 'Your_Username', desc="TODO"))
+add("auth", Setting("client_id", 'ID_From_Registering_app', desc="DEPRECATED"))
+add("auth", Setting("client_secret", 'Secret_from_registering_app', desc="DEPRECATED"))
+add("auth", Setting("password", 'Your_password', desc="DEPRECATED"))
+add("auth", Setting("user_agent", 'USE_A_RANDOM_ID_HERE', desc="The user agent to identify as, wherever possible."))
+add("auth", Setting("username", 'Your_Username', desc="DEPRECATED"))
 
 add("output", Setting("base_dir", './download/', desc="The base directory to save to. Cannot contain tags."))
 add("output", Setting("subdir_pattern", '/[subreddit]/', desc="The directory path, within the base_dir, to save files to."))
