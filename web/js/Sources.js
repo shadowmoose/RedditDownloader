@@ -18,6 +18,7 @@ class Sources extends React.Component {
 		});
 		this._add = this.addSource.bind(this);
 		this._update = this.updateSource.bind(this);
+		this._save_all = this.saveAll.bind(this);
 	}
 
 	addSource(evt){
@@ -65,6 +66,17 @@ class Sources extends React.Component {
 		this.setState({active: sources});
 	}
 
+	saveAll(){
+		console.log('Saving all settings...');
+		eel.api_save_sources(this.state.active)(n => {
+			if(n){
+				alertify.closeLogOnClick(true).success("Saved all Sources!")
+			}else{
+				alertify.closeLogOnClick(true).error("Error saving sources!")
+			}
+		});
+	}
+
 	render() {
 		let sources = this.state.active.sort((a,b)=>{
 			return (a.alias > b.alias) ? 1 : ((b.alias > a.alias) ? -1 : 0);
@@ -79,6 +91,7 @@ class Sources extends React.Component {
 			<div className={'source_container'}>
 				<div className={'source_controls'}>
 					<select className={'source_add'} value={'none'} onChange={this._add}>{available_sources}</select>
+					<input type={'button'} name={'save_sources'} className={'save_button'} value={'Save Sources'} onClick={this._save_all}/>
 				</div>
 				<div className={'source_list_wrapper'}>
 					{sources}
