@@ -10,7 +10,7 @@ class Sources extends React.Component {
 		run().then((r)=>{
 			this.setState({
 				available: r['available'],
-				active: r['available'],
+				active: r['active'],
 				filters: r['filters']
 			});
 			//console.log('Sources state:');
@@ -19,6 +19,7 @@ class Sources extends React.Component {
 		this._add = this.addSource.bind(this);
 		this._update = this.updateSource.bind(this);
 		this._save_all = this.saveAll.bind(this);
+		this._delete = this.deleteSource.bind(this);
 	}
 
 	addSource(evt){
@@ -66,6 +67,18 @@ class Sources extends React.Component {
 		this.setState({active: sources});
 	}
 
+	deleteSource(original_alias){
+		alertify.confirm('Are you sure you want to delete "'+original_alias+'"?', function () {
+			let sources = clone(this.state.active).filter((s)=>{
+				return s.alias !== original_alias;
+			});
+			console.log('Updated active sources:', sources);
+			this.setState({active: sources}, ()=>alertify.success('Deleted source "'+original_alias+"'."));
+		}.bind(this), function() {
+			alertify.error('Did not delete source.')
+		});
+	}
+
 	saveAll(){
 		console.log('Saving all settings...');
 		eel.api_save_sources(this.state.active)(n => {
@@ -81,7 +94,7 @@ class Sources extends React.Component {
 		let sources = this.state.active.sort((a,b)=>{
 			return (a.alias > b.alias) ? 1 : ((b.alias > a.alias) ? -1 : 0);
 		}).map((s) =>
-			<Source obj={s} key={s.alias} filterOptions={this.state.filters} update={this._update}/>
+			<Source obj={s} key={s.alias} filterOptions={this.state.filters} update={this._update} delete={this._delete}/>
 		);
 		let available_sources = this.state.available.map((s)=>{
 			return <option key={s.alias} title={s.description} value={s.type}>{s.description}</option>
@@ -151,12 +164,13 @@ class Source extends React.Component {
 	}
 
 	render() {
-		return <div>
+		return <div className={'source_full_wrapper'}>
 			<details open='open'>
 				<summary>
 					{this.state.alias ? this.state.alias : '[blank]'}
 				</summary>
 				<div className='description'>{this.state.description}</div>
+				<input type={'button'} onClick={()=>this.props.delete(this.state.alias)} value={'Delete Source'} className={'source_delete'}/>
 				<SourceSettingsGroup name={this.state.alias} type={this.state.type} list={this.state.settings} change={this._change}/>
 				<SourceFilterGroup filters={this.state.filters} change={this._changeFilters} filterOptions={this.props.filterOptions}/>
 			</details>
@@ -175,7 +189,7 @@ class SourceSettingsGroup extends React.Component {
 		let fields = this.props.list.map((field) =>
 			<SettingsField key={field.name} obj={field} change={this.props.change}/>
 		);
-		return <form className={"settings_group"}>
+		return <form className={"source_settings_group settings_group"}>
 			<div><label>Source Type: </label><span>{this.props.type}</span></div>
 			{fields}
 		</form>
