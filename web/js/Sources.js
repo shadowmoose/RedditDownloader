@@ -33,7 +33,7 @@ class Sources extends React.Component {
 			(val, ev) => {
 				ev.preventDefault();
 				// The value entered is availble in the val variable.
-				let alias = val.trim().replace(/ /g,'-').toLowerCase();
+				let alias = val.trim();
 				let sources = clone(this.state.active);
 				if(alias === ''){
 					alertify.error('The name cannot be blank.');
@@ -119,10 +119,16 @@ class Sources extends React.Component {
 class Source extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = clone(props.obj);
+		let ob = clone(props.obj);
+		ob.settings.forEach((d)=>{ // Load any preexisting values from the "data" dict.
+			if(d.name in ob.data){
+				d.value = ob.data[d.name]
+			}
+		});
+		this.state = ob;
 		this._change = this.changeSetting.bind(this);
 		this._changeFilters = this.changeFilters.bind(this);
-		this._state = this.sState.bind(this)
+		this._state = this.sState.bind(this);
 	}
 
 	pushUpdate(original_alias=false){

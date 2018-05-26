@@ -13,7 +13,8 @@ def save():
 	out = to_obj(save_format=True, include_private=True)
 	with open(_file, 'w') as o:
 		o.write(json.dumps(out, indent=4, sort_keys=True, separators=(',', ': ')))
-	print('Saved Settings.')
+		print('Saved Settings.')
+	return True
 
 
 def load(filename):
@@ -94,21 +95,21 @@ def has_source_alias(alias): #!cover - no sources yet
 			return True
 	return False
 
-def add_source(new_source): #!cover - no sources yet
+def add_source(new_source, prevent_duplicate=True, save_after=True): #!cover - no sources yet
 	""" Adds the given source to the JSON-encoded Settings data. Will not add a duplicate Source alias.
 		Returns if the Source was added
 	"""
-	if has_source_alias(new_source.get_alias()):
+	if prevent_duplicate and has_source_alias(new_source.get_alias()):
 		return False
 	new_sources = get_sources()
 	new_sources.append(new_source)
-	put('sources', [s.to_obj() for s in new_sources])
+	put('sources', [s.to_obj() for s in new_sources], save_after=save_after)
 	return True
 
-def remove_source(source): #!cover - no sources yet
-	""" Removes the given Source from the list of sources, and resaves. """
+def remove_source(source, save_after=True):
+	""" Removes the given Source from the list of sources, and resaves (if set). """
 	new_sources = [s for s in get_sources() if s.get_alias() != source.get_alias()]
-	put('sources', [s.to_obj() for s in new_sources])
+	put('sources', [s.to_obj() for s in new_sources], save_after=save_after)
 
 
 def save_base():
@@ -202,9 +203,9 @@ add("threading", Setting("max_handler_threads", 5, desc="How many threads can do
 add("threading", Setting("display_clear_screen", True, desc="If it's okay to clear the terminal while running.", etype="bool"))
 add("threading", Setting("display_refresh_rate", 5, desc="How often the UI should update progress.", etype="int"))
 
-add("interface", Setting("start_server", True, desc="If the WebUI should automatically start.", etype="bool"))
-add("interface", Setting("browser", 'chrome-app', desc="Browser mode to open UI in.", etype="str", opts=[('chrome-app','Chrome Application Mode'), 'default browser', 'off']))
-add("interface", Setting("keep_open", False, desc="If True, the WebUI will keep running as a webserver.", etype='bool'))
+add("interface", Setting("start_server", True, desc="If the WebUI should be available.", etype="bool"))
+add("interface", Setting("browser", 'chrome-app', desc="Browser mode to auto-open UI in.", etype="str", opts=[('chrome-app','Chrome Application Mode'), 'default browser', 'off']))
+add("interface", Setting("keep_open", False, desc="If True, the WebUI will stay available after the browser closes.", etype='bool'))
 add("interface", Setting("port", 8000, desc="The port to open the WebUI on.", etype="int"))
 add("interface", Setting("host", 'localhost', desc="The host to bind on."))
 
