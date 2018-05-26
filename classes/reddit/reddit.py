@@ -41,6 +41,7 @@ def post_orders():
 	""" Returns a list of tuples, indicating acceptable Order values and if they accept Time limits or not. """
 	return [
 		('top', True),
+		('best', False),
 		('new', False),
 		('hot', False),
 		('controversial', True),

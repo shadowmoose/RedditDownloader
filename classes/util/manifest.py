@@ -11,18 +11,6 @@ version = '2.0'
 conn = None
 lock = rwlock.RWLock() # Custom Read/Write lock, with Writer priority.
 
-#TODO: Change adapting to checking metadata table.
-''''
-change, data = _adapt(data)
-while change:
-	change, data = _adapt(data)
-#
-assert 'elements' in data
-assert 'completed' in data['elements']
-assert 'failed' in data['elements']
-og_count = len(data['elements']['completed']+ data['elements']['failed'])
-'''
-
 
 def create(file):
 	global conn, version
