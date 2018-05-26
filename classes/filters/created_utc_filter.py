@@ -4,7 +4,7 @@ from classes.util import stringutil
 
 class UTCFilter(filter.Filter):
 	def __init__(self):
-		super().__init__(field='created_utc', description='The time this post/comment was created, in UTC.')
+		super().__init__(field='created_utc', description='The time this post/comment was created, in UTC. (#)')
 
 	def _convert_imported_limit(self, val):
 		"""  Overrides default to convert user-supplied string dates to timestamps.  """

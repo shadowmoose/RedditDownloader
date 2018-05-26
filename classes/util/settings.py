@@ -237,7 +237,7 @@ def _adapt(obj): #!cover
 		converted = True
 
 	if version == 2:
-		# Version 2->3 sees addition of display config, for Threading.
+		# Version 2->3 saw addition of display config, for Threading.
 		obj['meta-version'] = 3
 		obj['threading'] = {
 			"max_handler_threads":5,
@@ -249,6 +249,7 @@ def _adapt(obj): #!cover
 		converted = True
 
 	if version == 3:
+		# Version 3->4 saw the Manifest shift to SQLite, the Settings overhaul, and the WebUI.
 		obj[_default_cat] = {}
 		rm = []
 		for k, v in obj.items():
