@@ -115,7 +115,7 @@ class SettingsField extends React.Component {
 		this.type = this.parse_type();
 		this.ele_id = this.obj.category + '.' + this.obj.name; // Build the ID in python's "cat.id" notation. This is used to save properly.
 		this.changeVal = props.change;
-		console.log(this.obj)
+		//console.log(this.obj)
 	}
 
 	parse_type(){

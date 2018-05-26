@@ -1,4 +1,4 @@
-class Main extends React.Component {
+class App extends React.Component {
 	constructor(props) {
 		super(props);
 		this.pages = [[<Home />, 'Home'], [<Sources />, 'Sources'], [<Settings />, 'Settings']];
@@ -10,8 +10,7 @@ class Main extends React.Component {
 
 
 	openPage(page){
-		console.log('OpenPage called.');
-		console.log(page);
+		console.log('Switching tab:', page);
 		this.setState({
 			page: page
 		});
@@ -20,9 +19,14 @@ class Main extends React.Component {
 
 	render() {
 		let pages = this.pages.map((p)=>{
-			return <li className={this.state.page === this.pages.indexOf(p) ? 'active':'inactive'}>
-				<a onClick={this.openPage.bind(this, this.pages.indexOf(p))}>{p[1]}</a>
+			let idx = this.pages.indexOf(p);
+			return <li className={this.state.page === idx ? 'active':'inactive'} key={idx}>
+				<a onClick={this.openPage.bind(this, idx)}>{p[1]}</a>
 			</li>
+		});
+		let eles = this.pages.map((p)=>{
+			let idx = this.pages.indexOf(p);
+			return <div key={idx} className={this.state.page === idx? 'content':'hidden'} >{p[0]}</div>
 		});
 		return (
 			<div>
@@ -30,7 +34,7 @@ class Main extends React.Component {
 					{pages}
 				</ul>
 				<div className="content">
-					{this.pages[this.state.page][0]}
+					{eles}
 				</div>
 			</div>
 		);
@@ -38,6 +42,6 @@ class Main extends React.Component {
 }
 
 ReactDOM.render(
-	<Main />,
+	<App />,
 	document.getElementById('root')
 );
