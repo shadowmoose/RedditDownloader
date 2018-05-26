@@ -30,7 +30,6 @@ class Settings extends React.Component {
 		}
 		console.log('Saving all settings...');
 		eel.api_save_settings(this.changes)(n => {
-			console.log('Got this from Python: ', n);
 			if(n){
 				alertify.closeLogOnClick(true).success("Saved settings!")
 			}else{
