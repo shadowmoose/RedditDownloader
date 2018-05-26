@@ -3,7 +3,7 @@ import re
 
 class URLFilter(filter.Filter):
 	def __init__(self):
-		super().__init__(field='url_pattern', description='Individual URLs in each Post, matching a regex pattern.')
+		super().__init__(field='url_pattern', description='Download only from URLs matching a Regex pattern. (Text)')
 		self.operator = filter.Operators.MATCH
 		self.accepts_operator = False
 		self._reg = None
