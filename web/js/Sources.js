@@ -54,7 +54,8 @@ class Source extends React.Component {
 		return {
 			alias: this.state.alias,
 			type: this.state.type,
-			data: Object.assign({}, this.state.data),
+			data: clone(this.state.data),
+			filters: clone(this.state.filters)
 		}
 	}
 
@@ -75,7 +76,7 @@ class Source extends React.Component {
 			ob[targ] = val.replace(/ /g, '-').toLowerCase();
 			this.setState(ob);
 		}else {
-			let cd = Object.assign({}, this.state.data);
+			let cd = clone(this.state.data);
 			cd[targ] = val;
 			this.setState({data: cd});
 		}
@@ -139,25 +140,25 @@ class SourceFilterGroup extends React.Component {
 		if(prop === 'field'){
 			let flt = false;
 			this.props.filterOptions.available.forEach((f)=>{
-				if(f.field === val)flt = JSON.parse(JSON.stringify(f));
+				if(f.field === val)flt = this.make_base_filter(f); // automatically clones.
 			});
 			if(flt){
 				this.setState({filter: flt});
-				console.log('Swapped filters.')
+				console.log('Swapped selected filter type.')
 			}else{
 				alertify.error('Error finding matching Filter!');
 				console.error('Error finding matching filter.');
 			}
 		}else{
-			let nf = JSON.parse(JSON.stringify(this.state.filter));
+			let nf = clone(this.state.filter);
 			nf[prop] = val;
 			this.setState({filter: nf});
 		}
 	}
 
 	add_current_filter(){
-		let filters = JSON.parse(JSON.stringify(this.props.filters));
-		let newf = JSON.parse(JSON.stringify(this.state.filter));
+		let filters = clone(this.props.filters);
+		let newf = clone(this.state.filter);
 		if(!newf.limit){
 			alertify.error('You must specify a limit!');
 			return;
@@ -166,23 +167,23 @@ class SourceFilterGroup extends React.Component {
 		filters.push(this.state.filter);
 		this.setState({filter: this.make_base_filter()});
 		console.log('Pushing new filters up from group:', filters);
-		this.props.change(filters);
+		this.props.change(filters); // pass change up.
 	}
 
 	remove_filter(obj){
 		let field = obj.field;
 		let operator = obj.operator;
-		let filters = JSON.parse(JSON.stringify(this.props.filters));
+		let filters = clone(this.props.filters);
 		filters = filters.filter((f)=>{return !(f.field===field && f.operator === operator)}); // Unique field+key combo.
-		this.props.change(filters);
+		this.props.change(filters); // pass change up.
 	}
 
 	format_operator(op){
 		return String(op).replace('.','').replace('match', 'matches')
 	}
 
-	make_base_filter(){
-		let f = JSON.parse(JSON.stringify(this.props.filterOptions.available[0]));
+	make_base_filter(fil=null){
+		let f = fil ? clone(fil) : clone(this.props.filterOptions.available[0]);
 		if(!f.operator){
 			f.operator = this.props.filterOptions.operators[0]
 		}
@@ -196,30 +197,30 @@ class SourceFilterGroup extends React.Component {
 		console.log('Filter Group Rerender:', this.state.filter);
 		let filter = this.state.filter;
 
-		let opts = this.props.filterOptions.operators.map((o)=>{
+		let operators = this.props.filterOptions.operators.map((o)=>{
 			return <option key={o} value={o}>{this.format_operator(o)}</option>
 		});
-		let operator = <select className='filter_operator' onChange={(e) => this._update(e, 'operator')} value={filter.operator? filter.operator : ''} disabled={!filter.accepts_operator}>{opts}</select>;
-
-
 		let fieldOpts = this.props.filterOptions.available.map((o)=>{
 			return <option key={o.field} value={o.field} title={o.description}>{o.field}</option>
 		});
+
 		let fieldSelect = <select className='filter_field' onChange={(e) => this._update(e, 'field')} value={filter.field ? filter.field : ''} title={filter.description}>{fieldOpts}</select>;
-
-
+		let operator = <select className='filter_operator' onChange={(e) => this._update(e, 'operator')} value={filter.operator? filter.operator : ''} disabled={!filter.accepts_operator}>{operators}</select>;
 		let limit = <input type='text' className='filter_limit' onChange={(e) => this._update(e, 'limit')} value={filter.limit ? filter.limit : ''}/>;
 
 		let filters = this.props.filters.map((field) => //TODO: Should be props.filters.
 			<FilterField key={field.field+field.limit} obj={field} remove={this._remove}/>
 		);
-
+		let prompt = this.props.filters.length > 0 ? 'Accept URLs if:' : 'Filter the Posts from this Source:';
 		return <form className={"source_filter_group"}>
-			<div><b>Filter Group:</b></div>
-			{fieldSelect}
-			{operator}
-			{limit}
-			<input type={"button"} className="source_add_filter" onClick={this._add_filter} value={"Add Filter"}/>
+			<div><b className={'source_filter_prompt'}>{prompt}</b></div>
+			<div className={'source_add_filter_wrapper'}>
+				{fieldSelect}
+				{operator}
+				{limit}
+				<input type={"button"} className="source_add_filter" onClick={this._add_filter} value={"Add Filter"}/>
+			</div>
+
 			<ul className="source_filter_list">
 				{filters}
 			</ul>
@@ -234,8 +235,16 @@ class FilterField extends React.Component {
 	}
 
 	render(){
-		return <li className="source_filter_field">
-			{JSON.stringify(this.props.obj)}
+		let symbols = {
+			'.min': '>=',
+			'.max': '<=',
+			'.equals': 'is',
+			'.match': 'matches pattern'
+		};
+		return <li className="source_filter_wrapper">
+			<b className={'filter_field'}>{this.props.obj.field}</b>
+			<em className={'filter_operator'}> {symbols[this.props.obj.operator]}</em>
+			<span className={'filter_limit'}> {this.props.obj.limit}</span>
 			<input type={'button'} onClick={() => this.props.remove(this.props.obj)} value={'Remove'} className={'source_filter_remove'}/>
 		</li>
 	}
