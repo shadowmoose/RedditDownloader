@@ -33,7 +33,7 @@ class Settings extends React.Component {
 			if(n){
 				alertify.closeLogOnClick(true).success("Saved settings!")
 			}else{
-				alertify.closeLogOnClick(true).error("Saved settings!")
+				alertify.closeLogOnClick(true).error("Error saving settings!")
 			}
 			this.changes = {}
 		});

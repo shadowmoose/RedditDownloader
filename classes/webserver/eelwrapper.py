@@ -95,6 +95,22 @@ def api_get_sources():
 	print(ret)
 	return ret
 
+@eel.expose
+def api_save_sources(new_obj):
+	# import json
+	# print(json.dumps(new_obj, indent=4, sort_keys=True, separators=(',', ': ')))
+	for so in new_obj:
+		print('Type:', so['type'], 'Alias:', so['alias'])
+		print('\tData:')
+		for k, v in so['data'].items():
+			print('\t\t%s = %s' % (k, v))
+		print('\tFilters:')
+		for f in so['filters']:
+			pattern = {'%s%s' % (f['field'], f['operator']), f['limit']}
+			print('\t\t', pattern)
+
+	return True
+	#  https://github.com/shadowmoose/RedditDownloader/blob/master/classes/wizards/wizard.py
 
 
 

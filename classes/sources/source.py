@@ -26,6 +26,8 @@ class Source:
 		self._alias = self.type
 		self.filters = []
 		self.data = {}
+		for _s in self.get_settings():
+			self.data[_s.name] = _s.val()
 
 	def get_elements(self): #!cover
 		"""  Tells this Source to build and return a generator for RedditElements. """
@@ -73,6 +75,9 @@ class Source:
 		for _s in self.get_settings():
 			obj.append(_s.to_obj())
 		return obj
+
+	def insert_data(self, key, val):
+		self.data[key] = val
 
 
 	def get_filters(self): #!cover
