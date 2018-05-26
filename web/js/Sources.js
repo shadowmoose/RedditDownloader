@@ -8,6 +8,7 @@ class Sources extends React.Component {
 			return n
 		}
 		run().then((r)=>{
+			console.log(r);
 			this.setState({
 				available: r['available'],
 				active: r['active'],
@@ -306,16 +307,25 @@ class FilterField extends React.Component {
 		super(props);
 	}
 
+	convert_symbol(sym){
+		switch(sym){
+			case '.min':
+				return '>=';
+			case '.max':
+				return '<=';
+			case '.equals':
+				return 'is';
+			case '.match':
+				return 'matches pattern';
+			default:
+				return sym;
+		}
+	}
+
 	render(){
-		let symbols = {
-			'.min': '>=',
-			'.max': '<=',
-			'.equals': 'is',
-			'.match': 'matches pattern'
-		};
 		return <li className="source_filter_wrapper">
 			<b className={'filter_field'}>{this.props.obj.field}</b>
-			<em className={'filter_operator'}> {symbols[this.props.obj.operator]}</em>
+			<em className={'filter_operator'}> {this.convert_symbol(this.props.obj.operator)}</em>
 			<span className={'filter_limit'}> {this.props.obj.limit}</span>
 			<input type={'button'} onClick={() => this.props.remove(this.props.obj)} value={'Remove'} className={'source_filter_remove'}/>
 		</li>
