@@ -1,36 +1,88 @@
 class Sources extends React.Component {
 	constructor(props){
 		super(props);
-		this.state = {available:[], active:[], filters: {}}
-	}
-
-	componentDidMount() {
+		this.state = {available:[], active:[], filters: {}};
 		async function run() {
-			// Inside a function marked 'async' we can use the 'await' keyword.
 			let n = await eel.api_get_sources()(); // Must prefix call with 'await'
-			console.log('Got this from Python: ');
-			console.log(n);
+			console.log('Ran source query.');
 			return n
 		}
 		run().then((r)=>{
 			this.setState({
 				available: r['available'],
-				active: r['active'],
+				active: r['available'],
 				filters: r['filters']
 			});
-			console.log('Sources state:');
-			console.log(this.state)
-		})
+			//console.log('Sources state:');
+			//console.log(this.state)
+		});
+		this._add = this.addSource.bind(this);
+		this._update = this.updateSource.bind(this);
 	}
 
+	addSource(evt){
+		let type = evt.target.value;
+		let base_obj = clone(this.state.available).filter((s)=>{
+			return s.type === type
+		})[0];
+		//console.log('Adding source of type:', type);
+		alertify.prompt("Setting up a Source for "+base_obj.description.toLowerCase()+"<br/><br/>Enter a unique name for this Source",
+			(val, ev) => {
+				ev.preventDefault();
+				// The value entered is availble in the val variable.
+				let alias = val.trim().replace(/ /g,'-').toLowerCase();
+				let sources = clone(this.state.active);
+				if(alias === ''){
+					alertify.error('The name cannot be blank.');
+					return;
+				}
+				for(let i=0;i<sources.length;i++){
+					if(sources[i].alias === alias) {
+						alertify.error('That alias has already been used!');
+						return;
+					}
+				}
+				console.log('Adding source:', base_obj.type, '->', alias);
+				base_obj.alias = alias;
+				sources.push(base_obj);
+				this.setState({active: sources}, ()=>alertify.success('Added new Source! Now configure it!'));
+			}, (ev) => {
+				// The click event is in the event variable, so you can use it here.
+				ev.preventDefault();
+				alertify.error("Not adding source.");
+			}
+		);
+	}
+
+	updateSource(original_alias, obj){
+		//console.log('Pushing source update:', original_alias, obj);
+		let sources = clone(this.state.active).filter((s)=>{
+			//console.log('\t+Screening ', s.alias,':', s.alias !== original_alias);
+			return s.alias !== original_alias;
+		});
+		sources.push(obj);
+		console.log('Updated active sources:', sources);
+		this.setState({active: sources});
+	}
 
 	render() {
-		let sources = this.state.available.map((s) => //TODO: Switch to "active"
-			<Source obj={s} key={s.alias} filterOptions={this.state.filters}/>
+		let sources = this.state.active.sort((a,b)=>{
+			return (a.alias > b.alias) ? 1 : ((b.alias > a.alias) ? -1 : 0);
+		}).map((s) =>
+			<Source obj={s} key={s.alias} filterOptions={this.state.filters} update={this._update}/>
 		);
+		let available_sources = this.state.available.map((s)=>{
+			return <option key={s.alias} title={s.description} value={s.type}>{s.description}</option>
+		});
+		available_sources.unshift(<option key={'none'} value={"none"} disabled>Add a new Source</option>);
 		return (
-			<div>
-				{sources}
+			<div className={'source_container'}>
+				<div className={'source_controls'}>
+					<select className={'source_add'} value={'none'} onChange={this._add}>{available_sources}</select>
+				</div>
+				<div className={'source_list_wrapper'}>
+					{sources}
+				</div>
 			</div>
 		);
 	}
@@ -40,23 +92,21 @@ class Sources extends React.Component {
 class Source extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = props.obj;
-		this._save = this.saveSettings.bind(this);
+		this.state = clone(props.obj);
 		this._change = this.changeSetting.bind(this);
 		this._changeFilters = this.changeFilters.bind(this);
+		this._state = this.sState.bind(this)
 	}
 
-	saveSettings(){
-
+	pushUpdate(original_alias=false){
+		if(!original_alias)
+			original_alias = this.state.alias;
+		this.props.update(original_alias, this.state)
 	}
 
-	getObj(){
-		return {
-			alias: this.state.alias,
-			type: this.state.type,
-			data: clone(this.state.data),
-			filters: clone(this.state.filters)
-		}
+	sState(new_state){
+		let oa = clone(this.state.alias);
+		this.setState(new_state, () => this.pushUpdate(oa))
 	}
 
 	changeSetting(evt){
@@ -74,30 +124,27 @@ class Source extends React.Component {
 		if(targ in this.state){
 			let ob = {};
 			ob[targ] = val.replace(/ /g, '-').toLowerCase();
-			this.setState(ob);
+			this._state(ob);
 		}else {
 			let cd = clone(this.state.data);
 			cd[targ] = val;
-			this.setState({data: cd});
+			this._state({data: cd});
 		}
 	}
 
 	changeFilters(new_filter_list){
-		console.log('New filter list:', new_filter_list);
-		this.setState({filters: new_filter_list});
+		//console.log('New filter list:', new_filter_list);
+		this._state({filters: new_filter_list});
 	}
 
 	render() {
-		console.log('Redrew:', this.state.alias);
-		console.log('New Data:', this.state.data);
-		console.log('Output Object:', this.getObj());
 		return <div>
 			<details open='open'>
 				<summary>
 					{this.state.alias ? this.state.alias : '[blank]'}
 				</summary>
 				<div className='description'>{this.state.description}</div>
-				<SourceSettingsGroup name={this.state.alias} type={this.state.type} list={this.state.settings} save={this._save} change={this._change}/>
+				<SourceSettingsGroup name={this.state.alias} type={this.state.type} list={this.state.settings} change={this._change}/>
 				<SourceFilterGroup filters={this.state.filters} change={this._changeFilters} filterOptions={this.props.filterOptions}/>
 			</details>
 		</div>
@@ -110,15 +157,13 @@ class SourceSettingsGroup extends React.Component {
 	}
 
 	render(){
-		console.log('redrew group.');
-		console.log(this.props);
+		//console.log('redrew group.');
+		//console.log(this.props);
 		let fields = this.props.list.map((field) =>
 			<SettingsField key={field.name} obj={field} change={this.props.change}/>
 		);
 		return <form className={"settings_group"}>
 			<div><label>Source Type: </label><span>{this.props.type}</span></div>
-			<label htmlFor='alias' title='Rename this Source!'>Name:</label>
-			<input type={'text'} id='alias' value={this.props.name} onChange={this.props.change} title='Rename this Source!'/>
 			{fields}
 		</form>
 	}
@@ -136,7 +181,7 @@ class SourceFilterGroup extends React.Component {
 
 	update(evt, prop){
 		let val = evt.target.value;
-		console.log('Group is Updating Filter: ', prop, '->', val);
+		//console.log('Group is Updating Filter: ', prop, '->', val);
 		if(prop === 'field'){
 			let flt = false;
 			this.props.filterOptions.available.forEach((f)=>{
@@ -144,7 +189,7 @@ class SourceFilterGroup extends React.Component {
 			});
 			if(flt){
 				this.setState({filter: flt});
-				console.log('Swapped selected filter type.')
+				//console.log('Swapped selected filter type.')
 			}else{
 				alertify.error('Error finding matching Filter!');
 				console.error('Error finding matching filter.');
@@ -166,7 +211,7 @@ class SourceFilterGroup extends React.Component {
 		filters = filters.filter((f)=>{return !(f.field===newf.field && f.operator === newf.operator)}); // Unique field+key combo.
 		filters.push(this.state.filter);
 		this.setState({filter: this.make_base_filter()});
-		console.log('Pushing new filters up from group:', filters);
+		//console.log('Pushing new filters up from group:', filters);
 		this.props.change(filters); // pass change up.
 	}
 
@@ -194,7 +239,7 @@ class SourceFilterGroup extends React.Component {
 	}
 
 	render(){
-		console.log('Filter Group Rerender:', this.state.filter);
+		//console.log('Filter Group Rerender:', this.state.filter);
 		let filter = this.state.filter;
 
 		let operators = this.props.filterOptions.operators.map((o)=>{
