@@ -106,11 +106,11 @@ def api_save_sources(new_obj):
 			print('\t\t%s = %s' % (k, v))
 		print('\tFilters:')
 		for f in so['filters']:
-			pattern = {'%s%s' % (f['field'], f['operator']), f['limit']}
+			pattern = ['%s%s' % (f['field'], f['operator']), f['limit']]
 			print('\t\t', pattern)
 
 	return True
-	#  https://github.com/shadowmoose/RedditDownloader/blob/master/classes/wizards/wizard.py
+	# TODO: Copy wizard text->obj here: https://github.com/shadowmoose/RedditDownloader/blob/master/classes/wizards/wizard.py
 
 
 

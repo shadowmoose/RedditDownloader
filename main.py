@@ -17,6 +17,7 @@ parser.add_argument("--update_only", help="Update the program and exit.", action
 parser.add_argument("--skip_pauses", help="Skip all skippable pauses.", action="store_true")
 parser.add_argument("--source", '-s', help="Run each loaded Source only if alias matches the given pattern. Can pass multiple patterns.", type=str, action='append', metavar='')
 parser.add_argument("--category.setting", help="Override the given setting.", action="store_true")
+parser.add_argument("--list_settings", help="Display a list of overridable settings.", action="store_true")
 args, unknown_args = parser.parse_known_args()
 
 if args.update or args.update_only: #!cover
@@ -123,17 +124,33 @@ class Scraper(object):
 		return sources
 
 
+if args.list_settings:  #!cover
+	print('All valid overridable settings:')
+	for s in settings.get_all():
+		if s.public:
+			print("%s.%s" % (s.category, s.name))
+			print('\tDescription: %s' % s.description)
+			if not s.opts:
+				print('\tValid value: \n\t\tAny %s' % s.type)
+			else:
+				print('\tValid values:')
+				for o in s.opts:
+					print('\t\t"%s": %s' % o)
+			print()
+	sys.exit()
+
 settings_file = 'settings.json'
 if args.settings:
 	settings_file = args.settings #!cover
 if args.test:
 	print("Test Mode running")
 	print('Using test settings file.')
+	settings_file = './tests/test-settings.json'
 
-_loaded = settings.load(settings_file if not args.test else './tests/test-settings.json')
+_loaded = settings.load(settings_file)
 if not _loaded:
 	stringutil.error('Failed to load settings file!')
-	print('A settings file has been created for you as "%s". Please customize it.' % settings_file)
+	print('A settings file has been created for you, at "%s". Please customize it.' % settings_file)
 	# TODO: Prompt for WebUI instead.
 	sys.exit(1)
 
@@ -145,48 +162,7 @@ for ua in unknown_args:
 	except KeyError:
 		print('Unknown setting: %s' % k)
 		sys.exit(50)
-'''
-# Though the settings file can be manually edited, 
-# Using the format default listed in 'settings', we allow the user to override most of them with command-line args.
-# Simply pop key->value replacements into this obj to override those key->value pairs when the Scraper launches.
-custom_settings = {}
 
-if args.base_dir: #!cover
-	mod = Settings(settings, False).get('output')# get default output format from a non-saving Settings object.
-	mod['base_dir'] = args.base_dir
-	if args.file_pattern:
-		mod['file_name_pattern'] = args.file_pattern
-	if args.subdir_pattern:
-		mod['subdir_pattern'] = args.subdir_pattern
-	custom_settings['output'] = mod
-
-user_settings = [args.c_id , args.c_secret , args.password , args.agent , args.username]
-if any(user_settings):
-	if not all(user_settings): #!cover
-		print('You must set all the Client, User, and User-Agent parameters to do that!')
-		sys.exit(5)
-	auth = {
-		"client_id": args.c_id,
-		"client_secret": args.c_secret,
-		"password": args.password,
-		"user_agent": args.agent,
-		"username": args.username
-	}
-	print('Using command-line authorization details!')
-	custom_settings['auth'] = auth
-
-if args.duplicate: #!cover
-	custom_settings['deduplicate_files'] = False
-
-if args.skip_manifest: #!cover
-	custom_settings['build_manifest'] = False
-
-
-# If no settings were specified, pass 'None' to stick completely with default, auto-saving file values.
-if len(custom_settings) == 0: #!cover
-	print('Loading all settings from file.')
-	custom_settings = None
-'''
 
 p = Scraper()
 p.run()
