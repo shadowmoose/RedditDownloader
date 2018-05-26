@@ -1,5 +1,10 @@
 body {
 	font-family: 'Roboto', sans-serif;
+    margin: 0;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select:none;
+    user-select:none;
 }
 
 a {
@@ -28,6 +33,41 @@ summary:focus {
 
 summary::-webkit-details-marker {
     display: none;
+}
+
+ul.header {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333;
+    position: -webkit-sticky; /* Safari */
+    position: sticky;
+    top: 0;
+}
+
+li.active {
+    background-color: #4CAF50;
+}
+
+.header li {
+    float: left;
+}
+
+.header li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+.header li a.header:hover {
+    background-color: #111;
+}
+
+.content {
+    margin-left: 3px;
 }
 
 .description {

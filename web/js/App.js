@@ -1,7 +1,8 @@
 class Main extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = {page: <Settings />};
+		this.pages = [[<Home />, 'Home'], [<Sources />, 'Sources'], [<Settings />, 'Settings']];
+		this.state = {page: 0};
 
 		// This binding is necessary to make `this` work in the callback
 		this.openPage = this.openPage.bind(this);
@@ -18,16 +19,18 @@ class Main extends React.Component {
 
 
 	render() {
+		let pages = this.pages.map((p)=>{
+			return <li className={this.state.page === this.pages.indexOf(p) ? 'active':'inactive'}>
+				<a onClick={this.openPage.bind(this, this.pages.indexOf(p))}>{p[1]}</a>
+			</li>
+		});
 		return (
 			<div>
-				<h1>Reddit Media Downloader</h1>
 				<ul className="header">
-					<li><a onClick={this.openPage.bind(this, <Home />)}>Home</a></li>
-					<li><a onClick={this.openPage.bind(this, <Sources />)}>Sources</a></li>
-					<li><a onClick={this.openPage.bind(this, <Settings />)}>Settings</a></li>
+					{pages}
 				</ul>
 				<div className="content">
-					{this.state.page}
+					{this.pages[this.state.page][0]}
 				</div>
 			</div>
 		);

@@ -208,7 +208,7 @@ class SourceFilterGroup extends React.Component {
 		let operator = <select className='filter_operator' onChange={(e) => this._update(e, 'operator')} value={filter.operator? filter.operator : ''} disabled={!filter.accepts_operator}>{operators}</select>;
 		let limit = <input type='text' className='filter_limit' onChange={(e) => this._update(e, 'limit')} value={filter.limit ? filter.limit : ''}/>;
 
-		let filters = this.props.filters.map((field) => //TODO: Should be props.filters.
+		let filters = this.props.filters.map((field) =>
 			<FilterField key={field.field+field.limit} obj={field} remove={this._remove}/>
 		);
 		let prompt = this.props.filters.length > 0 ? 'Accept URLs if:' : 'Filter the Posts from this Source:';
