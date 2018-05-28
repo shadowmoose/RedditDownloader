@@ -205,7 +205,7 @@ add("threading", Setting("display_clear_screen", True, desc="If it's okay to cle
 add("threading", Setting("display_refresh_rate", 5, desc="How often the UI should update progress.", etype="int"))
 
 add("interface", Setting("start_server", True, desc="If the WebUI should be available.", etype="bool"))
-add("interface", Setting("browser", 'chrome-app', desc="Browser to auto-open UI in.", etype="str", opts=[('chrome-app','Chrome Application Mode'), ('default browser', 'The default system browser'), ('off', "Don't auto-open a browser.")]))
+add("interface", Setting("browser", 'chrome-app', desc="Browser to auto-open UI in.", etype="str", opts=[('chrome-app','Chrome Application Mode (recommended)'), ('default browser', 'The default system browser'), ('off', "Don't auto-open a browser")]))
 add("interface", Setting("keep_open", False, desc="If True, the WebUI will stay available after the browser closes.", etype='bool'))
 add("interface", Setting("port", 7505, desc="The port to open the WebUI on.", etype="int"))
 add("interface", Setting("host", 'localhost', desc="The host to bind on."))

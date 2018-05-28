@@ -1,5 +1,5 @@
 from classes.sources import source
-import classes.reddit.reddit as reddit
+import classes.reddit.praw_wrapper as reddit
 
 
 class TestPostProducer(source.Source):

@@ -5,9 +5,7 @@ __version__ = "2.2"
 import argparse
 import sys
 import os
-import time
-import datetime
-import re
+
 
 SCRIPT_BASE = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
 
@@ -49,85 +47,19 @@ if args.update or args.update_only: #!cover
 import colorama
 from colorama import Fore
 from classes.util import settings
-from classes.processing.elementprocessor import ElementProcessor
-from classes.reddit.redditloader import RedditLoader
-import classes.util.manifest as manifest
-import classes.reddit.reddit as reddit
 from classes.util import stringutil
 from classes.util import console
 from classes.webserver import eelwrapper
+from classes.downloader import RMD
 
 
 colorama.init(convert=True)
-
 stringutil.print_color(Fore.GREEN, """
 ====================================
     Reddit Media Downloader %s
 ====================================
     (By ShadowMoose @ Github)
 """ % __version__)
-
-
-class Scraper(object):
-	def __init__(self,):
-		if not os.path.isdir(settings.save_base()):
-			os.makedirs(os.path.abspath(settings.save_base()) )
-		os.chdir(settings.save_base()) # Hop into base dir, so all file work can be relative.
-
-		manifest.create('manifest.sqldb')
-
-		self.sources = self.load_sources()
-		self.reddit = None
-		self.processor = None
-		
-		# Authenticate and prepare to scan:
-		reddit.init(client_id=settings.get('auth.client_id'), client_secret=settings.get('auth.client_secret'),
-					password=settings.get('auth.password'), user_agent=settings.get('auth.user_agent'), username=settings.get('auth.username'))
-		reddit.login()
-
-		manifest.check_legacy(settings.save_base())  # Convert away from legacy Manifest.
-
-
-	def run(self):
-		_start_time = time.time()
-		try:
-			self.reddit = RedditLoader(args.test)
-			self.reddit.scan(self.sources) # Starts the scanner thread.
-			self.processor = ElementProcessor(self.reddit)
-			self.processor.run()
-		except KeyboardInterrupt:
-			print("Interrupted by User.")
-			if self.processor:
-				self.processor.stop_process()
-		_total_time = str( datetime.timedelta(seconds= round(time.time() - _start_time)) )
-		print('Found %s posts missing files - with %s new files downloaded - and %s files that cannot be found.' %
-			  (self.processor.total_posts, self.processor.total_urls, self.processor.failed_urls))
-		print('Finished processing in %s.' % _total_time)
-
-
-	def load_sources(self): #!cover
-		sources = []
-		settings_sources = settings.get_sources()
-		if args.source is None:
-			for s in settings_sources:
-				print('Loaded Source: ', s.get_alias())
-				sources.append(s)
-		else:
-			for so in args.source:
-				regexp = re.compile(str(so), re.IGNORECASE)
-				for s in settings_sources:
-					if regexp.search( str(s.get_alias()) ):
-						print('Matched Source: ', s.get_alias() )
-						sources.append(s)
-						break
-
-		if len(sources) == 0:
-			if len(settings_sources) == 0:
-				stringutil.error('No sources were found from the settings file.')
-			else:
-				stringutil.error('No sources were found from the settings file matching the supplied patterns.')
-			sys.exit(20)
-		return sources
 
 
 if args.list_settings:  #!cover
@@ -185,17 +117,19 @@ if not _loaded:
 		settings.put('interface.start_server', False)
 		sys.exit(1)
 
-p = None
+p = RMD(source_patterns=args.source, test=args.test)
+p.connect()
+
 # Only starts if the settings allow it to.
 if not args.no_ui and eelwrapper.start(os.path.join(SCRIPT_BASE, 'web'), settings.save_base()):
 	print('WebUI is now in control.')
 	try:
 		while True:
 			eelwrapper.sleep(600)  # Eel will terminate with a sys.exit() call, when it's time to exit.
+			# TODO: WebUI should actually run RMD.
 	except KeyboardInterrupt:
 		print('\nUser terminated WebUI loop.')
 else:
-	p = Scraper()
 	p.run()
 
 
