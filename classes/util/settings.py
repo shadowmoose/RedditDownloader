@@ -14,7 +14,7 @@ def save():
 	out = to_obj(save_format=True, include_private=True)
 	with open(_file, 'w') as o:
 		o.write(json.dumps(out, indent=4, sort_keys=True, separators=(',', ': ')))
-		print('Saved Settings.')
+		print('~Saved Settings.~')
 	return True
 
 
@@ -32,7 +32,7 @@ def load(filename):
 			st.set(val)
 	print('Loaded settings file [%s].' % filename)
 	if converted:
-		print('Had to convert from older settings, so saving updated version!')
+		print('\tHad to convert from older settings, so saving updated version!')
 		save()
 	return True
 
@@ -56,8 +56,8 @@ def get(key, full_obj=False, cat=None):
 	raise KeyError('The given setting (%s) does not exist!' % key)
 
 
-def put(key, value, save_after=True):
-	s = get(key, full_obj=True)
+def put(key, value, cat=None, save_after=True):
+	s = get(key, cat=cat, full_obj=True)
 	s.set(value)
 	if save_after:
 		save()

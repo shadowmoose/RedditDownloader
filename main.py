@@ -20,6 +20,7 @@ parser.add_argument("--skip_pauses", help="Skip all skippable pauses.", action="
 parser.add_argument("--source", '-s', help="Run each loaded Source only if alias matches the given pattern. Can pass multiple patterns.", type=str, action='append', metavar='')
 parser.add_argument("--category.setting", help="Override the given setting.", action="store_true")
 parser.add_argument("--list_settings", help="Display a list of overridable settings.", action="store_true")
+parser.add_argument("--no_ui", '-noui', help="Disable the WebUI from running on this run.", action="store_true")
 args, unknown_args = parser.parse_known_args()
 
 
@@ -131,15 +132,15 @@ class Scraper(object):
 
 if args.list_settings:  #!cover
 	print('All valid overridable settings:')
-	for s in settings.get_all():
-		if s.public:
-			print("%s.%s" % (s.category, s.name))
-			print('\tDescription: %s' % s.description)
-			if not s.opts:
-				print('\tValid value: \n\t\tAny %s' % s.type)
+	for _s in settings.get_all():
+		if _s.public:
+			print("%s.%s" % (_s.category, _s.name))
+			print('\tDescription: %s' % _s.description)
+			if not _s.opts:
+				print('\tValid value: \n\t\tAny %s' % _s.type)
 			else:
 				print('\tValid values:')
-				for o in s.opts:
+				for o in _s.opts:
 					print('\t\t"%s": %s' % o)
 			print()
 	sys.exit()
@@ -185,8 +186,8 @@ if not _loaded:
 		sys.exit(1)
 
 p = None
-
-if eelwrapper.start(os.path.join(SCRIPT_BASE, 'web'), settings.save_base()):  # Only starts if the settings allow it to.
+# Only starts if the settings allow it to.
+if not args.no_ui and eelwrapper.start(os.path.join(SCRIPT_BASE, 'web'), settings.save_base()):
 	print('WebUI is now in control.')
 	try:
 		while True:
@@ -194,7 +195,6 @@ if eelwrapper.start(os.path.join(SCRIPT_BASE, 'web'), settings.save_base()):  # 
 	except KeyboardInterrupt:
 		print('\nUser terminated WebUI loop.')
 else:
-	print('Running without WebUI.')
 	p = Scraper()
 	p.run()
 
@@ -207,7 +207,6 @@ if args.test:
 	stringutil.print_color(Fore.YELLOW, "Checking against prearranged data...")
 	
 	# Import all the testing modules.
-	import os.path
 	import pkgutil
 	import tests
 	pkg_path = os.path.dirname(tests.__file__)
