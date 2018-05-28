@@ -2,7 +2,7 @@ import gzip
 import json
 from classes.util import stringutil
 from classes.util import manifest
-from classes.reddit import reddit as rd
+from classes.reddit import praw_wrapper as rd
 
 _verbose = False
 _converted = 0  # For testing.

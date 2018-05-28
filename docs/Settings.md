@@ -1,4 +1,6 @@
+
 # List of Settings
+[Back to User Guide](./site/User_Guide.md)
 
 Settings can be adjusted within the ```settings.json``` file RMD generates,
 or they can be overridden by passing the setting category and name from the command line, like so:
@@ -9,7 +11,7 @@ or they can be overridden by passing the setting category and name from the comm
 
 If a setting has options, its value **must** be one of its options.
 
-**Note:** File output paths support tags to isntert data about each post into the file path. 
+**Note:** File output paths support tags to insert data about each post into the file path. 
 See [the bottom of this page](#output-format) for more info.
 
 **Below are the relevant categories, and their settings:**
@@ -30,7 +32,7 @@ See [the bottom of this page](#output-format) for more info.
 + user_agent
   + **Description:** *The user agent to identify as, wherever possible.* 
   + **Expected Type:** str 
-  + **Default value:** RMD-Scanner-0.4597126166817933 
+  + **Default value:** RMD-Scanner-0.09153684916052074 
 + username
   + **Description:** *DEPRECATED* 
   + **Expected Type:** str 
@@ -75,9 +77,9 @@ See [the bottom of this page](#output-format) for more info.
   + **Expected Type:** str 
   + **Default value:** chrome-app 
   + **Options:** 
-    + chrome-app - *Chrome Application Mode* 
+    + chrome-app - *Chrome Application Mode (recommended)* 
     + default browser - *The default system browser* 
-    + off - *Don't auto-open a browser.* 
+    + off - *Don't auto-open a browser* 
 + keep_open
   + **Description:** *If True, the WebUI will stay available after the browser closes.* 
   + **Expected Type:** bool 
@@ -102,10 +104,10 @@ To insert them, include *'[tag_name]'* in the path. EG: *'/custom/[subreddit]/[u
 
 __Files are saved as:__ *base_dir/subdir_pattern/file_pattern*
 
-+ **base_dir**  -       override base directory. This changes where the files are saved, and can be absolute or relative. Cannot contain inserted data.
++ **base_dir**  - override base directory. This changes where the files are saved, and can be absolute or relative. Cannot contain inserted data.
 
-+ **file_pattern** -    override filename output pattern. *Do not include a file extension.*
++ **file_pattern** - override filename output pattern. *Do not include a file extension.*
   + URLs pointing to albums or groups of multiple files will save file_pattern as a directory, containing the incrementally-named files.
   
-+ **subdir_pattern** -  override subdirectory name pattern. 
++ **subdir_pattern** - override subdirectory name pattern. 
   + Supports the same tags as *file_pattern*, but should always end with a path separator slash.

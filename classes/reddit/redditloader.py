@@ -14,15 +14,18 @@ class RedditLoader(threading.Thread):
 		self._c_lock = threading.Lock()
 		self._total_count = 0
 		self._queue = queue.Queue(maxsize= 1000)
-		self._running = True
+		self._running = False
 		self.daemon = True
 
 	
 	def run(self):
 		""" Threaded loading of elements. """
+		self._running = True
 		for source in self.sources:
 			stringutil.print_color(Fore.GREEN, 'Downloading from Source: %s' % source.get_alias())
 			for r in source.get_elements():
+				if not self._running:
+					return
 				r.set_source(source)
 				self._queue.put(r)
 
@@ -39,6 +42,10 @@ class RedditLoader(threading.Thread):
 		""" Grab all RedditElements from all the supplied Sources """
 		self.sources = sources
 		self.start()
+
+
+	def stop(self):
+		self._running = False
 
 
 	def is_running(self):
