@@ -9,6 +9,9 @@ or they can be overridden by passing the setting category and name from the comm
 
 If a setting has options, its value **must** be one of its options.
 
+**Note:** File output paths support tags to isntert data about each post into the file path. 
+See [the bottom of this page](#output-format) for more info.
+
 **Below are the relevant categories, and their settings:**
 
 ## Auth
@@ -27,7 +30,7 @@ If a setting has options, its value **must** be one of its options.
 + user_agent
   + **Description:** *The user agent to identify as, wherever possible.* 
   + **Expected Type:** str 
-  + **Default value:** RMD-Scanner-0.9588420261091074 
+  + **Default value:** RMD-Scanner-0.4597126166817933 
 + username
   + **Description:** *DEPRECATED* 
   + **Expected Type:** str 
@@ -38,11 +41,11 @@ If a setting has options, its value **must** be one of its options.
   + **Expected Type:** str 
   + **Default value:** ./download/ 
 + subdir_pattern
-  + **Description:** *The directory path, within the base_dir, to save files to.* 
+  + **Description:** *The directory path, within the base_dir, to save files to. Supports tags.* 
   + **Expected Type:** str 
   + **Default value:** /[subreddit]/ 
 + file_name_pattern
-  + **Description:** *The ouput file name.* 
+  + **Description:** *The ouput file name. Supports tags.* 
   + **Expected Type:** str 
   + **Default value:** [title] - ([author]) 
 + deduplicate_files
@@ -87,3 +90,22 @@ If a setting has options, its value **must** be one of its options.
   + **Description:** *The host to bind on.* 
   + **Expected Type:** str 
   + **Default value:** localhost 
+
+
+## Output Format:
+
+The patterns allow for data insertion, based off the currently-processing post.
+
+To insert them, include *'[tag_name]'* in the path. EG: *'/custom/[subreddit]/[user]/'*
+
+**Available tags:** ```type``` *(will be 'Post'/'Comment')*, ```id```, ```title```, ```author```, ```subreddit```, ```source_alias```
+
+__Files are saved as:__ *base_dir/subdir_pattern/file_pattern*
+
++ **base_dir**  -       override base directory. This changes where the files are saved, and can be absolute or relative. Cannot contain inserted data.
+
++ **file_pattern** -    override filename output pattern. *Do not include a file extension.*
+  + URLs pointing to albums or groups of multiple files will save file_pattern as a directory, containing the incrementally-named files.
+  
++ **subdir_pattern** -  override subdirectory name pattern. 
+  + Supports the same tags as *file_pattern*, but should always end with a path separator slash.

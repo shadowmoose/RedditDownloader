@@ -196,8 +196,8 @@ add("auth", Setting("user_agent", 'RMD-Scanner-%s' % random.random(), desc="The 
 add("auth", Setting("username", '', desc="DEPRECATED"))
 
 add("output", Setting("base_dir", './download/', desc="The base directory to save to. Cannot contain tags."))
-add("output", Setting("subdir_pattern", '/[subreddit]/', desc="The directory path, within the base_dir, to save files to."))
-add("output", Setting("file_name_pattern", '[title] - ([author])', desc="The ouput file name."))
+add("output", Setting("subdir_pattern", '/[subreddit]/', desc="The directory path, within the base_dir, to save files to. Supports tags."))
+add("output", Setting("file_name_pattern", '[title] - ([author])', desc="The ouput file name. Supports tags."))
 add("output", Setting("deduplicate_files", True, desc="Remove downloaded files if another copy already exists. Also compares images for visual similarity.", etype="bool"))
 
 add("threading", Setting("max_handler_threads", 5, desc="How many threads can download media at once.", etype="int"))
