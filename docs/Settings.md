@@ -1,7 +1,9 @@
 # List of Settings
 
 Settings can be adjusted within the ```settings.json``` file RMD generates,
-or they can be overridden by passing the relevant ```--category.setting_name``` from the command line.
+or they can be overridden by passing the setting category and name from the command line, like so:
+
+```--category.setting_name``` 
 
 *(For more information about command line options, see [Arguments.md](./Arguments.md))*
 
@@ -25,7 +27,7 @@ If a setting has options, its value **must** be one of its options.
 + user_agent
   + **Description:** *The user agent to identify as, wherever possible.* 
   + **Expected Type:** str 
-  + **Default value:** RMD-Scanner-0.522730981342159 
+  + **Default value:** RMD-Scanner-0.9588420261091074 
 + username
   + **Description:** *DEPRECATED* 
   + **Expected Type:** str 
@@ -66,7 +68,7 @@ If a setting has options, its value **must** be one of its options.
   + **Expected Type:** bool 
   + **Default value:** True 
 + browser
-  + **Description:** *Browser mode to auto-open UI in.* 
+  + **Description:** *Browser to auto-open UI in.* 
   + **Expected Type:** str 
   + **Default value:** chrome-app 
   + **Options:** 
