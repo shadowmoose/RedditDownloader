@@ -2,9 +2,11 @@
 So you've decided to give Reddit Media Downloader a try, eh? Great! 
 Here are a few things you'll probably want to know.
 
-Either read through this document or skip to the [Example](#example)
+Either read through this document or skip to the [Example](#example).
 
-For information about the Arguments RMD accepts, check [Arguments.md](../Arguments.md)
+For information about the Arguments RMD accepts, check [Arguments.md](../Arguments.md).
+
+If you're looking for help with RMD's various settings, check [Settings.md](../Settings.md).
 
 ### Setup:
 [**The full setup guide can be found** here](./Setup_Requirements.md).
