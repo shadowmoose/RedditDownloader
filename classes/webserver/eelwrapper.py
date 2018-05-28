@@ -59,7 +59,7 @@ def _downloaded_files():
 		In format: "./file?id=Path/to/File.jpg"
 	"""
 	file_path = eel.btl.request.query.id
-	print(f'Requested RMD File: {file_path}')
+	print('Requested RMD File: %s' % file_path)
 	return eel.btl.static_file(file_path, root=_file_dir)
 
 
