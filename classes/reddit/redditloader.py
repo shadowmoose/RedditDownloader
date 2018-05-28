@@ -21,14 +21,21 @@ class RedditLoader(threading.Thread):
 	def run(self):
 		""" Threaded loading of elements. """
 		self._running = True
+		if self._testing_cache is not None:
+			self._testing_cache = []
+
 		for source in self.sources:
 			stringutil.print_color(Fore.GREEN, 'Downloading from Source: %s' % source.get_alias())
 			for r in source.get_elements():
 				if not self._running:
 					return
 				r.set_source(source)
-				self._queue.put(r)
-
+				while self._running:
+					try:  # Keep trying to add this element to the queue, with a timeout to catch any stop triggers.
+						self._queue.put(r, timeout=1)
+						break
+					except queue.Full:
+						pass
 				# Extra tracking stuff below:
 				with self._c_lock:
 					self._total_count+= 1
