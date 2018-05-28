@@ -263,6 +263,7 @@ def _adapt(obj): #!cover
 		obj['output']['deduplicate_files'] = obj['deduplicate_files']
 		for r in rm:
 			del obj[r]
+		obj['interface'] = {}
 		obj['interface']['start_server'] = False  # Default to old behavior.
 		print("Adapted from Settings version 3 -> 4!")
 		converted = True
