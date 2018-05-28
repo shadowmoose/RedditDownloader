@@ -125,9 +125,12 @@ def api_save_sources(new_obj):
 	return settings.save()
 
 
+def sleep(sec):
+	eel.sleep(sec)
+
 
 if __name__ == '__main__':
 	settings.load('test-webui-settings.json')
 	opened = start('../../web/', '../../../download')
 	while opened:
-		eel.sleep(60)
+		sleep(60)

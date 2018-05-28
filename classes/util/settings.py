@@ -1,6 +1,7 @@
 import copy
 import json
 import os
+import random
 
 
 _file = ''
@@ -188,11 +189,11 @@ class Setting(object):
 
 
 # =========  DEFAULT SETTINGS  =========
-add("auth", Setting("client_id", 'ID_From_Registering_app', desc="DEPRECATED"))
-add("auth", Setting("client_secret", 'Secret_from_registering_app', desc="DEPRECATED"))
-add("auth", Setting("password", 'Your_password', desc="DEPRECATED"))
-add("auth", Setting("user_agent", 'USE_A_RANDOM_ID_HERE', desc="The user agent to identify as, wherever possible."))
-add("auth", Setting("username", 'Your_Username', desc="DEPRECATED"))
+add("auth", Setting("client_id", '', desc="DEPRECATED"))
+add("auth", Setting("client_secret", '', desc="DEPRECATED"))
+add("auth", Setting("password", '', desc="DEPRECATED"))
+add("auth", Setting("user_agent", 'RMD-Scanner-%s' % random.random(), desc="The user agent to identify as, wherever possible."))
+add("auth", Setting("username", '', desc="DEPRECATED"))
 
 add("output", Setting("base_dir", './download/', desc="The base directory to save to. Cannot contain tags."))
 add("output", Setting("subdir_pattern", '/[subreddit]/', desc="The directory path, within the base_dir, to save files to."))
@@ -204,9 +205,9 @@ add("threading", Setting("display_clear_screen", True, desc="If it's okay to cle
 add("threading", Setting("display_refresh_rate", 5, desc="How often the UI should update progress.", etype="int"))
 
 add("interface", Setting("start_server", True, desc="If the WebUI should be available.", etype="bool"))
-add("interface", Setting("browser", 'chrome-app', desc="Browser mode to auto-open UI in.", etype="str", opts=[('chrome-app','Chrome Application Mode'), 'default browser', 'off']))
+add("interface", Setting("browser", 'chrome-app', desc="Browser mode to auto-open UI in.", etype="str", opts=[('chrome-app','Chrome Application Mode'), ('default browser', 'The default system browser'), ('off', "Don't auto-open a browser.")]))
 add("interface", Setting("keep_open", False, desc="If True, the WebUI will stay available after the browser closes.", etype='bool'))
-add("interface", Setting("port", 8000, desc="The port to open the WebUI on.", etype="int"))
+add("interface", Setting("port", 7505, desc="The port to open the WebUI on.", etype="int"))
 add("interface", Setting("host", 'localhost', desc="The host to bind on."))
 
 add(None, Setting("meta-version", 4, etype="int", public=False))
@@ -262,6 +263,7 @@ def _adapt(obj): #!cover
 		obj['output']['deduplicate_files'] = obj['deduplicate_files']
 		for r in rm:
 			del obj[r]
+		obj['interface']['start_server'] = False  # Default to old behavior.
 		print("Adapted from Settings version 3 -> 4!")
 		converted = True
 

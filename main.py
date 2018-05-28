@@ -9,6 +9,8 @@ import time
 import datetime
 import re
 
+SCRIPT_BASE = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
+
 parser = argparse.ArgumentParser(description="Tool for scanning Reddit and downloading media - Guide @ https://goo.gl/hgBxN4")
 parser.add_argument("--settings", help="Path to custom Settings file.", type=str, metavar='')
 parser.add_argument("--test", help="Launch in Test Mode. Only used for TravisCI testing.",action="store_true")
@@ -19,6 +21,7 @@ parser.add_argument("--source", '-s', help="Run each loaded Source only if alias
 parser.add_argument("--category.setting", help="Override the given setting.", action="store_true")
 parser.add_argument("--list_settings", help="Display a list of overridable settings.", action="store_true")
 args, unknown_args = parser.parse_known_args()
+
 
 if args.update or args.update_only: #!cover
 	from classes.util.updater import Updater
@@ -50,6 +53,8 @@ from classes.reddit.redditloader import RedditLoader
 import classes.util.manifest as manifest
 import classes.reddit.reddit as reddit
 from classes.util import stringutil
+from classes.util import console
+from classes.webserver import eelwrapper
 
 
 colorama.init(convert=True)
@@ -148,11 +153,6 @@ if args.test:
 	settings_file = './tests/test-settings.json'
 
 _loaded = settings.load(settings_file)
-if not _loaded:
-	stringutil.error('Failed to load settings file!')
-	print('A settings file has been created for you, at "%s". Please customize it.' % settings_file)
-	# TODO: Prompt for WebUI instead.
-	sys.exit(1)
 
 for ua in unknown_args:
 	k = ua.split('=')[0].strip('- ')
@@ -163,9 +163,40 @@ for ua in unknown_args:
 		print('Unknown setting: %s' % k)
 		sys.exit(50)
 
+if not _loaded:
+	# First-time configuration.
+	stringutil.error('Failed to load settings file! A new one will be generated!')
+	if not args.skip_pauses:
+		if not console.confirm('Would you like to start the WebUI to help set things up?', True):
+			stringutil.print_color(Fore.RED, "If you don't open the webUI now, you'll need to edit the settings file yourself.")
+			if console.confirm("Are you sure you'd like to edit it without the UI (if 'yes', these prompts will not show again)?"):
+				settings.put('interface.start_server', False)  # Creates a save.
+				print('A settings file has been created for you, at "%s". Please customize it.' % settings_file)
+			else:
+				print('Please re-run RMD to configure again.')
+			sys.exit(1)
+		else:
+			mode = console.prompt_list('How would you like to open the UI?', settings.get('interface.browser', full_obj=True).opts)
+			settings.put('interface.browser', mode, save_after=False)
+			settings.put('interface.start_server', True)
+	else:
+		print('Skipping prompts is enabled, please edit the settings file yourself.')
+		settings.put('interface.start_server', False)
+		sys.exit(1)
 
-p = Scraper()
-p.run()
+p = None
+
+if eelwrapper.start(os.path.join(SCRIPT_BASE, 'web'), settings.save_base()):  # Only starts if the settings allow it to.
+	print('WebUI is now in control.')
+	try:
+		while True:
+			eelwrapper.sleep(600)  # Eel will terminate with a sys.exit() call, when it's time to exit.
+	except KeyboardInterrupt:
+		print('\nUser terminated WebUI loop.')
+else:
+	print('Running without WebUI.')
+	p = Scraper()
+	p.run()
 
 
 
