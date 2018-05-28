@@ -36,7 +36,7 @@ def number(prompt, min_num = None, max_num = None, round_val=True):
 
 def prompt_list(prompt, options, allow_none=False):
 	""" Prompts for the user to select an option from the list, and returns the index.
-	 	If *options* is an array of tuples, they are prompted with [0], and [1] is returned.
+	 	If *options* is an array of tuples, they are prompted with [1], and [0] is returned.
 	"""
 	if len(options) == 0:
 		return None
@@ -47,9 +47,9 @@ def prompt_list(prompt, options, allow_none=False):
 	if allow_none:
 		options.append(('Cancel', None))
 	for idx, opt in enumerate(options):
-		print("\t%s: %s" % (idx+1, opt[0]) )
+		print("\t%s: %s" % (idx+1, opt[1]) )
 	select = number("Choose an option", 1, len(options), round_val=True) - 1
-	return options[select][1]
+	return options[select][0]
 
 
 def confirm(prompt, default=None):
