@@ -22,20 +22,25 @@ label{
 }
 
 summary{
+    /* Summary objects are used as JS-free hidable groups. */
     font-weight: bold;
     font-size: 20px;
     cursor: pointer;
 }
 
 summary:focus {
+    /* Summary objects are used as JS-free hidable groups. */
     outline-style: none;
 }
 
 summary::-webkit-details-marker {
+    /* Summary objects are used as JS-free hidable groups. */
+    /* TODO: Maybe show these, but make the less terrible looking. */
     display: none;
 }
 
 ul.header {
+    /* NavBar */
     list-style-type: none;
     margin: 0;
     padding: 0;
@@ -47,14 +52,17 @@ ul.header {
 }
 
 li.active {
+    /* NavBar - selected "page". */
     background-color: #4CAF50;
 }
 
 .header li {
+    /* NavBar */
     float: left;
 }
 
 .header li a {
+    /* NavBar */
     display: block;
     color: white;
     text-align: center;
@@ -63,17 +71,34 @@ li.active {
 }
 
 .header li a.header:hover {
+    /* NavBar */
     background-color: #111;
 }
 
 .content {
+    /* The main wrapper class for all "Page" content. Each section will embed in one of these divs. */
     margin-left: 3px;
+    margin-right: 3px;
 }
 
 .hidden {
-    display: none;
+    /** If set, should always hide the object. */
+    display: none !important;
 }
 
 .description {
+    /* Generic class for less-important, more detailed text. Usually below headers. */
     color: gray;
+}
+
+.alert_div {
+    /** Div used to wrap Update messages in an alertify popup. Needs to be scrollable. */
+    overflow-y: scroll;
+    max-height: 400px;
+    text-align: left;
+}
+
+.clickable_alert {
+    /* alertify styling. */
+    cursor: pointer;
 }

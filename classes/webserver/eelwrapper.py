@@ -46,7 +46,7 @@ def start(web_dir, file_dir):
 
 def _websocket_close():
 	print('A WebUI just closed.')
-	eel.sleep(1.0)
+	eel.sleep(2.0)
 	if len(eel._websockets) == 0 and not settings.get('interface.keep_open'):
 		print('WebUI keep_open is disabled, and all open clients have closed.\nExiting.')
 		sys.exit()
