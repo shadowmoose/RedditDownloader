@@ -1,16 +1,20 @@
 class App extends React.Component {
 	constructor(props) {
 		super(props);
+		let hash = window.location.hash.substr(1);
+		let current = 0;
 		this.pages = [[<Home />, 'Home'], [<Sources />, 'Sources'], [<Settings />, 'Settings']];
-		this.state = {page: 0};
-
-		// This binding is necessary to make `this` work in the callback
+		for(let i=0; i < this.pages.length; i++)
+			if(this.pages[i][1].toLowerCase() === hash.toLowerCase())
+				current = i;
+		this.state = {page: current};
 		this.openPage = this.openPage.bind(this);
 	}
 
 
 	openPage(page){
 		console.log('Switching tab:', page);
+		window.location.hash = this.pages[page][1];
 		this.setState({
 			page: page
 		});
