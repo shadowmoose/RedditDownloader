@@ -16,6 +16,7 @@ class RedditLoader(threading.Thread):
 		self._queue = queue.Queue(maxsize= 1000)
 		self._running = False
 		self.daemon = True
+		self.name = 'RedditElementLoader'
 
 	
 	def run(self):
