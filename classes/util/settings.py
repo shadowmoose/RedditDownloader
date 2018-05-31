@@ -176,6 +176,7 @@ class Setting(object):
 			for k, v in vars(self).items():
 				if not k.startswith('_'):
 					obj[k] = v
+			obj['value'] = self.val()
 			return obj
 
 	def attempt_convert(self, val):
