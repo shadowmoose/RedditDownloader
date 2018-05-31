@@ -19,6 +19,7 @@ parser.add_argument("--source", '-s', help="Run each loaded Source only if alias
 parser.add_argument("--category.setting", help="Override the given setting.", action="store_true")
 parser.add_argument("--list_settings", help="Display a list of overridable settings.", action="store_true")
 parser.add_argument("--no_ui", '-noui', help="Disable the WebUI from running on this run.", action="store_true")
+parser.add_argument("--version", '-v', help="Print the current version and exit.", action="store_true")
 args, unknown_args = parser.parse_known_args()
 
 
@@ -61,6 +62,8 @@ stringutil.print_color(Fore.GREEN, """
     (By ShadowMoose @ Github)
 """ % __version__)
 
+if args.version:
+	sys.exit(0)
 
 if args.list_settings:  #!cover
 	print('All valid overridable settings:')
@@ -76,6 +79,7 @@ if args.list_settings:  #!cover
 					print('\t\t"%s": %s' % o)
 			print()
 	sys.exit()
+
 
 settings_file = 'settings.json'
 if args.settings:

@@ -2,6 +2,7 @@ import copy
 import json
 import os
 import random
+from classes.util.rwlock import RWLock
 
 
 _file = ''
@@ -14,7 +15,7 @@ def save():
 	out = to_obj(save_format=True, include_private=True)
 	with open(_file, 'w') as o:
 		o.write(json.dumps(out, indent=4, sort_keys=True, separators=(',', ': ')))
-		print('~Saved Settings.~')
+		print('-Saved Settings-')
 	return True
 
 
@@ -61,6 +62,7 @@ def put(key, value, cat=None, save_after=True):
 	s.set(value)
 	if save_after:
 		save()
+
 
 def to_obj(save_format=False, include_private=True):
 	obj = dict()
@@ -129,16 +131,18 @@ def save_filename():
 class Setting(object):
 	def __init__(self, name, value, desc='', etype='str', public=True, opts=None):
 		self.name = name
-		self.value = None
+		self._value = None
 		self.type = str( etype )
 		self.category = None
 		self.public = public
 		self.description = desc
+		self._lock = RWLock()
 		self.opts = self.set_opts(opts)
 		self.set(value)
 
 	def val(self):
-		return copy.deepcopy(self.value)
+		with self._lock('r'):
+			return copy.deepcopy(self._value)
 
 	def set(self, val):
 		if val is None and len(self.opts) > 0:
@@ -148,10 +152,12 @@ class Setting(object):
 			raise TypeError('Invalid type for setting [%s]! %s != %s' % (self.name, self.type, val.__class__.__name__))
 		if self.opts and val not in [x[0] for x in self.opts]:
 			raise ValueError('Invalid value for setting [%s]! Value is not within given keys.' % val)
-		self.value = val
+		with self._lock('w'):
+			self._value = val
 
 	def set_cat(self, cat):
-		self.category = cat.lower()
+		with self._lock('w'):
+			self.category = cat.lower()
 
 	def set_opts(self, opts):
 		""" Parse the given opts array into this setting's Options, a named list of (value, description) pairs. """
@@ -165,11 +171,12 @@ class Setting(object):
 		return ret
 
 	def to_obj(self):
-		obj = {}
-		for k, v in vars(self).items():
-			if not k.startswith('_'):
-				obj[k] = v
-		return obj
+		with self._lock('r'):
+			obj = {}
+			for k, v in vars(self).items():
+				if not k.startswith('_'):
+					obj[k] = v
+			return obj
 
 	def attempt_convert(self, val):
 		if self.type == 'int':
