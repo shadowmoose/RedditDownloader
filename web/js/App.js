@@ -30,7 +30,7 @@ class App extends React.Component {
 		});
 		let eles = this.pages.map((p)=>{
 			let idx = this.pages.indexOf(p);
-			return <div key={idx} className={this.state.page === idx? 'content':'hidden'} >{p[0]}</div>
+			return <div key={idx} className={this.state.page === idx? 'active_page_container':'hidden'} >{p[0]}</div>
 		});
 		return (
 			<div>
