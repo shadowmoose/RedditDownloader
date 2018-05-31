@@ -3,6 +3,7 @@ class Sources extends React.Component {
 		super(props);
 		this.state = {available:[], active:[], filters: {}};
 		async function run() {
+			// noinspection JSUnresolvedFunction
 			let n = await eel.api_get_sources()(); // Must prefix call with 'await'
 			console.log('Ran source query.');
 			return n
@@ -69,7 +70,7 @@ class Sources extends React.Component {
 	}
 
 	deleteSource(original_alias){
-		alertify.confirm('Are you sure you want to delete "'+original_alias+'"?', function () {
+		alertify.confirm('You are about to delete:<br><b>'+original_alias+' </b><br>Do you want to continue?', function(){
 			let sources = clone(this.state.active).filter((s)=>{
 				return s.alias !== original_alias;
 			});
@@ -82,6 +83,7 @@ class Sources extends React.Component {
 
 	saveAll(){
 		console.log('Saving all settings...');
+		// noinspection JSUnresolvedFunction
 		eel.api_save_sources(this.state.active)(n => {
 			if(n){
 				alertify.closeLogOnClick(true).success("Saved all Sources!")
