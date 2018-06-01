@@ -65,7 +65,7 @@ class Settings extends React.Component {
 				<div className="settings_body">
 					{settings_groups}
 				</div>
-				<button onClick={this.saveSettings.bind(this)}>Save</button>
+				<button className="settings_save_btn" onClick={this.saveSettings.bind(this)}>Save</button>
 			</div>
 		);
 	}
