@@ -177,9 +177,9 @@ class Source extends React.Component {
 			<details open='open'>
 				<summary>
 					{this.state.alias ? this.state.alias : '[blank]'}
+					<span onClick={(e)=>{e.preventDefault(); this.props.delete(this.state.alias)}} className={'source_delete'} title="Delete this Source.">&#10006;</span>
 				</summary>
 				<div className='description'>{this.state.description}</div>
-				<input type={'button'} onClick={()=>this.props.delete(this.state.alias)} value={'Delete Source'} className={'source_delete'}/>
 				<SourceSettingsGroup name={this.state.alias} type={this.state.type} list={this.state.settings} change={this._change}/>
 				<SourceFilterGroup filters={this.state.filters} change={this._changeFilters} filterOptions={this.props.filterOptions}/>
 			</details>
@@ -292,7 +292,7 @@ class SourceFilterGroup extends React.Component {
 		let filters = this.props.filters.map((field) =>
 			<FilterField key={field.field+field.limit} obj={field} remove={this._remove}/>
 		);
-		let prompt = this.props.filters.length > 0 ? 'Accept URLs if:' : 'Filter the Posts from this Source:';
+		let prompt = this.props.filters.length > 0 ? 'Use Filters:' : 'Filter the Posts from this Source:';
 		return <form className={"source_filter_group"}>
 			<div><b className={'source_filter_prompt'}>{prompt}</b></div>
 			<div className={'source_add_filter_wrapper'}>
@@ -335,7 +335,7 @@ class FilterField extends React.Component {
 			<b className={'filter_field'}>{this.props.obj.field}</b>
 			<em className={'filter_operator'}> {this.convert_symbol(this.props.obj.operator)}</em>
 			<span className={'filter_limit'}> {this.props.obj.limit}</span>
-			<input type={'button'} onClick={() => this.props.remove(this.props.obj)} value={'Remove'} className={'source_filter_remove'}/>
+			<span onClick={(e)=>{e.preventDefault(); this.props.remove(this.props.obj)}} className={'source_delete'} title="Delete this Filter.">&#10006;</span>
 		</li>
 	}
 }
