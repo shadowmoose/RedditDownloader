@@ -65,9 +65,10 @@ def my_liked_saved():
 	yield from user_liked_saved(_user.name)
 
 
-def user_liked_saved(username, scan_upvoted=True, scan_saved=True):
-	""" Gets all the upvoted/saved comments and/or submissions for the given User. """
+def user_liked_saved(username, scan_upvoted=True, scan_saved=True, scan_sub=None):
+	""" Gets all the upvoted/saved comments and/or submissions for the given User. Allows filtering by Subreddit. """
 	global _reddit, _user
+	params = {'sr': scan_sub} if scan_sub else None
 	try:
 		if _user.name.lower() == username.lower():
 			redditor = _user
@@ -75,13 +76,13 @@ def user_liked_saved(username, scan_upvoted=True, scan_saved=True):
 			redditor = _reddit.redditor(username)
 		if scan_saved:
 			#stringutil.print_color(Fore.CYAN, '\tLoading %s\'s Saved Posts...' % redditor.name)
-			for saved in redditor.saved(limit=None):
+			for saved in redditor.saved(limit=None, params=params):
 				re = RedditElement(saved)
 				yield re
 
 		if scan_upvoted:
 			#stringutil.print_color(Fore.CYAN, '\tLoading %s\'s Upvoted Posts...' % redditor.name)
-			for upvoted in redditor.upvoted(limit=None):
+			for upvoted in redditor.upvoted(limit=None, params=params):
 				re = RedditElement(upvoted)
 				yield re
 	except prawcore.exceptions.NotFound:
