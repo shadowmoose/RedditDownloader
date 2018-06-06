@@ -10,9 +10,11 @@ class UserUpvotedSaved(source.Source):
 
 	def get_elements(self):
 		dat = self.data
-		for ele in reddit.user_liked_saved(dat['user'], dat['scan_upvoted'], dat['scan_saved'], dat['scan_sub']):
-			if self.check_filters(ele):
-				yield ele
+		for sub in dat['scan_sub'].split(','):
+			sub = sub.strip()
+			for ele in reddit.user_liked_saved(dat['user'], dat['scan_upvoted'], dat['scan_saved'], sub):
+				if self.check_filters(ele):
+					yield ele
 
 
 	def get_settings(self):
