@@ -99,7 +99,8 @@ class Source:
 		"""
 		if self.type != obj['type']:
 			return False
-		self.data = obj['data']
+		for k, v in obj['data'].items():
+			self.data[k] = v
 		self._alias = obj['alias']
 		self._load_filters(obj)
 		return True
