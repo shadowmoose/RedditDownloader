@@ -1,21 +1,20 @@
-/* Courtesy of Suhkotos */
 @media only screen and (max-width: 700px) {
-	.source_add_filter, .source_filter_remove, .save_button  {
-		  margin-left: 0 ;
-			margin-top:10px;
-	}
+    .source_add_filter, .source_filter_remove, .save_button  {
+        margin-left: 0 ;
+        margin-top:10px;
+    }
 }
 
 
 body {
-	font-family: 'Roboto', sans-serif;
+    font-family: 'Roboto', sans-serif;
     margin: 0;
     -moz-user-select: none;
     -webkit-user-select: none;
     -ms-user-select:none;
     user-select:none;
-		color:white;
-		background:#3b3b3b;
+    color:white;
+    background:#3b3b3b;
 }
 
 a {
@@ -37,6 +36,20 @@ summary{
     font-weight: bold;
     font-size: 20px;
     cursor: pointer;
+}
+
+details{
+    padding-left: 5px;
+    padding-top: 2px;
+    border: 1px solid #656565;
+    border-radius: 10px;
+}
+details[open] summary{
+    border-bottom: 1px dashed #656565;
+}
+
+summary:hover {
+    text-shadow: 2px 2px black;
 }
 
 summary:focus {
@@ -67,6 +80,24 @@ li.active {
     background-color: #4CAF50;
 }
 
+input[type=button]:hover{
+    cursor: pointer;
+    filter: brightness(85%);
+}
+
+select:disabled {
+    border: #292929 !important;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+option:enabled {
+    color:#3b3b3b;
+}
+
+.msg {
+    color: black;
+}
 .header li {
     /* NavBar */
     float: left;
@@ -88,7 +119,7 @@ li.active {
 
 .content {
     /* The main wrapper class for all "Page" content. Each section will embed in one of these divs. */
-		margin-left: auto;
+    margin-left: auto;
     margin-right: auto;
     display: block;
     max-width: 1200px;
@@ -102,7 +133,7 @@ li.active {
 
 .description {
     /* Generic class for less-important, more detailed text. Usually below headers. */
-		color: silver;
+    color: silver;
     padding-top: 10px;
     padding-bottom: 10px;
 }
@@ -112,6 +143,7 @@ li.active {
     overflow-y: scroll;
     max-height: 400px;
     text-align: left;
+    color: black;
 }
 
 .clickable_alert {
@@ -119,43 +151,54 @@ li.active {
     cursor: pointer;
 }
 .settings_input_wrapper {
-	padding:10px;
+    padding:10px;
 }
 .settings_input, .source_add, .source_add_filter_wrapper .filter_field,
 .source_add_filter_wrapper .filter_operator, .source_add_filter_wrapper .filter_limit{
-	background: transparent;
-border: solid #dadada 1px;
-border-radius:5px;
-padding: 5px;
-color: #dadada;
+    background: transparent;
+    border: solid #dadada 1px;
+    border-radius:5px;
+    padding: 5px;
+    color: #dadada;
 }
 .settings_save_btn, .save_button, .source_add_filter, .source_filter_remove  {
-	background: #4caf50;
-padding: 6px 75px;
-color: white;
-border: none;
-border-radius:5px;
+    background: #4caf50;
+    padding: 6px 75px;
+    color: white;
+    border: none;
+    border-radius:5px;
 }
-.source_delete {
-	background: #ca2121;
-padding: 6px 75px;
-color: white;
-border: none;
-border-radius:5px;
+.source_delete, .source_filter_remove {
+    color: #ca2121;
+    text-shadow: none;
+    display: inline-block;
+    margin-left: 25px;
+    cursor: pointer;
+    vertical-align: middle;
+}
+.source_delete:hover, .source_filter_remove:hover{
+    color: #fa2222;
+    text-shadow: 2px 2px black;
 }
 .source_controls {
-padding-bottom:10px;
+    padding-bottom:10px;
 }
-.source_add option {
-	color:#3b3b3b;
-}
+
 .source_settings_group.settings_group {
-	margin-top: 10px;
-	margin-bottom: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 .source_filter_wrapper {
-     line-height: 35px;
-	 }
+    line-height: 25px;
+}
+.source_filter_list {
+    margin-top:3px;
+}
 .source_add_filter, .source_filter_remove  {
-	  margin-left: 5px;
+    margin-left: 5px;
+}
+
+
+.source_full_wrapper {
+    padding-bottom: 10px;
 }
