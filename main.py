@@ -121,8 +121,7 @@ if not _loaded:
 		settings.put('interface.start_server', False)
 		sys.exit(1)
 
-p = RMD(source_patterns=args.source, test=args.test)
-p.connect()
+p = None
 
 # Only starts if the settings allow it to.
 if not args.no_ui and eelwrapper.start(os.path.join(SCRIPT_BASE, 'web'), settings.save_base()):
@@ -134,6 +133,8 @@ if not args.no_ui and eelwrapper.start(os.path.join(SCRIPT_BASE, 'web'), setting
 	except KeyboardInterrupt:
 		print('\nUser terminated WebUI loop.')
 else:
+	p = RMD(source_patterns=args.source, test=args.test)
+	p.connect()
 	p.run()
 
 

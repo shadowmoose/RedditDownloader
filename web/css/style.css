@@ -97,7 +97,7 @@ li.active {
 
 .hidden {
     /** If set, should always hide the object. */
-    /* display: none !important; */
+    display: none !important;
 }
 
 .description {
