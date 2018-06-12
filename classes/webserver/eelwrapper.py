@@ -8,6 +8,7 @@ from classes.filters import filter
 
 _file_dir = None
 _web_dir = None
+_rmd_version = '0'
 
 """
 	Eel is great, but doesn't expose everything we want.
@@ -16,10 +17,11 @@ _web_dir = None
 	See simple documentation: https://bottlepy.org/docs/dev/tutorial.html
 """
 
-def start(web_dir, file_dir):
-	global _file_dir, _web_dir
+def start(web_dir, file_dir, rmd_version):
+	global _file_dir, _web_dir, _rmd_version
 	_file_dir = os.path.abspath(file_dir)
 	_web_dir = os.path.abspath(web_dir)
+	_rmd_version = rmd_version
 	if not settings.get('interface.start_server'):
 		print('WebUI is disabled by settings.')
 		return False
@@ -47,6 +49,7 @@ def start(web_dir, file_dir):
 def _websocket_close():
 	print('A WebUI just closed.')
 	eel.sleep(2.0)
+	# noinspection PyProtectedMember
 	if len(eel._websockets) == 0 and not settings.get('interface.keep_open'):
 		print('WebUI keep_open is disabled, and all open clients have closed.\nExiting.')
 		sys.exit()
@@ -65,9 +68,8 @@ def _downloaded_files():
 
 # ======  JS->Python API functions:  ======
 @eel.expose
-def api_current_status(a, b):
-	print('Eel api call:', a, b, a + b)  # TODO: once WebUI is passed 'main', implement progress status here.
-	return a + b
+def api_current_status():
+	return {'current_version': _rmd_version}
 
 @eel.expose
 def api_get_settings():
@@ -131,6 +133,6 @@ def sleep(sec):
 
 if __name__ == '__main__':
 	settings.load('test-webui-settings.json')
-	opened = start('../../web/', '../../../download')
+	opened = start('../../web/', '../../../download', '1.5')
 	while opened:
 		sleep(60)

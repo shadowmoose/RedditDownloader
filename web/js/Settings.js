@@ -35,7 +35,8 @@ class Settings extends React.Component {
 			}else{
 				alertify.closeLogOnClick(true).error("Error saving settings!")
 			}
-			this.changes = {}
+			this.changes = {};
+			this.setState({changes: {}})
 		});
 	}
 
@@ -53,6 +54,7 @@ class Settings extends React.Component {
 		}
 		console.log('Changed: ', event.target.id, val);
 		this.changes[event.target.id] = val;
+		this.setState({changes: clone(this.changes)});
 	}
 
 	render() {
@@ -62,10 +64,15 @@ class Settings extends React.Component {
 
 		return (
 			<div>
+				<p className={'description'}>
+					These are the settings RMD uses. Changing them may require a restart to take effect. <br />
+					For more information about each setting, go <a href={'https://github.com/shadowmoose/RedditDownloader/blob/master/docs/Settings.md'} target={'_blank'}>here</a>.
+				</p>
+				<input type="button" className="settings_save_btn" onClick={this.saveSettings.bind(this)} value="Save Settings" disabled={Object.keys(this.changes).length === 0}/>
 				<div className="settings_body">
 					{settings_groups}
 				</div>
-				<input type="button" className="settings_save_btn" onClick={this.saveSettings.bind(this)} value="Save Settings"/>
+				<input type="button" className="settings_save_btn" onClick={this.saveSettings.bind(this)} value="Save Settings" disabled={Object.keys(this.changes).length === 0}/>
 			</div>
 		);
 	}
