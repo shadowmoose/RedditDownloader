@@ -21,7 +21,7 @@ class UserUpvotedSaved(source.Source):
 		yield Setting('user', '', etype='str', desc='Target username:')
 		yield Setting('scan_upvoted', False, etype='bool', desc='Scan the posts they\'ve upvoted?')
 		yield Setting('scan_saved', False, etype='bool', desc='Scan the posts they\'ve saved?')
-		yield Setting('scan_sub', '', etype='str', desc='Scan a specific Subreddit (leave blank for all):')
+		yield Setting('scan_sub', '', etype='str', desc='Scan specific subreddits, separated by commas (leave blank for all):')
 
 
 	def get_config_summary(self):

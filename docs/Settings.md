@@ -32,7 +32,7 @@ See [the bottom of this page](#output-format) for more info.
 + user_agent
   + **Description:** *The user agent to identify as, wherever possible.* 
   + **Expected Type:** str 
-  + **Default value:** RMD-Scanner-0.09153684916052074 
+  + **Default value:** [Unique ID] 
 + username
   + **Description:** *DEPRECATED* 
   + **Expected Type:** str 
