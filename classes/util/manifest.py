@@ -21,13 +21,20 @@ def create(file):
 		if build:
 			with closing(conn.cursor()) as cur:
 				cur.execute('''CREATE TABLE posts (
-					id text PRIMARY KEY, author text, source_alias text, subreddit text, title text, type text, parent text, body text
+					id text PRIMARY KEY,
+					author text COLLATE NOCASE,
+					source_alias text COLLATE NOCASE,
+					subreddit text COLLATE NOCASE,
+					title text COLLATE NOCASE,
+					type text COLLATE NOCASE,
+					parent text COLLATE NOCASE,
+					body text COLLATE NOCASE
 				)''')
 				cur.execute('''CREATE TABLE urls (
-					post_id text, url text, file_path text
+					post_id text, url text, file_path text COLLATE nocase
 				)''')
 				cur.execute('''CREATE TABLE hashes (
-					file_path text PRIMARY KEY, lastmtime int, hash text
+					file_path text PRIMARY KEY COLLATE nocase, lastmtime int, hash text
 				)''')
 				cur.execute('''CREATE TABLE metadata (
 					meta_key text PRIMARY KEY, meta_val text
@@ -82,6 +89,7 @@ def direct_insert_post(_id, author, source_alias, subreddit, title, _type, files
 		for k,v in files.items():
 			cur.execute('INSERT INTO urls VALUES (?,?,?)', (_id, k, str(v) ))
 		conn.commit()
+
 
 def insert_post(reddit_ele):
 	""" Inserts a given list of elements into the database. """
@@ -163,6 +171,37 @@ def remove_file_hash(f_path):
 		conn.commit()
 
 
+def get_searchable_fields():
+	""" Gets the set of explicitly whitelisted searchable Post fields. """
+	return {'author', 'body', 'title', 'subreddit', 'source_alias'}
+
+
+def search_posts(fields=(), term=''):
+	""" Search for Posts, checking the given fields (must be whitelisted strings) for a matching (LIKE) term. """
+	if len(fields) == 0 or not set(fields).issubset(get_searchable_fields()):
+		stringutil.error('Invalid search field(s): %s' % fields)
+		return None
+	with lock('r'), closing(conn.cursor()) as cur:
+		all_fields = "||' '||".join(fields)
+		cur.execute('SELECT * FROM posts WHERE (%s) LIKE :term ORDER BY parent DESC, title' % all_fields, {'term':'%%%s%%' % term})
+		names = [description[0] for description in cur.description]
+		for p in cur:
+			yield dict(zip(names, p))
+'''
+SELECT p.*, COUNT(*) AS 'file_count' FROM posts p
+LEFT JOIN urls u
+	ON u.post_id = p.id
+where
+	(p.title||' '||p.author||' '||p.subreddit||' '||p.body||' '||p.source_alias) LIKE '%term%'
+	AND u.file_path not in ('None', 'False')
+GROUP BY
+	p.id
+ORDER BY
+	p.parent DESC, p.title
+
+'''
+
+
 def _expose_testing_cursor():
 	"""
 		This function exists ONLY FOR TESTING USES, where rolling functions may not make sense.
@@ -170,45 +209,3 @@ def _expose_testing_cursor():
 	"""
 	return conn.cursor()
 
-
-if __name__ == '__main__':
-	os.chdir(input('Enter a base dir: '))
-	print('Testing Manifest...')
-
-	create('manifest.sqldb')
-	# noinspection PyProtectedMember
-	#insert(_all_eles())
-
-	print('Real Hash:', get_file_hash('fake_filename'))
-	print('Fake Hash:', get_file_hash('fake-2'))
-
-	print('\nIterating Hashes:')
-	_hgen = hash_iterator(10)
-	i = 1
-	for h in _hgen:
-		print('\tRet [%s]: ' % i, h)
-		i+=1
-		if i> 10:
-			print('Test killing gen.')
-			_hgen.send(True)
-
-	print('\nTesting Files:')
-	_c = _expose_testing_cursor()
-	_c.execute('SELECT post_id, file_path FROM urls')
-	_failed = 0
-	_invalid = 0
-	_total = 0
-	for r in _c.fetchall():
-		_pid = r[0]
-		_file = r[1]
-		_total+=1
-		if _file == 'None' or _file == 'False':
-			_failed+=1
-			continue
-		if not os.path.exists(_file):
-			print(_pid, _file)
-			_invalid+=1
-	print('%s total files.' % _total)
-	print('%s invalid file paths.' % _invalid)
-	print('%s failed files.' % _failed)
-	print('Test done.')
