@@ -48,7 +48,7 @@ def convert(save_base, data):
 			nid = find_comment(e)
 			if not nid:
 				broken += 1
-				print('Could not match comment. Cannot migrate over. [%s]' % e['id'])
+				print('Could not match old Comment; Will re-download. [%s]' % e['id'])
 				continue
 			else:
 				if _verbose:
