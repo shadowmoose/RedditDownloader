@@ -50,8 +50,10 @@ from colorama import Fore
 from classes.util import settings
 from classes.util import stringutil
 from classes.util import console
+from classes.util import manifest
 from classes.webserver import eelwrapper
 from classes.downloader import RMD
+from classes.reddit import praw_wrapper
 
 
 colorama.init(convert=True)
@@ -121,10 +123,22 @@ if not _loaded:
 		settings.put('interface.start_server', False)
 		sys.exit(1)
 
-p = None
+
+# Initialize all database and reddit connections.
+if not os.path.isdir(settings.save_base()):
+	os.makedirs(os.path.abspath(settings.save_base()) )
+os.chdir(settings.save_base()) # Hop into base dir, so all file work can be relative.
+# Authenticate and prepare to scan:
+praw_wrapper.init(client_id=settings.get('auth.client_id'), client_secret=settings.get('auth.client_secret'),
+			password=settings.get('auth.password'), user_agent=settings.get('auth.user_agent'), username=settings.get('auth.username'))
+praw_wrapper.login()
+manifest.create('manifest.sqldb')
+manifest.check_legacy(settings.save_base())  # Convert away from legacy Manifest.
+
+p = RMD(source_patterns=args.source, test=args.test)
 
 # Only starts if the settings allow it to.
-if not args.no_ui and eelwrapper.start(os.path.join(SCRIPT_BASE, 'web'), settings.save_base(), __version__):
+if not args.test and not args.no_ui and eelwrapper.start(os.path.join(SCRIPT_BASE, 'web'), './', __version__):
 	print('WebUI is now in control.')
 	try:
 		while True:
@@ -133,8 +147,6 @@ if not args.no_ui and eelwrapper.start(os.path.join(SCRIPT_BASE, 'web'), setting
 	except KeyboardInterrupt:
 		print('\nUser terminated WebUI loop.')
 else:
-	p = RMD(source_patterns=args.source, test=args.test)
-	p.connect()
 	p.run()
 
 

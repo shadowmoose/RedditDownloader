@@ -183,7 +183,7 @@ def search_posts(fields=(), term=''):
 		return None
 	with lock('r'), closing(conn.cursor()) as cur:
 		all_fields = "||' '||".join(fields)
-		cur.execute('SELECT * FROM posts WHERE (%s) LIKE :term ORDER BY parent DESC, title' % all_fields, {'term':'%%%s%%' % term})
+		cur.execute('SELECT * FROM posts WHERE (%s) LIKE :term ORDER BY type DESC' % all_fields, {'term':'%%%s%%' % term})
 		names = [description[0] for description in cur.description]
 		for p in cur:
 			yield dict(zip(names, p))
