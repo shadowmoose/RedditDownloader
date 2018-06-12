@@ -210,7 +210,7 @@ add("output", Setting("deduplicate_files", True, desc="Remove downloaded files i
 
 add("threading", Setting("max_handler_threads", 5, desc="How many threads can download media at once.", etype="int"))
 add("threading", Setting("display_clear_screen", True, desc="If it's okay to clear the terminal while running.", etype="bool"))
-add("threading", Setting("display_refresh_rate", 5, desc="How often the UI should update progress.", etype="int"))
+add("threading", Setting("display_refresh_rate", 5, desc="How often the UI should update progress, in seconds.", etype="int"))
 
 add("interface", Setting("start_server", True, desc="If the WebUI should be available.", etype="bool"))
 add("interface", Setting("browser", 'chrome-app', desc="Browser to auto-open UI in.", etype="str", opts=[('chrome-app','Chrome Application Mode (recommended)'), ('default browser', 'The default system browser'), ('off', "Don't auto-open a browser")]))
