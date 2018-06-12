@@ -85,10 +85,15 @@ input[type=button]:hover{
     filter: brightness(85%);
 }
 
+select{
+    cursor: pointer;
+}
+
 select:disabled {
     border: #292929 !important;
     -webkit-appearance: none;
     -moz-appearance: none;
+    cursor: auto;
 }
 
 option:enabled {
@@ -123,7 +128,7 @@ option:enabled {
     margin-right: auto;
     display: block;
     max-width: 1200px;
-    padding: 50px 35px 50px 35px;
+    padding: 15px 35px 50px 35px;
 }
 
 .hidden {
@@ -167,6 +172,12 @@ option:enabled {
     color: white;
     border: none;
     border-radius:5px;
+    margin-bottom: 10px;
+}
+.settings_save_btn:disabled {
+    background: #3b3b3b;
+    border: 1px solid gray;
+    cursor: auto !important;
 }
 .source_delete, .source_filter_remove {
     color: #ca2121;

@@ -124,7 +124,7 @@ if not _loaded:
 p = None
 
 # Only starts if the settings allow it to.
-if not args.no_ui and eelwrapper.start(os.path.join(SCRIPT_BASE, 'web'), settings.save_base()):
+if not args.no_ui and eelwrapper.start(os.path.join(SCRIPT_BASE, 'web'), settings.save_base(), __version__):
 	print('WebUI is now in control.')
 	try:
 		while True:

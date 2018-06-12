@@ -1,17 +1,27 @@
 class Home extends React.Component {
 	constructor(props){
 		super(props);
-		this.state = {version: '1.53'}; //TODO: Get version from Python.
+		this.state = {version: ''};
 
-		let xhttp = new XMLHttpRequest();
-		let self = this;
-		xhttp.onreadystatechange = function() {
-			if (this.readyState === 4 && this.status === 200) {
-				self.updates_loaded(this.responseText)
-			}
-		};
-		xhttp.open("GET", "https://api.github.com/repos/shadowmoose/RedditDownloader/releases", true);
-		xhttp.send();
+		async function run() {
+			// Inside a function marked 'async' we can use the 'await' keyword.
+			let n = await eel.api_current_status()(); // Must prefix call with 'await'
+			console.log('RMD State:', n);
+			return n
+		}
+		run().then((r)=>{
+			this.setState({version: r['current_version']}, ()=> {
+				let xhttp = new XMLHttpRequest();
+				let self = this;
+				xhttp.onreadystatechange = function () {
+					if (this.readyState === 4 && this.status === 200) {
+						self.updates_loaded(this.responseText)
+					}
+				};
+				xhttp.open("GET", "https://api.github.com/repos/shadowmoose/RedditDownloader/releases", true);
+				xhttp.send();
+			})
+		})
 	}
 
 	updates_loaded(resp){
@@ -19,6 +29,7 @@ class Home extends React.Component {
 		let converter = new showdown.Converter();
 		let body = data[0].body;
 		let tag = parseFloat(data[0].tag_name);
+		console.log('Current version:', this.state.version, 'Latest Release:', tag);
 		if(tag <= parseFloat(this.state.version)) {
 			return;
 		}
