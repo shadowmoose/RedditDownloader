@@ -64,7 +64,7 @@ See [the bottom of this page](#output-format) for more info.
   + **Expected Type:** bool 
   + **Default value:** True 
 + display_refresh_rate
-  + **Description:** *How often the UI should update progress.* 
+  + **Description:** *How often the UI should update progress, in seconds.* 
   + **Expected Type:** int 
   + **Default value:** 5 
 ## Interface
