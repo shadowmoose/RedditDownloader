@@ -4,7 +4,13 @@ import classes.sources.source as sources
 
 source_list = [{
 	"alias": "default",
-	"data": {},
+	"data": {
+		'owner': '',
+		'multi_name': '',
+		'order': 'top',
+		'time': 'all',
+		'limit': 0
+	},
 	"filters": {
 		"created_utc.max": 0,
 		"score.min": 1000,
@@ -30,5 +36,6 @@ def run_test(re):
 		if 'multi' not in s.type:
 			return 'Loaded source is of invalid type!', 2
 		if s.to_obj() != source_list[0]:
+			print(s.to_obj())
 			return 'Converted Source does not match original!', 3
 	return '', 0
