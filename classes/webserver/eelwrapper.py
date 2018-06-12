@@ -4,6 +4,7 @@ import os
 from classes.util import settings
 from classes.sources import source
 from classes.filters import filter
+from classes.util import manifest
 
 
 _file_dir = None
@@ -125,6 +126,21 @@ def api_save_sources(new_obj):
 	for s in output_settings:
 		settings.add_source(s, prevent_duplicate=False, save_after=False)
 	return settings.save()
+
+
+@eel.expose
+def api_search_posts(fields, term):
+	obj = {}
+	for p in manifest.search_posts(fields, term):
+		if p['type'] == 'Submission':
+			p['children'] = []
+			obj[p['id']] = p
+		else:
+			if p['parent'] in obj:
+				obj[p['parent']]['children'].append(p)
+			else:
+				obj[p['id']] = p
+	return list(obj.values())
 
 
 def sleep(sec):
