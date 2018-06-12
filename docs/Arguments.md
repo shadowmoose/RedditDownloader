@@ -2,7 +2,7 @@
 While it's suggested you make any settings changes in the 'settings.json' file generated, 
 you may find yourself instead wanting to pass a few things in for one-off runs (or automation).
 
-All arguments are optional, but some must be supplied in a group (and are grouped as such):
+All arguments are optional:
 
 **-h, --help** -        show help message and exit
 
