@@ -12,7 +12,7 @@ install:
 script:
 - coverage run main.py --test --update_only --skip_pauses
 - coverage run main.py --test --skip_pauses
-after_script:
+after_success:
 - COVERALLS_PARALLEL=true coveralls
 notifications:
   email: false
