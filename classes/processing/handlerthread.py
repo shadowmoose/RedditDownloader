@@ -118,7 +118,7 @@ class HandlerThread(threading.Thread):
 
 			og = basefile
 			i=2
-			while basefile in HandlerThread.used_files: # TODO: Increment if Manifest contains a downloaded path containing this basefile.
+			while basefile in HandlerThread.used_files or manifest.get_file_matching(basefile):
 				# Use local list of filenames used here, since used filenames won't be updated until done otherwise.
 				basefile = og+' . '+str(i)
 				basefile = stringutil.normalize_file(basefile)
