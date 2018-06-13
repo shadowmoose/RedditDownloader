@@ -95,6 +95,8 @@ class HandlerThread(threading.Thread):
 		manifest.insert_post(reddit_element) # Update Manifest with completed ele.
 		if was_new_ele:
 			self.total_new_posts += 1
+			# This isn't a completely accurate count, because a duplicate Post could slip in while its copy is still downloading
+			# TODO: Fix this by implementing a cach of processing IDs, like handlerThread.used_files.
 
 		with HandlerThread.ele_lock:
 			# Clear blacklisted filename list, just to release the memory.
@@ -187,7 +189,7 @@ class HandlerThread(threading.Thread):
 						manifest.remap_filepath(existing_path, file_path)
 						return file_path
 					else:
-						manifest.remove_file_hash(file_path) #TODO: This should callback through HashJar, just to keep it centralized.
+						manifest.remove_file_hash(file_path)
 						os.remove(file_path)
 						return existing_path
 			return file_path
