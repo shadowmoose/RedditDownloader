@@ -13,6 +13,13 @@ from classes.util import settings
 class HandlerThread(threading.Thread):
 	ele_lock = threading.RLock()
 	used_files = [] # A shared list of used base filenames, to avoid duplicating files until they're written and stored.
+	active_ids = [] # A shared list of all currently-processing Post IDs.
+
+	@staticmethod
+	def reset():
+		HandlerThread.ele_lock = threading.RLock()
+		HandlerThread.used_fields = []
+		HandlerThread.active_ids = []
 
 	def __init__(self, name, e_queue):
 		threading.Thread.__init__(self)
@@ -39,7 +46,16 @@ class HandlerThread(threading.Thread):
 				item = self._loader.next_ele()
 				if item is None:
 					continue
+
+				with HandlerThread.ele_lock:
+					if item.get_id() in HandlerThread.active_ids:
+						continue  # Skip eles that are currently processing already.
+					HandlerThread.active_ids.append(item.get_id())
+
 				self.process_ele(item)
+
+				with HandlerThread.ele_lock:
+					HandlerThread.active_ids.remove(item.get_id())
 			except queue.Empty:
 				# An exception is raised when queue is empty and loading is done.
 				self.keep_running = False
@@ -95,8 +111,6 @@ class HandlerThread(threading.Thread):
 		manifest.insert_post(reddit_element) # Update Manifest with completed ele.
 		if was_new_ele:
 			self.total_new_posts += 1
-			# This isn't a completely accurate count, because a duplicate Post could slip in while its copy is still downloading
-			# TODO: Fix this by implementing a cach of processing IDs, like handlerThread.used_files.
 
 		with HandlerThread.ele_lock:
 			# Clear blacklisted filename list, just to release the memory.
