@@ -1,6 +1,7 @@
 import eel
 import sys
 import os
+import base64
 from classes.util import settings
 from classes.sources import source
 from classes.filters import filter
@@ -63,6 +64,7 @@ def _downloaded_files():
 		In format: "./file?id=Path/to/File.jpg"
 	"""
 	file_path = eel.btl.request.query.id
+	file_path = base64.b64decode(file_path).decode('utf-8')
 	print('Requested RMD File: %s' % file_path)
 	return eel.btl.static_file(file_path, root=_file_dir)
 
@@ -130,6 +132,29 @@ def api_save_sources(new_obj):
 
 @eel.expose
 def api_search_posts(fields, term):
+	obj = {}
+	def explode(file):
+		if os.path.isfile(file):
+			return [file]
+		elif os.path.isdir(file):
+			return [os.path.join(file, f) for f in os.listdir(file) if os.path.isfile(os.path.join(file, f))]
+		else:
+			return None
+
+	for p in manifest.search_posts(fields, term):
+		if p['id'] not in obj:
+			p['files'] = explode(p['file_path'])
+			del p['file_path']
+			obj[p['id']] = p
+		else:
+			for f in explode(p['file_path']):
+				obj[p['id']]['files'].append(f)
+	print('Sending file list:', obj.values())
+	return list(obj.values())
+
+
+@eel.expose
+def api_search_nested_posts(fields, term):
 	obj = {}
 	for p in manifest.search_posts(fields, term):
 		if p['type'] == 'Submission':

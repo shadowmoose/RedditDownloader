@@ -188,23 +188,16 @@ def search_posts(fields=(), term=''):
 		return None
 	with lock('r'), closing(conn.cursor()) as cur:
 		all_fields = "||' '||".join(fields)
-		cur.execute('SELECT * FROM posts WHERE (%s) LIKE :term ORDER BY type DESC' % all_fields, {'term':'%%%s%%' % term})
+		cur.execute('''
+				SELECT * FROM posts 
+				LEFT JOIN urls u
+					ON u.post_id = id
+				WHERE (%s) LIKE :term
+				AND u.file_path not in ('None', 'False') 
+				ORDER BY type DESC''' % all_fields, {'term':'%%%s%%' % term})
 		names = [description[0] for description in cur.description]
 		for p in cur:
 			yield dict(zip(names, p))
-'''
-SELECT p.*, COUNT(*) AS 'file_count' FROM posts p
-LEFT JOIN urls u
-	ON u.post_id = p.id
-where
-	(p.title||' '||p.author||' '||p.subreddit||' '||p.body||' '||p.source_alias) LIKE '%term%'
-	AND u.file_path not in ('None', 'False')
-GROUP BY
-	p.id
-ORDER BY
-	p.parent DESC, p.title
-
-'''
 
 
 def _expose_testing_cursor():
