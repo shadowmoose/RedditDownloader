@@ -22,7 +22,7 @@ class ElementProcessor:
 
 	def run(self):
 		max_threads = settings.get('threading.max_handler_threads')
-
+		HandlerThread.reset()
 		#start threads
 		for i in range(max_threads):
 			ht = HandlerThread('Handler - %s' % (i+1), self._loader)
