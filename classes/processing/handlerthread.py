@@ -41,8 +41,8 @@ class HandlerThread(threading.Thread):
 					continue
 				self.process_ele(item)
 			except queue.Empty:
-				self.keep_running = False
 				# An exception is raised when queue is empty and loading is done.
+				self.keep_running = False
 				break
 		self.log.out(0, stringutil.color('Completed.', stringutil.Fore.GREEN))
 		self.handler_log.clear()
@@ -118,7 +118,7 @@ class HandlerThread(threading.Thread):
 
 			og = basefile
 			i=2
-			while basefile in HandlerThread.used_files:
+			while basefile in HandlerThread.used_files: # TODO: Increment if Manifest contains a downloaded path containing this basefile.
 				# Use local list of filenames used here, since used filenames won't be updated until done otherwise.
 				basefile = og+' . '+str(i)
 				basefile = stringutil.normalize_file(basefile)
@@ -182,7 +182,7 @@ class HandlerThread(threading.Thread):
 				# Quick and dirty comparison, assumes larger filesize means better quality.
 				if os.path.isfile(file_path) and os.path.isfile(existing_path):
 					if os.path.getsize(file_path) > os.path.getsize(existing_path):
-						manifest.remove_file_hash(existing_path) #TODO: This should callback through HashJar, just to keep it centralized. Also, this should probably call *before* the file deletion, to avoid tracking nonexistant files (in event of crash between deletion and removal)
+						manifest.remove_file_hash(existing_path)
 						os.remove(existing_path)
 						manifest.remap_filepath(existing_path, file_path)
 						return file_path
