@@ -1,249 +1,252 @@
 @media only screen and (max-width: 700px) {
-    .source_add_filter, .source_filter_remove, .save_button  {
-        margin-left: 0 ;
-        margin-top:10px;
-    }
+	.source_add_filter, .source_filter_remove, .save_button  {
+		margin-left: 0 ;
+		margin-top:10px;
+	}
 }
 
 
 body {
-    font-family: 'Roboto', sans-serif;
-    margin: 0;
-    -moz-user-select: none;
-    -webkit-user-select: none;
-    -ms-user-select:none;
-    user-select:none;
-    color:white;
-    background:#3b3b3b;
+	font-family: 'Roboto', sans-serif;
+	margin: 0;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select:none;
+	user-select:none;
+	color:white;
+	background:#3b3b3b;
 }
 
 a {
-    color: dodgerblue;
-    cursor: pointer;
+	color: dodgerblue;
+	cursor: pointer;
 }
 
 a:hover {
-    font-weight: bold;
+	font-weight: bold;
 }
 
 label{
-    color: silver;
-    padding-right: 5px;
+	color: silver;
+	padding-right: 5px;
 }
 
 summary{
-    /* Summary objects are used as JS-free hidable groups. */
-    font-weight: bold;
-    font-size: 20px;
-    cursor: pointer;
+	/* Summary objects are used as JS-free hidable groups. */
+	font-weight: bold;
+	font-size: 20px;
+	cursor: pointer;
 }
 
 details{
-    padding-left: 5px;
-    padding-top: 2px;
-    border: 1px solid #656565;
-    border-radius: 10px;
+	padding-left: 5px;
+	padding-top: 2px;
+	border: 1px solid #656565;
+	border-radius: 10px;
 }
 details[open] summary{
-    border-bottom: 1px dashed #656565;
+	border-bottom: 1px dashed #656565;
 }
 
 summary:hover {
-    text-shadow: 2px 2px black;
+	text-shadow: 2px 2px black;
 }
 
 summary:focus {
-    /* Summary objects are used as JS-free hidable groups. */
-    outline-style: none;
+	/* Summary objects are used as JS-free hidable groups. */
+	outline-style: none;
 }
 
 summary::-webkit-details-marker {
-    /* Summary objects are used as JS-free hidable groups. */
-    /* TODO: Maybe show these, but make the less terrible looking. */
-    display: none;
+	/* Summary objects are used as JS-free hidable groups. */
+	/* TODO: Maybe show these, but make the less terrible looking. */
+	display: none;
 }
 
 ul.header {
-    /* NavBar */
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    background-color: #333;
-    position: -webkit-sticky; /* Safari */
-    position: sticky;
-    top: 0;
+	/* NavBar */
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+	background-color: #333;
+	position: -webkit-sticky; /* Safari */
+	position: sticky;
+	top: 0;
 }
 
 li.active {
-    /* NavBar - selected "page". */
-    background-color: #4CAF50;
+	/* NavBar - selected "page". */
+	background-color: #4CAF50;
 }
 
 input[type=button]:hover{
-    cursor: pointer;
-    filter: brightness(85%);
+	cursor: pointer;
+	filter: brightness(85%);
 }
 
 select{
-    cursor: pointer;
+	cursor: pointer;
 }
 
 select:disabled {
-    border: #292929 !important;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    cursor: auto;
+	border: #292929 !important;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	cursor: auto;
 }
 
 option:enabled {
-    color:#3b3b3b;
+	color:#3b3b3b;
 }
 
 .msg {
-    color: black;
+	color: black;
 }
 .header {
 	z-index: 1000;
 }
 .header li {
-    /* NavBar */
-    float: left;
+	/* NavBar */
+	float: left;
 }
 
 .header li a {
-    /* NavBar */
-    display: block;
-    color: white;
-    text-align: center;
-    padding: 14px 16px;
-    text-decoration: none;
+	/* NavBar */
+	display: block;
+	color: white;
+	text-align: center;
+	padding: 14px 16px;
+	text-decoration: none;
 }
 
 .header li a.header:hover {
-    /* NavBar */
-    background-color: #111;
+	/* NavBar */
+	background-color: #111;
 }
 
 .content {
-    /* The main wrapper class for all "Page" content. Each section will embed in one of these divs. */
-    margin-left: auto;
-    margin-right: auto;
-    display: block;
-    max-width: 1200px;
-    padding: 15px 35px 50px 35px;
+	/* The main wrapper class for all "Page" content. Each section will embed in one of these divs. */
+	margin-left: auto;
+	margin-right: auto;
+	display: block;
+	max-width: 1200px;
+	padding: 15px 35px 50px 35px;
 }
 
 .hidden {
-    /** If set, should always hide the object. */
-    display: none !important;
+	/** If set, should always hide the object. */
+	display: none !important;
 }
 
 .description {
-    /* Generic class for less-important, more detailed text. Usually below headers. */
-    color: silver;
-    padding-top: 10px;
-    padding-bottom: 10px;
+	/* Generic class for less-important, more detailed text. Usually below headers. */
+	color: silver;
+	padding-top: 10px;
+	padding-bottom: 10px;
 }
 
 .alert_div {
-    /** Div used to wrap Update messages in an alertify popup. Needs to be scrollable. */
-    overflow-y: scroll;
-    max-height: 400px;
-    text-align: left;
-    color: black;
+	/** Div used to wrap Update messages in an alertify popup. Needs to be scrollable. */
+	overflow-y: scroll;
+	max-height: 400px;
+	text-align: left;
+	color: black;
 }
 
 .clickable_alert {
-    /* alertify styling. */
-    cursor: pointer;
+	/* alertify styling. */
+	cursor: pointer;
 }
 .settings_input_wrapper {
-    padding:10px;
+	padding:10px;
 }
 .settings_input, .source_add, .source_add_filter_wrapper .filter_field,
 .source_add_filter_wrapper .filter_operator, .source_add_filter_wrapper .filter_limit{
-    background: transparent;
-    border: solid #dadada 1px;
-    border-radius:5px;
-    padding: 5px;
-    color: #dadada;
+	background: transparent;
+	border: solid #dadada 1px;
+	border-radius:5px;
+	padding: 5px;
+	color: #dadada;
 }
 .settings_save_btn, .save_button, .source_add_filter, .source_filter_remove  {
-    background: #4caf50;
-    padding: 6px 75px;
-    color: white;
-    border: none;
-    border-radius:5px;
-    margin-bottom: 10px;
+	background: #4caf50;
+	padding: 6px 75px;
+	color: white;
+	border: none;
+	border-radius:5px;
+	margin-bottom: 10px;
 }
 .settings_save_btn:disabled {
-    background: #3b3b3b;
-    border: 1px solid gray;
-    cursor: auto !important;
+	background: #3b3b3b;
+	border: 1px solid gray;
+	cursor: auto !important;
 }
 .source_delete, .source_filter_remove {
-    color: #ca2121;
-    text-shadow: none;
-    display: inline-block;
-    margin-left: 25px;
-    cursor: pointer;
-    vertical-align: middle;
+	color: #ca2121;
+	text-shadow: none;
+	display: inline-block;
+	margin-left: 25px;
+	cursor: pointer;
+	vertical-align: middle;
 }
 .source_delete:hover, .source_filter_remove:hover{
-    color: #fa2222;
-    text-shadow: 2px 2px black;
+	color: #fa2222;
+	text-shadow: 2px 2px black;
 }
 .source_controls {
-    padding-bottom:10px;
+	padding-bottom:10px;
 }
 
 .source_settings_group.settings_group {
-    margin-top: 10px;
-    margin-bottom: 10px;
+	margin-top: 10px;
+	margin-bottom: 10px;
 }
 .source_filter_wrapper {
-    line-height: 25px;
+	line-height: 25px;
 }
 .source_filter_list {
-    margin-top:3px;
+	margin-top:3px;
 }
 .source_add_filter, .source_filter_remove  {
-    margin-left: 5px;
+	margin-left: 5px;
 }
 
 
 .source_full_wrapper {
-    padding-bottom: 10px;
+	padding-bottom: 10px;
 }
 
 
 
 
 * {
-    box-sizing: border-box;
+	box-sizing: border-box;
 }
 
 
 .img_row {
-    display: -ms-flexbox; /* IE 10 */
-    display: flex;
-    -ms-flex-wrap: wrap; /* IE 10 */
-    flex-wrap: wrap;
-    padding: 0 4px;
+	display: -ms-flexbox; /* IE 10 */
+	display: flex;
+	-ms-flex-wrap: wrap; /* IE 10 */
+	flex-wrap: wrap;
+	padding: 0 4px;
 }
 
 /* Create two equal columns that sits next to each other */
 .img_column {
-    -ms-flex: 25%; /* IE 10 */
-    flex: 25%;
-    padding: 0 4px;
+	-ms-flex: 25%; /* IE 10 */
+	flex: 25%;
+	padding: 0 4px;
 }
 
 .img_column .media_container {
-    margin-top: 8px;
-    vertical-align: middle;
+	margin-top: 8px;
+	vertical-align: middle;
 	position: relative;
+	max-width: inherit;
+	max-height: inherit;
+	cursor: pointer;
 }
 
 .media_gallery_icon {
@@ -257,4 +260,70 @@ option:enabled {
 .icon {
 	font-size: 20px;
 	text-shadow: 0 0 10px black;
+}
+
+.lightbox {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	border: 2px solid #FFF;
+	background: #FFF;
+	z-index: 1002;
+	transform: translate(-50%, -50%);
+    cursor: auto;
+}
+
+.lightbox .media{
+	display: block;
+	width: auto !important;
+	height: auto;
+	max-height: 90vh;
+	max-width: 90vw;
+}
+
+.lightbox_fade {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: black;
+	z-index: 1001;
+	-moz-opacity: 0.8;
+	opacity: .90;
+	filter: alpha(opacity=80);
+}
+
+.lightbox_overlay {
+	transition: .5s ease;
+	opacity: 0;
+	width: 100%;
+	text-align: center;
+	background: rgba(0,0,0,.8);
+}
+
+
+.lightbox:hover .lightbox_overlay {
+	opacity: 1;
+}
+
+
+.top {
+	position: absolute;
+	top:0;
+}
+
+.bottom {
+	position: absolute;
+	bottom:0;
+}
+
+.left {
+	position: absolute;
+	left:0;
+}
+
+.right {
+	position: absolute;
+	right:0;
 }

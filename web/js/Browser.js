@@ -59,7 +59,8 @@ class MediaContainer extends React.Component {
 			console.log('+Found Media Gallery: ', '('+this.elements.length+')',this.post.title);
 		}
 		this._next = this.next.bind(this);
-		this.state = {index: 0};
+		this.state = {index: 0, lightbox: false};
+		this._close = this.close.bind(this);
 	}
 
 	parse_media(file){
@@ -70,32 +71,84 @@ class MediaContainer extends React.Component {
 			case 'png':
 			case 'bmp':
 			case 'gif':
-				return <img src={'/file?id='+file[0]} style={{width:"100%"}} title={this.post.title}/>;
+				return <img src={'/file?id='+file[0]} style={{width:"100%"}} className={'media'}/>;
 			case 'mp4':
 			case "webm":
-				return <video width="100%" title={this.post.title} autoPlay controls muted loop>
+				return <video width="100%" className={'media'} autoPlay controls muted loop>
 					<source src={'/file?id='+file[0]} type={"video/"+ext} />
 				</video>;
 			default:
 				console.log('Cannot handle media:', file);
-				return <div style={{width:"100%", height:"100px"}} title={this.post.title}>Empty</div>;
+				return <div style={{width:"100%", height:"100px"}} className={'media'}>Empty</div>;
 		}
 	}
 
 	next(){
-		console.log('Next image...', this.state.index);
-		this.setState({index: (this.state.index+1) % this.elements.length})
+		let nidx = this.state.index;
+		if(this.state.lightbox) {
+			nidx = (nidx + 1) % this.elements.length;
+			console.log('Incrementing media index:', nidx)
+		}
+		this.setState({index: nidx, lightbox: true})
+	}
+
+	close(evt){
+		evt.stopPropagation();
+		console.log('Closing...');
+		this.setState({lightbox: false})
 	}
 
 	render() {
 		let special = [];
 		if(this.elements.length > 1)
 			special.push(<i className={'media_gallery_icon icon fa fa-list-ul'} key={'gallery'} />);
+		if(this.state.lightbox){
+			special.push(<div key={'lightbox'}>
+				<div className={'lightbox_fade'} onClick={this._close} />
+				<div className={'lightbox'}>
+					{this.elements[this.state.index]}
+					<div className={'lightbox_overlay top'}>
+						<h3>{this.post.title}</h3>
+						<p>{this.post.author}</p>
+					</div>
+					<div className={'lightbox_overlay bottom'}>
+						{this.post.body}
+					</div>
+				</div>
+			</div>);
+		}
 		return (
 			<div className={'media_container'} style={{width:"100%"}} onClick={this._next}>
 				{special}
-				{this.elements[this.state.index]}
+				<div title={this.post.title}>
+					{this.elements[this.state.index]}
+				</div>
 			</div>
 		);
+	}
+}
+
+
+class LightBox extends React.Component {
+	constructor(props) {
+		super(props);
+		this.media = props.media;
+		this.index = props.index;
+		this.post = props.post;
+		console.log("Lightbox:", this.media[this.index]);
+		this._close = this.close.bind(this);
+	}
+
+	close(){
+		console.log('Closing lightbox.');
+	}
+
+	render() {
+		return (<div>
+			<div className={'lightbox_fade'} onClick={this._close} />
+			<div className={'lightbox'}>
+				{this.media[this.index]}
+			</div>
+		</div>);
 	}
 }
