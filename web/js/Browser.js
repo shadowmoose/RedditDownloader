@@ -2,7 +2,7 @@ class Browser extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {posts:[]};
-		this.search(['title', 'body', 'subreddit'], "test")
+		this.search(['title', 'body', 'subreddit'], "aww")
 	}
 
 	search(categories, term){
@@ -63,22 +63,22 @@ class MediaContainer extends React.Component {
 	}
 
 	parse_media(file){
-		let ext = file.split('.').pop();
+		let ext = file[1].split('.').pop();
 		switch(ext){
 			case 'jpg':
 			case 'jpeg':
 			case 'png':
 			case 'bmp':
 			case 'gif':
-				return <img src={'/file?id='+btoa(file)} style={{width:"100%"}}/>;
+				return <img src={'/file?id='+file[0]} style={{width:"100%"}} title={this.post.title}/>;
 			case 'mp4':
 			case "webm":
-				return <video width="100%" autoPlay controls muted loop>
-					<source src={'/file?id='+btoa(file)} type={"video/"+ext} />
+				return <video width="100%" title={this.post.title} autoPlay controls muted loop>
+					<source src={'/file?id='+file[0]} type={"video/"+ext} />
 				</video>;
 			default:
 				console.log('Cannot handle media:', file);
-				return <img src={'/file?id='+btoa('z/z.jpg')} style={{width:"100%"}}/>;
+				return <div style={{width:"100%", height:"100px"}} title={this.post.title}>Empty</div>;
 		}
 	}
 
