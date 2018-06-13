@@ -103,6 +103,9 @@ option:enabled {
 .msg {
     color: black;
 }
+.header {
+	z-index: 1000;
+}
 .header li {
     /* NavBar */
     float: left;
@@ -212,4 +215,46 @@ option:enabled {
 
 .source_full_wrapper {
     padding-bottom: 10px;
+}
+
+
+
+
+* {
+    box-sizing: border-box;
+}
+
+
+.img_row {
+    display: -ms-flexbox; /* IE 10 */
+    display: flex;
+    -ms-flex-wrap: wrap; /* IE 10 */
+    flex-wrap: wrap;
+    padding: 0 4px;
+}
+
+/* Create two equal columns that sits next to each other */
+.img_column {
+    -ms-flex: 25%; /* IE 10 */
+    flex: 25%;
+    padding: 0 4px;
+}
+
+.img_column .media_container {
+    margin-top: 8px;
+    vertical-align: middle;
+	position: relative;
+}
+
+.media_gallery_icon {
+	position: absolute;
+	top: 2px;
+	right: 2px;
+	font-size: 10px;
+	color: #ff8177;
+}
+
+.icon {
+	font-size: 20px;
+	text-shadow: 0 0 10px black;
 }

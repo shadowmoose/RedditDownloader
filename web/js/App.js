@@ -3,7 +3,7 @@ class App extends React.Component {
 		super(props);
 		let hash = window.location.hash.substr(1);
 		let current = 0;
-		this.pages = [[<Home />, 'Home'], [<Sources />, 'Sources'], [<Settings />, 'Settings']];
+		this.pages = [[<Home />, 'Home'], [<Sources />, 'Sources'], [<Settings />, 'Settings'], [<Browser />, 'Browser']];
 		for(let i=0; i < this.pages.length; i++)
 			if(this.pages[i][1].toLowerCase() === hash.toLowerCase())
 				current = i;
