@@ -41,7 +41,8 @@ class YTDLWrapper:
 			'logger': Logger(),
 			'progress_hooks': [self.ytdl_hook],
 			'outtmpl': data['single_file'] % '.%(ext)s', # single_file only needs the extension. In this case, use the YTDL ext format.
-			'http_headers': {'User-Agent': data['user_agent']}
+			'http_headers': {'User-Agent': data['user_agent']},
+			'socket_timeout': 10
 		}
 		with youtube_dl.YoutubeDL(ydl_opts) as ydl:
 			ydl.download([url])
