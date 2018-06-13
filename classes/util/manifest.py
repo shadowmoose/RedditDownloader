@@ -171,6 +171,11 @@ def remove_file_hash(f_path):
 		conn.commit()
 
 
+def get_file_matching(file_start):
+	""" Returns the first file, if any, that starts with the given pattern. """
+	return _select_fancy('urls', ['file_path'], 'file_path LIKE :fname', {'fname':str(file_start) + '%'})
+
+
 def get_searchable_fields():
 	""" Gets the set of explicitly whitelisted searchable Post fields. """
 	return {'author', 'body', 'title', 'subreddit', 'source_alias'}
