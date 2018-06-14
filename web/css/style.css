@@ -8,6 +8,9 @@
 	}
 }
 
+* {
+	box-sizing: border-box;
+}
 
 body {
 	font-family: 'Roboto', sans-serif;
@@ -32,6 +35,7 @@ a:hover {
 label{
 	color: silver;
 	padding-right: 5px;
+	cursor: pointer;
 }
 
 summary{
@@ -86,6 +90,11 @@ li.active {
 input[type=button]:hover{
 	cursor: pointer;
 	filter: brightness(85%);
+}
+
+input[type=checkbox]{
+	vertical-align: middle;
+	cursor: pointer;
 }
 
 select{
@@ -179,10 +188,10 @@ option:enabled {
 	border: none;
 	border-radius:5px;
 	margin-bottom: 10px;
+	cursor: pointer;
 }
 .settings_save_btn:disabled {
-	background: #3b3b3b;
-	border: 1px solid gray;
+	background: #4b4b4b;
 	cursor: auto !important;
 }
 .source_delete, .source_filter_remove {
@@ -218,13 +227,6 @@ option:enabled {
 
 .source_full_wrapper {
 	padding-bottom: 10px;
-}
-
-
-
-
-* {
-	box-sizing: border-box;
 }
 
 
@@ -266,8 +268,11 @@ option:enabled {
 
 .icon {
 	font-size: 20px;
-	text-shadow: 0 0 10px black;
 	cursor: pointer;
+}
+
+.shadow {
+	text-shadow: 0 0 10px black;
 }
 
 .lightbox {
@@ -350,9 +355,34 @@ option:enabled {
 	text-align: center !important;
 }
 
-.test {
-	position: absolute;
-	left: 101%;
+.align_to_text{
+	vertical-align: middle;
+}
+
+.left_pad {
+	margin-left: 5px;
+}
+
+.fixed {
+	position: fixed !important;
+}
+
+.red {
+	color: darkred !important;
+}
+.green {
+	color: #4CAF50 !important;
+}
+.blue{
+	color: #5576ed !important;
+}
+.black {
+	color: black !important;
+}
+
+.hover_shadow:hover {
+	text-shadow: 2px 2px black;
+	cursor: pointer;
 }
 
 .search_categories{
@@ -370,4 +400,40 @@ option:enabled {
 	display: table;
 	padding: 5px;
 	margin-top: 5px;
+}
+
+
+.pagination {
+	display: inline-block;
+}
+
+.pagination a {
+	color: white;
+	float: left;
+	padding: 8px 16px;
+	text-decoration: none;
+	border: 1px solid #ddd;
+}
+
+.pagination a.pagination_active {
+	background-color: #4CAF50;
+	color: black;
+	border: 1px solid #ddd;
+}
+
+.pagination a:hover:not(.active) {
+	background-color: #ddd;
+}
+.pagination a:hover {
+	color: black;
+}
+
+.pagination a:first-child {
+	border-top-left-radius: 5px;
+	border-bottom-left-radius: 5px;
+}
+
+.pagination a:last-child {
+	border-top-right-radius: 5px;
+	border-bottom-right-radius: 5px;
 }

@@ -1,7 +1,7 @@
 class Browser extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = {posts:[], term:'', fields:[], autoplay: true};
+		this.state = {posts:[[]], term:'', fields:[], autoplay: true, page_size: 20, page: 0};
 		this.search_timer = null;
 		eel.api_searchable_fields()(n => {
 			let fields = {};
@@ -13,6 +13,7 @@ class Browser extends React.Component {
 		this._toggle_field = this.toggle_field.bind(this);
 		this._search_term = this.change_search_term.bind(this);
 		this._autoplay = this.autoplay.bind(this);
+		this._set_page = this.setPage.bind(this);
 	}
 
 	search(){
@@ -26,12 +27,9 @@ class Browser extends React.Component {
 		console.log("Searching:", fields, term);
 		eel.api_search_posts(fields, term)(n => {
 			console.log("Searched posts:", n);
-			let posts = [];
-			n.forEach((p)=>{
-				posts.push(p)
-			});
+			let posts = this.paginate(n, this.state.page_size);
 			console.log('posts:', posts);
-			this.setState({posts: posts});
+			this.setState({posts: posts, page: 0});
 		});
 	}
 
@@ -58,6 +56,11 @@ class Browser extends React.Component {
 
 	autoplay(event){
 		this.setState({autoplay: event.target.checked});
+	}
+
+	setPage(evt, idx){
+		evt.preventDefault();
+		this.setState({page: idx});
 	}
 
 	chunkify(a, n, balanced) {// Split array [a] into [n] arrays of roughly-equal length.
@@ -90,11 +93,19 @@ class Browser extends React.Component {
 		return out;
 	}
 
+	paginate(arr, size=10){
+		// Split the given array into smaller arrays limited by [size]
+		let arrs = [];
+		while(arr.length) {
+			arrs.push(arr.splice(0,size));
+		}
+		return arrs;
+	}
 
 	render() {
 		let groups = [];
 		let group = [];
-		let chunks = this.chunkify(this.state.posts, 4, true);
+		let chunks = this.chunkify(this.state.posts[this.state.page], 4, true);
 		chunks.forEach((ch)=>{
 			ch.forEach((p)=>{
 				group.push(<MediaContainer post={p} key={p.id} autoplay={this.state.autoplay}/>);
@@ -109,16 +120,41 @@ class Browser extends React.Component {
 				<input id={f} type={'checkbox'} defaultChecked={this.state.fields[f]} onChange={this._toggle_field}/>
 			</div>
 		});
+
+		let page_buttons = [];
+		let idx = this.state.page;
+		let start = idx-2;
+		let end = idx+3;
+		if(start<0)end+=Math.abs(0-start);
+		if(end>=this.state.posts.length)start-=(end - this.state.posts.length);
+		start = Math.max(0, start);
+		end = Math.min(this.state.posts.length, end);
+		for(let i=start; i<end; i++){
+			page_buttons.push(
+				<a
+				onClick={(e)=>(this._set_page(e, i))}
+				key={'page_select_'+i}
+				className={i===this.state.page?'pagination_active':''}>{i+1}</a>
+			);
+		}
+
 		return(
 			<div>
-				<div>
-					<div className={'search_field_group'} >Search for downloaded media:</div>
+				<div className={'center'}>
+					<label className={'search_field_group'} htmlFor={'search_term'}>Search for downloaded media:</label>
 					<input type={'text'} id={'search_term'} className={'settings_input'} value={this.state.term} onChange={this._search_term}/>
+					<label htmlFor="autoplay" title={'Autoplay videos?'}><i className={'align_to_text left_pad icon hover_shadow fa fa-play-circle '+(this.state.autoplay?'green':'red')}/></label>
+					<input id='autoplay' type={'checkbox'} defaultChecked={this.state.autoplay} onChange={this._autoplay} className={'hidden'}/>
 					<div className={'search_group'}>
 						<div className={'search_categories'}> {categories}</div>
 					</div>
-					<label htmlFor="autoplay">Autoplay Video:</label>
-					<input id='autoplay' type={'checkbox'} defaultChecked={this.state.autoplay} onChange={this._autoplay}/>
+				</div>
+				<div className={'center'}>
+					<div className={'pagination '+(this.state.posts[0].length>0?'':'hidden')}>
+						<a onClick={(e)=>(this._set_page(e, 0))}>&laquo;</a>
+						{page_buttons}
+						<a onClick={(e)=>(this._set_page(e, this.state.posts.length-1))}>&raquo;</a>
+					</div>
 				</div>
 				<div className="img_row">
 					{groups}
@@ -223,9 +259,9 @@ class MediaContainer extends React.Component {
 		let media = this.parse_media(this.state.files[this.state.index], true);
 
 		if(this.state.files.length > 1)
-			special.push(<i className={'media_gallery_icon icon fa fa-list-ul'} key={'gallery'} />);
+			special.push(<i className={'media_gallery_icon icon shadow fa fa-list-ul'} key={'gallery'} />);
 		if(this.is_video && !this.state.autoplay)
-			special.push(<i className={'bottom right icon fa fa-video-camera'} key={'video'} />);
+			special.push(<i className={'bottom right icon shadow fa fa-video-camera'} key={'video'} />);
 		if(this.state.lightbox){
 			special.push(<div key={'lightbox'}>
 				<div className={'lightbox_fade'} onClick={this._close} />
@@ -237,8 +273,8 @@ class MediaContainer extends React.Component {
 					</div>
 					{this.state.files.length > 1 &&
 						<div className={'lightbox_overlay'}>
-							<i className={'vcenter left icon fa fa-arrow-circle-o-left'} onClick={(e)=>{this._next(e, -1)}} title={'Previous'}/>
-							<i className={'vcenter right icon fa fa-arrow-circle-o-right'} onClick={(e)=>{this._next(e, 1)}} title={'Next'}/>
+							<i className={'vcenter left icon shadow fa fa-arrow-circle-o-left'} onClick={(e)=>{this._next(e, -1)}} title={'Previous'}/>
+							<i className={'vcenter right icon shadow fa fa-arrow-circle-o-right'} onClick={(e)=>{this._next(e, 1)}} title={'Next'}/>
 						</div>
 					}
 				</div>

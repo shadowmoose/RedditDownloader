@@ -57,7 +57,8 @@ class Home extends React.Component {
 			<div>
 				<h2>Welcome to the RMD {this.state.version} WebUI!</h2>
 				<p>
-					It's still in super-early Alpha right now, but I appreciate the testing!<i className="fa fa-heart"/>
+					It's still in super-early Alpha right now, but I appreciate the testing!
+					<i className="left_pad red icon fa fa-heart"/>
 				</p>
 				<p>
 					It still needs a ton of styling, but if you're confused about a setting,
