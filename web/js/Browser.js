@@ -1,7 +1,7 @@
 class Browser extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = {posts:[[]], term:'', fields:[], autoplay: true, page_size: 20, page: 0};
+		this.state = {posts:[[]], term:'', fields:[], autoplay: true, page_size: 50, page: 0};
 		this.search_timer = null;
 		eel.api_searchable_fields()(n => {
 			let fields = {};
