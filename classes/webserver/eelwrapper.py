@@ -131,12 +131,17 @@ def api_save_sources(new_obj):
 
 
 @eel.expose
+def api_searchable_fields():
+	return list(set(manifest.get_searchable_fields()))
+
+
+@eel.expose
 def api_search_posts(fields, term):
 	obj = {}
 	def b64(str_in):
 		return base64.encodebytes(str_in.encode()).decode()
 
-	def explode(file, url):
+	def explode(file):
 		if os.path.isfile(file):
 			return [{'token': b64(file), 'path': file}]
 		elif os.path.isdir(file):
@@ -146,13 +151,14 @@ def api_search_posts(fields, term):
 
 	for p in manifest.search_posts(fields, term):
 		if p['id'] not in obj:
-			p['files'] = explode(p['file_path'], p['url'])
+			p['files'] = explode(p['file_path'])
 			del p['file_path']
 			obj[p['id']] = p
 		else:
-			for f in explode(p['file_path'], p['url']):
+			for f in explode(p['file_path']):
 				obj[p['id']]['files'].append(f)
-	print('Sending file list:', obj.values())
+	#import json
+	#print('Sending file list:', json.dumps(list(obj.values()), indent=4, sort_keys=True, separators=(',', ': ')))
 	return list(obj.values())
 
 
