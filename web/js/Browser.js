@@ -172,7 +172,7 @@ class MediaContainer extends React.Component {
 					autoPlay={this.state.autoplay || this.state.lightbox && !is_small_player}
 					controls={this.state.autoplay || this.state.lightbox && !is_small_player}
 					preload={'metadata'}
-					muted={is_small_player?true: this.state.muted}
+					muted={is_small_player?true: this.state.muted} //TODO: Maybe just implement local cookie storage.
 					loop>
 					<source src={'/file?id='+file.token} type={"video/"+ext} />
 				</video>;
