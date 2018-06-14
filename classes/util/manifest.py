@@ -39,6 +39,8 @@ def create(file):
 				cur.execute('''CREATE TABLE metadata (
 					meta_key text PRIMARY KEY, meta_val text
 				)''')
+				cur.execute('''CREATE INDEX url_index ON urls(post_id)''')
+				cur.execute('''CREATE INDEX hash_index ON hashes(hash)''')
 				conn.commit()
 			with closing(conn.cursor()) as cur:
 				cur.execute('INSERT INTO metadata VALUES (?,?)', ('version', version))

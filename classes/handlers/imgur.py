@@ -211,7 +211,7 @@ def handle(url, data, log, guess=True):
 				if r.status_code == 200:
 					content_type = r.headers['content-type']
 					ext = mimetypes.guess_extension(content_type)
-					if 'gifv' in url: #!cover
+					if any(_e in url for _e in ['gifv', 'webm']): #!cover
 						log.out(1,'-Allowing YTDL Handler to download animations.')
 						return False# Let Youtube-dl module convert animations.
 					if not ext or ext=='': #!cover
