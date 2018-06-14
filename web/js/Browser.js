@@ -269,7 +269,7 @@ class MediaContainer extends React.Component {
 					{this.parse_media(this.state.files[this.state.index], false)}
 					<div className={'lightbox_overlay top'}>
 						<h3>{this.state.post.title}</h3>
-						<a href={reddit_url} target={'_blank'} title={'Go to post on Reddit'}><p>{this.state.post.author} in {this.state.post.subreddit}</p></a>
+						<a href={reddit_url} target={'_blank'} title={'Go to post on Reddit'} className={'no_bot'}>{this.state.post.author} in {this.state.post.subreddit}</a>
 					</div>
 					{this.state.files.length > 1 &&
 						<div className={'lightbox_overlay'}>
