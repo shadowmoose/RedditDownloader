@@ -111,7 +111,10 @@ class Sources extends React.Component {
 				</p>
 				<div className={'source_controls'}>
 					<select className={'source_add'} value={'none'} onChange={this._add}>{available_sources}</select>
-					<input type={'button'} name={'save_sources'} className={'save_button'} value={'Save Sources'} onClick={this._save_all}/>
+					<button className={'settings_save_btn fixed bottom right'}>
+						<i className={'blue icon fa fa-save'} title={'Save Sources'} onClick={this._save_all}/>
+						<label className={''} onClick={this._save_all}> Save Sources</label>
+					</button>
 				</div>
 				<div className={'source_list_wrapper'}>
 					{sources}
@@ -303,7 +306,7 @@ class SourceFilterGroup extends React.Component {
 				{fieldSelect}
 				{operator}
 				{limit}
-				<input type={"button"} className="source_add_filter" onClick={this._add_filter} value={"Add Filter"}/>
+				<i className={'green align_to_text left_pad hover_shadow icon fa fa-plus-square'} onClick={this._add_filter} title={"Add Filter"}/>
 			</div>
 
 			<ul className="source_filter_list">
