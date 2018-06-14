@@ -61,14 +61,10 @@ eel._websocket_close = _websocket_close
 @eel.btl.route('/file')
 def _downloaded_files():
 	""" Allows the UI to request files RMD has scraped.
-		In format: "./file?id=Path/to/File.jpg"
+		In format: "./file?id=file_token"
 	"""
-	url = eel.btl.request.query.id
-	url = base64.b64decode(url).decode('utf-8')
-	file_info = manifest.get_url_info(url)
-	if not file_info:
-		return None
-	file_path = file_info['file_path']
+	token = eel.btl.request.query.id
+	file_path = base64.decodebytes(token.replace(' ', '+').encode()).decode()
 	print('Requested RMD File: %s' % file_path)
 	return eel.btl.static_file(file_path, root=_file_dir)
 
@@ -137,11 +133,14 @@ def api_save_sources(new_obj):
 @eel.expose
 def api_search_posts(fields, term):
 	obj = {}
+	def b64(str_in):
+		return base64.encodebytes(str_in.encode()).decode()
+
 	def explode(file, url):
 		if os.path.isfile(file):
-			return [(base64.b64encode(url.encode()).decode('utf-8'), file)]
+			return [{'token': b64(file), 'path': file}]
 		elif os.path.isdir(file):
-			return [(base64.b64encode(url.encode()).decode('utf-8'), os.path.join(file, _f)) for _f in os.listdir(file) if os.path.isfile(os.path.join(file, _f))]
+			return [{'token': b64(os.path.join(file, _f)), 'path': os.path.join(file, _f)} for _f in os.listdir(file) if os.path.isfile(os.path.join(file, _f))]
 		else:
 			return None
 
