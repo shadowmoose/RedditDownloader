@@ -1,12 +1,30 @@
 class Browser extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = {posts:[]};
-		this.search(['title', 'body', 'subreddit'], "aww")
+		this.state = {posts:[], term:'', fields:[], autoplay: true};
+		this.search_timer = null;
+		eel.api_searchable_fields()(n => {
+			let fields = {};
+			n.forEach((p)=>{
+				fields[p] = true
+			});
+			this.setState({fields: fields});
+		});
+		this._toggle_field = this.toggle_field.bind(this);
+		this._search_term = this.change_search_term.bind(this);
+		this._autoplay = this.autoplay.bind(this);
 	}
 
-	search(categories, term){
-		eel.api_search_posts(categories, term)(n => {
+	search(){
+		console.log('Running search');
+		let fields = Object.keys(this.state.fields).filter((f)=> {
+			return this.state.fields[f];
+		});
+		let term = this.state.term;
+		if(term.trim() === '')
+			return;
+		console.log("Searching:", fields, term);
+		eel.api_search_posts(fields, term)(n => {
 			console.log("Searched posts:", n);
 			let posts = [];
 			n.forEach((p)=>{
@@ -17,23 +35,91 @@ class Browser extends React.Component {
 		});
 	}
 
+	schedule_search(){
+		if(this.search_timer !== false)
+			clearTimeout(this.search_timer);
+		this.search_timer = setTimeout(this.search.bind(this), 250);
+	}
+
+	toggle_field(event){
+		let id = event.target.id;
+		let val = event.target.checked;
+		let fields = clone(this.state.fields);
+		fields[id] = val;
+		this.setState({fields: fields}, ()=>{this.schedule_search()});
+	}
+
+	change_search_term(event){
+		let val = event.target.value;
+		if(this.search_timer !== false)
+			clearTimeout(this.search_timer);
+		this.setState({term: val}, ()=>{this.schedule_search()});
+	}
+
+	autoplay(event){
+		this.setState({autoplay: event.target.checked});
+	}
+
+	chunkify(a, n, balanced) {// Split array [a] into [n] arrays of roughly-equal length.
+		if (n < 2)
+			return [a];
+		let len = a.length,
+			out = [],
+			i = 0,
+			size;
+		if (len % n === 0) {
+			size = Math.floor(len / n);
+			while (i < len) {
+				out.push(a.slice(i, i += size));
+			}
+		}else if (balanced) {
+			while (i < len) {
+				size = Math.ceil((len - i) / n--);
+				out.push(a.slice(i, i += size));
+			}
+		}else {
+			n--;
+			size = Math.floor(len / n);
+			if (len % size === 0)
+				size--;
+			while (i < size * n) {
+				out.push(a.slice(i, i += size));
+			}
+			out.push(a.slice(size * n));
+		}
+		return out;
+	}
+
+
 	render() {
 		let groups = [];
-		let i = 0;
-		let per_group = Math.ceil(this.state.posts.length / 4);
 		let group = [];
-		this.state.posts.forEach((p)=>{
-			group.push(<MediaContainer post={p} key={i} />);
-			i+=1;
-			if(i%per_group===0 && i < per_group*4){
-				groups.push(<div className="img_column" key={"img_group_"+groups.length}>{group}</div>);
-				group = []
-			}
+		let chunks = this.chunkify(this.state.posts, 4, true);
+		chunks.forEach((ch)=>{
+			ch.forEach((p)=>{
+				group.push(<MediaContainer post={p} key={p.id} autoplay={this.state.autoplay}/>);
+			});
+			groups.push(<div className="img_column" key={"img_group_"+groups.length}>{group}</div>);
+			group = [];
 		});
-		if(group.length>0)
-			groups.push(<div className="img_column" key={'img_group_'+groups.length}>{group}</div>);
+
+		let categories = Object.keys(this.state.fields).map((f)=>{
+			return <div key={f} className={'search_field_group'} title={'Search within '+f}>
+				<label htmlFor={f} >{f}</label>
+				<input id={f} type={'checkbox'} defaultChecked={this.state.fields[f]} onChange={this._toggle_field}/>
+			</div>
+		});
 		return(
 			<div>
+				<div>
+					<div className={'search_field_group'} >Search for downloaded media:</div>
+					<input type={'text'} id={'search_term'} className={'settings_input'} value={this.state.term} onChange={this._search_term}/>
+					<div className={'search_group'}>
+						<div className={'search_categories'}> {categories}</div>
+					</div>
+					<label htmlFor="autoplay">Autoplay Video:</label>
+					<input id='autoplay' type={'checkbox'} defaultChecked={this.state.autoplay} onChange={this._autoplay}/>
+				</div>
 				<div className="img_row">
 					{groups}
 				</div>
@@ -47,51 +133,73 @@ class Browser extends React.Component {
 class MediaContainer extends React.Component {
 	constructor(props) {
 		super(props);
-		this.post = props.post;
-		this.files = this.post.files;
-		this.elements = this.files.map((f)=>{
-			return this.parse_media(f);
-		}).filter((f)=>{
-			return f;
-		});
+		this.state = {index:0, lightbox:false, post: props.post, files: props.post.files, autoplay: props.autoplay, muted: true};
 		// TODO: Empty list support (display text block?)
-		if(this.elements.length > 1){
-			console.log('+Found Media Gallery: ', '('+this.elements.length+')',this.post.title);
-		}
-		this.reddit_url = 'http://redd.it/' + (this.post.parent? this.post.parent : this.post.id).replace('t3_','');
-		this.state = {index: 0, lightbox: false};
+		this.is_video = false;
 		this._next = this.next.bind(this);
-
 		this._close = this.close.bind(this);
+		this._mute_toggle = this.mute_toggle.bind(this);
 	}
 
-	parse_media(file){
+	static getDerivedStateFromProps(props, state) {
+		return {
+			post: props.post,
+			files: props.post.files,
+			autoplay: props.autoplay
+		};
+	}
+
+	parse_media(file, is_small_player=false){
 		let ext = file.path.split('.').pop();
+		this.is_video = false;
 		switch(ext){
 			case 'jpg':
 			case 'jpeg':
 			case 'png':
 			case 'bmp':
 			case 'gif':
+			case 'ico':
 				return <img src={'/file?id='+file.token} style={{width:"100%"}} className={'media'}/>;
 			case 'mp4':
 			case "webm":
-				return <video width="100%" className={'media'} autoPlay controls muted loop>
+				this.is_video = true;
+				return <video
+					width="100%"
+					key={'vid_'+file.path+is_small_player}
+					className={'media'}
+					ref={is_small_player?'video':null} // only mount the video control callback for the preview embed.
+					onVolumeChange={this._mute_toggle}
+					autoPlay={this.state.autoplay || this.state.lightbox && !is_small_player}
+					controls={this.state.autoplay || this.state.lightbox && !is_small_player}
+					preload={'metadata'}
+					muted={is_small_player?true: this.state.muted}
+					loop>
 					<source src={'/file?id='+file.token} type={"video/"+ext} />
 				</video>;
 			default:
 				console.log('Cannot handle media:', file.path);
-				return <div style={{width:"100%", height:"100px"}} className={'media'}>Empty</div>;
+				return <div style={{width:"100%", height:"100px"}} className={'media center invalid_media'}>Invalid Media</div>;
 		}
 	}
 
-	next(){
+	next(event, step=1){
+		event.stopPropagation();
 		let nidx = this.state.index;
 		if(this.state.lightbox) {
-			nidx = (nidx + 1) % this.elements.length;
-			console.log('Incrementing media index:', nidx)
+			nidx = (nidx + step) % this.state.files.length;
 		}
+		console.log('New index:', nidx);
+		if(nidx<0)
+			nidx = this.state.files.length - 1;
 		this.setState({index: nidx, lightbox: true})
+	}
+
+	mute_toggle(evt){
+		if(evt.target.buffered.length===0){
+			console.log('No mute changes while loading.');
+			return; //TODO: This could probably be made more reliable, if there's a better way to detect unloading.
+		}
+		this.setState({muted: evt.target.muted})
 	}
 
 	close(evt){
@@ -100,30 +208,48 @@ class MediaContainer extends React.Component {
 		this.setState({lightbox: false})
 	}
 
+	componentDidUpdate(prevProps, prevState, snapshot){
+		if(this.refs.video) {
+			if(!prevState.autoplay && this.state.autoplay)
+				this.refs.video.play();
+			if(prevState.autoplay && !this.state.autoplay)
+				this.refs.video.pause();
+		}
+	}
+
 	render() {
-		let special = [];
-		if(this.elements.length > 1)
+		let reddit_url = 'http://redd.it/' + (this.state.post.parent? this.state.post.parent : this.state.post.id).replace('t3_','');
+		let special = []; // Special elements to overlay on this box.
+		let media = this.parse_media(this.state.files[this.state.index], true);
+
+		if(this.state.files.length > 1)
 			special.push(<i className={'media_gallery_icon icon fa fa-list-ul'} key={'gallery'} />);
+		if(this.is_video && !this.state.autoplay)
+			special.push(<i className={'bottom right icon fa fa-video-camera'} key={'video'} />);
 		if(this.state.lightbox){
 			special.push(<div key={'lightbox'}>
 				<div className={'lightbox_fade'} onClick={this._close} />
 				<div className={'lightbox'}>
-					{this.elements[this.state.index]}
+					{this.parse_media(this.state.files[this.state.index], false)}
 					<div className={'lightbox_overlay top'}>
-						<h3>{this.post.title}</h3>
-						<a href={this.reddit_url} target={'_blank'}><p>{this.post.author}</p></a>
+						<h3>{this.state.post.title}</h3>
+						<a href={reddit_url} target={'_blank'} title={'Go to post on Reddit'}><p>{this.state.post.author} in {this.state.post.subreddit}</p></a>
 					</div>
-					<div className={'lightbox_overlay bottom'}>
-						{this.post.body}
-					</div>
+					{this.state.files.length > 1 &&
+						<div className={'lightbox_overlay'}>
+							<i className={'vcenter left icon fa fa-arrow-circle-o-left'} onClick={(e)=>{this._next(e, -1)}} title={'Previous'}/>
+							<i className={'vcenter right icon fa fa-arrow-circle-o-right'} onClick={(e)=>{this._next(e, 1)}} title={'Next'}/>
+						</div>
+					}
 				</div>
 			</div>);
 		}
+
 		return (
 			<div className={'media_container'} style={{width:"100%"}} onClick={this._next}>
 				{special}
-				<div title={this.post.title}>
-					{this.elements[this.state.index]}
+				<div title={this.state.post.title}>
+					{media}
 				</div>
 			</div>
 		);

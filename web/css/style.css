@@ -3,6 +3,9 @@
 		margin-left: 0 ;
 		margin-top:10px;
 	}
+	.search_categories{
+		display: block;
+	}
 }
 
 
@@ -257,9 +260,14 @@ option:enabled {
 	color: #ff8177;
 }
 
+.invalid_media {
+	background-color: black;
+}
+
 .icon {
 	font-size: 20px;
 	text-shadow: 0 0 10px black;
+	cursor: pointer;
 }
 
 .lightbox {
@@ -267,10 +275,12 @@ option:enabled {
 	top: 50%;
 	left: 50%;
 	border: 2px solid #FFF;
-	background: #FFF;
+	background: black;
 	z-index: 1002;
 	transform: translate(-50%, -50%);
     cursor: auto;
+	min-height: 300px;
+	min-width: 350px;
 }
 
 .lightbox .media{
@@ -300,8 +310,9 @@ option:enabled {
 	width: 100%;
 	text-align: center;
 	background: rgba(0,0,0,.8);
+	overflow-y: auto;
+	max-height: 130px;
 }
-
 
 .lightbox:hover .lightbox_overlay {
 	opacity: 1;
@@ -315,8 +326,9 @@ option:enabled {
 
 .bottom {
 	position: absolute;
-	bottom:0;
+	bottom:1px;
 }
+
 
 .left {
 	position: absolute;
@@ -325,5 +337,37 @@ option:enabled {
 
 .right {
 	position: absolute;
-	right:0;
+	right:5px;
+}
+
+.vcenter {
+	position: absolute;
+	top: 50%;
+	transform: translate(0%, -50%);
+}
+
+.center {
+	text-align: center !important;
+}
+
+.test {
+	position: absolute;
+	left: 101%;
+}
+
+.search_categories{
+	display: inline-block;
+}
+
+.search_field_group{
+	display: inline-block;
+	margin-right: 10px;
+	margin-left: 13px;
+}
+
+.search_group {
+	border: 1px solid gray;
+	display: table;
+	padding: 5px;
+	margin-top: 5px;
 }
