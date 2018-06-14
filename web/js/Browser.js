@@ -58,27 +58,29 @@ class MediaContainer extends React.Component {
 		if(this.elements.length > 1){
 			console.log('+Found Media Gallery: ', '('+this.elements.length+')',this.post.title);
 		}
-		this._next = this.next.bind(this);
+		this.reddit_url = 'http://redd.it/' + (this.post.parent? this.post.parent : this.post.id).replace('t3_','');
 		this.state = {index: 0, lightbox: false};
+		this._next = this.next.bind(this);
+
 		this._close = this.close.bind(this);
 	}
 
 	parse_media(file){
-		let ext = file[1].split('.').pop();
+		let ext = file.path.split('.').pop();
 		switch(ext){
 			case 'jpg':
 			case 'jpeg':
 			case 'png':
 			case 'bmp':
 			case 'gif':
-				return <img src={'/file?id='+file[0]} style={{width:"100%"}} className={'media'}/>;
+				return <img src={'/file?id='+file.token} style={{width:"100%"}} className={'media'}/>;
 			case 'mp4':
 			case "webm":
 				return <video width="100%" className={'media'} autoPlay controls muted loop>
-					<source src={'/file?id='+file[0]} type={"video/"+ext} />
+					<source src={'/file?id='+file.token} type={"video/"+ext} />
 				</video>;
 			default:
-				console.log('Cannot handle media:', file);
+				console.log('Cannot handle media:', file.path);
 				return <div style={{width:"100%", height:"100px"}} className={'media'}>Empty</div>;
 		}
 	}
@@ -109,7 +111,7 @@ class MediaContainer extends React.Component {
 					{this.elements[this.state.index]}
 					<div className={'lightbox_overlay top'}>
 						<h3>{this.post.title}</h3>
-						<p>{this.post.author}</p>
+						<a href={this.reddit_url} target={'_blank'}><p>{this.post.author}</p></a>
 					</div>
 					<div className={'lightbox_overlay bottom'}>
 						{this.post.body}
