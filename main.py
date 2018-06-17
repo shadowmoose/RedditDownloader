@@ -5,6 +5,7 @@ __version__ = "2.2"
 import argparse
 import sys
 import os
+import time
 
 
 SCRIPT_BASE = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
@@ -20,8 +21,12 @@ parser.add_argument("--category.setting", help="Override the given setting.", ac
 parser.add_argument("--list_settings", help="Display a list of overridable settings.", action="store_true")
 parser.add_argument("--no_ui", '-noui', help="Disable the WebUI from running on this run.", action="store_true")
 parser.add_argument("--version", '-v', help="Print the current version and exit.", action="store_true")
+parser.add_argument("--wizard", '-w', help="Legacy, no longer does anything.", action="store_true")
 args, unknown_args = parser.parse_known_args()
 
+if args.wizard:
+	print('The Wizard has been replaced by the built-in WebUI.')
+	sys.exit(1)
 
 if args.update or args.update_only: #!cover
 	from classes.util.updater import Updater
@@ -147,7 +152,13 @@ if not args.test and not args.no_ui and eelwrapper.start(os.path.join(SCRIPT_BAS
 	except KeyboardInterrupt:
 		print('\nUser terminated WebUI loop.')
 else:
-	p.run()
+	try:
+		p.start()
+		while p.running:
+			time.sleep(0.25)
+	except KeyboardInterrupt:
+		stringutil.error('\nProcess interrupted by user! Shutting down...')
+		p.stop()
 
 
 
