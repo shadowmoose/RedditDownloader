@@ -2,6 +2,7 @@ import time
 import datetime
 import re
 import sys
+import threading
 from colorama import Fore
 from classes.util import settings
 from classes.processing.elementprocessor import ElementProcessor
@@ -9,8 +10,11 @@ from classes.reddit.redditloader import RedditLoader
 from classes.util import stringutil as su
 
 
-class RMD(object):
+class RMD(threading.Thread):
 	def __init__(self, source_patterns=None, test=False):
+		super().__init__()
+		self.daemon = False
+		self.running = False
 		self.sources = source_patterns
 		self.sources = self.load_sources()
 		self.test = test
@@ -19,6 +23,7 @@ class RMD(object):
 
 
 	def run(self):
+		self.running = True
 		_start_time = time.time()
 		try:
 			self.reddit = RedditLoader(self.test)
@@ -27,7 +32,7 @@ class RMD(object):
 			self.processor.run()
 		except KeyboardInterrupt:
 			print("Interrupted by User.")
-			self.stop()
+		self.stop()
 		_total_time = str( datetime.timedelta(seconds= round(time.time() - _start_time)) )
 		su.print_color(Fore.GREEN, 'Found %s posts missing files - with %s new files downloaded - and %s files that cannot be found.' %
 			  (self.processor.total_posts, self.processor.total_urls, self.processor.failed_urls))
@@ -39,6 +44,7 @@ class RMD(object):
 			self.reddit.stop()
 		if self.processor:
 			self.processor.stop_process()
+		self.running = False
 
 
 	def load_sources(self): #!cover
