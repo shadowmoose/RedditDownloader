@@ -272,7 +272,7 @@ def _adapt(obj): #!cover
 		for r in rm:
 			del obj[r]
 		obj['interface'] = {}
-		obj['interface']['start_server'] = False  # Default to old behavior.
+		#obj['interface']['start_server'] = False  # Default to old behavior.
 		print("Adapted from Settings version 3 -> 4!")
 		converted = True
 
