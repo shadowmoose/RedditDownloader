@@ -11,7 +11,7 @@ install:
 - python ./classes/tools/encryptor.py decrypt ./tests/Legacy-Manifest.json.gz.enc ./download/Manifest.json.gz
 script:
 - coverage run main.py --test --update_only --skip_pauses
-- coverage run main.py --test --skip_pauses
+- coverage run main.py --test --skip_pauses --interface.start_server=false
 after_success:
 - COVERALLS_PARALLEL=true coveralls
 notifications:
