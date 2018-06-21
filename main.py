@@ -6,6 +6,7 @@ import argparse
 import sys
 import os
 import time
+import subprocess
 
 
 SCRIPT_BASE = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
@@ -19,14 +20,11 @@ parser.add_argument("--skip_pauses", help="Skip all skippable pauses.", action="
 parser.add_argument("--source", '-s', help="Run each loaded Source only if alias matches the given pattern. Can pass multiple patterns.", type=str, action='append', metavar='')
 parser.add_argument("--category.setting", help="Override the given setting.", action="store_true")
 parser.add_argument("--list_settings", help="Display a list of overridable settings.", action="store_true")
-parser.add_argument("--no_ui", '-noui', help="Disable the WebUI from running on this run.", action="store_true")
 parser.add_argument("--version", '-v', help="Print the current version and exit.", action="store_true")
 parser.add_argument("--wizard", '-w', help="Legacy, no longer does anything.", action="store_true")
+parser.add_argument("--no_restart", help="If RMD should not be capable of restarting itself.", action="store_true")
 args, unknown_args = parser.parse_known_args()
 
-if args.wizard:
-	print('The Wizard has been replaced by the built-in WebUI.')
-	sys.exit(1)
 
 if args.update or args.update_only: #!cover
 	from classes.util.updater import Updater
@@ -49,6 +47,9 @@ if args.update or args.update_only: #!cover
 			print("Exiting following update bootstrap.")
 			sys.exit(0)
 
+if args.wizard:
+	print('The Wizard has been replaced by the built-in WebUI.')
+	sys.exit(1)
 
 import colorama
 from colorama import Fore
@@ -113,7 +114,7 @@ if not _loaded:
 	if not args.skip_pauses:
 		if not console.confirm('Would you like to start the WebUI to help set things up?', True):
 			stringutil.print_color(Fore.RED, "If you don't open the webUI now, you'll need to edit the settings file yourself.")
-			if console.confirm("Are you sure you'd like to edit it without the UI (if 'yes', these prompts will not show again)?"):
+			if console.confirm("Are you sure you'd like to edit settings without the UI (if 'yes', these prompts will not show again)?"):
 				settings.put('interface.start_server', False)  # Creates a save.
 				print('A settings file has been created for you, at "%s". Please customize it.' % settings_file)
 			else:
@@ -127,6 +128,23 @@ if not _loaded:
 		print('Skipping prompts is enabled, please edit the settings file yourself.')
 		settings.put('interface.start_server', False)
 		sys.exit(1)
+
+
+if settings.get('interface.start_server') and not args.no_restart and not args.test:
+	# If run in UI mode, the initial script will stick here & reboot copies as needed.
+	# A new RMD instance is only started if the last one exited with the special "restart" code.
+	# This should always be performed before any DB or PRAW initialization, because it needs neither.
+	while True:
+		print('BOOTSTRAPPING RMD...')
+		sargs = list(filter(lambda x: not x.startswith('--update'),sys.argv[:]))  # get running script args
+		sargs.insert(len(sargs), '--no_restart')  # tell the child process to not enter this loop.
+		sargs.insert(0, sys.executable)  # give it the executable
+		print('Launching: ', (sys.executable, sargs))
+		ret = subprocess.call(sargs)
+		if ret != 202:
+			sys.exit(ret)
+		print('Relaunching in 30 seconds... (CWD: %s)' % os.getcwd())
+		time.sleep(30)  #TODO: Wait for UI sockets to recycle. Maybe 60s (or a check if possible cross-platform)?
 
 
 # Initialize all database and reddit connections.
@@ -143,7 +161,7 @@ manifest.check_legacy(settings.save_base())  # Convert away from legacy Manifest
 p = RMD(source_patterns=args.source, test=args.test)
 
 # Only starts if the settings allow it to.
-if not args.test and not args.no_ui and eelwrapper.start(os.path.join(SCRIPT_BASE, 'web'), './', __version__):
+if not args.test and settings.get('interface.start_server') and eelwrapper.start(os.path.join(SCRIPT_BASE, 'web'), './', __version__):
 	print('WebUI is now in control.')
 	try:
 		while True:
