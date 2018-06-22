@@ -172,7 +172,7 @@ if not args.test and settings.get('interface.start_server') and eelwrapper.start
 else:
 	try:
 		p.start()
-		while p.running:
+		while p.is_running():
 			time.sleep(0.25)
 	except KeyboardInterrupt:
 		stringutil.error('\nProcess interrupted by user! Shutting down...')
@@ -199,7 +199,7 @@ if args.test:
 			print( ("\t%3d:%-"+padding_len+"s -> ") % (i, name) , end='')
 			name = "tests." + name
 			test = __import__(name, fromlist=[''])
-			msg,val = test.run_test(p.reddit)
+			msg,val = test.run_test(p.loader)
 			if val != 0: #!cover
 				stringutil.print_color(Fore.RED, 'FAIL: %s' % str(msg))
 				exit_values.append(1000+i)  #use a unique error code for potential help debugging.

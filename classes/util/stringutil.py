@@ -36,7 +36,7 @@ def color(string_out, text_color):
 
 def print_color(fore_color, string_output, **kwargs):
 	""" Print() the given string colored as desired. """
-	print(fore_color + string_output + Style.RESET_ALL, **kwargs)
+	print(color(fore_color, string_output), **kwargs)
 
 
 def out(obj, print_val=True, text_color=None): #!cover

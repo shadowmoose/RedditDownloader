@@ -14,25 +14,25 @@ class RMD(threading.Thread):
 	def __init__(self, source_patterns=None, test=False):
 		super().__init__()
 		self.daemon = False
-		self.running = False
 		self.sources = source_patterns
 		self.sources = self.load_sources()
 		self.test = test
-		self.reddit = None
+		self.loader = None
 		self.processor = None
 
 
 	def run(self):
-		self.running = True
 		_start_time = time.time()
 		try:
-			self.reddit = RedditLoader(self.test)
-			self.reddit.scan(self.sources) # Starts the scanner thread.
-			self.processor = ElementProcessor(self.reddit)
-			self.processor.run()
-		except KeyboardInterrupt:
-			print("Interrupted by User.")
-		self.stop()
+			self.loader = RedditLoader(self.test)
+			self.loader.scan(self.sources) # Starts the scanner thread.
+			self.processor = ElementProcessor(self.loader)
+			self.processor.run()  # hangs until processor runs out of elements.
+			# Reaching this point should indicate that the loader & processor are finished.
+		except Exception:
+			raise
+		finally:
+			self.stop()
 		_total_time = str( datetime.timedelta(seconds= round(time.time() - _start_time)) )
 		su.print_color(Fore.GREEN, 'Found %s posts missing files - with %s new files downloaded - and %s files that cannot be found.' %
 			  (self.processor.total_posts, self.processor.total_urls, self.processor.failed_urls))
@@ -40,11 +40,14 @@ class RMD(threading.Thread):
 
 
 	def stop(self):
-		if self.reddit:
-			self.reddit.stop()
+		if self.loader:
+			self.loader.stop()
 		if self.processor:
 			self.processor.stop_process()
-		self.running = False
+
+
+	def is_running(self):
+		return super(RMD, self).isAlive() or self.loader.isAlive() or self.processor.is_running()
 
 
 	def load_sources(self): #!cover
