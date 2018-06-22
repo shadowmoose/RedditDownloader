@@ -4,6 +4,7 @@ python:
 - '3.5'
 - '3.6'
 install:
+- pip install -U pip wheel
 - pip install -r requirements.txt
 - pip install coveralls
 - pip install pycryptodome
@@ -24,3 +25,4 @@ notifications:
     on_start: change
     on_cancel: never
     on_error: change
+cache: pip
