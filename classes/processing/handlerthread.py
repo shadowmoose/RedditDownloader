@@ -23,6 +23,7 @@ class HandlerThread(threading.Thread):
 
 	def __init__(self, name, e_queue):
 		threading.Thread.__init__(self)
+		self.daemon = True
 		self.name = name
 		self.log = logger.Logger(2, padding=1)
 		self.handler_log = logger.Logger(2, padding=2)

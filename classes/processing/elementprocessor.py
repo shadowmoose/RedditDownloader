@@ -12,9 +12,7 @@ class ElementProcessor:
 	def __init__(self, reddit_loader):
 		""" Creates and prepares the Processor object, with the given RedditLoader to provide RedditElements. Takes a loaded Settings object to find the configured save path. """
 		self._loader = reddit_loader
-		self.handlers = []
 		self.threads = []
-
 		self.total_urls = 0
 		self.total_posts = 0
 		self.failed_urls = 0
@@ -23,17 +21,17 @@ class ElementProcessor:
 	def run(self):
 		max_threads = settings.get('threading.max_handler_threads')
 		HandlerThread.reset()
+		self.threads = []
 		#start threads
 		for i in range(max_threads):
 			ht = HandlerThread('Handler - %s' % (i+1), self._loader)
-			ht.daemon = True
 			ht.start()
 			self.threads.append(ht)
 		try:
 			clear = settings.get('threading.display_clear_screen')
 			refresh_rate = max(0.1, settings.get('threading.display_refresh_rate'))
 
-			while any([t.keep_running for t in self.threads]):
+			while self.is_running():  # Threads are still running...
 				self.redraw(clear)
 				# Sleep...
 				if refresh_rate > 5: #!cover
@@ -52,8 +50,9 @@ class ElementProcessor:
 			self.redraw(clear)
 			print("\r\nQueue finished! (Total Processed: %s)" % self._loader.count_total())
 		except:
-			self.stop_process()
 			raise
+		finally:
+			self.stop_process()
 	#
 
 
@@ -80,14 +79,16 @@ class ElementProcessor:
 		if not clear:
 			print('\n\n\n\n')
 
-		out+= stringutil.color("Processing Posts: (~%s in queue, %s %s)" % (
+		stopping = all(not th.keep_running for th in self.threads)
+		out+= stringutil.color("Processing Posts: (~%s in queue, %s %s)%s" % (
 			self._loader.count_remaining(),
 			self._loader.count_total(),
-			'found so far' if self._loader.is_running() else 'Total'
+			'found so far' if self._loader.is_running() else 'Total',
+			'' if not stopping else ' - Shutting down gracefully...'
 		), colorama.Fore.CYAN )
 		out+= "\n"
 		for th in self.threads:
-			if th.keep_running:
+			if th.isAlive():
 				head_color = stringutil.Fore.GREEN
 			else:
 				head_color = stringutil.Fore.LIGHTYELLOW_EX
@@ -97,6 +98,8 @@ class ElementProcessor:
 		# noinspection PyBroadException
 		try:
 			print(out.rstrip(), end='')
+			if stopping:
+				stringutil.error('\nWaiting for running downloads before shutting down gracefully...')
 		except:
 			if depth <= 1:
 				self.redraw(False, depth+1)
@@ -111,3 +114,6 @@ class ElementProcessor:
 		""" Signal any running threads that they should exit. Non-blocking. """
 		for th in self.threads: #!cover
 			th.keep_running = False
+
+	def is_running(self):
+		return any(th.isAlive() for th in self.threads)

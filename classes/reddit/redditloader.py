@@ -14,24 +14,24 @@ class RedditLoader(threading.Thread):
 		self._c_lock = threading.Lock()
 		self._total_count = 0
 		self._queue = queue.Queue(maxsize= 1000)
-		self._running = False
+		self._keep_running = False
 		self.daemon = True
 		self.name = 'RedditElementLoader'
 
 	
 	def run(self):
 		""" Threaded loading of elements. """
-		self._running = True
+		self._keep_running = True
 		if self._testing_cache is not None:
 			self._testing_cache = []
 
 		for source in self.sources:
 			stringutil.print_color(Fore.GREEN, 'Downloading from Source: %s' % source.get_alias())
 			for r in source.get_elements():
-				if not self._running:
+				if not self._keep_running:
 					return
 				r.set_source(source)
-				while self._running:
+				while self._keep_running:
 					try:  # Keep trying to add this element to the queue, with a timeout to catch any stop triggers.
 						self._queue.put(r, timeout=1)
 						break
@@ -43,7 +43,7 @@ class RedditLoader(threading.Thread):
 				if self._testing_cache is not None:
 					self._testing_cache.append(r)
 		#print("Element loading complete.\n")
-		self._running = False
+		self._keep_running = False
 
 
 	def scan(self, sources):
@@ -53,12 +53,12 @@ class RedditLoader(threading.Thread):
 
 
 	def stop(self):
-		self._running = False
+		self._keep_running = False
 
 
 	def is_running(self):
 		""" Check if this Loader is still running. """
-		return self._running
+		return self.isAlive()
 
 
 	def count_remaining(self):
