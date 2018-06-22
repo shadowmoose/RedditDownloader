@@ -2,8 +2,8 @@ import colorama
 import time
 import shutil
 from classes.processing.handlerthread import HandlerThread
-from classes.util import stringutil
-from classes.util import settings
+from classes.static import stringutil
+from classes.static import settings
 
 
 class ElementProcessor:

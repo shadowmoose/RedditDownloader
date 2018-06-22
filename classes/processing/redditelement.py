@@ -1,6 +1,6 @@
 import praw.models
 import copy
-from classes.util import stringutil
+from classes.static import stringutil
 
 class RedditElement(object):
 	"""

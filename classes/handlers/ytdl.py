@@ -1,6 +1,6 @@
 import youtube_dl
 import os
-from classes.util import stringutil
+from classes.static import stringutil
 
 tag = 'ytdl'
 order = 100

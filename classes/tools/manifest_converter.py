@@ -1,8 +1,8 @@
 import gzip
 import json
-from classes.util import stringutil
-from classes.util import manifest
-from classes.reddit import praw_wrapper as rd
+from classes.static import stringutil
+from classes.static import manifest
+from static import praw_wrapper as rd
 
 _verbose = False
 _converted = 0  # For testing.

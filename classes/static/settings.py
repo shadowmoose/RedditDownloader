@@ -2,7 +2,7 @@ import copy
 import json
 import os
 import random
-from classes.util.rwlock import RWLock
+from processing.rwlock import RWLock
 
 
 _file = ''

@@ -2,9 +2,8 @@ import os.path
 import sqlite3
 from contextlib import closing
 
-from classes.util import stringutil
-from classes.util import rwlock
-
+from classes.static import stringutil
+from processing import rwlock
 
 version = '2.0'
 

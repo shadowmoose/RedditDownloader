@@ -1,7 +1,7 @@
 from colorama import Fore
 import queue
 import threading
-from classes.util import stringutil
+from classes.static import stringutil
 
 class RedditLoader(threading.Thread):
 	def __init__(self, testing=False):

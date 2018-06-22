@@ -1,5 +1,5 @@
 import os
-from classes.util import manifest
+from classes.static import manifest
 
 # Check manifest was built (should always be during testing).
 def run_test(re):
