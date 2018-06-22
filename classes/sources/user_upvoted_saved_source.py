@@ -1,5 +1,5 @@
 from classes.sources import source
-import static.praw_wrapper as reddit
+import classes.static.praw_wrapper as reddit
 from classes.static.settings import Setting
 
 class UserUpvotedSaved(source.Source):

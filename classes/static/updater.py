@@ -157,7 +157,7 @@ class Updater:
 			with open(path, 'r') as f:
 				data=f.read()
 			return self._git_hash(data)
-		except FileNotFoundError as fnf:
+		except FileNotFoundError:
 			print("Oops, a local file doesn't exist that we were expecting to check!")
 			print("Assuming it's gone. This is probably correctable.")
 			return None

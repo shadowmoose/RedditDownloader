@@ -6,7 +6,7 @@ import praw
 import prawcore
 from colorama import Fore
 from classes.static import stringutil
-from processing.redditelement import RedditElement
+from classes.processing.redditelement import RedditElement
 
 _credentials = None
 _user = None

@@ -6,7 +6,7 @@ import threading
 from colorama import Fore
 from classes.static import settings
 from classes.processing.elementprocessor import ElementProcessor
-from processing.redditloader import RedditLoader
+from classes.processing.redditloader import RedditLoader
 from classes.static import stringutil as su
 
 
