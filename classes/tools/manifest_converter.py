@@ -2,7 +2,7 @@ import gzip
 import json
 from classes.static import stringutil
 from classes.static import manifest
-from static import praw_wrapper as rd
+from classes.static import praw_wrapper as rd
 
 _verbose = False
 _converted = 0  # For testing.

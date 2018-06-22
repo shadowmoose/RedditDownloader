@@ -59,7 +59,7 @@ from classes.static import console
 from classes.static import manifest
 from classes.webserver import eelwrapper
 from classes.downloader import RMD
-from static import praw_wrapper
+from classes.static import praw_wrapper
 
 colorama.init(convert=True)
 stringutil.print_color(Fore.GREEN, """
