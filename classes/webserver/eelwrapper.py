@@ -37,7 +37,7 @@ def start(web_dir, file_dir, rmd_version):
 	}
 
 	eel.init(web_dir)
-	eel.start('index.html', options=options, block=False)
+	eel.start('index.html', options=options, block=False, callback=_websocket_close)
 	# interface.port
 	print('Started WebUI!')
 	if browser:
@@ -48,14 +48,12 @@ def start(web_dir, file_dir, rmd_version):
 	return True
 
 
-def _websocket_close():
-	print('A WebUI just closed.')
+def _websocket_close(page, websockets):
+	print('A WebUI just closed. (%s)' % page)
 	eel.sleep(2.0)
-	# noinspection PyProtectedMember
-	if len(eel._websockets) == 0 and not settings.get('interface.keep_open'):
+	if len(websockets) == 0 and not settings.get('interface.keep_open'):
 		print('WebUI keep_open is disabled, and all open clients have closed.\nExiting.')
 		sys.exit()
-eel._websocket_close = _websocket_close
 
 
 @eel.btl.route('/file')
