@@ -3,11 +3,9 @@
 branch = False
 source = .
 omit =
-    # omit Wizards, which rely on human input.
-    ./classes/wizards/*
-    ./classes/util/console.py
-    ./classes/util/updater.py
-    ./classes/util/tools/*
+    ./classes/static/console.py
+    ./classes/static/updater.py
+    ./classes/tools/*
     ./tests/*
 [report]
 exclude_lines =
