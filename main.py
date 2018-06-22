@@ -27,7 +27,7 @@ args, unknown_args = parser.parse_known_args()
 
 
 if args.update or args.update_only: #!cover
-	from classes.util.updater import Updater
+	from classes.static.updater import Updater
 	upd = Updater('shadowmoose', 'RedditDownloader', __version__, args.skip_pauses) # Pull from the latest release
 	upd.run()
 
@@ -53,14 +53,13 @@ if args.wizard:
 
 import colorama
 from colorama import Fore
-from classes.util import settings
-from classes.util import stringutil
-from classes.util import console
-from classes.util import manifest
+from classes.static import settings
+from classes.static import stringutil
+from classes.static import console
+from classes.static import manifest
 from classes.webserver import eelwrapper
 from classes.downloader import RMD
-from classes.reddit import praw_wrapper
-
+from static import praw_wrapper
 
 colorama.init(convert=True)
 stringutil.print_color(Fore.GREEN, """
@@ -153,7 +152,7 @@ if not os.path.isdir(settings.save_base()):
 os.chdir(settings.save_base()) # Hop into base dir, so all file work can be relative.
 # Authenticate and prepare to scan:
 praw_wrapper.init(client_id=settings.get('auth.client_id'), client_secret=settings.get('auth.client_secret'),
-			password=settings.get('auth.password'), user_agent=settings.get('auth.user_agent'), username=settings.get('auth.username'))
+				  password=settings.get('auth.password'), user_agent=settings.get('auth.user_agent'), username=settings.get('auth.username'))
 praw_wrapper.login()
 manifest.create('manifest.sqldb')
 manifest.check_legacy(settings.save_base())  # Convert away from legacy Manifest.

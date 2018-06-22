@@ -4,10 +4,10 @@ import re
 import sys
 import threading
 from colorama import Fore
-from classes.util import settings
+from classes.static import settings
 from classes.processing.elementprocessor import ElementProcessor
-from classes.reddit.redditloader import RedditLoader
-from classes.util import stringutil as su
+from processing.redditloader import RedditLoader
+from classes.static import stringutil as su
 
 
 class RMD(threading.Thread):

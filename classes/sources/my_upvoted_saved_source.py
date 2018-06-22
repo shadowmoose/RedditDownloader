@@ -1,5 +1,5 @@
 from classes.sources import source
-import classes.reddit.praw_wrapper as reddit
+import static.praw_wrapper as reddit
 
 
 

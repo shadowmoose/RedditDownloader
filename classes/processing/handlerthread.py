@@ -5,9 +5,9 @@ import pkgutil
 
 import classes.processing.logger as logger
 import classes.handlers as handlers
-from classes.util import hashjar, stringutil
-from classes.util import manifest
-from classes.util import settings
+from classes.static import hashjar, stringutil
+from classes.static import manifest
+from classes.static import settings
 
 
 class HandlerThread(threading.Thread):

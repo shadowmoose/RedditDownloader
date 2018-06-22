@@ -2,10 +2,10 @@ import eel
 import sys
 import os
 import base64
-from classes.util import settings
+from classes.static import settings
 from classes.sources import source
 from classes.filters import filter
-from classes.util import manifest
+from classes.static import manifest
 
 
 _file_dir = None

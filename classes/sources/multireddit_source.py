@@ -1,6 +1,6 @@
 from classes.sources import source
-import classes.reddit.praw_wrapper as reddit
-from classes.util.settings import Setting
+import static.praw_wrapper as reddit
+from classes.static.settings import Setting
 
 class MultiRedditSource(source.Source):
 	def __init__(self):
