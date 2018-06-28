@@ -8,7 +8,6 @@ class UserPostsSource(source.Source):
 		super().__init__(source_type='subreddit-posts-source', description="The submissions in a given subreddit")
 		self._elements = []
 
-
 	def get_elements(self):
 		for p in reddit.subreddit_posts(
 				sub      = self.data['subreddit'],
@@ -18,13 +17,11 @@ class UserPostsSource(source.Source):
 			if self.check_filters(p):
 				yield p
 
-
 	def get_settings(self):
 		yield Setting('subreddit', '', etype='str', desc='Name of this user\'s multireddit:')
 		yield Setting('order', None, etype='str', desc='Order submissions by:', opts=reddit.post_orders())
 		yield Setting('time', None, etype='str', desc='Select a time span to filter by:', opts=reddit.time_filters())
 		yield Setting('limit', 0, etype='int', desc='How many would you like to download? (0 for no limit):')
-
 
 	def get_config_summary(self):
 		lim = self.data['limit']

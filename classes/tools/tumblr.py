@@ -1,7 +1,7 @@
 import requests
 
-def get_page(url):
 
+def get_page(url):
 	# remove embed
 	if "/embed" in url:
 		url = url[:-6]
@@ -31,5 +31,6 @@ def get_page(url):
 	print(url)
 	print(request.status_code, request.url)
 	return request.text
+
 
 print(get_page(input('URL: ').strip()))

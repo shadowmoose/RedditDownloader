@@ -18,6 +18,7 @@ import threading
 
 __author__ = "Mateusz Kobos"
 
+
 class RWLock:
 	"""Synchronization object used in a solution of so-called second
 	readers-writers problem. In this problem, many readers can simultaneously
@@ -65,12 +66,9 @@ class RWLock:
 		self.__no_writers.release()
 		self.__write_switch.release(self.__no_readers)
 
-
 	def __call__(self, a_type):
 		""" This lock secretly hands out private objects that can handle __enter__ and __exit__ for it. """
 		return _Lockr(self, a_type)
-
-
 
 
 class _LightSwitch:
@@ -95,7 +93,6 @@ class _LightSwitch:
 		self.__mutex.release()
 
 
-
 class _Lockr:
 	def __init__(self, targ_lock, a_type):
 		self.lock = targ_lock
@@ -103,22 +100,21 @@ class _Lockr:
 
 	def __enter__(self):
 		if 'r' in self.type:
-			#print('+Obtaining reader lock [%s].' % id(self))
+			# print('+Obtaining reader lock [%s].' % id(self))
 			self.lock.reader_acquire()
 			return self
 		if 'w' in self.type:
-			#print('-Obtaining writer lock [%s].' % id(self))
+			# print('-Obtaining writer lock [%s].' % id(self))
 			self.lock.writer_acquire()
 			return self
 		raise Exception('Bad lock type.')
-
 
 	def __exit__(self, exc_type, exc_val, exc_tb):
 		if self.type == 'r':
 			self.lock.reader_release()
 		if self.type == 'w':
 			self.lock.writer_release()
-		#print('!Released "%s" lock [%s].' % (self.type, id(self)))
+		# print('!Released "%s" lock [%s].' % (self.type, id(self)))
 
 
 if __name__ == '__main__':
@@ -134,6 +130,6 @@ if __name__ == '__main__':
 		print('\tWrite lock acquired!')
 		print('SHOULD PERMA-FREEZE NOW:')
 		with rwl('r'):
-			raise Exception('Writer didn\'t lock readers out properly!') # This should never happen if it's working.
+			raise Exception('Writer didn\'t lock readers out properly!')  # This should never happen if it's working.
 		with rwl('w'):
-			raise Exception('Writer didn\'t lock other writers out properly!') # This can never happen, but here it is.
+			raise Exception('Writer didn\'t lock other writers out properly!')  # This can never happen, but here it is.

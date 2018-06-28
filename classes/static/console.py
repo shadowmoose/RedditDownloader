@@ -11,7 +11,7 @@ def col_input(prompt, color=Fore.LIGHTYELLOW_EX):
 	return input()
 
 
-def number(prompt, min_num = None, max_num = None, round_val=True):
+def number(prompt, min_num=None, max_num=None, round_val=True):
 	"""
 	Prompts the user for a number.
 	:param prompt: The string to display
@@ -47,7 +47,7 @@ def prompt_list(prompt, options, allow_none=False):
 	if allow_none:
 		options.append(('Cancel', None))
 	for idx, opt in enumerate(options):
-		print("\t%s: %s" % (idx+1, opt[1]) )
+		print("\t%s: %s" % (idx+1, opt[1]))
 	select = number("Choose an option", 1, len(options), round_val=True) - 1
 	return options[select][0]
 
@@ -60,7 +60,7 @@ def confirm(prompt, default=None):
 	elif not default:
 		defa = 'y/[n]'
 	inp = col_input("%s(%s): " % (prompt, defa))
-	if inp=='' and default is not None:
+	if inp == '' and default is not None:
 		return default
 	return 'y' in inp.lower()
 
@@ -70,7 +70,7 @@ def string(prompt, auto_strip=True):
 	ret = col_input("%s: " % prompt)
 	if auto_strip:
 		ret = ret.strip()
-	if ret=='':
+	if ret == '':
 		return None
 	return ret
 
@@ -83,7 +83,7 @@ def pause():
 
 if __name__ == '__main__':
 	print(prompt_list('Test non-tuple:', ['one', 'two', 'three'], allow_none=True))
-	ans = prompt_list('Available Modules:', [('Module one', 'one'),('Module two', 'two'),('Module three', 'three')])
+	ans = prompt_list('Available Modules:', [('Module one', 'one'), ('Module two', 'two'), ('Module three', 'three')])
 	print("Chose: %s" % ans)
 
 	print(confirm("Everything look good?", True))

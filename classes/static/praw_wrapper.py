@@ -12,17 +12,18 @@ _credentials = None
 _user = None
 _reddit = None
 
-def init( client_id, client_secret, password, username, user_agent):
+
+def init(client_id, client_secret, password, username, user_agent):
 	"""
 	Sets the credentials to sign in with.
 	"""
 	global _credentials
 	_credentials = {
-		'client_id':client_id,
-		'client_secret':client_secret,
-		'password':password,
-		'user_agent':user_agent,
-		'username':username
+		'client_id': client_id,
+		'client_secret': client_secret,
+		'password': password,
+		'user_agent': user_agent,
+		'username': username
 	}
 
 
@@ -75,13 +76,11 @@ def user_liked_saved(username, scan_upvoted=True, scan_saved=True, scan_sub=None
 		else:
 			redditor = _reddit.redditor(username)
 		if scan_saved:
-			#stringutil.print_color(Fore.CYAN, '\tLoading %s\'s Saved Posts...' % redditor.name)
 			for saved in redditor.saved(limit=None, params=params):
 				re = RedditElement(saved)
 				yield re
 
 		if scan_upvoted:
-			#stringutil.print_color(Fore.CYAN, '\tLoading %s\'s Upvoted Posts...' % redditor.name)
 			for upvoted in redditor.upvoted(limit=None, params=params):
 				re = RedditElement(upvoted)
 				yield re
@@ -124,7 +123,8 @@ def multi_reddit(username, reddit_name, order_by='new', limit=None, time='all'):
 
 
 def get_submission_comments(t3_id):
-	""" Implemented initially for converting invalid IDs, returns a generator of top comments from the given Submission. """
+	""" Implemented initially for converting invalid IDs.
+	Returns a generator of top comments from the given Submission. """
 	assert t3_id.startswith('t3_')
 	t3_id = t3_id.lstrip('t3_')  # Convert to expected format.
 	submission = _reddit.submission(id=t3_id)
@@ -135,7 +135,7 @@ def get_submission_comments(t3_id):
 def _praw_apply_filter(praw_object, order_by='new', limit=None, time='all'):
 	""" Accepts a Praw object (subreddit/multireddit/user posts/etc) and applies filters to it. Returns a Generator. """
 	order = [o for o in post_orders() if o[0] == order_by]
-	assert len(order) > 0 # The order must be a valid value.
+	assert len(order) > 0  # The order must be a valid value.
 	assert time in time_filters()
 	if limit < 1:
 		limit = None
