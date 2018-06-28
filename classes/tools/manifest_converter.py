@@ -7,6 +7,7 @@ from classes.static import praw_wrapper as rd
 _verbose = False
 _converted = 0  # For testing.
 
+
 def load(file):
 	with gzip.GzipFile(file, 'rb') as data_file:
 		data = json.loads(data_file.read().decode('utf8'))
@@ -63,4 +64,3 @@ def convert(save_base, data):
 		manifest.direct_insert_post(e['id'], e['author'], e['source_alias'], e['subreddit'], e['title'], e['type'], e['files'], e['parent'], body)
 		_converted += 1
 	print('Comments that cannot be converted: %s' % broken)
-

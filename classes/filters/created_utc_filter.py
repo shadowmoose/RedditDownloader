@@ -10,4 +10,4 @@ class UTCFilter(filter.Filter):
 		"""  Overrides default to convert user-supplied string dates to timestamps.  """
 		if stringutil.is_numeric(val):
 			return val
-		raise Exception("Cannot load this Filter: Expects time in a numeric UTC timestamp.") #!cover
+		raise Exception("Cannot load this Filter: Expects time in a numeric UTC timestamp.")  # !cover

@@ -1,6 +1,7 @@
 submissions = 5
 comments = 1
 
+
 # Checks how many, and which types, of posts/comments we've found.
 def run_test(re):
 	types_found = {}
@@ -12,5 +13,5 @@ def run_test(re):
 			types_found[e.type] = 1
 	# Check that we found the correct # of posts/comments.
 	if types_found['Comment'] != comments or types_found['Submission'] != submissions:
-		return 'Invalid posts or comment parsing: '+str(types_found) , 1 #!cover
+		return 'Invalid posts or comment parsing: '+str(types_found), 1  # !cover
 	return '', 0

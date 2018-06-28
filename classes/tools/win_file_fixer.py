@@ -2,6 +2,7 @@
 
 import os
 
+
 def get_short_path_name(long_name):
 	"""
 	Gets the short path name of a given long path.
@@ -22,13 +23,12 @@ def get_short_path_name(long_name):
 			output_buf_size = needed
 
 
-
 def repair_subdirs(parent):
 	if os.name != 'nt':
 		print("This is only for Windows, as it is the only platform to experience the bug this fixes.")
 		return
 	dirs = ([x[0] for x in os.walk(parent)])
-	dirs = sorted(dirs, reverse=True)# Should put subdirs first.
+	dirs = sorted(dirs, reverse=True)  # Should put subdirs first.
 	for d in dirs:
 		short = get_short_path_name(d)
 		d = os.path.abspath(d)
@@ -39,10 +39,9 @@ def repair_subdirs(parent):
 		try:
 			os.rename(short, new_file)
 			print("Renamed file: [%s]  ->  [%s]  (Short: %s)" % (d, new_file, short))
-		except:
+		except Exception:
 			print("Hit error renaming directory: ", d)
 			pass
-
 
 
 if __name__ == '__main__':

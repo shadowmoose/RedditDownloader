@@ -19,6 +19,7 @@ _rmd_version = '0'
 	See simple documentation: https://bottlepy.org/docs/dev/tutorial.html
 """
 
+
 def start(web_dir, file_dir, rmd_version):
 	global _file_dir, _web_dir, _rmd_version
 	_file_dir = os.path.abspath(file_dir)
@@ -72,9 +73,11 @@ def _downloaded_files():
 def api_current_status():
 	return {'current_version': _rmd_version}
 
+
 @eel.expose
 def api_get_settings():
 	return settings.to_obj(save_format=False, include_private=False)
+
 
 @eel.expose
 def api_save_settings(settings_obj):
@@ -90,6 +93,7 @@ def api_save_settings(settings_obj):
 		return False
 	return True
 
+
 @eel.expose
 def api_get_sources():
 	ret = {'available': [], 'active': [], 'filters': {}}
@@ -100,6 +104,7 @@ def api_get_sources():
 	ret['filters']['available'] = [f.to_js_obj() for f in filter.get_filters()]
 	ret['filters']['operators'] = [f.value for f in filter.Operators]
 	return ret
+
 
 @eel.expose
 def api_save_sources(new_obj):
@@ -136,6 +141,7 @@ def api_searchable_fields():
 @eel.expose
 def api_search_posts(fields, term):
 	obj = {}
+
 	def b64(str_in):
 		return base64.encodebytes(str_in.encode()).decode()
 
@@ -155,8 +161,8 @@ def api_search_posts(fields, term):
 		else:
 			for f in explode(p['file_path']):
 				obj[p['id']]['files'].append(f)
-	#import json
-	#print('Sending file list:', json.dumps(list(obj.values()), indent=4, sort_keys=True, separators=(',', ': ')))
+	# import json
+	# print('Sending file list:', json.dumps(list(obj.values()), indent=4, sort_keys=True, separators=(',', ': ')))
 	return list(obj.values())
 
 

@@ -5,19 +5,16 @@ from classes.static import stringutil
 tag = 'ytdl'
 order = 100
 
+
 class Logger(object):
 	def debug(self, msg):
 		pass
 
 	def warning(self, msg):
-		pass #!cover
+		pass  # !cover
 
 	def error(self, msg):
-		pass #!cover
-		# if 'Unsupported' not in msg:
-			#if ';' in msg:
-			#	msg = msg.split(';')[0].strip()
-			#stringutil.error("\t\tYTDL :: %s" % msg)
+		pass  # !cover
 
 
 class YTDLWrapper:
@@ -25,22 +22,20 @@ class YTDLWrapper:
 		self.file = None
 		self.log = log
 
-
 	def ytdl_hook(self, d):
 		if '_percent_str' in d:
 			self.log.out(0, 'Downloading video...')
-			self.log.out(1,"+ Downloading:: %s" % d['_percent_str'])
+			self.log.out(1, "+ Downloading:: %s" % d['_percent_str'])
 		if 'filename' in d:
 			self.file = str(d['filename'])
 		if 'status' in d and d['status'] == 'finished':
 			self.log.out(1, '+ Done downloading, now converting ...')
 
-
 	def run(self, url, data):
 		ydl_opts = {
 			'logger': Logger(),
 			'progress_hooks': [self.ytdl_hook],
-			'outtmpl': data['single_file'] % '.%(ext)s', # single_file only needs the extension. In this case, use the YTDL ext format.
+			'outtmpl': data['single_file'] % '.%(ext)s',  # single_file only needs the extension.
 			'http_headers': {'User-Agent': data['user_agent']},
 			'socket_timeout': 10
 		}
@@ -56,7 +51,8 @@ class YTDLWrapper:
 		return self.file
 
 
-# Return filename/directory name of created file(s), False if a failure is reached, or None if there was no issue, but there are no files.
+# Return filename/directory name of created file(s),
+#  False if a failure is reached, or None if there was no issue, but there are no files.
 def handle(url, data, log):
 	log.out(0, "Preparing YTDL Handler...")
 	# noinspection PyBroadException
@@ -69,4 +65,3 @@ def handle(url, data, log):
 	except Exception:
 		# Don't allow the script to crash due to a YTDL exception.
 		return False
-#

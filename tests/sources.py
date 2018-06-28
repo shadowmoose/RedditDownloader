@@ -29,10 +29,10 @@ def run_test(re):
 			return 'Loaded test Source by mistake.', 2
 
 	sl = sources.get_sources(source_list)
-	if len(sl)!= len(source_list):
+	if len(sl) != len(source_list):
 		return 'Error loading test source list!', 1
 	for s in sl:
-		#print(s)
+		# print(s)
 		if 'multi' not in s.type:
 			return 'Loaded source is of invalid type!', 2
 		if s.to_obj() != source_list[0]:

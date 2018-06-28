@@ -10,7 +10,6 @@ _settings = dict()
 _default_cat = 'misc'
 
 
-
 def save():
 	out = to_obj(save_format=True, include_private=True)
 	with open(_file, 'w') as o:
@@ -78,6 +77,7 @@ def to_obj(save_format=False, include_private=True):
 				obj[cat].append(opt.to_obj())
 	return obj
 
+
 def get_all():
 	""" Get all Setting objects. Used for the help printout. """
 	for __k, __v in _settings.items():
@@ -88,9 +88,10 @@ def get_all():
 def get_sources():
 	""" Builds and then returns a list of the Sources in this Settings config. """
 	from classes.sources import source
-	return source.get_sources( get('sources') )
+	return source.get_sources(get('sources'))
 
-def has_source_alias(alias): #!cover - no sources yet
+
+def has_source_alias(alias):  # !cover - no sources yet
 	""" Check if the given source alias exists. """
 	sources = get_sources()
 	for s in sources:
@@ -98,7 +99,8 @@ def has_source_alias(alias): #!cover - no sources yet
 			return True
 	return False
 
-def add_source(new_source, prevent_duplicate=True, save_after=True): #!cover - no sources yet
+
+def add_source(new_source, prevent_duplicate=True, save_after=True):  # !cover - no sources yet
 	""" Adds the given source to the JSON-encoded Settings data. Will not add a duplicate Source alias.
 		Returns if the Source was added
 	"""
@@ -108,6 +110,7 @@ def add_source(new_source, prevent_duplicate=True, save_after=True): #!cover - n
 	new_sources.append(new_source)
 	put('sources', [s.to_obj() for s in new_sources], save_after=save_after)
 	return True
+
 
 def remove_source(source, save_after=True):
 	""" Removes the given Source from the list of sources, and resaves (if set). """
@@ -119,9 +122,11 @@ def save_base():
 	""" The base folder pattern to save to. """
 	return get('output.base_dir')
 
+
 def save_subdir():
 	""" The save path's subdirectory pattern. """
 	return get('output.subdir_pattern')
+
 
 def save_filename():
 	""" The save path's filename pattern. """
@@ -132,7 +137,7 @@ class Setting(object):
 	def __init__(self, name, value, desc='', etype='str', public=True, opts=None):
 		self.name = name
 		self._value = None
-		self.type = str( etype )
+		self.type = str(etype)
 		self.category = None
 		self.public = public
 		self.description = desc
@@ -213,7 +218,7 @@ add("threading", Setting("display_clear_screen", True, desc="If it's okay to cle
 add("threading", Setting("display_refresh_rate", 5, desc="How often the UI should update progress, in seconds.", etype="int"))
 
 add("interface", Setting("start_server", True, desc="If the WebUI should be available.", etype="bool"))
-add("interface", Setting("browser", 'chrome-app', desc="Browser to auto-open UI in.", etype="str", opts=[('chrome-app','Chrome Application Mode (recommended)'), ('default browser', 'The default system browser'), ('off', "Don't auto-open a browser")]))
+add("interface", Setting("browser", 'chrome-app', desc="Browser to auto-open UI in.", etype="str", opts=[('chrome-app', 'Chrome Application Mode (recommended)'), ('default browser', 'The default system browser'), ('off', "Don't auto-open a browser")]))
 add("interface", Setting("keep_open", False, desc="If True, the WebUI will stay available after the browser closes.", etype='bool'))
 add("interface", Setting("port", 7505, desc="The port to open the WebUI on.", etype="int"))
 add("interface", Setting("host", 'localhost', desc="The host to bind on."))
@@ -223,8 +228,7 @@ add(None, Setting("sources", [{'alias': 'default-downloader', 'data': {}, 'filte
 # ======================================
 
 
-
-def _adapt(obj): #!cover
+def _adapt(obj):  # !cover
 	""" Convert old versions of the Settings files up to the newest version. """
 	version = 1
 	converted = False
@@ -238,7 +242,7 @@ def _adapt(obj): #!cover
 		obj['meta-version'] = 2
 		obj['sources'] = {}
 		from classes.sources.my_upvoted_saved_source import UpvotedSaved
-		us = UpvotedSaved()# This Source doesn't need any extra info, and it simulates original behavior.
+		us = UpvotedSaved()  # This Source doesn't need any extra info, and it simulates original behavior.
 		us.set_alias('default-downloader')
 		obj['sources'].append(us.to_obj())
 		version = 2
@@ -249,9 +253,9 @@ def _adapt(obj): #!cover
 		# Version 2->3 saw addition of display config, for Threading.
 		obj['meta-version'] = 3
 		obj['threading'] = {
-			"max_handler_threads":5,
-			"display_clear_screen":True,
-			"display_refresh_rate":5
+			"max_handler_threads": 5,
+			"display_clear_screen": True,
+			"display_refresh_rate": 5
 		}
 		version = 3
 		print("Adapted from Settings version 2 -> 3!")
@@ -264,7 +268,7 @@ def _adapt(obj): #!cover
 		for k, v in obj.items():
 			if isinstance(v, dict):
 				continue
-			if not k in ['build_manifest', 'last_started', 'deduplicate_files']:
+			if k not in ['build_manifest', 'last_started', 'deduplicate_files']:
 				obj[_default_cat][k] = v
 			rm.append(k)
 		obj[_default_cat]['meta-version'] = 4
@@ -272,7 +276,7 @@ def _adapt(obj): #!cover
 		for r in rm:
 			del obj[r]
 		obj['interface'] = {}
-		#obj['interface']['start_server'] = False  # Default to old behavior.
+		# obj['interface']['start_server'] = False  # Default to old behavior.
 		print("Adapted from Settings version 3 -> 4!")
 		converted = True
 
@@ -281,6 +285,6 @@ def _adapt(obj): #!cover
 
 if __name__ == '__main__':
 	for _k, _v in _settings.items():
-		print(_k.title()+ ':')
+		print(_k.title() + ':')
 		for _key, stt in _v.items():
 			print('\t%s: %s' % (_key, stt))
