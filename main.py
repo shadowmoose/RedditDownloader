@@ -30,7 +30,6 @@ args, unknown_args = parser.parse_known_args()
 
 if args.update or args.update_only:  # !cover
 	from classes.static.updater import Updater
-
 	upd = Updater('shadowmoose', 'RedditDownloader', __version__, args.skip_pauses)  # Pull from the latest release
 	upd.run()
 
@@ -54,13 +53,13 @@ if args.wizard:
 	print('The Wizard has been replaced by the built-in WebUI.')
 	sys.exit(1)
 
+from classes.webserver import eelwrapper
 import colorama
 from colorama import Fore
 from classes.static import settings
 from classes.static import stringutil
 from classes.static import console
 from classes.static import manifest
-from classes.webserver import eelwrapper
 from classes.downloader import RMD
 from classes.static import praw_wrapper
 
@@ -224,4 +223,3 @@ if args.test:
 		sys.exit(max(exit_values))
 	stringutil.print_color(Fore.GREEN, 'Passed all tests!')
 	sys.exit(0)
-

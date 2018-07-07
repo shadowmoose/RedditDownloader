@@ -52,12 +52,21 @@ def start(web_dir, file_dir, rmd_version, downloader_args, relaunched=False):
 	return True
 
 
-def _websocket_close(page, websockets):
-	print('A WebUI just closed. (%s)' % page)
-	eel.sleep(2.0)
-	if len(websockets) == 0 and not settings.get('interface.keep_open'):
+def _websocket_close(page, old_websockets):
+	print('A WebUI just closed. (%s)[%s]' % (page, len(old_websockets)))
+	for i in range(80):
+		eel.sleep(.1)
+		# noinspection PyProtectedMember
+		if len(eel._websockets) > 0:
+			print('Open connections still exist. Not stopping UI server.')
+			return
+	if not settings.get('interface.keep_open'):
 		print('WebUI keep_open is disabled, and all open clients have closed.\nExiting.')
-		sys.exit()
+		if _downloader:
+			_downloader.stop()
+		sys.exit(0)
+	else:
+		print('Keeping UI server open...')
 
 
 @eel.btl.route('/file')
@@ -185,9 +194,10 @@ def api_search_nested_posts(fields, term):
 
 
 @eel.expose
-def restart():
+def api_restart():
 	""" API to terminate with special "restart" code, which the Bootstrap uses as a signal to relaunch. """
 	sys.exit(202)
+
 
 @eel.expose
 def start_download():
@@ -197,6 +207,7 @@ def start_download():
 	else:
 		_downloader = RMD(**_downloader_args)
 		_downloader.start()
+		print('Started downloader.')
 		return {'status': 'Started downloader!'}
 
 
