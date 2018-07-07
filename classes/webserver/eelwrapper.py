@@ -12,7 +12,6 @@ _file_dir = None
 _web_dir = None
 _rmd_version = '0'
 _downloader = None
-_downloader_args = {}
 
 """
 	Eel is great, but doesn't expose everything we want.
@@ -22,12 +21,11 @@ _downloader_args = {}
 """
 
 
-def start(web_dir, file_dir, rmd_version, downloader_args, relaunched=False):
-	global _file_dir, _web_dir, _rmd_version, _downloader_args
+def start(web_dir, file_dir, rmd_version, relaunched=False):
+	global _file_dir, _web_dir, _rmd_version
 	_file_dir = os.path.abspath(file_dir)
 	_web_dir = os.path.abspath(web_dir)
 	_rmd_version = rmd_version
-	_downloader_args = downloader_args
 	if not settings.get('interface.start_server'):
 		print('WebUI is disabled by settings.')
 		return False
@@ -203,12 +201,12 @@ def api_restart():
 def start_download():
 	global _downloader
 	if _downloader is not None and _downloader.is_running():
-		return {'error': 'Error starting downloader - already running!'}
+		return False
 	else:
-		_downloader = RMD(**_downloader_args)
+		_downloader = RMD()
 		_downloader.start()
 		print('Started downloader.')
-		return {'status': 'Started downloader!'}
+		return True
 
 
 @eel.expose
@@ -227,6 +225,6 @@ def sleep(sec):
 
 if __name__ == '__main__':
 	settings.load('test-webui-settings.json')
-	opened = start('../../web/', '../../../download', '1.5', {})
+	opened = start('../../web/', '../../../download', '1.5')
 	while opened:
 		sleep(60)

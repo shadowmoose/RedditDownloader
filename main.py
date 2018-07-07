@@ -163,14 +163,13 @@ praw_wrapper.login()
 manifest.create('manifest.sqldb')
 manifest.check_legacy(settings.save_base())  # Convert away from legacy Manifest.
 
-dl_args = {'source_patterns': args.source, 'test': args.test}
 
 test_downloader = None
 
 # Only starts if the settings allow it to.
 if not args.test \
 		and settings.get('interface.start_server') \
-		and eelwrapper.start(os.path.join(SCRIPT_BASE, 'web'), './',  __version__, dl_args, args.relaunched):
+		and eelwrapper.start(os.path.join(SCRIPT_BASE, 'web'), './',  __version__, args.relaunched):
 	print('WebUI is now in control.')
 	try:
 		while True:
@@ -179,7 +178,7 @@ if not args.test \
 	except KeyboardInterrupt:
 		print('\nUser terminated WebUI loop.')
 else:
-	p = RMD(**dl_args)
+	p = RMD(source_patterns=args.source, test=args.test)
 	test_downloader = p
 	try:
 		p.start()
