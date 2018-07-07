@@ -15,7 +15,7 @@ class App extends React.Component {
 		this.state = {page: current, downloading: false};
 		this.openPage = this.openPage.bind(this);
 		this._start_download = this.start_download.bind(this);
-
+		this.check_timer = null;
 		this.checkStatus()
 	}
 
@@ -44,7 +44,7 @@ class App extends React.Component {
 				page: page
 			});
 			clearTimeout(warning);
-			setTimeout(this.checkStatus.bind(this), 1500)
+			this.check_timer = setTimeout(this.checkStatus.bind(this), 1500)
 		})
 	}
 
@@ -63,7 +63,14 @@ class App extends React.Component {
 		if(this.state.downloading)
 			return;
 		console.log('Starting RMD download process!');
-		eel.start_download()();
+		eel.start_download()(n => {
+			if (n) {
+				clearTimeout(this.check_timer);
+				this.checkStatus();
+			} else {
+				alertify.error('Unable to start RMD downloading - Is it already running?')
+			}
+		});
 	}
 
 
