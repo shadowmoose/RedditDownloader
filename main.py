@@ -25,6 +25,7 @@ parser.add_argument("--list_settings", help="Display a list of overridable setti
 parser.add_argument("--version", '-v', help="Print the current version and exit.", action="store_true")
 parser.add_argument("--wizard", '-w', help="Legacy, no longer does anything.", action="store_true")
 parser.add_argument("--no_restart", help="If RMD should not be capable of restarting itself.", action="store_true")
+parser.add_argument("--relaunched", help="Internal use. If RMD has bootstrapped at least once.", action="store_true")
 args, unknown_args = parser.parse_known_args()
 
 if args.update or args.update_only:  # !cover
@@ -135,17 +136,21 @@ if settings.get('interface.start_server') and not args.no_restart and not args.t
 	# If run in UI mode, the initial script will stick here & reboot copies as needed.
 	# A new RMD instance is only started if the last one exited with the special "restart" code.
 	# This should always be performed before any DB or PRAW initialization, because it needs neither.
+	relaunching = False
 	while True:
 		print('BOOTSTRAPPING RMD...')
 		sargs = list(filter(lambda x: not x.startswith('--update'), sys.argv[:]))  # get running script args
 		sargs.insert(len(sargs), '--no_restart')  # tell the child process to not enter this loop.
 		sargs.insert(0, sys.executable)  # give it the executable
+		if relaunching:
+			sargs.insert(len(sargs), '--relaunched')  # tell the child process it has already run once.
 		print('Launching: ', (sys.executable, sargs))
 		ret = subprocess.call(sargs)
 		if ret != 202:
 			sys.exit(ret)
 		print('Relaunching in 30 seconds... (CWD: %s)' % os.getcwd())
-		time.sleep(30)  # TODO: Wait for UI sockets to recycle. Maybe 60s (or a check if possible cross-platform)?
+		relaunching = True
+		# Wait for UI sockets to recycle - Maybe 60s (or a check if possible cross-platform)?
 
 # Initialize all database and reddit connections.
 if not os.path.isdir(settings.save_base()):
@@ -159,12 +164,14 @@ praw_wrapper.login()
 manifest.create('manifest.sqldb')
 manifest.check_legacy(settings.save_base())  # Convert away from legacy Manifest.
 
-p = RMD(source_patterns=args.source, test=args.test)
+dl_args = {'source_patterns': args.source, 'test': args.test}
+
+test_downloader = None
 
 # Only starts if the settings allow it to.
 if not args.test \
 		and settings.get('interface.start_server') \
-		and eelwrapper.start(os.path.join(SCRIPT_BASE, 'web'), './',  __version__):
+		and eelwrapper.start(os.path.join(SCRIPT_BASE, 'web'), './',  __version__, dl_args, args.relaunched):
 	print('WebUI is now in control.')
 	try:
 		while True:
@@ -173,6 +180,8 @@ if not args.test \
 	except KeyboardInterrupt:
 		print('\nUser terminated WebUI loop.')
 else:
+	p = RMD(**dl_args)
+	test_downloader = p
 	try:
 		p.start()
 		while p.is_running():
@@ -200,7 +209,7 @@ if args.test:
 			print(("\t%3d:%-" + padding_len + "s -> ") % (i, name), end='')
 			name = "tests." + name
 			test = __import__(name, fromlist=[''])
-			msg, val = test.run_test(p.loader)
+			msg, val = test.run_test(test_downloader.loader)
 			if val != 0:  # !cover
 				stringutil.print_color(Fore.RED, 'FAIL: %s' % str(msg))
 				exit_values.append(1000 + i)  # use a unique error code for potential help debugging.
@@ -215,4 +224,4 @@ if args.test:
 		sys.exit(max(exit_values))
 	stringutil.print_color(Fore.GREEN, 'Passed all tests!')
 	sys.exit(0)
-#
+

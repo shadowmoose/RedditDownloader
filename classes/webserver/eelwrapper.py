@@ -6,11 +6,13 @@ from classes.static import settings
 from classes.sources import source
 from classes.filters import filter
 from classes.static import manifest
-
+from classes.downloader import RMD
 
 _file_dir = None
 _web_dir = None
 _rmd_version = '0'
+_downloader = None
+_downloader_args = {}
 
 """
 	Eel is great, but doesn't expose everything we want.
@@ -20,16 +22,17 @@ _rmd_version = '0'
 """
 
 
-def start(web_dir, file_dir, rmd_version):
-	global _file_dir, _web_dir, _rmd_version
+def start(web_dir, file_dir, rmd_version, downloader_args, relaunched=False):
+	global _file_dir, _web_dir, _rmd_version, _downloader_args
 	_file_dir = os.path.abspath(file_dir)
 	_web_dir = os.path.abspath(web_dir)
 	_rmd_version = rmd_version
+	_downloader_args = downloader_args
 	if not settings.get('interface.start_server'):
 		print('WebUI is disabled by settings.')
 		return False
 	browser = settings.get('interface.browser').lower().strip()
-	browser = None if browser == 'off' else browser
+	browser = None if (browser == 'off' or relaunched) else browser
 	options = {
 		'mode': browser,
 		'host': settings.get('interface.host'),
@@ -181,12 +184,38 @@ def api_search_nested_posts(fields, term):
 	return list(obj.values())
 
 
+@eel.expose
+def restart():
+	""" API to terminate with special "restart" code, which the Bootstrap uses as a signal to relaunch. """
+	sys.exit(202)
+
+@eel.expose
+def start_download():
+	global _downloader
+	if _downloader is not None and _downloader.is_running():
+		return {'error': 'Error starting downloader - already running!'}
+	else:
+		_downloader = RMD(**_downloader_args)
+		_downloader.start()
+		return {'status': 'Started downloader!'}
+
+
+@eel.expose
+def download_status():
+	if _downloader is None:
+		return {'running': False}
+	return {
+		'running': _downloader.is_running()
+		# TODO: More information here: progress report, etc.
+	}
+
+
 def sleep(sec):
 	eel.sleep(sec)
 
 
 if __name__ == '__main__':
 	settings.load('test-webui-settings.json')
-	opened = start('../../web/', '../../../download', '1.5')
+	opened = start('../../web/', '../../../download', '1.5', {})
 	while opened:
 		sleep(60)
