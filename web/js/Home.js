@@ -21,7 +21,7 @@ class Home extends React.Component {
 				xhttp.open("GET", "https://api.github.com/repos/shadowmoose/RedditDownloader/releases", true);
 				xhttp.send();
 			})
-		})
+		});
 	}
 
 	updates_loaded(resp){

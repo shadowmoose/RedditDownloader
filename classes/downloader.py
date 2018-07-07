@@ -13,7 +13,7 @@ from classes.static import stringutil as su
 class RMD(threading.Thread):
 	def __init__(self, source_patterns=None, test=False):
 		super().__init__()
-		self.daemon = False
+		self.daemon = True
 		self.sources = source_patterns
 		self.sources = self.load_sources()
 		self.test = test

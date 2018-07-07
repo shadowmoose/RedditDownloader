@@ -87,6 +87,17 @@ li.active {
 	background-color: #4CAF50;
 }
 
+li.special {
+	background-color: cornflowerblue;
+	margin-left: 50px;
+	border-radius: 15px
+}
+
+li.disabled a{
+	color: gray !important;
+	cursor: auto !important;
+}
+
 input[type=button]:hover{
 	cursor: pointer;
 	filter: brightness(85%);

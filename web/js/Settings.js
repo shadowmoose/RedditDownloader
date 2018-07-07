@@ -29,14 +29,31 @@ class Settings extends React.Component {
 			return;
 		}
 		console.log('Saving all settings...');
-		eel.api_save_settings(this.changes)(n => {
-			if(n){
-				alertify.closeLogOnClick(true).success("Saved settings!")
-			}else{
-				alertify.closeLogOnClick(true).error("Error saving settings!")
-			}
-			this.changes = {};
-			this.setState({changes: {}})
+		alertify.confirm('Save settings? This will automatically restart RMD.', (evt2)=>{
+			evt2.preventDefault();
+			eel.api_save_settings(this.changes)(n => {
+				if(n){
+					alertify.closeLogOnClick(true).success("Saved settings!");
+					alertify.log('Please wait: RMD will restart for settings to take effect, in 5 seconds...');
+					eel.api_restart()();
+					if('interface.host' in this.changes || 'interface.port' in this.changes){
+						console.log(this.state.settings.interface);
+						let host = this.changes['interface.host'] ? this.changes['interface.host']:location.hostname;
+						let port = this.changes['interface.port'] ? this.changes['interface.port']: (location.port ? location.port:'');
+						setTimeout(() => {
+								window.location.href = (window.location.protocol+'//'+host+':'+port+'/index.html'+window.location.hash);
+						}, 4500);
+					} else {
+						setTimeout(() => {
+							location.reload()
+						}, 4500);
+					}
+				} else{
+					alertify.closeLogOnClick(true).error("Error saving settings!")
+				}
+				this.changes = {};
+				this.setState({changes: {}})
+			});
 		});
 	}
 
