@@ -61,7 +61,6 @@ from classes.static import stringutil
 from classes.static import console
 from classes.static import manifest
 from classes.downloader import RMD
-from classes.static import praw_wrapper
 
 colorama.init(convert=True)
 stringutil.print_color(Fore.GREEN, """
@@ -155,11 +154,7 @@ if settings.get('interface.start_server') and not args.no_restart and not args.t
 if not os.path.isdir(settings.save_base()):
 	os.makedirs(os.path.abspath(settings.save_base()))
 os.chdir(settings.save_base())  # Hop into base dir, so all file work can be relative.
-# Authenticate and prepare to scan:
-praw_wrapper.init(client_id=settings.get('auth.client_id'), client_secret=settings.get('auth.client_secret'),
-				  password=settings.get('auth.password'), user_agent=settings.get('auth.user_agent'),
-				  username=settings.get('auth.username'))
-praw_wrapper.login()
+
 manifest.create('manifest.sqldb')
 manifest.check_legacy(settings.save_base())  # Convert away from legacy Manifest.
 
@@ -174,7 +169,6 @@ if not args.test \
 	try:
 		while True:
 			eelwrapper.sleep(600)  # Eel will terminate with a sys.exit() call, when it's time to exit.
-		# TODO: WebUI should actually run RMD.
 	except KeyboardInterrupt:
 		print('\nUser terminated WebUI loop.')
 else:

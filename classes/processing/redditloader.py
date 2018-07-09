@@ -52,10 +52,6 @@ class RedditLoader(threading.Thread):
 	def stop(self):
 		self._keep_running = False
 
-	def is_running(self):
-		""" Check if this Loader is still running. """
-		return self.isAlive()
-
 	def count_remaining(self):
 		""" Approximate the remaining elements in the queue. """
 		return self._queue.qsize()
@@ -72,7 +68,7 @@ class RedditLoader(threading.Thread):
 			self._queue.task_done()
 			return ret
 		except queue.Empty:
-			if not self.is_running():
+			if not self.isAlive():
 				raise
 			else:
 				return None

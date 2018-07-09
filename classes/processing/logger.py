@@ -1,5 +1,6 @@
 # Logger object to simplify Thread logging.
 import threading
+import re
 from classes.static import stringutil
 
 
@@ -9,6 +10,7 @@ class Logger:
 		self._lines = [None] * self.max_lines
 		self.padding = padding
 		self.lock = threading.RLock()
+		self.ansi_escape = re.compile(r'(\x9B|\x1B\[)[0-?]*[ -/]*[@-~]')
 
 	def clear(self):
 		with self.lock:
@@ -19,11 +21,17 @@ class Logger:
 			Set the value of one of this log's lines.
 			Clears the sub-values after this line.
 		"""
+		txt = str(txt)
 		with self.lock:
 			idx = max(0, min(self.max_lines-1, idx))
 			self._lines[idx] = txt.replace('\n', '').strip()
 			for i in range(idx+1, self.max_lines):
 				self._lines[i] = None
+
+	def raw_lines(self):
+		""" Returns an array of the (unpadded) lines in this Log, with ansi characters removed. """
+		with self.lock:
+			return [self.ansi_escape.sub('', l) if l else None for l in self._lines]
 
 	def render(self, limit=-1, max_width=-1):
 		"""

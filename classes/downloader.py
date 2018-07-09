@@ -44,7 +44,22 @@ class RMD(threading.Thread):
 			self.processor.stop_process()
 
 	def is_running(self):
-		return super(RMD, self).isAlive() or self.loader.isAlive() or self.processor.is_running()
+		return super(RMD, self).isAlive() \
+			   or (self.loader and self.loader.isAlive()) \
+			   or (self.processor and self.processor.is_running())
+
+	def get_progress(self):
+		if not self.is_running():
+			return {
+				'running': False
+			}
+		else:
+			return {
+				'running': self.is_running(),
+				'loading': self.loader.isAlive(),
+				'processing': self.processor.is_running(),
+				'progress': self.processor.get_progress()
+			}
 
 	def load_sources(self):  # !cover
 		sources = []

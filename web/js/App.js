@@ -3,8 +3,11 @@ class App extends React.Component {
 		super(props);
 		let hash = window.location.hash.substr(1);
 		let current = 0;
+		this._openPage = this.openPage.bind(this);
+		this._start_download = this.startDownload.bind(this);
+		this._get_progress = this.getProgress.bind(this);
 		this.pages = [
-			[<Home />, 'Home', true],
+			[<Home getProgress={this._get_progress}/>, 'Home', true],
 			[<Sources />, 'Sources', false],
 			[<Settings />, 'Settings', false],
 			[<Browser />, 'Browser', true]
@@ -12,13 +15,10 @@ class App extends React.Component {
 		for(let i=0; i < this.pages.length; i++)
 			if(this.pages[i][1].toLowerCase() === hash.toLowerCase())
 				current = i;
-		this.state = {page: current, downloading: false};
-		this.openPage = this.openPage.bind(this);
-		this._start_download = this.start_download.bind(this);
+		this.state = {page: current, downloading: false, progress: null};
 		this.check_timer = null;
 		this.checkStatus()
 	}
-
 
 	checkStatus() {
 		async function run() {
@@ -35,6 +35,7 @@ class App extends React.Component {
 		run().then((r)=>{
 			let page = this.state.page;
 			let name = this.pages[page][1];
+			console.log('RMD running status: ', r);
 			if(r.running && this.pages[page][2] === false){
 				page = 0;
 				alertify.log('The '+name+' panel is disabled while RMD is downloading!')
@@ -48,7 +49,6 @@ class App extends React.Component {
 		})
 	}
 
-
 	openPage(page){
 		console.log('Switching tab:', page);
 		window.location.hash = this.pages[page][1];
@@ -57,8 +57,7 @@ class App extends React.Component {
 		});
 	}
 
-
-	start_download(evt){
+	startDownload(evt){
 		evt.preventDefault();
 		if(this.state.downloading)
 			return;
@@ -73,6 +72,9 @@ class App extends React.Component {
 		});
 	}
 
+	getProgress(){
+		return this.state.progress;
+	}
 
 	render() {
 		let pages = this.pages.map((p)=>{
@@ -81,7 +83,7 @@ class App extends React.Component {
 				return <li className={'inactive disabled'} key={idx}><a>{p[1]}</a></li>
 			} else {
 				return <li className={this.state.page === idx ? 'active' : 'inactive'} key={idx}>
-					<a onClick={this.openPage.bind(this, idx)}>{p[1]}</a>
+					<a onClick={this._openPage.bind(this, idx)}>{p[1]}</a>
 				</li>
 			}
 		});

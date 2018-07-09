@@ -82,7 +82,7 @@ class ElementProcessor:
 		out += stringutil.color("Processing Posts: (~%s in queue, %s %s)%s" % (
 			self._loader.count_remaining(),
 			self._loader.count_total(),
-			'found so far' if self._loader.is_running() else 'Total',
+			'found so far' if self._loader.isAlive() else 'Total',
 			'' if not stopping else ' - Shutting down gracefully...'
 		), colorama.Fore.CYAN)
 		out += "\n"
@@ -112,6 +112,13 @@ class ElementProcessor:
 		""" Signal any running threads that they should exit. Non-blocking. """
 		for th in self.threads:  # !cover
 			th.keep_running = False
+
+	def get_progress(self):
+		return {
+			'queue_size': self._loader.count_remaining(),
+			'found': self._loader.count_total(),
+			'threads': [{'thread': th.name, 'running': th.isAlive(), 'lines': th.log.raw_lines()} for th in self.threads],
+		}
 
 	def is_running(self):
 		return any(th.isAlive() for th in self.threads)

@@ -51,7 +51,7 @@ def start(web_dir, file_dir, rmd_version, relaunched=False):
 
 
 def _websocket_close(page, old_websockets):
-	print('A WebUI just closed. (%s)[%s]' % (page, len(old_websockets)))
+	print('A WebUI just closed. Checking for other connections... (%s)[%s]' % (page, len(old_websockets)))
 	for i in range(80):
 		eel.sleep(.1)
 		# noinspection PyProtectedMember
@@ -213,10 +213,7 @@ def start_download():
 def download_status():
 	if _downloader is None:
 		return {'running': False}
-	return {
-		'running': _downloader.is_running()
-		# TODO: More information here: progress report, etc.
-	}
+	return _downloader.get_progress()
 
 
 def sleep(sec):

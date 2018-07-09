@@ -6,11 +6,25 @@ import praw
 import prawcore
 from colorama import Fore
 from classes.static import stringutil
+from classes.static import settings
 from classes.processing.redditelement import RedditElement
+
 
 _credentials = None
 _user = None
 _reddit = None
+_logged_in = False
+
+
+def check_login(f):
+	def wrapper(*xs, **kws):
+		if not _logged_in:
+			init(client_id=settings.get('auth.client_id'), client_secret=settings.get('auth.client_secret'),
+				 password=settings.get('auth.password'), user_agent=settings.get('auth.user_agent'),
+				 username=settings.get('auth.username'))
+			login()
+		return f(*xs, **kws)
+	return wrapper
 
 
 def init(client_id, client_secret, password, username, user_agent):
@@ -28,7 +42,7 @@ def init(client_id, client_secret, password, username, user_agent):
 
 
 def login():
-	global _credentials, _user, _reddit
+	global _credentials, _user, _reddit, _logged_in
 	if not _credentials:
 		raise ConnectionError('Credentials not set!')
 
@@ -36,6 +50,7 @@ def login():
 	_reddit = praw.Reddit(**_credentials)
 	_user = _reddit.user.me()
 	stringutil.print_color(Fore.LIGHTYELLOW_EX, "Authenticated as [%s]\n" % _user.name)
+	_logged_in = True
 
 
 def post_orders():
@@ -58,17 +73,17 @@ def time_filters():
 	]
 
 
+@check_login
 def my_liked_saved():
 	""" Get the upvoted/saved posts & comments for the signed-in user. """
-	global _user
 	if not _user:
 		raise ConnectionError('User not signed in!')
 	yield from user_liked_saved(_user.name)
 
 
+@check_login
 def user_liked_saved(username, scan_upvoted=True, scan_saved=True, scan_sub=None):
 	""" Gets all the upvoted/saved comments and/or submissions for the given User. Allows filtering by Subreddit. """
-	global _reddit, _user
 	params = {'sr': scan_sub} if scan_sub else None
 	try:
 		if _user.name.lower() == username.lower():
@@ -90,21 +105,21 @@ def user_liked_saved(username, scan_upvoted=True, scan_saved=True, scan_sub=None
 		stringutil.error('Cannot load Upvoted/Saved Posts from the User "%s", because they are private!' % username)
 
 
+@check_login
 def subreddit_posts(sub, order_by='new', limit=None, time='all'):
 	""" Get Posts from the given subreddit, with PRAW-based filtering & sorting options. """
-	global _reddit
 	yield from _praw_apply_filter(_reddit.subreddit(sub), order_by, limit, time)
 
 
+@check_login
 def frontpage_posts(order_by='new', limit=None, time='all'):
 	""" Get Posts from the authed account's front page, with PRAW-based filtering & sorting options. """
-	global _reddit
 	yield from _praw_apply_filter(_reddit.front, order_by, limit, time)
 
 
+@check_login
 def user_posts(username, find_submissions, find_comments):
 	""" Generator for all the posts made by the given Redditor. """
-	global _reddit
 	try:
 		if find_comments:
 			for c in _reddit.redditor(username).comments.new():
@@ -116,12 +131,13 @@ def user_posts(username, find_submissions, find_comments):
 		stringutil.error('Cannot locate comments or submissions for nonexistent user: %s' % username)
 
 
+@check_login
 def multi_reddit(username, reddit_name, order_by='new', limit=None, time='all'):
 	""" Generator to get Submissions from a User-curated MultiReddit. """
-	global _reddit
 	yield from _praw_apply_filter(_reddit.multireddit(username, reddit_name), order_by, limit, time)
 
 
+@check_login
 def get_submission_comments(t3_id):
 	""" Implemented initially for converting invalid IDs.
 	Returns a generator of top comments from the given Submission. """
@@ -132,6 +148,7 @@ def get_submission_comments(t3_id):
 		yield top_level_comment
 
 
+@check_login
 def _praw_apply_filter(praw_object, order_by='new', limit=None, time='all'):
 	""" Accepts a Praw object (subreddit/multireddit/user posts/etc) and applies filters to it. Returns a Generator. """
 	order = [o for o in post_orders() if o[0] == order_by]
