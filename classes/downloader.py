@@ -49,7 +49,7 @@ class RMD(threading.Thread):
 			   or (self.processor and self.processor.is_running())
 
 	def get_progress(self):
-		if not self.is_running():
+		if not self.is_running() or not self.processor or not self.loader:
 			return {
 				'running': False
 			}
