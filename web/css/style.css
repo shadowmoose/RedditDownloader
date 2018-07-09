@@ -294,7 +294,7 @@ option:enabled {
 	background: black;
 	z-index: 1002;
 	transform: translate(-50%, -50%);
-    cursor: auto;
+	cursor: auto;
 	min-height: 300px;
 	min-width: 350px;
 }
@@ -397,8 +397,8 @@ option:enabled {
 }
 
 .no_bot{
-    margin-bottom: 0 !important;
-    padding-bottom: 0 !important;
+	margin-bottom: 0 !important;
+	padding-bottom: 0 !important;
 }
 
 .search_categories{
@@ -416,6 +416,8 @@ option:enabled {
 	display: table;
 	padding: 5px;
 	margin-top: 5px;
+	margin-left:auto;
+	margin-right:auto;
 }
 
 
