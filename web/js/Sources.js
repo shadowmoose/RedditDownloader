@@ -107,7 +107,7 @@ class Sources extends React.Component {
 			<div className={'source_container'}>
 				<p className={'description'}>
 					Sources are the places on Reddit that RMD finds Posts. <br />
-					For more information, see <a href={"https://github.com/shadowmoose/RedditDownloader/blob/master/docs/site/Supported_Sources.md"} target={"_blank"}>here</a>.
+					For more information, click <a href={"https://rmd.page.link/sources"} target={"_blank"}>here</a>.
 				</p>
 				<div className={'source_controls'}>
 					<select className={'source_add'} value={'none'} onChange={this._add}>{available_sources}</select>

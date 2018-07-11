@@ -83,7 +83,7 @@ class Settings extends React.Component {
 			<div>
 				<p className={'description'}>
 					These are the settings RMD uses. Changing them may require a restart to take effect. <br />
-					For more information about each setting, go <a href={'https://github.com/shadowmoose/RedditDownloader/blob/master/docs/Settings.md'} target={'_blank'}>here</a>.
+					For more information about each setting, go <a href={'https://rmd.page.link/settings'} target={'_blank'}>here</a>.
 				</p>
 				<button className="fixed bottom right settings_save_btn" onClick={this.saveSettings.bind(this)} disabled={Object.keys(this.changes).length === 0}>
 					<i className={'blue icon fa fa-save'}/> Save Settings
