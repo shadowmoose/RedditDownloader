@@ -1,6 +1,6 @@
 # Contribution Guidelines:
 
-All contributions too RMD are welcome! I appreciate any help I can get.
+All contributions to RMD are welcome! I appreciate any help I can get, and I'm always open to suggestions. I'll make sure any contributors get credit for their work on each release cycle.
 
 That said; There are a few things to keep in mind in order to make the process run smoothly for everybody:
 
