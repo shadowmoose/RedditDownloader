@@ -1,7 +1,7 @@
 class Home extends React.Component {
 	constructor(props){
 		super(props);
-		this.state = {version: ''};
+		this.state = {version: '', progress: null};
 
 		async function run() {
 			// Inside a function marked 'async' we can use the 'await' keyword.
@@ -52,25 +52,78 @@ class Home extends React.Component {
 		alertify.reset();
 	}
 
+	set_download_progress(prog){
+		// Hook used by App to update all child pages that can accept this data.
+		this.setState({progress: clone(prog)});
+	}
+
 	render() {
+		let progress_display = null;
+		if(this.state.progress && 'summary' in this.state.progress){
+			let summ = this.state.progress.summary;
+			progress_display = <details open={'open'}>
+				<summary className={'center'}>
+					Download Progress
+				</summary>
+				<h3 className={'center'}>Complete</h3>
+				<div className={'green'}>
+					<b>New Posts: </b>{summ.total}
+				</div>
+				<div className={'blue'}>
+					<b>New Files Downloaded: </b>{summ.new_files}
+				</div>
+				<div className={'red'}>
+					<b>Total Failed File Downloads: </b>{summ.failed}
+				</div>
+				<div className={'orange'}>
+					<b>Completed In: </b>{(summ.time)}
+				</div>
+			</details>
+		}else if(this.state.progress && this.state.progress.running){
+			console.log(this.state.progress);
+			let progress = this.state.progress.progress;
+			let loading = this.state.progress.loading;
+			let threads = progress.threads.map((thread)=>{
+				let lines = thread.lines.map((line, idx)=>{
+					return <div key={idx}>{line}</div>
+				});
+				return <details className={'progressThread '+ (thread.running? 'active':'inactive')} key={thread.thread} open='open'>
+					<summary className={thread.running? 'green':'orange'}>{thread.thread}</summary>
+					<div className='description'>{lines}</div>
+				</details>
+
+			});
+			progress_display = <details open={'open'}>
+				<summary className={'center'}>
+					Download Progress
+				</summary>
+				<h3 className={'center'}>
+					{loading? 'Scanning for Posts & Downloading':'Downloading'}
+				</h3>
+				<div className={'green'}>
+					<b>Posts Found: </b>{progress.found + (loading?' (so far)':'')}
+				</div>
+				<div className={'blue'}>
+					<b>Posts Completed: </b>{progress.found - progress.queue_size}
+				</div>
+				<div className={'orange'}>
+					<b>In Queue: </b>{progress.queue_size}
+				</div>
+				<details open={'open'}>
+					<summary>Running Threads</summary>
+					{threads}
+				</details>
+			</details>
+		}
+
 		return (
 			<div>
 				<h2>Welcome to the RMD {this.state.version} WebUI!</h2>
 				<p>
-					It's still in super-early Alpha right now, but I appreciate the testing!
+					It's still in early Beta right now, but I appreciate the testing!
 					<i className="left_pad red icon fa fa-heart"/>
 				</p>
-				<p>
-					It still needs a ton of styling, but if you're confused about a setting,
-					hovering over it will give you more information.
-				</p>
-				<p>
-					Head over to the other two tabs above, and use them to configure everything!
-				</p>
-				<p>
-					<strong>Keep in mind - </strong>
-					settings related to the UI will require you to restart before they take effect!
-				</p>
+				{progress_display}
 			</div>
 		);
 	}

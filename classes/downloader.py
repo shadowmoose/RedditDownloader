@@ -19,6 +19,7 @@ class RMD(threading.Thread):
 		self.test = test
 		self.loader = None
 		self.processor = None
+		self._total_time = 0
 
 	def run(self):
 		_start_time = time.time()
@@ -32,10 +33,10 @@ class RMD(threading.Thread):
 			raise
 		finally:
 			self.stop()
-		_total_time = str(datetime.timedelta(seconds=round(time.time() - _start_time)))
+		self._total_time = str(datetime.timedelta(seconds=round(time.time() - _start_time)))
 		su.print_color(Fore.GREEN, 'Found %s posts missing files - with %s new files downloaded - and %s files that cannot be found.' %
 			  (self.processor.total_posts, self.processor.total_urls, self.processor.failed_urls))
-		print('Finished processing in %s.' % _total_time)
+		print('Finished processing in %s.' % self._total_time)
 
 	def stop(self):
 		if self.loader:
@@ -51,7 +52,13 @@ class RMD(threading.Thread):
 	def get_progress(self):
 		if not self.is_running() or not self.processor or not self.loader:
 			return {
-				'running': False
+				'running': False,
+				'summary': {
+					'total': self.processor.total_posts,
+					'new_files': self.processor.total_urls,
+					'failed': self.processor.failed_urls,
+					'time': self._total_time
+				}
 			}
 		else:
 			return {

@@ -3,7 +3,7 @@ import os
 size_list = {
 	'http://imgur.com/a/TPbjI': 0,
 	'http://i.imgur.com/uAQwWz3.png': 85401,
-	'https://gfycat.com/RegalFrighteningIsabellinewheatear': 10064467,
+	'https://gfycat.com/RegalFrighteningIsabellinewheatear': 2201577,
 	'http://imgur.com/a/fNmS3': 259480,
 	'http://wehavekookies.tumblr.com/post/171206791864/shak%C3%A4ste': 819161
 }

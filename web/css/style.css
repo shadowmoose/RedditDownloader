@@ -55,6 +55,12 @@ details[open] summary{
 	border-bottom: 1px dashed #656565;
 }
 
+details > details {
+	margin-top: 5px;
+	margin-bottom: 5px;
+	border: 0;
+}
+
 summary:hover {
 	text-shadow: 2px 2px black;
 }
@@ -390,6 +396,9 @@ option:enabled {
 .black {
 	color: black !important;
 }
+.orange {
+	color: darkorange !important;
+}
 
 .hover_shadow:hover {
 	text-shadow: 2px 2px black;
@@ -454,4 +463,8 @@ option:enabled {
 .pagination a:last-child {
 	border-top-right-radius: 5px;
 	border-bottom-right-radius: 5px;
+}
+
+.progressGroup {
+	margin-top: 5px;
 }

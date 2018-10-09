@@ -5,9 +5,9 @@ class App extends React.Component {
 		let current = 0;
 		this._openPage = this.openPage.bind(this);
 		this._start_download = this.startDownload.bind(this);
-		this._get_progress = this.getProgress.bind(this);
 		this.pages = [
-			[<Home getProgress={this._get_progress}/>, 'Home', true],
+			// [Element, Name, Disable_while_running]
+			[<Home ref={ele => {this.home = ele}}/>, 'Home', true],
 			[<Sources />, 'Sources', false],
 			[<Settings />, 'Settings', false],
 			[<Browser />, 'Browser', true]
@@ -44,6 +44,9 @@ class App extends React.Component {
 				downloading: r.running,
 				page: page
 			});
+
+			this.home.set_download_progress(r);
+
 			clearTimeout(warning);
 			this.check_timer = setTimeout(this.checkStatus.bind(this), 1500)
 		})
@@ -72,13 +75,8 @@ class App extends React.Component {
 		});
 	}
 
-	getProgress(){
-		return this.state.progress;
-	}
-
 	render() {
-		let pages = this.pages.map((p)=>{
-			let idx = this.pages.indexOf(p);
+		let pages = this.pages.map((p, idx)=>{
 			if(this.state.downloading && this.pages[idx][2] === false){
 				return <li className={'inactive disabled'} key={idx}><a>{p[1]}</a></li>
 			} else {

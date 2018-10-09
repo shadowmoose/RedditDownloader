@@ -220,8 +220,3 @@ def sleep(sec):
 	eel.sleep(sec)
 
 
-if __name__ == '__main__':
-	settings.load('test-webui-settings.json')
-	opened = start('../../web/', '../../../download', '1.5')
-	while opened:
-		sleep(60)
