@@ -1,7 +1,7 @@
 import copy
 import json
 import os
-import random
+import uuid
 from classes.processing.rwlock import RWLock
 
 
@@ -28,8 +28,11 @@ def load(filename):
 		return False
 	for cat, sets in loaded.items():
 		for ky, val in sets.items():
-			st = get(ky, cat=cat, full_obj=True)
-			st.set(val)
+			try:
+				st = get(ky, cat=cat, full_obj=True)
+				st.set(val)
+			except KeyError as ke:
+				print('Error loading setting:', ke)
 	print('Loaded settings file [%s].' % filename)
 	if converted:
 		print('\tHad to convert from older settings, so saving updated version!')
@@ -202,11 +205,10 @@ class Setting(object):
 
 
 # =========  DEFAULT SETTINGS  =========
-add("auth", Setting("client_id", '', desc="DEPRECATED"))
-add("auth", Setting("client_secret", '', desc="DEPRECATED"))
-add("auth", Setting("password", '', desc="DEPRECATED"))
-add("auth", Setting("user_agent", 'RMD-Scanner-%s' % random.random(), desc="The user agent to identify as, wherever possible."))
-add("auth", Setting("username", '', desc="DEPRECATED"))
+add("auth", Setting("refresh_token", '', desc="Use this to safely authorize RMD to read your Reddit account."))
+add("auth", Setting("rmd_client_key", 'v4XVrdEH_A-ZaA', desc="Change only if you know what you're doing.", public=False))
+add("auth", Setting("user_agent", 'RMD-Scanner-%s' % uuid.uuid4(), desc="The user agent to identify as, wherever possible."))
+add("auth", Setting("oauth_key", str(uuid.uuid4()), desc="Internal key.", public=False))
 
 add("output", Setting("base_dir", './download/', desc="The base directory to save to. Cannot contain tags."))
 add("output", Setting("subdir_pattern", '/[subreddit]/', desc="The directory path, within the base_dir, to save files to. Supports tags."))
@@ -268,7 +270,8 @@ def _adapt(obj):  # !cover
 		for k, v in obj.items():
 			if isinstance(v, dict):
 				continue
-			if k not in ['build_manifest', 'last_started', 'deduplicate_files']:
+			if k not in ['build_manifest', 'last_started', 'deduplicate_files',
+						 'client_id', 'client_secret', 'password', 'username']:
 				obj[_default_cat][k] = v
 			rm.append(k)
 		obj[_default_cat]['meta-version'] = 4

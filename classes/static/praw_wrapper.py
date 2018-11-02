@@ -19,35 +19,49 @@ _logged_in = False
 def check_login(f):
 	def wrapper(*xs, **kws):
 		if not _logged_in:
-			init(client_id=settings.get('auth.client_id'), client_secret=settings.get('auth.client_secret'),
-				 password=settings.get('auth.password'), user_agent=settings.get('auth.user_agent'),
-				 username=settings.get('auth.username'))
+			init()
 			login()
 		return f(*xs, **kws)
 	return wrapper
 
 
-def init(client_id, client_secret, password, username, user_agent):
+def get_reddit_token_url():
+	init()
+	return _reddit.auth.url(['identity', 'read', 'history'], settings.get('auth.oauth_key'), 'permanent')
+
+
+# noinspection PyBroadException
+def get_refresh_token(code):
+	init()
+	try:
+		refresh_token = _reddit.auth.authorize(code)
+		return refresh_token
+	except Exception:
+		return False
+
+
+def init():
 	"""
 	Sets the credentials to sign in with.
 	"""
-	global _credentials
-	_credentials = {
-		'client_id': client_id,
-		'client_secret': client_secret,
-		'password': password,
-		'user_agent': user_agent,
-		'username': username
-	}
+	global _reddit
+	refresh = None
+	if settings.get('auth.refresh_token'):
+		refresh = settings.get('auth.refresh_token')
+	_reddit = praw.Reddit(
+		client_id=settings.get('auth.rmd_client_key'),
+		client_secret=None,
+		redirect_uri='http://%s:%s/authorize' % (settings.get('interface.host'), settings.get('interface.port')),
+		user_agent=settings.get('auth.user_agent'),
+		refresh_token=refresh
+	)
 
 
 def login():
-	global _credentials, _user, _reddit, _logged_in
-	if not _credentials:
-		raise ConnectionError('Credentials not set!')
-
+	global _user, _logged_in
+	if not settings.get('auth.refresh_token'):
+		raise ConnectionError('Missing the Refresh Token from Reddit! Cannot auth.')
 	stringutil.print_color(Fore.LIGHTYELLOW_EX, "Authenticating via OAuth...")
-	_reddit = praw.Reddit(**_credentials)
 	_user = _reddit.user.me()
 	stringutil.print_color(Fore.LIGHTYELLOW_EX, "Authenticated as [%s]\n" % _user.name)
 	_logged_in = True

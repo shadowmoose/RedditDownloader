@@ -17,26 +17,14 @@ See [the bottom of this page](#output-format) for more info.
 **Below are the relevant categories, and their settings:**
 
 ## Auth
-+ client_id
-  + **Description:** *DEPRECATED* 
-  + **Expected Type:** str 
-  + **Default value:** [blank] 
-+ client_secret
-  + **Description:** *DEPRECATED* 
-  + **Expected Type:** str 
-  + **Default value:** [blank] 
-+ password
-  + **Description:** *DEPRECATED* 
++ refresh_token
+  + **Description:** *Use this to safely authorize RMD to read your Reddit account.* 
   + **Expected Type:** str 
   + **Default value:** [blank] 
 + user_agent
   + **Description:** *The user agent to identify as, wherever possible.* 
   + **Expected Type:** str 
   + **Default value:** [Unique ID] 
-+ username
-  + **Description:** *DEPRECATED* 
-  + **Expected Type:** str 
-  + **Default value:** [blank] 
 ## Output
 + base_dir
   + **Description:** *The base directory to save to. Cannot contain tags.* 

@@ -7,11 +7,7 @@ class Settings extends React.Component {
 
 	componentDidMount() {
 		async function run() {
-			// Inside a function marked 'async' we can use the 'await' keyword.
-			let n = await eel.api_get_settings()(); // Must prefix call with 'await'
-			console.log('Got this from Python: ');
-			console.log(n);
-			return n
+			return await eel.api_get_settings()();
 		}
 		run().then((r)=>{
 			this.setState({
@@ -76,7 +72,7 @@ class Settings extends React.Component {
 
 	render() {
 		const settings_groups = Object.keys(this.state.settings).map((group) =>
-			<SettingsGroup key={group} name={group} list={this.state.settings[group]} save={this.saveSettings.bind(this)} change={this.changeSetting.bind(this)}/>
+			<SettingsGroup key={group} name={group} list={this.state.settings[group]} change={this.changeSetting.bind(this)}/>
 		);
 
 		return (
@@ -101,13 +97,6 @@ class Settings extends React.Component {
 class SettingsGroup extends React.Component {
 	constructor(props) {
 		super(props);
-		this.name = props.name;
-		this.list = props.list;
-		this.changeSetting = props.change;
-		let fields = this.list.map((field) =>
-			<SettingsField key={field.name} obj={field} change={this.changeSetting}/>
-		);
-		this.state = {elems: fields}
 	}
 
 	titleCase(str) {
@@ -117,15 +106,18 @@ class SettingsGroup extends React.Component {
 	}
 
 	render(){
-		if(this.list.length === 0){
+		let list = this.props.list.map((field) =>
+			<SettingsField key={field.name} obj={field} change={this.props.change}/>
+		);
+		if(list.length === 0){
 			return (null); // Render nothing if this group is empty.
 		}
 		return <form className={"settings_group"}>
 			<details open='open'>
 				<summary>
-					{this.titleCase(this.name)}
+					{this.titleCase(this.props.name)}
 				</summary>
-				{this.state.elems}
+				{list}
 			</details>
 		</form>
 	}
@@ -135,36 +127,69 @@ class SettingsGroup extends React.Component {
 class SettingsField extends React.Component {
 	constructor(props) {
 		super(props);
-		this.obj = props.obj;
-		this.state = {value: this.obj.value};
-		this.type = this.parse_type();
-		this.ele_id = this.obj.category + '.' + this.obj.name; // Build the ID in python's "cat.id" notation. This is used to save properly.
-		this.changeVal = props.change;
 		//console.log(this.obj)
 	}
 
+	ele_id(){
+		let obj = this.props.obj;
+		return obj.category + '.' + obj.name; // Build the ID in python's "cat.id" notation. This is used to save properly.
+	}
+
 	parse_type(){
-		if(this.obj.opts){
-			let opts = this.obj.opts.map((o) =>{
+		let obj = this.props.obj;
+		let ele_id = this.ele_id();
+		let change_val = this.props.change;
+		if(obj.opts){
+			let opts = obj.opts.map((o) =>{
 				return <option value={o[0]} title={o[1].toString()} key={o[0]}>{o[0]}</option>
 			});
-			return <select id={this.ele_id} defaultValue={this.state.value} onChange={this.changeVal} className='settings_input'>
+			return <select id={ele_id} defaultValue={obj.value} onChange={change_val} className='settings_input'>
 				{opts}
 			</select>
 		}
-		switch(this.obj.type){
+		switch(obj.type){
 			case 'int':
-				return <input type="number" id={this.ele_id} className='settings_input' defaultValue={this.state.value} onChange={this.changeVal}/>;
+				return <input type="number" id={ele_id} className='settings_input' defaultValue={obj.value} onChange={change_val}/>;
 			case 'bool':
-				return <input type="checkbox" id={this.ele_id} className='settings_input' defaultChecked={this.state.value} onChange={this.changeVal}/>;
+				return <input type="checkbox" id={ele_id} className='settings_input' defaultChecked={obj.value} onChange={change_val}/>;
 			default:
-				return <input type="text" id={this.ele_id} className='settings_input' defaultValue={this.state.value} onChange={this.changeVal}/>;
+				return <input type="text" id={ele_id} className='settings_input' defaultValue={obj.value} onChange={change_val}/>;
 		}
 	}
 
+	open_oauth(){
+		console.log('Opening oauth.');
+		let win = window.open("", '_blank');
+		eel.api_get_oauth_url()(url => {
+			console.log('oAuth url', url);
+			if(!url){
+				alertify.closeLogOnClick(true).delay(1000).log("Auth (currently) requires the interface to use port 7505!");
+			}else {
+				win.location = url;
+				win.focus();
+				let popupTick = setInterval(function() {
+					if (!win || win.closed) {
+						clearInterval(popupTick);
+						console.log('window closed!');
+						alertify.confirm('Reload?', (evt2)=> {
+							evt2.preventDefault();
+							location.reload(true);
+						});
+					}
+				}, 500);
+			}
+		})
+	}
+
 	render(){
-		return <div className='settings_input_wrapper' title={this.obj.description.toString()}>
-			<label htmlFor={this.ele_id} className='settings_label'>{this.obj.name.replace(/_/g, ' ')}:</label>
+		let obj = this.props.obj;
+		if(this.ele_id() === 'auth.refresh_token'){
+			return <div className='settings_input_wrapper' title={obj.description.toString()}>
+				<a className={"center"} onClick={this.open_oauth.bind(this)}>{obj.value?"Change Authorized Account":"Authorize an account!"}</a>
+			</div>
+		}
+		return <div className='settings_input_wrapper' title={obj.description.toString()}>
+			<label htmlFor={this.ele_id()} className='settings_label'>{obj.name.replace(/_/g, ' ')}:</label>
 			{this.parse_type()}
 		</div>
 	}

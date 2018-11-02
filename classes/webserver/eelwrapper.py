@@ -7,6 +7,7 @@ from classes.sources import source
 from classes.filters import filter
 from classes.static import manifest
 from classes.downloader import RMD
+from classes.static import praw_wrapper
 
 _file_dir = None
 _web_dir = None
@@ -78,10 +79,31 @@ def _downloaded_files():
 	return eel.btl.static_file(file_path, root=_file_dir)
 
 
+@eel.btl.route('/authorize')
+def _authorize_rmd_token():
+	state = eel.btl.request.query.state
+	print('New refresh code request: ', state, eel.btl.request.query.code)
+	if state.strip() == settings.get('auth.oauth_key').strip():
+		code = eel.btl.request.query.code
+		print('Saving new reddit code.')
+		refresh = praw_wrapper.get_refresh_token(code)
+		if refresh:
+			settings.put('auth.refresh_token', refresh)
+			return 'Saved authorization token! Close this page to continue.'
+	return 'Cannot save the new auth key, something went wrong.<br><a href="../index.html">Back</a>'
+
+
 # ======  JS->Python API functions:  ======
 @eel.expose
 def api_current_status():
 	return {'current_version': _rmd_version}
+
+
+@eel.expose
+def api_get_oauth_url():
+	if settings.get('interface.port') != 7505:
+		return False
+	return praw_wrapper.get_reddit_token_url()
 
 
 @eel.expose
@@ -110,7 +132,7 @@ def api_get_sources():
 	for s in source.get_sources():
 		ret['available'].append(s.to_obj(for_webui=True))
 	for s in settings.get_sources():
-		ret['active'].append(s.to_obj(for_webui=True))
+		ret['active'].append(s.to_obj(for_webui=True))  # TODO: Why am I sending the same data twice?
 	ret['filters']['available'] = [f.to_js_obj() for f in filter.get_filters()]
 	ret['filters']['operators'] = [f.value for f in filter.Operators]
 	return ret
