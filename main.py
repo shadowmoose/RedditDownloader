@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-__version__ = "2.3"
+__version__ = "3.0"
 
 import argparse
 import sys
@@ -134,20 +134,17 @@ if settings.get('interface.start_server') and not args.no_restart and not args.t
 	# If run in UI mode, the initial script will stick here & reboot copies as needed.
 	# A new RMD instance is only started if the last one exited with the special "restart" code.
 	# This should always be performed before any DB or PRAW initialization, because it needs neither.
-	relaunching = False
+	sargs = list(filter(lambda x: not x.startswith('--update'), sys.argv[:]))  # get running script args
+	sargs.insert(len(sargs), '--no_restart')  # tell the child process to not enter this loop.
+	sargs.insert(0, sys.executable)  # give it the executable
 	while True:
 		print('BOOTSTRAPPING RMD...')
-		sargs = list(filter(lambda x: not x.startswith('--update'), sys.argv[:]))  # get running script args
-		sargs.insert(len(sargs), '--no_restart')  # tell the child process to not enter this loop.
-		sargs.insert(0, sys.executable)  # give it the executable
-		if relaunching:
-			sargs.insert(len(sargs), '--relaunched')  # tell the child process it has already run once.
 		print('Launching: ', (sys.executable, sargs))
 		ret = subprocess.call(sargs)
 		if ret != 202:
 			sys.exit(ret)
 		print('Relaunching in 30 seconds... (CWD: %s)' % os.getcwd())
-		relaunching = True
+		sargs.insert(len(sargs), '--relaunched')  # tell the child process it has already run once.
 		# Wait for UI sockets to recycle - Maybe 60s (or a check if possible cross-platform)?
 
 # Initialize all database and reddit connections.
