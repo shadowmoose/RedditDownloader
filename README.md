@@ -23,7 +23,7 @@ find any media linked to. It then uses multiple downloaders to save this media l
 **RMD** comes equipped with a suite of options to let it scan just about anywhere you can find media on Reddit.
 Coupled with its powerful baked-in Filter options to let you specify exactly what type of posts and comments
 you're looking for (*"I only want Submissions with 'Unicorn' in the title, and no less than 1000 upvotes!"*), 
-RMD makes automatically saving things a simple process. Built in Python and running headless (without a GUI), 
+RMD makes automatically saving things a simple process. Built in Python and runnable headless (without a GUI) or as its own server, 
 you can launch this program anywhere - and it's built from the ground-up to make automation a breeze.
 
 [Check out the different places RMD can scan!](docs/site/Supported_Sources.md)
