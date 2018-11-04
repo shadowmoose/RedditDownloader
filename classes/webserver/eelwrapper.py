@@ -183,13 +183,14 @@ def api_search_posts(fields, term):
 		elif os.path.isdir(file):
 			return [{'token': b64(os.path.join(file, _f)), 'path': os.path.join(file, _f)} for _f in os.listdir(file) if os.path.isfile(os.path.join(file, _f))]
 		else:
-			return None
+			return []
 
 	for p in manifest.search_posts(fields, term):
 		if p['id'] not in obj:
 			p['files'] = explode(p['file_path'])
 			del p['file_path']
-			obj[p['id']] = p
+			if p['files']:
+				obj[p['id']] = p
 		else:
 			for f in explode(p['file_path']):
 				obj[p['id']]['files'].append(f)

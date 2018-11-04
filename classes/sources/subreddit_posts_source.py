@@ -18,7 +18,7 @@ class UserPostsSource(source.Source):
 				yield p
 
 	def get_settings(self):
-		yield Setting('subreddit', '', etype='str', desc='Name of this user\'s multireddit:')
+		yield Setting('subreddit', '', etype='str', desc='Name of the desired subreddit:')
 		yield Setting('order', None, etype='str', desc='Order submissions by:', opts=reddit.post_orders())
 		yield Setting('time', None, etype='str', desc='Select a time span to filter by:', opts=reddit.time_filters())
 		yield Setting('limit', 0, etype='int', desc='How many would you like to download? (0 for no limit):')

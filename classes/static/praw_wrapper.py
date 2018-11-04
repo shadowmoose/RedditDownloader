@@ -36,7 +36,8 @@ def get_refresh_token(code):
 	try:
 		refresh_token = _reddit.auth.authorize(code)
 		return refresh_token
-	except Exception:
+	except Exception as ex:
+		print(ex)
 		return False
 
 
