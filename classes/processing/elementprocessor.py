@@ -7,12 +7,10 @@ from classes.static import settings
 
 
 class ElementProcessor:
-	""" The heavy-lifting bit. Handles processing all the Elements provided to it via the generator it's created with,
-	by finding the most appropriate Handler for each Element. """
 	
 	def __init__(self, reddit_loader):
 		""" Creates and prepares the Processor object, with the given RedditLoader to provide RedditElements.
-		Takes a loaded Settings object to find the configured save path. """
+		"""
 		self._loader = reddit_loader
 		self.threads = []
 		self.total_urls = 0

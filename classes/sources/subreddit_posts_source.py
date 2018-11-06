@@ -3,7 +3,7 @@ import classes.static.praw_wrapper as reddit
 from classes.static.settings import Setting
 
 
-class UserPostsSource(source.Source):
+class SubredditPostsSource(source.Source):
 	def __init__(self):
 		super().__init__(source_type='subreddit-posts-source', description="The submissions in a given subreddit")
 		self._elements = []

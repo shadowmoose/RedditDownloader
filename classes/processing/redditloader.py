@@ -6,8 +6,8 @@ from classes.static import stringutil
 
 class RedditLoader(threading.Thread):
 	def __init__(self, testing=False):
-		""" Initializes a connector object to the given Reddit account, which instantly attempts to login.
-			The script will hang on creating this connection, until the user is signed in.
+		""" This is a daemon Loader class, which facilitates loading from multiple Sources,
+		 	and safely popping Posts off an internal queue.
 		"""
 		threading.Thread.__init__(self)
 		self.sources = []

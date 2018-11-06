@@ -3,7 +3,7 @@ import classes.static.praw_wrapper as reddit
 from classes.static.settings import Setting
 
 
-class UserPostsSource(source.Source):
+class FrontpagePostsSource(source.Source):
 	def __init__(self):
 		super().__init__(source_type='frontpage-posts-source', description="The submissions on your front page.")
 		self._elements = []
