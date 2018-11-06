@@ -1,5 +1,5 @@
 from classes.filters import filter
-import classes.filters as filters
+from classes import filters
 import re
 
 

@@ -2,12 +2,12 @@ import eel
 import sys
 import os
 import base64
+from classes import filters
 from classes import sources
 from classes.static import settings
 from classes.static import manifest
 from classes.downloader import RMD
 from classes.static import praw_wrapper
-import classes.filters as filters
 
 _file_dir = None
 _web_dir = None

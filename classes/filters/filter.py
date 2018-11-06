@@ -3,7 +3,7 @@
 """
 
 import re
-import classes.filters as filters
+from classes import filters
 
 
 class Filter:
