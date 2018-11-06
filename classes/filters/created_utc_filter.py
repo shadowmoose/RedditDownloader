@@ -8,6 +8,6 @@ class UTCFilter(filter.Filter):
 
 	def _convert_imported_limit(self, val):
 		"""  Overrides default to convert user-supplied string dates to timestamps.  """
-		if stringutil.is_numeric(val):
-			return val
-		raise Exception("Cannot load this Filter: Expects time in a numeric UTC timestamp.")  # !cover
+		if not stringutil.is_numeric(val):
+			stringutil.error("Error in UTC Filter: Expects time in a numeric UTC timestamp.")  # !cover
+		return val

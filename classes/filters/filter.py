@@ -35,14 +35,16 @@ class Filter:
 
 	def set_operator(self, op):  # !cover
 		""" Sets this Filter's Operator. """
-		if self._lookup_operator(op):
+		if isinstance(op, str):
+			op = self._get_operator_from_str(op)
+		if self._validate_operator(op):
 			self.operator = op
 			return True
-		return False
+		raise KeyError('Attempted to set invalid Filter operator:', op)
 
 	def set_limit(self, limit):
 		""" Sets the limit of this Filter. Autocasts as needed. """
-		self._limit = self._cast(limit)
+		self._limit = self._convert_imported_limit(self._cast(limit))
 
 	def get_limit(self):
 		return self._limit
@@ -116,7 +118,7 @@ class Filter:
 		""" Convert this source into a data model that can be saved/loaded from Settings.
 			Returns: key, val -> This represents the way this is stored within the "Filters" JSON Object.
 		"""
-		op = self._lookup_operator(self.operator, True)
+		op = self._validate_operator(self.operator, True)
 		if not op:
 			op = ''
 		return self.field+op, self._limit
@@ -125,26 +127,28 @@ class Filter:
 		"""  Parses the given filter string into this filter, setting its values.  """
 		if self.field not in str_key:
 			return False
-		op = None
-		for k in Operators:
-			v = k.value
-			if v in str_key.lower():
-				op = k
+		op = self._get_operator_from_str(str_key)
 		if '.' not in str_key:
 			op = Operators.EQUALS  # !cover
-		if self._lookup_operator(op):
+		if self._validate_operator(op):
 			self.operator = op
 		else:
 			raise Exception('Unable to parse operator for Filter: %s' % self.field)  # !cover
 		return True
 
-	def _lookup_operator(self, op, return_value=False):
+	def _validate_operator(self, op, return_value=False):
 		"""  Returns if this operator is a valid operator string or not. If set, returns mapped value. """
 		if op in Operators:
 			if return_value:
 				return op.value
 			return True
 		return False
+
+	def _get_operator_from_str(self, val):
+		""" Attempts a (really generous) search to match the given string to a valid Operator. """
+		for k in Operators:
+			if k.value.lower().strip() in val.lower().strip():
+				return k
 
 	def __str__(self):  # !cover
 		lim = self._limit

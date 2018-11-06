@@ -111,9 +111,9 @@ class Sources extends React.Component {
 				</p>
 				<div className={'source_controls'}>
 					<select className={'source_add'} value={'none'} onChange={this._add}>{available_sources}</select>
-					<button className={'settings_save_btn fixed bottom right'}>
+					<button className={'settings_save_btn fixed bottom right'} onClick={this._save_all}>
 						<i className={'blue icon fa fa-save'} title={'Save Sources'} onClick={this._save_all}/>
-						<label className={''} onClick={this._save_all}> Save Sources</label>
+						<label className={''}> Save Sources</label>
 					</button>
 				</div>
 				<div className={'source_list_wrapper'}>
