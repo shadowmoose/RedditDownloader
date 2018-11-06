@@ -1,5 +1,5 @@
 import classes.sources.test_producer as test_source
-import classes.filters.filter as filters
+from classes import filters
 import time
 
 # Tests general Filter capability loading Filters from a JSON-style dict, then filtering Posts from the Test Source.
@@ -15,6 +15,8 @@ filter_dict = {
 
 def run_test(re):
 	fl = filters.get_filters(filter_dict)
+	if len(fl) != 4:
+		return 'Built incorrect list of Filters: %s' % fl, 6
 	# print('\n\n')
 	ts = test_source.TestPostProducer()
 	ts.apply_filters(fl)

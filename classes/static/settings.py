@@ -90,8 +90,8 @@ def get_all():
 
 def get_sources():
 	""" Builds and then returns a list of the Sources in this Settings config. """
-	from classes.sources import source
-	return source.get_sources(get('sources'))
+	from classes import sources
+	return sources.load_sources(get('sources'))
 
 
 def has_source_alias(alias):  # !cover - no sources yet

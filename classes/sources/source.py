@@ -1,8 +1,7 @@
 """
 	Generic Source class, all actual sources should override this.
 """
-from classes.filters import filter
-from classes import sources
+import classes.filters as filters
 
 
 class Source:
@@ -46,7 +45,7 @@ class Source:
 
 	def available_filters(self):  # !cover
 		""" Returns a list of the available filters this Source can listen to. """
-		return filter.get_filters()
+		return filters.get_filters()
 
 	def set_alias(self, alias):  # !cover
 		""" Set the alias of this Source. """
@@ -113,76 +112,4 @@ class Source:
 		""" Builds the list of filters this object needs. """
 		if 'filters' not in data:
 			return False  # !cover
-		self.filters = filter.get_filters(data['filters'])
-
-
-def get_sources(source_list=None):
-	"""
-	Get a list of all availale Sources.
-
-	Expects that source_list is the direct array of Sources loaded from settings.
-	"""
-	import pkgutil
-	import os
-	pkg_path = os.path.dirname(sources.__file__)
-	loaded = []
-	for _, name, _ in pkgutil.iter_modules([pkg_path]):
-		if '_source' not in name:
-			continue
-		fi = __import__('classes.sources.%s' % name, fromlist=[''])
-		for clazz in _module_classes(fi):
-			if source_list is not None:
-				for obj in source_list:
-					cl = clazz()  # build the class.
-					if cl.from_obj(obj):  # if the class accepts this data.
-						loaded.append(cl)
-			else:  # !cover
-				cl = clazz()
-				loaded.append(cl)
-	return loaded
-
-
-def _module_classes(module_trg):
-	"""  Pull the classes from the given module.  """
-	md = module_trg.__dict__
-	return [
-		md[c] for c in md if (
-			isinstance(md[c], type) and md[c].__module__ == module_trg.__name__
-		)
-	]
-
-
-if __name__ == '__main__':
-	print('All Available Sources: ')
-	for s in get_sources():
-		print('Source:', end='')
-		print(s.to_obj())
-	print()
-	import sys
-	sys.path.insert(0, '../filters')
-	so = Source('test-source', description="This is just a test source.")
-	built = so.from_obj({
-		"type": "test-source",
-		"alias": "test-source-alias",
-		"data": {
-			"auth": {
-				"client_id": "ID_From_Registering_app",
-				"client_secret": "Secret_from_registering_app",
-				"password": "Your_password",
-				"user_agent": "USE_A_RANDOM_ID_HERE",
-				"username": "Your_Username"
-			}
-		},
-		"filters": {
-				"created_utc.min": '2017-11-08T05:18:19+00:00',
-				"created_utc.max": 0,
-				"score.min": 0,
-				"author": "shadowmoose"
-			}
-	})
-	print('Built Source Object: ', built)
-	print('Loaded Filters:')
-	for f in so.filters:
-		print('\t', f)
-	print('\n\nLoaded Data: ', end='')
-	print(so.data)
+		self.filters = filters.get_filters(data['filters'])

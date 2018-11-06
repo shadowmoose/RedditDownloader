@@ -1,7 +1,6 @@
 import threading
 import queue
 import os
-import pkgutil
 
 import classes.processing.logger as logger
 import classes.handlers as handlers
@@ -27,11 +26,9 @@ class HandlerThread(threading.Thread):
 		self.name = name
 		self.log = logger.Logger(2, padding=1)
 		self.handler_log = logger.Logger(2, padding=2)
-		self.handlers = []
 		self.release_filenames = []  # Each thread keeps a list of base filenames it's currently using, to avoid dupes.
 
 		self._loader = e_queue
-		self.load_handlers()
 		self.keep_running = True
 		self.total_new_urls = 0  # Counter for stat display.
 		self.total_new_posts = 0
@@ -160,14 +157,15 @@ class HandlerThread(threading.Thread):
 				+Also returns False or None if no appropriate handler was found, or if the handler told us not to download anything.
 		"""
 		ret_val = False  # Default to 'False', meaning no file was located by a handler.
-		for h in self.handlers:
+		for h in handlers.sorted_list:
 			self.log.out(1, stringutil.color("Checking handler: %s" % h.tag, stringutil.Fore.CYAN))
 			ret = False
 
 			# noinspection PyBroadException
 			try:
 				ret = h.handle(url, info, self.handler_log)
-			except Exception:  # There are too many possible exceptions between all handlers to catch properly.
+			except Exception as ex:  # There are too many possible exceptions between all handlers to catch properly.
+				stringutil.error(ex)
 				pass  # Maybe consider stopping thread. I want to see errors reported, but don't want to interrupt users.
 
 			if ret is None:  # cover
@@ -207,13 +205,3 @@ class HandlerThread(threading.Thread):
 						return existing_path
 			return file_path
 	# exit lock
-
-	def load_handlers(self):
-		""" Loads all the available handlers from the handler directory. """
-		self.handlers = []
-		for _, name, _ in pkgutil.iter_modules([os.path.dirname(handlers.__file__)]):
-			fi = __import__('classes.handlers.%s' % name, fromlist=[''])
-			self.handlers.append(fi)
-		self.handlers.sort(key=lambda x: x.order, reverse=False)
-		# print("Loaded handlers: ", ', '.join([x.tag for x in self.handlers]) )
-		assert len(self.handlers) > 0

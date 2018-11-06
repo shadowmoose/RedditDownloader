@@ -2,9 +2,9 @@ import eel
 import sys
 import os
 import base64
+from classes import filters
+from classes import sources
 from classes.static import settings
-from classes.sources import source
-from classes.filters import filter
 from classes.static import manifest
 from classes.downloader import RMD
 from classes.static import praw_wrapper
@@ -129,12 +129,12 @@ def api_save_settings(settings_obj):
 @eel.expose
 def api_get_sources():
 	ret = {'available': [], 'active': [], 'filters': {}}
-	for s in source.get_sources():
+	for s in sources.load_sources():
 		ret['available'].append(s.to_obj(for_webui=True))
 	for s in settings.get_sources():
 		ret['active'].append(s.to_obj(for_webui=True))  # TODO: Why am I sending the same data twice?
-	ret['filters']['available'] = [f.to_js_obj() for f in filter.get_filters()]
-	ret['filters']['operators'] = [f.value for f in filter.Operators]
+	ret['filters']['available'] = [f.to_js_obj() for f in filters.get_filters()]
+	ret['filters']['operators'] = [f.value for f in filters.Operators]
 	return ret
 
 
@@ -144,14 +144,13 @@ def api_save_sources(new_obj):
 	output_settings = []
 	for so in new_obj:
 		print('\tType:', so['type'], 'Alias:', so['alias'])
-		all_sources = source.get_sources()
-		for s in all_sources:
+		for s in sources.load_sources():
 			if s.type == so['type']:
 				s.set_alias(so['alias'])
 				for k, v in so['data'].items():
 					s.insert_data(k, v)
 				for f in so['filters']:
-					for fi in filter.get_filters():
+					for fi in filters.get_filters():
 						if f['field'] == fi.field:
 							fi.set_operator(f['operator'])
 							fi.set_limit(f['limit'])
@@ -241,5 +240,3 @@ def download_status():
 
 def sleep(sec):
 	eel.sleep(sec)
-
-

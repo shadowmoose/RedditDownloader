@@ -1,11 +1,12 @@
 from classes.filters import filter
+from classes import filters
 import re
 
 
 class URLFilter(filter.Filter):
 	def __init__(self):
 		super().__init__(field='url_pattern', description='Download only from URLs matching a Regex pattern. (Text)')
-		self.operator = filter.Operators.MATCH
+		self.operator = filters.Operators.MATCH
 		self.accepts_operator = False
 		self._reg = None
 

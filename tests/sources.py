@@ -1,4 +1,4 @@
-import classes.sources.source as sources
+from classes import sources
 
 # Tests loading Source objects, not their posts.
 
@@ -21,14 +21,14 @@ source_list = [{
 
 
 def run_test(re):
-	sl = sources.get_sources()
+	sl = sources.load_sources()
 	for s in sl:
 		if not s.get_alias():
 			return 'Missing Source alias! (%s)' % s, 1
 		if 'test' in s.get_alias():
 			return 'Loaded test Source by mistake.', 2
 
-	sl = sources.get_sources(source_list)
+	sl = sources.load_sources(source_list)
 	if len(sl) != len(source_list):
 		return 'Error loading test source list!', 1
 	for s in sl:

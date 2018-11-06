@@ -1,19 +1,9 @@
 """
 	Filter class and static methods to access all available filters.
 """
-import pkgutil
-import os
+
 import re
-from enum import Enum
-from classes import filters
-
-
-class Operators(Enum):
-	""" Enum for porting around operators. """
-	EQUALS = '.equals'
-	MINIMUM = '.min'
-	MAXIMUM = '.max'
-	MATCH = '.match'
+from classes import filters as filters
 
 
 class Filter:
@@ -63,18 +53,18 @@ class Filter:
 		if isinstance(val, str) or isinstance(lim, str):  # Case doesn't matter for the basic comparisons.
 			val = str(val).lower()
 			lim = str(lim).lower()
-		if self.operator == Operators.MAXIMUM:
+		if self.operator == filters.Operators.MAXIMUM:
 			return val <= lim
-		if self.operator == Operators.MINIMUM:
+		if self.operator == filters.Operators.MINIMUM:
 			return val >= lim
-		if self.operator == Operators.EQUALS:
+		if self.operator == filters.Operators.EQUALS:
 			return val == lim
-		if self.operator == Operators.MATCH:
+		if self.operator == filters.Operators.MATCH:
 			regexp = re.compile(str(self.get_limit()), re.IGNORECASE)
 			if regexp.search(str(val)):
 				return True
 			return False
-		raise Exception("Invalid comparator for Filter!")  # !cover
+		raise Exception("Invalid comparator for Filter! %s" % self.operator)  # !cover
 
 	def _cast(self, val):
 		"""  Attempt to cast to integer, or just return the value as a string.  """
@@ -129,7 +119,7 @@ class Filter:
 			return False
 		op = self._get_operator_from_str(str_key)
 		if '.' not in str_key:
-			op = Operators.EQUALS  # !cover
+			op = filters.Operators.EQUALS  # !cover
 		if self._validate_operator(op):
 			self.operator = op
 		else:
@@ -138,7 +128,7 @@ class Filter:
 
 	def _validate_operator(self, op, return_value=False):
 		"""  Returns if this operator is a valid operator string or not. If set, returns mapped value. """
-		if op in Operators:
+		if op in filters.Operators:
 			if return_value:
 				return op.value
 			return True
@@ -146,7 +136,7 @@ class Filter:
 
 	def _get_operator_from_str(self, val):
 		""" Attempts a (really generous) search to match the given string to a valid Operator. """
-		for k in Operators:
+		for k in filters.Operators:
 			if k.value.lower().strip() in val.lower().strip():
 				return k
 
@@ -162,98 +152,3 @@ class Filter:
 			lim,
 			self.description
 		)
-
-
-def get_filters(filter_dict=None):
-	""" Get a list of all availale Filter objects.
-		If passed a dict of {'field.operator':val} - as specified by the filter settings syntax -
-			it will return loaded filter objects.
-	"""
-	pkg_path = os.path.dirname(filters.__file__)
-	loaded = []
-	used = []
-	# Load packaged classes first, as they need to be treated specially in the event of custom data.
-	for _, name, _ in pkgutil.iter_modules([pkg_path]):
-		if '_filter' not in name:
-			continue
-		fi = __import__('classes.filters.%s' % name, fromlist=[''])
-		for clazz in _module_classes(fi):
-			if filter_dict is not None:
-				for k, v in filter_dict.items():
-					cl = clazz()
-					if cl.from_obj(k, v):
-						loaded.append(cl)
-						used.append(cl.field)
-			else:
-				cl = clazz()
-				loaded.append(cl)
-				used.append(cl.field)
-	# Append default field filters, if not already handled by special ones above.
-	for k, v in get_filter_fields().items():
-		if k in used:
-			continue
-		if filter_dict is not None:
-			for loaded_field, loaded_val in filter_dict.items():
-				cl = Filter(field=k, description=v)  # New filter for default values.
-				if cl.from_obj(loaded_field, loaded_val):
-					loaded.append(cl)
-		else:
-			cl = Filter(field=k, description=v)  # New filter for default values.
-			loaded.append(cl)
-
-	return loaded
-
-
-def _module_classes(module_trg):
-	"""  Pull the classes from the given module.  """
-	md = module_trg.__dict__
-	return [
-		md[c] for c in md if (
-			isinstance(md[c], type) and md[c].__module__ == module_trg.__name__
-		)
-	]
-
-
-def get_filter_fields():
-	""" Builds a list of acceptable fields to filter Elements by. """
-	return {
-		'link_count': 'The amount of links found for this element. (#)',
-		'type': 'The type of post this is. ("Submission" or "Comment")',
-		'title':  'The title of the submission containing this post. (Text)',
-		'author': 'The author of this element. (Text)',
-		'body':  'The text in this element. Blank if this post is a submission without selftext. (Text)',
-		'subreddit': 'The subreddit this element is from. (Text)',
-		'over_18': 'If this post is age-limited, AKA "NSFW". (True/False)',
-		'created_utc': 'The timestamp, in UTC seconds, that this element was posted. (#)',
-		'num_comments': 'The number of comments on this post. (#)',
-		'score': 'The number of net upvotes on this post. (#)',
-	}
-
-
-if __name__ == '__main__':
-	print('All available:')
-	for f in get_filters():
-		print(f)
-	print()
-	print("Loading...")
-
-	class TestPost:  # Dummy Post object.
-		def __init__(self):
-			self.created_utc = 99
-			self.title = 'Test Title'
-
-	test_post = TestPost()
-	all_filters = get_filters({
-		'created_utc.min': 0,
-		'created_utc.max': 100,
-		'created_utc': 99,
-		'created_utc.match': '99',
-		'title.match': 'Test'
-	})
-	print('Loaded Filters:')
-	for f in all_filters:
-		print('\t', f.to_keyval())
-
-	print('\nRunning checks on test:', test_post)
-	for f in all_filters:
-		print(f.check(test_post), '|', f)
