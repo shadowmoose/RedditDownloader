@@ -14,6 +14,5 @@ ADD requirements.txt ./
 RUN mkdir ./settings/
 
 RUN pip install -r ./requirements.txt
-RUN python -V
 
 ENTRYPOINT [ "python", "-u", "./main.py", "--settings", "./settings/settings.json"]

@@ -39,9 +39,9 @@ def get_filters(filter_dict=None):
 			it will return loaded filter objects.
 	"""
 	loaded = []
-	used = set()
 	if filter_dict is None:
 		loaded = custom_filters()
+		used = set(l.field for l in loaded)
 		for k, v in filter_fields().items():
 			if k in used:
 				continue

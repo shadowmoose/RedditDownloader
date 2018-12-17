@@ -120,8 +120,9 @@ class Home extends React.Component {
 			<div>
 				<h2>Welcome to the RMD {this.state.version} WebUI!</h2>
 				<p>
-					It's still in early Beta right now, but I appreciate the testing!
-					<i className="left_pad red icon fa fa-heart"/>
+					Hover over any UI field or value to see a helpful description. <br /><br />
+					If you haven't yet, go to the Settings tab and authorize an account. <br />
+					RMD needs this in order to access Reddit! <i className="left_pad red icon fa fa-heart"/>
 				</p>
 				{progress_display}
 			</div>

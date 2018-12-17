@@ -14,6 +14,7 @@ class Browser extends React.Component {
 		this._search_term = this.change_search_term.bind(this);
 		this._autoplay = this.autoplay.bind(this);
 		this._set_page = this.setPage.bind(this);
+		this.schedule_search();
 	}
 
 	search(){
@@ -22,8 +23,6 @@ class Browser extends React.Component {
 			return this.state.fields[f];
 		});
 		let term = this.state.term;
-		if(term.trim() === '')
-			return;
 		console.log("Searching:", fields, term);
 		eel.api_search_posts(fields, term)(n => {
 			console.log("Searched posts:", n);
@@ -66,6 +65,8 @@ class Browser extends React.Component {
 	chunkify(a, n, balanced) {// Split array [a] into [n] arrays of roughly-equal length.
 		if (n < 2)
 			return [a];
+		if (!a)
+			return [];
 		let len = a.length,
 			out = [],
 			i = 0,
@@ -150,7 +151,7 @@ class Browser extends React.Component {
 					</div>
 				</div>
 				<div className={'center'}>
-					<div className={'pagination '+(this.state.posts[0].length>0?'':'hidden')}>
+					<div className={'pagination '+(this.state.posts.length>0 && this.state.posts[0].length>0?'':'hidden')}>
 						<a onClick={(e)=>(this._set_page(e, 0))}>&laquo;</a>
 						{page_buttons}
 						<a onClick={(e)=>(this._set_page(e, this.state.posts.length-1))}>&raquo;</a>

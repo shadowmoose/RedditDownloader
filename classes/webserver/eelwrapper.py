@@ -132,7 +132,7 @@ def api_get_sources():
 	for s in sources.load_sources():
 		ret['available'].append(s.to_obj(for_webui=True))
 	for s in settings.get_sources():
-		ret['active'].append(s.to_obj(for_webui=True))  # TODO: Why am I sending the same data twice?
+		ret['active'].append(s.to_obj(for_webui=True))
 	ret['filters']['available'] = [f.to_js_obj() for f in filters.get_filters()]
 	ret['filters']['operators'] = [f.value for f in filters.Operators]
 	return ret
@@ -193,8 +193,6 @@ def api_search_posts(fields, term):
 		else:
 			for f in explode(p['file_path']):
 				obj[p['id']]['files'].append(f)
-	# import json
-	# print('Sending file list:', json.dumps(list(obj.values()), indent=4, sort_keys=True, separators=(',', ': ')))
 	return list(obj.values())
 
 
