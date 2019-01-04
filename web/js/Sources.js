@@ -2,21 +2,13 @@ class Sources extends React.Component {
 	constructor(props){
 		super(props);
 		this.state = {available:[], active:[], filters: {}};
-		async function run() {
-			// noinspection JSUnresolvedFunction
-			let n = await eel.api_get_sources()(); // Must prefix call with 'await'
-			console.log('Ran source query.');
-			return n
-		}
-		run().then((r)=>{
+		eel.api_get_sources()(r=>{
 			console.log(r);
 			this.setState({
 				available: r['available'],
 				active: r['active'],
 				filters: r['filters']
 			});
-			//console.log('Sources state:');
-			//console.log(this.state)
 		});
 		this._add = this.addSource.bind(this);
 		this._update = this.updateSource.bind(this);
@@ -74,7 +66,7 @@ class Sources extends React.Component {
 			let sources = clone(this.state.active).filter((s)=>{
 				return s.alias !== original_alias;
 			});
-			console.log('Updated active sources:', sources);
+			console.log('Deleted & Updated active sources:', sources);
 			this.setState({active: sources}, ()=>alertify.success('Deleted source "'+original_alias+"'."));
 		}.bind(this), function() {
 			alertify.error('Did not delete source.')

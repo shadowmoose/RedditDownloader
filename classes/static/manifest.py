@@ -202,7 +202,7 @@ def search_posts(fields=(), term=''):
 						ON u.post_id = id
 					WHERE (%s) LIKE :term
 					AND u.file_path not in ('None', 'False') 
-					ORDER BY type DESC''' % all_fields, {'term': '%%%s%%' % term})
+					ORDER BY type DESC''' % all_fields, {'term': '%%%s%%' % term.strip('%')})
 		names = [description[0] for description in cur.description]
 		for p in cur:
 			yield dict(zip(names, p))

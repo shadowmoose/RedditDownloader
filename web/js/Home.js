@@ -2,14 +2,10 @@ class Home extends React.Component {
 	constructor(props){
 		super(props);
 		this.state = {version: '', progress: null};
+	}
 
-		async function run() {
-			// Inside a function marked 'async' we can use the 'await' keyword.
-			let n = await eel.api_current_status()(); // Must prefix call with 'await'
-			console.log('RMD State:', n);
-			return n
-		}
-		run().then((r)=>{
+	componentDidMount(){
+		eel.api_current_status()(r=>{
 			this.setState({version: r['current_version']}, ()=> {
 				let xhttp = new XMLHttpRequest();
 				let self = this;

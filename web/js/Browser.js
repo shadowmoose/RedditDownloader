@@ -3,6 +3,13 @@ class Browser extends React.Component {
 		super(props);
 		this.state = {posts:[[]], term:'', fields:[], autoplay: true, page_size: 50, page: 0};
 		this.search_timer = null;
+		this._toggle_field = this.toggle_field.bind(this);
+		this._search_term = this.change_search_term.bind(this);
+		this._autoplay = this.autoplay.bind(this);
+		this._set_page = this.setPage.bind(this);
+	}
+
+	componentDidMount(){
 		eel.api_searchable_fields()(n => {
 			let fields = {};
 			n.forEach((p)=>{
@@ -10,10 +17,6 @@ class Browser extends React.Component {
 			});
 			this.setState({fields: fields});
 		});
-		this._toggle_field = this.toggle_field.bind(this);
-		this._search_term = this.change_search_term.bind(this);
-		this._autoplay = this.autoplay.bind(this);
-		this._set_page = this.setPage.bind(this);
 		this.schedule_search();
 	}
 
@@ -36,6 +39,11 @@ class Browser extends React.Component {
 		if(this.search_timer !== false)
 			clearTimeout(this.search_timer);
 		this.search_timer = setTimeout(this.search.bind(this), 250);
+	}
+
+	on_open(){
+		console.log("Browser opening..");
+		this.schedule_search()
 	}
 
 	toggle_field(event){

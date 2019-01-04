@@ -6,15 +6,10 @@ class Settings extends React.Component {
 	}
 
 	componentDidMount() {
-		async function run() {
-			return await eel.api_get_settings()();
-		}
-		run().then((r)=>{
+		eel.api_get_settings()(r=>{
 			this.setState({
 				settings: r
 			});
-			console.log('Settings state:');
-			console.log(this.state)
 		})
 	}
 
