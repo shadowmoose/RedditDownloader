@@ -11,18 +11,23 @@ class UserUpvotedSaved(source.Source):
 
 	def get_elements(self):
 		dat = self.data
-		for sub in dat['scan_sub'].split(','):
-			sub = sub.strip()
-			for ele in reddit.user_liked_saved(dat['user'], dat['scan_upvoted'], dat['scan_saved'], sub):
+		if not dat['scan_sub'].strip():
+			for ele in reddit.user_liked_saved(dat['user'], dat['scan_upvoted'], dat['scan_saved']):
 				if self.check_filters(ele):
 					yield ele
+		else:
+			for sub in dat['scan_sub'].split(','):
+				sub = sub.strip()
+				for ele in reddit.user_liked_saved(dat['user'], dat['scan_upvoted'], dat['scan_saved'], sub):
+					if self.check_filters(ele):
+						yield ele
 
 	def get_settings(self):
 		yield Setting('user', '', etype='str', desc='Target username:')
 		yield Setting('scan_upvoted', False, etype='bool', desc='Scan the posts they\'ve upvoted?')
 		yield Setting('scan_saved', False, etype='bool', desc='Scan the posts they\'ve saved?')
 		yield Setting('scan_sub', '',
-					  etype='str', desc='Scan specific subreddits, separated by commas (leave blank for all):')
+					  etype='str', desc='Optionally scan specific subreddits, separated by commas (leave blank for all):')
 
 	def get_config_summary(self):
 		feeds = ""
