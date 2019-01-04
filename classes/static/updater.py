@@ -1,6 +1,7 @@
 import os
 from hashlib import sha1
 import shutil
+import math
 
 # Prepare for the grossest import ever:
 # noinspection PyBroadException
@@ -65,6 +66,9 @@ class Updater:
 
 		if '-' in newest_version or float(self._version) >= float(newest_version):
 			print("\t+Up to date! (Version: %s)" % self._version)
+			return self._file_tree
+		if math.floor(float(newest_version)) != math.floor(float(self._version)):
+			print("\t-The major version has changed, and this program cannot safely auto-update.")
 			return self._file_tree
 		print("\nCurrently on version: %s" % self._version)
 		print("Found new version: %s! \"%s\"" % (newest_version, update_title))
