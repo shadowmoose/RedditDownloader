@@ -159,12 +159,13 @@ class SettingsField extends React.Component {
 
 	open_oauth(){
 		console.log('Opening oauth.');
-		let win = window.open("", '_blank');
-		eel.api_get_oauth_url()(url => {
-			console.log('oAuth url', url);
+		eel.api_get_oauth_url()(data => {
+			console.log('oAuth data', data);
+			let url = data['url'];
 			if(!url){
-				alertify.closeLogOnClick(true).delay(1000).log("Auth (currently) requires the interface to use port 7505!");
+				alertify.closeLogOnClick(true).delay(10000).error(data['message']);
 			}else {
+				let win = window.open("", '_blank');
 				win.location = url;
 				win.focus();
 				let popupTick = setInterval(function() {

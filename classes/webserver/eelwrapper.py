@@ -101,9 +101,17 @@ def api_current_status():
 
 @eel.expose
 def api_get_oauth_url():
-	if settings.get('interface.port') != 7505:
-		return False
-	return praw_wrapper.get_reddit_token_url()
+	port = 7505
+	url = False
+	message = ''
+	if settings.get('interface.port') != port:
+		message = 'The UI is not using the default port (%s), and cannot use the premade App to authenticate!' % port
+	else:
+		url = praw_wrapper.get_reddit_token_url()
+	return {
+		'url': url,
+		'message': message
+	}
 
 
 @eel.expose
