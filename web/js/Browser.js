@@ -17,7 +17,7 @@ class Browser extends React.Component {
 			});
 			this.setState({fields: fields});
 		});
-		this.schedule_search();
+		//this.schedule_search();
 	}
 
 	search(){
