@@ -21,7 +21,6 @@ parser.add_argument("--list_settings", help="Display a list of overridable setti
 parser.add_argument("--version", '-v', help="Print the current version and exit.", action="store_true")
 args, unknown_args = parser.parse_known_args()
 
-colorama.init(convert=True)
 
 if args.version:
 	print("RMD Version: %s" % __version__)
@@ -72,8 +71,10 @@ if not _loaded:
 		settings.put('interface.browser', mode, save_after=False)
 		settings.put('interface.start_server', True)
 
+print("Loaded settings:", settings.get("auth.refresh_token"))
 
 if __name__ == '__main__':
+	colorama.init(convert=True)
 	su.print_color(Fore.GREEN, """
 	====================================
 		Reddit Media Downloader %s

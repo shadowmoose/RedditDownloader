@@ -4,27 +4,36 @@ import os
 import uuid
 
 
-_file = ''
+_file = None
 _settings = dict()
 _default_cat = 'misc'
 
 
 def save():
-	out = to_obj(save_format=True, include_private=True)
+	if _file is None:
+		return False
 	with open(_file, 'w') as o:
-		o.write(json.dumps(out, indent=4, sort_keys=True, separators=(',', ': ')))
+		o.write(to_json())
 		print('-Saved Settings-')
 	return True
 
 
-def load(filename):
-	global _file
-	_file = os.path.abspath(filename)
-	try:
-		with open(_file, 'r') as json_data:
-			loaded, converted = _adapt(json.load(json_data))
-	except IOError:
-		return False
+def to_json():
+	"""
+	Converts the Settings into a JSON String, which this class is guaranteed to be capable of loading.
+	"""
+	out = to_obj(save_format=True, include_private=True)
+	return json.dumps(out, indent=4, sort_keys=True, separators=(',', ': '))
+
+
+def from_json(json_data):
+	"""
+	Apply all of the Settings data within the given JSON string.
+	:param json_data:
+	:return: True if the given data had to be adapted from an older version.
+	"""
+	loaded, converted = _adapt(json.loads(json_data))
+
 	for cat, sets in loaded.items():
 		for ky, val in sets.items():
 			try:
@@ -32,6 +41,17 @@ def load(filename):
 				st.set(val)
 			except KeyError as ke:
 				print('Error loading setting:', ke)
+	return converted
+
+
+def load(filename):
+	global _file
+	_file = os.path.abspath(filename)
+	try:
+		with open(_file, 'r') as json_data:
+			converted = from_json(json_data.read())
+	except IOError:
+		return False
 	print('Loaded settings file [%s].' % filename)
 	if converted:
 		print('\tHad to convert from older settings, so saving updated version!')
