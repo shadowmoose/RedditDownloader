@@ -3,27 +3,51 @@ import sys
 import threading
 from static import settings
 from static import stringutil as su
+from processing.redditloader import RedditLoader
+from processing.test_process import TestProcess
+
+'''
+	TODO: Probably need a special class for generating file location data.
+	It should accept a Post element from the DB, a URL, and if the URL is part of an Album,
+	It will output a File Path, which the Downloaders will be responsible to saving to.
+	
+	If the Downloaders find an Album URL, they could just use the same class to generate the File Path,
+	save the path to the DB, then report back the new ID so it can be queued.
+'''
 
 
 class RMD(threading.Thread):
-	def __init__(self, source_patterns=None, test=False):
+	def __init__(self, source_patterns=None):
 		super().__init__()
-		self.daemon = True
+		self.daemon = False
 		self.sources = source_patterns
 		self.sources = self.load_sources()
-		self.test = test
-		self.loader = None
+		# initialize Loader
+		self.loader = RedditLoader(sources=self.sources, settings_json=settings.to_json())
 		self.processor = None
 		self._total_time = 0
 
 	def run(self):
 		# Start Post scanner, with a Queue
+		self.loader.start()
+
+		tests = []
+		for i in range(5):
+			tp = TestProcess(reader=self.loader.get_reader(), ack=self.loader.get_ack())
+			tests.append(tp)
+			tp.start()
+
+		for t in tests:
+			t.join()
+
 		# Start Downloaders, with the Queue.
 		# Wait for Downloaders to finish.
-		print("RMD Ran.")  # TODO: implement
+		# TODO: status updating for console/UI.
+		# TODO: If all the Downloaders are finished, but the Loader is still hung, an ACK failed and we should alert.
+		print("All finished.")
 
 	def stop(self):
-		pass  # TODO: implement
+		self.loader.get_stop_event().set()  # TODO: fully implement
 
 	def is_running(self):
 		pass  # TODO: implement
