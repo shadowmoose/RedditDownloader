@@ -29,7 +29,7 @@ parser.add_argument("--relaunched", help="Internal use. If RMD has bootstrapped 
 args, unknown_args = parser.parse_known_args()
 
 if args.update or args.update_only:  # !cover
-	from classes.static.updater import Updater
+	from static.updater import Updater
 	upd = Updater('shadowmoose', 'RedditDownloader', __version__, args.skip_pauses)  # Pull from the latest release
 	upd.run()
 
@@ -53,14 +53,11 @@ if args.wizard:
 	print('The Wizard has been replaced by the built-in WebUI.')
 	sys.exit(1)
 
-from classes.webserver import eelwrapper
+from webserver import eelwrapper
 import colorama
 from colorama import Fore
-from classes.static import settings
-from classes.static import stringutil
-from classes.static import console
-from classes.static import manifest
-from classes.downloader import RMD
+from static import settings, console, manifest, stringutil
+from redditdownloader.classes import RMD
 
 colorama.init(convert=True)
 stringutil.print_color(Fore.GREEN, """
@@ -161,7 +158,7 @@ test_downloader = None
 # Only starts if the settings allow it to.
 if not args.test \
 		and settings.get('interface.start_server') \
-		and eelwrapper.start(os.path.join(SCRIPT_BASE, 'web'), './',  __version__, args.relaunched):
+		and eelwrapper.start(os.path.join(SCRIPT_BASE, 'web'), './', __version__, args.relaunched):
 	print('WebUI is now in control.')
 	try:
 		while True:
@@ -186,7 +183,7 @@ if args.test:
 
 	# Import all the testing modules.
 	import pkgutil
-	import tests
+	from redditdownloader import tests
 
 	pkg_path = os.path.dirname(tests.__file__)
 	padding_len = str(max([len(name) for _, name, _ in pkgutil.iter_modules([pkg_path])]))

@@ -2,9 +2,9 @@ FROM python:3.7-slim
 
 WORKDIR ./rmd/
 
-ADD classes ./classes
-ADD tests ./tests
-ADD web ./web
+ADD redditdownloader/classes ./classes
+ADD redditdownloader/tests ./tests
+ADD redditdownloader/web ./web
 ADD docs ./docs
 ADD main.py ./
 ADD requirements.txt ./
