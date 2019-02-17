@@ -8,3 +8,4 @@ colorama
 Pillow
 pathvalidate
 eel==0.9.10
+sqlalchemy

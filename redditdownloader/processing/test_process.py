@@ -17,11 +17,11 @@ class TestProcess(multiprocessing.Process):
 			if nxt is None:
 				break  # None means that the Loader has closed the Queue.
 
-			print("\t+Post Read:", nxt.title, '[%s]' % multiprocessing.current_process().name)  # Mock "handling" for testing.
+			print("\t+Post Read:", nxt, '[%s]' % multiprocessing.current_process().name)  # Mock "handling" for testing.
 
 			# Once *all* processing is completed on this URL, the Downloader needs to ACK it.
 			# If any additional Album URLS were located, they should be sent before the ACK.
-			self.ack_queue.put({'cmd': 'ack', 'id': nxt.id})
+			self.ack_queue.put({'cmd': 'ack', 'id': nxt})
 
 		# Start Downloaders, with the Queue.
 		# Wait for Downloaders to finish.

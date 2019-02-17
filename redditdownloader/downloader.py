@@ -5,6 +5,8 @@ from static import settings
 from static import stringutil as su
 from processing.redditloader import RedditLoader
 from processing.test_process import TestProcess
+import sql
+from processing.rel_file import SanitizedRelFile
 
 '''
 	TODO: Probably need a special class for generating file location data.
@@ -28,6 +30,11 @@ class RMD(threading.Thread):
 		self._total_time = 0
 
 	def run(self):
+		# Initialize Database
+		db_file = SanitizedRelFile(base=settings.get("output.base_dir"), file_path="manifest.sqldb")
+		db_file.mkdirs()
+		sql.init(db_file.absolute())
+
 		# Start Post scanner, with a Queue
 		self.loader.start()
 
