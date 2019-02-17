@@ -79,11 +79,14 @@ def insert_vars(str_path, ele):
 	""" Replace the [tagged] ele fields in the given string. Sanitizes inserted values to be filename-compatible. """
 	max_len = 230  # We need to leave some headroom for longer (Unknown) extensions and/or naming. !cover
 	# TODO: Filename length Test should be implemented to be sure this works cross-platform.
-	length = min(max_len, max(len(str(v)) for k, v in ele.to_obj().items()))
+	# TODO: This should replace vars in one pass, to avoid strings with [brackets] messing with it.
+	keys = [k for k, v in ele.__dict__.items() if '_' not in k]
+	length = min(max_len, max(len(str(ele.__dict__[k])) for k in keys))
 	while True:
 		ret_str = str_path
-		for k, v in ele.to_obj().items():
-			ret_str = ret_str.replace('[%s]' % str(k), ''.join(filename(str(v))[0:length]).strip())
+		for k, v in ele.__dict__.items():
+			if '_' not in k:
+				ret_str = ret_str.replace('[%s]' % str(k), ''.join(filename(str(v))[0:length]).strip())
 
 		if len(normalize_file(ret_str)) < max_len:
 			return normalize_file(ret_str)

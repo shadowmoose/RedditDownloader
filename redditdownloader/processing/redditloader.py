@@ -4,14 +4,14 @@ from colorama import Fore
 from static import stringutil
 import static.settings as settings
 from processing.queue_reader import QueueReader
-
+from processing.rel_file import SanitizedRelFile
+import sql
+from processing import name_generator
 
 class RedditLoader(multiprocessing.Process):
 	def __init__(self, sources, settings_json):
-		""" This is a daemon Loader class, which facilitates loading from multiple Sources,
-		 	and safely popping Posts off an internal queue.
-
-		 	Anything that creates a Reader is responsible for flagging when it should stop, using the provided Event.
+		""" This is a daemon Loader class, which facilitates loading from multiple Sources
+		 	and safely submitting their Posts to an internal queue.
 		"""
 		super().__init__()
 		self.sources = sources
@@ -21,6 +21,7 @@ class RedditLoader(multiprocessing.Process):
 		self._ack_queue = multiprocessing.Queue()
 		self._stop_event = multiprocessing.Event()  # This is a shared mp.Event, set when this reader should be done.
 		self._reader = QueueReader(input_queue=self._queue, stop_event=self._stop_event)
+		self._session = None
 		self.daemon = True
 		self.name = 'RedditElementLoader'
 
@@ -28,6 +29,10 @@ class RedditLoader(multiprocessing.Process):
 		""" Threaded loading of elements. """
 		print("Loading elements...", self.sources)
 		settings.from_json(self.settings)
+		db_file = SanitizedRelFile(base=settings.get("output.base_dir"), file_path="manifest.sqldb")
+		db_file.mkdirs()
+		sql.init(db_file.absolute())
+		self._session = sql.session()
 
 		# TODO: Query for all unhandled URLs, and submit them before scanning for new Posts.
 
@@ -36,8 +41,17 @@ class RedditLoader(multiprocessing.Process):
 				stringutil.print_color(Fore.GREEN, 'Downloading from Source: %s' % source.get_alias())
 				for r in source.get_elements():
 					r.set_source(source)
-					# TODO: If New URL, Create the Post/URL objects, and submit the URL ID instead of the RedditElement.
-					self._push_url(r)
+
+					# Create the SQL objects, then submit them to the queue.
+					post = self._session.query(sql.Post).filter(sql.Post.reddit_id == r.id).first()
+					if not post:
+						post = sql.Post.convert_element_to_post(r)
+						self._session.add(post)
+					urls = self._create_new_urls(r, post)
+					for u in urls:
+						self._create_url_files(u)
+						self._push_url(u.id)
+					self._session.commit()
 
 				# Wait for any remaining ACKS to come in, before closing the writing pipe.
 				# ...Until the Downloaders have confirmed completion of everything, more album URLS may come in.
@@ -49,6 +63,37 @@ class RedditLoader(multiprocessing.Process):
 				# TODO: How to best log a failure here?
 		print("Finished loading.")
 		self._stop_event.set()
+
+	def _create_new_urls(self, reddit_element, post):
+		"""
+		Creates and Commits all the *new* URLS in the given RedditElement,
+		then returns a list of the new URLs.
+		"""
+		urls = []
+		for u in reddit_element.get_urls():
+			if self._session.query(sql.URL.id).filter(sql.URL.address == u).first():
+				print("Skipping url.")
+				# These URLS can be skipped, because they are top-level "non-album-file" urls.
+				# Album URLs will be resubmitted submitted in a differet method.
+				continue
+			url = sql.URL.make_url(u, post, None, 0)
+			urls.append(url)
+		self._session.add_all(urls)
+		self._session.commit()  # After commiting, the URL generated IDs will be filled in.
+		return urls
+
+	def _create_url_files(self, url):
+		"""
+		Builds the desired sql.File object for the given sql.URL Object.
+		Automatically adds the File object to the URL.
+		"""
+		filename = name_generator.choose_file_name(url, self._session)
+		file = sql.File(
+			path=filename,
+			url_id=url.id
+		)
+		url.files.append(file)
+		self._session.commit()
 
 	def count_remaining(self):
 		""" Approximate the remaining elements in the queue. """
@@ -63,13 +108,12 @@ class RedditLoader(multiprocessing.Process):
 	def get_stop_event(self):
 		return self._stop_event
 
-	def _push_url(self, url):
-		# TODO: Create the Post/URL objects, and submit the URL ID instead of the RedditElement.
+	def _push_url(self, url_id):
 		self._handle_acks()  # passively process some ACKS in a non-blocking way to prevent queue bloat.
 		while not self._stop_event.is_set():
 			try:  # Keep trying to add this element to the queue, with a timeout to catch any stop triggers.
-				self._queue.put(url, timeout=1)
-				self._open_ack.add(url.id)  # Replace after testing.
+				self._queue.put(url_id, timeout=1)
+				self._open_ack.add(url_id)  # Replace after testing.
 				break
 			except queue.Full:
 				pass

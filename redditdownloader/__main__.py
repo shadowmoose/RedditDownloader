@@ -71,7 +71,6 @@ if not _loaded:
 		settings.put('interface.browser', mode, save_after=False)
 		settings.put('interface.start_server', True)
 
-print("Loaded settings:", settings.get("auth.refresh_token"))
 
 if __name__ == '__main__':
 	colorama.init(convert=True)
