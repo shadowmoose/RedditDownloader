@@ -6,7 +6,7 @@ from static import stringutil as su
 from processing.redditloader import RedditLoader
 from processing.test_process import TestProcess
 import sql
-from processing.rel_file import SanitizedRelFile
+from processing.wrappers.rel_file import SanitizedRelFile
 
 '''
 	TODO: Probably need a special class for generating file location data.
@@ -39,8 +39,12 @@ class RMD(threading.Thread):
 		self.loader.start()
 
 		tests = []
-		for i in range(5):
-			tp = TestProcess(reader=self.loader.get_reader(), ack=self.loader.get_ack())
+		for i in range(settings.get('threading.max_handler_threads')):
+			tp = TestProcess(
+				reader=self.loader.get_reader(),
+				ack_queue=self.loader.get_ack(),
+				settings_json=settings.to_json()
+			)
 			tests.append(tp)
 			tp.start()
 
@@ -50,7 +54,7 @@ class RMD(threading.Thread):
 		# Start Downloaders, with the Queue.
 		# Wait for Downloaders to finish.
 		# TODO: status updating for console/UI.
-		# TODO: If all the Downloaders are finished, but the Loader is still hung, an ACK failed and we should alert.
+		# TODO: If any Downloaders are finished, but the Loader is still hung, an ACK failed and we should alert.
 		print("All finished.")
 
 	def stop(self):

@@ -1,8 +1,10 @@
+# noinspection PyPackageRequirements
 from newspaper import Article, Config
 import requests
 import mimetypes
-import os
 import shutil
+from handlers import HandlerResponse
+from static import settings
 
 tag = 'newspaper'
 order = 90000
@@ -19,53 +21,45 @@ order = 90000
 """
 
 
-def handle(url, data, log):
-	try:
-		log.out(0, 'Downloading article...')
-		resp = requests.get(url, headers={'User-Agent': data['user_agent']})
-		if resp.status_code != 200:
-			return False  # !cover
+def handle(task):
+	user_agent = settings.get('auth.user_agent')
+	url = task.url
+	resp = requests.get(url, headers={'User-Agent': user_agent})
+	if resp.status_code != 200:
+		return False  # !cover
 
-		config = Config()
-		config.memoize_articles = False
-		config.verbose = False
-		article = Article(url='', config=config)
-		log.out(0, 'Parsing article...')
+	config = Config()
+	config.memoize_articles = False
+	config.verbose = False
+	article = Article(url='', config=config)
 
-		article.download()
-		article.set_html(resp.text)
-		article.parse()
-		if article.top_image:
-			src = article.top_image
-			if 'http' not in src:  # !cover
-				if 'https' in url:
-					src = 'https://' + src.lstrip('/ ').strip()
-				else:
-					src = 'http://' + src.lstrip('/ ').strip()
-			log.out(0, 'Newspaper located image: %s' % src)
-			
-			r = requests.get(src, headers={'User-Agent': data['user_agent']}, stream=True)
-			if r.status_code == 200:
-				content_type = r.headers['content-type']
-				ext = mimetypes.guess_extension(content_type)
-				if not ext or ext == '':  # !cover
-					log.out(1, 'NewsPaper Error locating file MIME Type: %s' % url)
-					return False
-				if '.jp' in ext:
-					ext = '.jpg'  # !cover
-				path = data['single_file'] % ext
-				if not os.path.isfile(path):
-					if not os.path.isdir(data['parent_dir']):  # !cover
-						log.out(1, ("+Building dir: %s" % data['parent_dir']))
-						os.makedirs(data['parent_dir'])  # Parent dir for the full filepath is supplied already.
-					with open(path, 'wb') as f:
-						r.raw.decode_content = True
-						shutil.copyfileobj(r.raw, f)
-				return path
-			else:  # !cover
-				log.out(0, ('\t\tError Reading Image: %s responded with code %i!' % (url, r.status_code)))
-				return False
-	except Exception as e:
-		log.out(0, ('"Newspaper" Generic handler failed. '+(str(e).strip())))
-	return False  # !cover
+	article.download()
+	article.set_html(resp.text)
+	article.parse()
+	if not article.top_image:
+		return None
 
+	src = article.top_image
+	if 'http' not in src:  # !cover
+		if 'https' in url:
+			src = 'https://' + src.lstrip('/ ').strip()
+		else:
+			src = 'http://' + src.lstrip('/ ').strip()
+
+	r = requests.get(src, headers={'User-Agent': user_agent}, stream=True)
+	if r.status_code == 200:
+		content_type = r.headers['content-type']
+		ext = mimetypes.guess_extension(content_type)
+		if not ext or ext == '':  # !cover
+			return None
+		if '.jp' in ext:
+			ext = '.jpg'  # !cover
+		task.file.set_ext(ext)
+		task.file.mkdirs()
+		with open(task.file.absolute(), 'wb') as f:
+			r.raw.decode_content = True
+			shutil.copyfileobj(r.raw, f)
+		return HandlerResponse(success=True, rel_file=task.file, handler=tag)
+	else:  # !cover
+		# log.out(0, ('\t\tError Reading Image: %s responded with code %i!' % (url, r.status_code)))
+		return None

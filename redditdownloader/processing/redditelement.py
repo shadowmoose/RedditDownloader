@@ -42,6 +42,7 @@ class RedditElement(object):
 
 	def detect_type(self, obj):
 		""" Simple function to call the proper Comment or Submission handler. """
+		# noinspection PyUnresolvedReferences
 		if type(obj) == praw.models.Submission:
 			self.submission(obj)
 		elif type(obj) == praw.models.reddit.comment.Comment:
@@ -88,6 +89,8 @@ class RedditElement(object):
 
 	def add_url(self, url):
 		""" Add a URL to this element. """
+		if any(url.strip().startswith(x) for x in ['/u/', '/r/']):
+			return
 		if url not in self._urls:
 			self._urls.append(url)
 

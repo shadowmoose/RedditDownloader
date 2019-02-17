@@ -30,3 +30,10 @@ class QueueReader:
 				if not hang:
 					raise
 		return None
+
+	def __iter__(self):
+		while True:
+			n = self.next(hang=True)
+			if not n:
+				break
+			yield n

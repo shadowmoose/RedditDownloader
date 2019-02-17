@@ -1,29 +1,18 @@
 import re
 import os
-import math
-from collections import Counter
 import requests
 import mimetypes
 import shutil
 import urllib.parse
 from static import stringutil
+from static import settings
+from handlers import HandlerResponse
 
 tag = 'imgur'
 order = 1
 
-# TODO: This class needs some major refactoring. The library is fine, but the single-image handler needs splitting.
 
-"""
-imguralbum.py - Download a whole imgur album in one go.
-Provides both a class and a command line utility in a single script
-to download Imgur albums.
-MIT License
-Copyright Alex Gisby <alex@solution10.com>
-"""
-
-# Pulled from: https://github.com/alexgisby/imgur-album-downloader and modified.
-
-
+# Code borrowed from: https://github.com/alexgisby/imgur-album-downloader and modified.
 class ImgurAlbumException(Exception):
 	def __init__(self, msg='Error'):  # !cover
 		self.msg = msg
@@ -35,10 +24,6 @@ class ImgurAlbumDownloader:
 		Constructor. Pass in the album_url that you want to download.
 		"""
 		self.album_url = album_url
-
-		# Callback members:
-		self.image_callbacks = []
-		self.complete_callbacks = []
 		
 		self.user_agent = user_agent
 
@@ -68,216 +53,82 @@ class ImgurAlbumDownloader:
 		html = self.response.text
 		self.imageIDs = re.findall('.*?{"hash":"([a-zA-Z0-9]+)".*?"ext":"(\.[a-zA-Z0-9]+)".*?', html)
 		seen = set()
-		self.imageIDs = [x for x in self.imageIDs if x not in seen and not seen.add(x)]
-		self.cnt = Counter()
-		for i in self.imageIDs:
-			self.cnt[i[1]] += 1
+		self.urls = ["http://i.imgur.com/" + x[0]+x[1] for x in self.imageIDs if x not in seen and not seen.add(x)]
 
-	def num_images(self):
-		"""
-		Returns the number of images that are present in this album.
-		"""
-		return len(self.imageIDs)
-
-	def list_extensions(self):  # !cover
-		"""
-		Returns list with occurrences of extensions in descending order.
-		"""  
-		return self.cnt.most_common()
-
-	def album_key(self):  # !cover
-		"""
-		Returns the key of this album. Helpful if you plan on generating your own
-		folder names.
-		"""
-		return self.album_key
-	
-	def set_path(self, path):
-		"""
-		Overrides the generated paths to use this one for all images, 
-		Automatically appending the file extension.
-		"""
-		self.custom_path = path
-
-	def on_image_download(self, callback):
-		"""
-		Allows you to bind a function that will be called just before an image is
-		about to be downloaded. You'll be given the 1-indexed position of the image, its URL
-		and its destination file in the callback like so:
-			my_awesome_callback(1, "http://i.imgur.com/fGWX0.jpg", "~/Downloads/1-fGWX0.jpg")
-		"""
-		self.image_callbacks.append(callback)
-
-	def on_complete(self, callback):  # !cover
-		"""
-		Allows you to bind onto the end of the process, displaying any lovely messages
-		to your users, or carrying on with the rest of the program. Whichever.
-		"""
-		self.complete_callbacks.append(callback)
-
-	def save_images(self, foldername=False):
-		"""
-		Saves the images from the album into a folder given by foldername.
-		If no foldername is given, it'll use the cwd and the album key.
-		And if the folder doesn't exist, it'll try and create it.
-		"""
-		# Try and create the album folder:
-		if foldername:
-			album_folder = foldername
-		else:  # !cover
-			album_folder = self.album_key
-
-		if not os.path.exists(album_folder):
-			os.makedirs(album_folder)
-
-		# And finally loop through and save the images:
-		for (counter, image) in enumerate(self.imageIDs, start=1):
-			image_url = "http://i.imgur.com/"+image[0]+image[1]
-
-			prefix = "%0*d-" % (
-				int(math.ceil(math.log(len(self.imageIDs) + 1, 10))),
-				counter
-			)
-
-			if self.custom_path:
-				self.custom_path += image[1]
-				path = self.custom_path
-			else:
-				path = os.path.join(album_folder, prefix + image[0] + image[1])
-
-			# Run the callbacks:
-			for fn in self.image_callbacks:
-				fn(counter, image_url, path)
-
-			# Actually download the thing
-			if not os.path.isfile(path):
-				try:
-					# urllib.request.urlretrieve(image_url, path)
-					r = requests.get(image_url, headers={'User-Agent': self.user_agent}, stream=True)
-					if r.status_code != 200:
-						# stringutil.error("IMGUR: Failed to download image! [%i]" % r.status_code )
-						raise ImgurAlbumException("Error reading Imgur Image: Error Code %d" % r.status_code)
-					with open(path, 'wb') as f:
-						r.raw.decode_content = True
-						shutil.copyfileobj(r.raw, f)
-				except KeyboardInterrupt:
-					raise
-				except Exception:
-					# stringutil.error("IMGUR: Imgur Download failed.")
-					if os.path.isfile(path):
-						os.remove(path)
-					raise
-
-		# Run the complete callbacks:
-		for fn in self.complete_callbacks:  # !cover
-			fn()
+	def get_urls(self):
+		return list(self.urls)
 
 
-def handle(url, data, log, guess=True):
+def get_direct_link(url):
+	"""
+	If we've got a non-gallery, and missing the direct image url, correct to the direct image link.
+	"""
+	if 'i.img' in url:
+		return url
+	base_img = url.split("/")[-1]
+	req = requests.get(url, headers={'User-Agent': settings.get('auth.user_agent')})
+	if 'i.img' in req.url:
+		# Redirected to valid Image.
+		return req.url
+	else:
+		# Load the page and parse for image.
+		for u in stringutil.html_elements(req.text, 'img', 'src'):
+			if base_img in u:
+				u = urllib.parse.urljoin('https://i.imgur.com/', u)
+				return u
+	return None
+
+
+def handle(task):
+	url = task.url
 	if 'imgur' not in url:
 		return False
-	log.out(0, "Preparing Imgur Handler...")
-	# Not a gallery, so we have to do our best to manually find/format this image.
-	if not any(x in url for x in ['gallery', '/a/']):
-		# If we've got a non-gallery, and missing the direct image url, correct to the direct image link.
-		if 'i.img' not in url:
-			base_img = url.split("/")[-1]
-			req = requests.get(url, headers={'User-Agent': data['user_agent']})
-			if 'i.img' in req.url:
-				# Redirected to valid Image.
-				url = req.url
-				log.out(1, ("+Auto-corrected Imgur URL: %s" % url))
-			else:
-				# Load the page and parse for image.
-				for u in stringutil.html_elements(req.text, 'img', 'src'):
-					if base_img in u:
-						u = urllib.parse.urljoin('https://i.imgur.com/', u)
-						log.out(0, ("+Located direct Imgur URL: %s" % u))
-						url = u
-						break
-		
-		# Handle the direct imgur links, because the lib doesn't.
-		if 'i.imgur.com' in url:
-			path = None
-			# noinspection PyBroadException
-			try:
-				# I don't like that we basically end up loading every image just to skip some,
-				# but it's best to verify filetype with imgur, because the URL can ignore extension.
-				r = requests.get(url, headers={'User-Agent': data['user_agent']}, stream=True)
-				if r.status_code == 200:
-					content_type = r.headers['content-type']
-					ext = mimetypes.guess_extension(content_type)
-					if any(_e in url for _e in ['gifv', 'webm']):  # !cover
-						log.out(1, '-Allowing YTDL Handler to download animations.')
-						return False  # Let Youtube-dl module convert animations.
-					if not ext or ext == '':  # !cover
-						# stringutil.error('IMGUR: Error locating file MIME Type: %s' % url)
-						if guess:
-							# Attempt to download this image (missing a file ext) as a png.
-							# It's last-ditch, but works in some cases.
-							return handle(url+'.png', data, log, guess=False)
-						else:
-							return False
-					
-					if '.jp' in ext:
-						ext = '.jpg'  # !cover
-					path = data['single_file'] % ext
-					
-					if not os.path.isfile(path):
-						if not os.path.isdir(data['parent_dir']):  # !cover
-							log.out(1, ("+Building dir: %s" % data['parent_dir']))
-							os.makedirs(data['parent_dir'])  # Parent dir for the full filepath is supplied already.
-						
-						with open(path, 'wb') as f:
-							r.raw.decode_content = True
-							shutil.copyfileobj(r.raw, f)
-							return path
-					else:
-						return path  # !cover
-				else:  # !cover
-					# stringutil.error('IMGUR: Error Reading Image: %s responded with code %i!' % (url, r.status_code) )
-					return False
-			except KeyboardInterrupt:
-				raise
-			except Exception:
-				# stringutil.error("IMGUR: Exception: "+str(e) )
-				# stringutil.error("IMGUR: Error downloading direct Image: [%s] to path [%s]" % (url, path))
-				if path and os.path.isfile(path):
-					os.remove(path)
-			# stringutil.error('IMGUR: Something strange failed with direct Imgur download...')
-			return False  # !cover
-	else:
+
+	# Check for an album/gallery.
+	if any(x in url for x in ['gallery', '/a/']):
 		if 'i.' in url:
-			# Sometimes people include 'i.imgur' in album releases, which is incorrect.
 			# Imgur redirects this, but we correct for posterity.
 			url = url.replace('i.', '')  # !cover
-	#
-	try:
-		# Fire up the class:
-		downloader = ImgurAlbumDownloader(url, data['user_agent'])
-		log.out(0, "Found {0} images in album".format(downloader.num_images()))
-		
-		ret = data['multi_dir']  # Create with a default value, assumes we're getting multiple files.
-		targ_dir = data['multi_dir']  # We're either downloading to a multi-dir, or the parent "subreddit" dir.
-		if downloader.num_images() == 1:
-			downloader.set_path(data['single_file'] % '')
-			targ_dir = data['parent_dir']
-		
-		def print_image_progress(index, img_url, dest):
-			crop = stringutil.fit(dest, 75)
-			log.out(1, ("Downloading Image %d	%s >> %s" % (index, img_url, crop)))
-		#
-		downloader.on_image_download(print_image_progress)
-		
-		downloader.save_images(targ_dir)
-		log.out(1, "Imgur download complete!")
-		if downloader.num_images() == 1:
-			# if there's only a single image, the downloader auto-modifies this to include
-			# the image extension after saving the single file.
-			ret = downloader.custom_path
+		try:
+			album = ImgurAlbumDownloader(url, settings.get("auth.user_agent"))
+			return HandlerResponse(success=True, handler=tag, album_urls=album.get_urls())
+		except ImgurAlbumException:
+			return None
 
-		return ret
-	except ImgurAlbumException:
-		# stringutil.error("IMGUR: Imgur Error: "+e.msg)
-		pass
-	return False  # !cover
+	url = get_direct_link(url)
+
+	if not url:
+		return False  # Unable to parse proper URL.
+
+	# noinspection PyBroadException
+	try:
+		# I don't like that we basically end up loading every image just to skip some,
+		# but it's best to verify filetype with imgur, because the URL can ignore extension.
+		r = requests.get(url, headers={'User-Agent': settings.get('auth.user_agent')}, stream=True)
+		if r.status_code != 200:
+			return HandlerResponse(success=False,
+								   handler=tag,
+								   failure_reason="Imgur Server Error: %s->%s" % (url, r.status_code))
+
+		content_type = r.headers['content-type']
+		ext = mimetypes.guess_extension(content_type)
+		if any(_e in url for _e in ['gifv', 'webm']):  # !cover
+			return False  # Let Youtube-dl module convert animations.
+		if not ext or ext == '':  # !cover
+			# stringutil.error('IMGUR: Error locating file MIME Type: %s' % url)
+			return HandlerResponse(success=False, handler=tag, failure_reason="Unable to determine MIME Type: %s" % url)
+
+		if '.jp' in ext:
+			ext = '.jpg'  # !cover
+
+		task.file.set_ext(ext)
+		path = task.file.absolute()
+		task.file.mkdirs()
+		with open(path, 'wb') as f:
+			r.raw.decode_content = True
+			shutil.copyfileobj(r.raw, f)
+		return HandlerResponse(success=True, rel_file=task.file, handler=tag)
+	except Exception:
+		if task.file.exists():
+			os.remove(task.file.absolute())
+		return None
