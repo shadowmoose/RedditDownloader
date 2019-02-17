@@ -34,7 +34,7 @@ def error(string_output, **kwargs):  # !cover
 
 def color(string_out, text_color):
 	""" Color the given string and return it. """
-	return text_color + string_out + Style.RESET_ALL
+	return '%s%s%s' % (text_color, string_out, Style.RESET_ALL)
 
 
 def print_color(fore_color, string_output, **kwargs):
@@ -77,15 +77,15 @@ def normalize_file(str_file):
 
 def insert_vars(str_path, ele):
 	""" Replace the [tagged] ele fields in the given string. Sanitizes inserted values to be filename-compatible. """
-	max_len = 230  # We need to leave some headroom for longer (Unknown) extensions and/or naming. !cover
+	max_len = 200  # We need to leave some headroom for longer (Unknown) extensions and/or naming. !cover
 	# TODO: Filename length Test should be implemented to be sure this works cross-platform.
 	# TODO: This should replace vars in one pass, to avoid strings with [brackets] messing with it.
-	keys = [k for k, v in ele.__dict__.items() if '_' not in k]
+	keys = [k for k, v in ele.__dict__.items() if not k.startswith("_")]
 	length = min(max_len, max(len(str(ele.__dict__[k])) for k in keys))
 	while True:
 		ret_str = str_path
 		for k, v in ele.__dict__.items():
-			if '_' not in k:
+			if not k.startswith("_"):
 				ret_str = ret_str.replace('[%s]' % str(k), ''.join(filename(str(v))[0:length]).strip())
 
 		if len(normalize_file(ret_str)) < max_len:

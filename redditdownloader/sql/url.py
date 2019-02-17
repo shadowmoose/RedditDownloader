@@ -16,6 +16,7 @@ class URL(sql.Base):
 	post = relationship("Post", back_populates="urls")
 	album_id = Column(String, default=None)
 	album_order = Column(Integer, default=0)
+	last_handler = Column(String, default=None)
 
 	def __repr__(self):
 		failure = ""

@@ -56,6 +56,10 @@ class RelFile:
 	def exists(self):
 		return op.exists(self.absolute())
 
+	def set_ext(self, ext):
+		""" Sets the file extension at the end of the local path. """
+		self._path += '.%s' % ''.join([c for c in ext if c.isalnum()])
+
 	def mkdirs(self):
 		"""
 		Builds the full path to this file, if its parent directories do not exist already.

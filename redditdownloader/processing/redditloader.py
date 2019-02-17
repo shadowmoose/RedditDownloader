@@ -3,10 +3,11 @@ import queue
 from colorama import Fore
 from static import stringutil
 import static.settings as settings
-from processing.queue_reader import QueueReader
-from processing.rel_file import SanitizedRelFile
+from processing.wrappers.queue_reader import QueueReader
+from processing.wrappers.rel_file import SanitizedRelFile
 import sql
 from processing import name_generator
+
 
 class RedditLoader(multiprocessing.Process):
 	def __init__(self, sources, settings_json):
@@ -72,22 +73,35 @@ class RedditLoader(multiprocessing.Process):
 		urls = []
 		for u in reddit_element.get_urls():
 			if self._session.query(sql.URL.id).filter(sql.URL.address == u).first():
-				print("Skipping url.")
+				print("Skipping url: %s" % u)
 				# These URLS can be skipped, because they are top-level "non-album-file" urls.
 				# Album URLs will be resubmitted submitted in a differet method.
 				continue
-			url = sql.URL.make_url(u, post, None, 0)
+			url = sql.URL.make_url(address=u, post=post, album_key=None, album_order=0)
 			urls.append(url)
 		self._session.add_all(urls)
 		self._session.commit()  # After commiting, the URL generated IDs will be filled in.
 		return urls
 
-	def _create_url_files(self, url):
+	def _create_album_urls(self, urls, post_id, album_key):
+		""" Generates URL objects for Album URLs. """
+		post = self._session.query(sql.Post).filter(sql.Post.reddit_id == post_id).first()
+		if not post:
+			raise ValueError("The given Post ID does not exist - cannot generate Album URL: %s" % post_id)
+		new_urls = []
+		for idx, u in enumerate(urls):
+			url = sql.URL.make_url(address=u, post=post, album_key=album_key, album_order=idx+1)
+			new_urls.append(url)
+		self._session.add_all(new_urls)
+		self._session.commit()  # After commiting, the URL generated IDs will be filled in.
+		return new_urls
+
+	def _create_url_files(self, url, album_size=1):
 		"""
 		Builds the desired sql.File object for the given sql.URL Object.
 		Automatically adds the File object to the URL.
 		"""
-		filename = name_generator.choose_file_name(url, self._session)
+		filename = name_generator.choose_file_name(url=url, session=self._session, album_size=album_size)
 		file = sql.File(
 			path=filename,
 			url_id=url.id
@@ -108,8 +122,9 @@ class RedditLoader(multiprocessing.Process):
 	def get_stop_event(self):
 		return self._stop_event
 
-	def _push_url(self, url_id):
-		self._handle_acks()  # passively process some ACKS in a non-blocking way to prevent queue bloat.
+	def _push_url(self, url_id, handle_acks=True):
+		if handle_acks:
+			self._handle_acks()  # passively process some ACKS in a non-blocking way to prevent queue bloat.
 		while not self._stop_event.is_set():
 			try:  # Keep trying to add this element to the queue, with a timeout to catch any stop triggers.
 				self._queue.put(url_id, timeout=1)
@@ -121,10 +136,12 @@ class RedditLoader(multiprocessing.Process):
 	def _handle_acks(self):
 		try:
 			packet = self._ack_queue.get_nowait()
-			if packet['cmd'] == 'ack':
-				self._open_ack.remove(packet['id'])
-			else:
-				print('Downloader reported new Album URL IDs:', packet)
-				# TODO: Take the submitted list of Album URLS, generate them in the DB, and submit them.
+			if packet.extra_urls:
+				print('Downloader reported new Album URL IDs:', packet.extra_urls)
+				urls = self._create_album_urls(packet.extra_urls, packet.post_id, packet.album_id)
+				for u in urls:
+					self._create_url_files(u, album_size=len(urls))
+					self._push_url(u.id, handle_acks=False)
+			self._open_ack.remove(packet.url_id)
 		except queue.Empty:
 			pass
