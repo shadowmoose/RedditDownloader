@@ -34,6 +34,6 @@ class QueueReader:
 	def __iter__(self):
 		while True:
 			n = self.next(hang=True)
-			if not n:
+			if n is None:
 				break
 			yield n

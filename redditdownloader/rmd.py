@@ -48,7 +48,7 @@ class RMD(threading.Thread):
 				print()
 				print('Downloader:', dl.name)
 				print('\tHandler:', dl.progress.get_handler())
-				print('\tHandler:', dl.progress.get_file())
+				print('\tFile:', dl.progress.get_file())
 				print('\tStatus:', dl.progress.get_status())
 				if dl.progress.get_percent():
 					print('\tPercent:', '%s%%' % dl.progress.get_percent())
@@ -60,6 +60,7 @@ class RMD(threading.Thread):
 		# Wait for Downloaders to finish.
 		# TODO: status updating for console/UI.
 		# TODO: If any Downloaders are finished, but the Loader is still hung, an ACK failed and we should alert.
+		sql.close()
 		print("All finished.")
 
 	def stop(self):
