@@ -55,6 +55,10 @@ def session():
 	return _Session()
 
 
+def close():
+	_Session.close()
+
+
 # Import ORM classes at bottom so they can access this package safely.
 from sql.file import File
 from sql.post import Post

@@ -57,8 +57,8 @@ class RedditLoader(multiprocessing.Process):
 				# ...Until the Downloaders have confirmed completion of everything, more album URLS may come in.
 				stringutil.print_color(Fore.GREEN, 'Waiting for acks...')
 				lt = time.time()
-				while len(self._open_ack) > 0:
-					if time.time() - lt >= 10:
+				while len(self._open_ack) > 0 and not self._stop_event.is_set():
+					if time.time() - lt >= 10:  # TODO: Remove this debugging.
 						lt = time.time()
 						print("QUEUE [%s], AWAITING %s ACKS, {%s}" %
 							  (self._queue.qsize(), len(self._open_ack), self._open_ack))
@@ -67,7 +67,7 @@ class RedditLoader(multiprocessing.Process):
 				print(str(ce).upper())
 				# TODO: How to best log a failure here?
 		print("Finished loading.")
-		self._session.close()
+		sql.close()
 		self._stop_event.set()
 
 	def _create_element_urls(self, reddit_element, post):

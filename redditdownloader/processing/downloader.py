@@ -84,6 +84,6 @@ class Downloader(multiprocessing.Process):
 				))
 				raise  # TODO: Error handling here.
 
-		self._session = sql.session()
+		sql.close()
 		print("Finished reading.")
 		self.progress.clear("Finished.")
