@@ -24,13 +24,14 @@ class HandlerResponse:
 		self.album_urls = album_urls
 
 
-def handle(handler_task):
+def handle(handler_task, progress_obj):
 	"""
 	Pass the given HandlerTask into the handler list, and try to find one that can download the given file.
 	"""
 	for h in sorted_list():
 		try:
-			result = h.handle(handler_task)
+			progress_obj.set_handler(h.tag)
+			result = h.handle(task=handler_task, progress=progress_obj)
 			if result:
 				return result
 		except Exception as ex:  # There are too many possible exceptions between all handlers to catch properly.

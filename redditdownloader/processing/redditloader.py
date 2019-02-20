@@ -5,8 +5,7 @@ from colorama import Fore
 from static import stringutil
 from static import settings
 from processing import name_generator
-from processing.wrappers import QueueReader
-from processing.wrappers import SanitizedRelFile
+from processing.wrappers import QueueReader, SanitizedRelFile
 import sql
 
 
@@ -79,7 +78,6 @@ class RedditLoader(multiprocessing.Process):
 		urls = []
 		for u in reddit_element.get_urls():
 			if self._session.query(sql.URL.id).filter(sql.URL.address == u).first():
-				print("Skipping url: %s" % u)
 				# These URLS can be skipped, because they are top-level "non-album-file" urls.
 				# Album URLs will be resubmitted submitted in a differet method.
 				continue

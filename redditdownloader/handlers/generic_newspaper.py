@@ -21,9 +21,10 @@ order = 90000
 """
 
 
-def handle(task):
+def handle(task, progress):
 	user_agent = settings.get('auth.user_agent')
 	url = task.url
+	progress.set_status("Requesting page...")
 	resp = requests.get(url, headers={'User-Agent': user_agent})
 	if resp.status_code != 200:
 		return False  # !cover
@@ -46,6 +47,8 @@ def handle(task):
 		else:
 			src = 'http://' + src.lstrip('/ ').strip()
 
+	progress.set_status("Downloading image...")
+
 	r = requests.get(src, headers={'User-Agent': user_agent}, stream=True)
 	if r.status_code == 200:
 		content_type = r.headers['content-type']
@@ -54,8 +57,10 @@ def handle(task):
 			return None
 		if '.jp' in ext:
 			ext = '.jpg'  # !cover
+
 		task.file.set_ext(ext)
 		task.file.mkdirs()
+		progress.set_file(task.file.relative())
 		with open(task.file.absolute(), 'wb') as f:
 			r.raw.decode_content = True
 			shutil.copyfileobj(r.raw, f)
