@@ -105,7 +105,7 @@ def handle(task, progress):
 	# noinspection PyBroadException
 	try:
 		# Verify filetype with imgur, because the URL can ignore extension.
-		r = requests.head(url, headers={'User-Agent': settings.get('auth.user_agent')}, stream=True)
+		r = requests.get(url, headers={'User-Agent': settings.get('auth.user_agent')}, stream=True)
 		if r.status_code != 200:
 			return HandlerResponse(success=False,
 								   handler=tag,

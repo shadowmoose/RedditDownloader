@@ -26,7 +26,7 @@ class Progress:
 		self.clear()  # Initialize the progress variables as their defaults.
 
 	def set_percent(self, prog):
-		self._ns.percent = str(prog) if prog is not None else None
+		self._ns.percent = str(prog).strip() if prog is not None else None
 
 	def get_percent(self):
 		return self._ns.percent
