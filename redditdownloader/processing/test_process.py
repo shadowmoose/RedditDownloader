@@ -1,19 +1,11 @@
 import multiprocessing
 import sql
 from static import settings
-from processing.wrappers.rel_file import SanitizedRelFile
+from processing.wrappers import SanitizedRelFile, AckPacket
 import handlers
 import uuid
 
 # TODO: Extend this to allow direct console input by wrapping the input/output queues.
-
-
-class AckPacket:
-	def __init__(self, url_id, post_id, album_id, extra_urls):
-		self.url_id = url_id
-		self.post_id = post_id
-		self.album_id = album_id
-		self.extra_urls = extra_urls
 
 
 class TestProcess(multiprocessing.Process):
@@ -62,9 +54,10 @@ class TestProcess(multiprocessing.Process):
 			if resp.rel_file:
 				file.downloaded = True
 				file.path = resp.rel_file.relative()
-				file.hash = None  # TODO: Hash file and deduplicate.
+				file.hash = None
 
 			self._session.commit()
+			# TODO: Hash file and deduplicate.
 
 			# Once *all* processing is completed on this URL, the Downloader needs to ACK it.
 			# If any additional Album URLS were located, they should be sent before the ACK.
@@ -73,8 +66,7 @@ class TestProcess(multiprocessing.Process):
 				post_id=url.post_id,
 				album_id=url.album_id,
 				extra_urls=resp.album_urls
-			))  # TODO: Ack packet, which can carry any new URLS and status.
+			))
 
-		# Start Downloaders, with the Queue.
-		# Wait for Downloaders to finish.
+		self._session = sql.session()
 		print("Finished reading.")
