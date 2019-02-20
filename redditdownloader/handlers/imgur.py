@@ -79,10 +79,12 @@ def get_direct_link(url):
 	return None
 
 
-def handle(task):
+def handle(task, progress):
 	url = task.url
-	if 'imgur' not in url:
+	if 'imgur.com' not in url:
 		return False
+
+	progress.set_status("Parsing url & verifying format...")
 
 	# Check for an album/gallery.
 	if any(x in url for x in ['gallery', '/a/']):
@@ -102,9 +104,8 @@ def handle(task):
 
 	# noinspection PyBroadException
 	try:
-		# I don't like that we basically end up loading every image just to skip some,
-		# but it's best to verify filetype with imgur, because the URL can ignore extension.
-		r = requests.get(url, headers={'User-Agent': settings.get('auth.user_agent')}, stream=True)
+		# Verify filetype with imgur, because the URL can ignore extension.
+		r = requests.head(url, headers={'User-Agent': settings.get('auth.user_agent')}, stream=True)
 		if r.status_code != 200:
 			return HandlerResponse(success=False,
 								   handler=tag,
@@ -113,7 +114,7 @@ def handle(task):
 		content_type = r.headers['content-type']
 		ext = mimetypes.guess_extension(content_type)
 		if any(_e in url for _e in ['gifv', 'webm']):  # !cover
-			return False  # Let Youtube-dl module convert animations.
+			return False  # TODO: YTDL is bad at these suddenly, so add custom handling here.
 		if not ext or ext == '':  # !cover
 			# stringutil.error('IMGUR: Error locating file MIME Type: %s' % url)
 			return HandlerResponse(success=False, handler=tag, failure_reason="Unable to determine MIME Type: %s" % url)
@@ -123,6 +124,8 @@ def handle(task):
 
 		task.file.set_ext(ext)
 		path = task.file.absolute()
+		progress.set_status("Downloading image...")
+		progress.set_file(task.file.relative())
 		task.file.mkdirs()
 		with open(path, 'wb') as f:
 			r.raw.decode_content = True

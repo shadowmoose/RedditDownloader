@@ -4,9 +4,10 @@ import threading
 from static import settings
 from static import stringutil as su
 from processing.redditloader import RedditLoader
-from processing.test_process import TestProcess
+from processing.downloader import Downloader
 import sql
-from processing.wrappers.rel_file import SanitizedRelFile
+from processing.wrappers import SanitizedRelFile
+import colorama
 
 '''
 	TODO: Probably need a special class for generating file location data.
@@ -26,8 +27,7 @@ class RMD(threading.Thread):
 		self.sources = self.load_sources()
 		# initialize Loader
 		self.loader = RedditLoader(sources=self.sources, settings_json=settings.to_json())
-		self.processor = None
-		self._total_time = 0
+		self._downloaders = self._create_downloaders()
 
 	def run(self):
 		# Initialize Database
@@ -37,19 +37,24 @@ class RMD(threading.Thread):
 
 		# Start Post scanner, with a Queue
 		self.loader.start()
+		for dl in self._downloaders:
+			dl.start()
 
-		tests = []
-		for i in range(settings.get('threading.max_handler_threads')):
-			tp = TestProcess(
-				reader=self.loader.get_reader(),
-				ack_queue=self.loader.get_ack_queue(),
-				settings_json=settings.to_json()
-			)
-			tests.append(tp)
-			tp.start()
-
-		for t in tests:
-			t.join()
+		# TODO: Remove this basic printout, and add wrapper UIs for the downloader to support Console/Web
+		while any(p.is_alive() for p in self._downloaders):
+			if settings.get('threading.display_clear_screen'):
+				print('\n'*10, colorama.ansi.clear_screen())
+			for dl in self._downloaders:
+				print()
+				print('Downloader:', dl.name)
+				print('\tHandler:', dl.progress.get_handler())
+				print('\tHandler:', dl.progress.get_file())
+				print('\tStatus:', dl.progress.get_status())
+				if dl.progress.get_percent():
+					print('\tPercent:', '%s%%' % dl.progress.get_percent())
+				else:
+					print()
+			self.loader.get_stop_event().wait(settings.get("threading.display_refresh_rate"))
 
 		# Start Downloaders, with the Queue.
 		# Wait for Downloaders to finish.
@@ -64,7 +69,18 @@ class RMD(threading.Thread):
 		pass  # TODO: implement
 
 	def get_progress(self):
-		pass  # TODO: implement
+		return [d.progress for d in self._downloaders]
+
+	def _create_downloaders(self):
+		dls = []
+		for i in range(settings.get('threading.max_handler_threads')):
+			tp = Downloader(
+				reader=self.loader.get_reader(),
+				ack_queue=self.loader.get_ack_queue(),
+				settings_json=settings.to_json()
+			)
+			dls.append(tp)
+		return dls
 
 	def load_sources(self):  # !cover
 		sources = []

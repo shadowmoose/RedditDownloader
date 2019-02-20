@@ -25,11 +25,11 @@ class Progress:
 		self._ns = Progress._manager.Namespace()
 		self.clear()  # Initialize the progress variables as their defaults.
 
-	def set_progress(self, prog):
-		self._ns.progress = str(prog) if prog is not None else None
+	def set_percent(self, prog):
+		self._ns.percent = str(prog) if prog is not None else None
 
-	def get_progress(self):
-		return self._ns.progress
+	def get_percent(self):
+		return self._ns.percent
 
 	def set_status(self, status):
 		self._ns.status = str(status)
@@ -43,8 +43,15 @@ class Progress:
 	def get_handler(self):
 		return self._ns.handler
 
+	def set_file(self, file_name):
+		self._ns.file_name = str(file_name)
+
+	def get_file(self):
+		return str(self._ns.file_name)
+
 	def clear(self, status=""):
 		""" Reset this Progress to the default values. Optionally accepts `status` as a convenience. """
-		self._ns.progress = None
+		self._ns.percent = None
 		self._ns.status = status
 		self._ns.handler = None
+		self._ns.file_name = None
