@@ -47,11 +47,11 @@ class RMD(threading.Thread):
 			for dl in self._downloaders:
 				print()
 				print('Downloader:', dl.name)
-				print('\tHandler:', dl.progress.get_handler())
-				print('\tFile:', dl.progress.get_file())
-				print('\tStatus:', dl.progress.get_status())
+				print('Handler:'.rjust(20), dl.progress.get_handler())
+				print('File:'.rjust(20), dl.progress.get_file())
+				print('Status:'.rjust(20), dl.progress.get_status())
 				if dl.progress.get_percent():
-					print('\tPercent:', '%s%%' % dl.progress.get_percent())
+					print('Percent:'.rjust(20), '%s%%' % dl.progress.get_percent())
 				else:
 					print()
 			self.loader.get_stop_event().wait(settings.get("threading.display_refresh_rate"))
