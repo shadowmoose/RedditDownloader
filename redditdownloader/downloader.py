@@ -42,7 +42,7 @@ class RMD(threading.Thread):
 		for i in range(settings.get('threading.max_handler_threads')):
 			tp = TestProcess(
 				reader=self.loader.get_reader(),
-				ack_queue=self.loader.get_ack(),
+				ack_queue=self.loader.get_ack_queue(),
 				settings_json=settings.to_json()
 			)
 			tests.append(tp)

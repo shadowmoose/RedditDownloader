@@ -58,7 +58,10 @@ class RelFile:
 
 	def set_ext(self, ext):
 		""" Sets the file extension at the end of the local path. """
-		self._path += '.%s' % ''.join([c for c in ext if c.isalnum()])
+		ext = (''.join([c for c in ext if c.isalnum()])).strip()
+		if not ext:
+			ext = '.unknown'
+		self._path += '.%s' % ext
 
 	def mkdirs(self):
 		"""

@@ -4,8 +4,8 @@ from static import stringutil
 from sql import File, URL
 
 
-def choose_file_name(url, session, album_size=1):
-	base = _choose_base_name(url).relative()
+def choose_file_name(url, post, session, album_size=1):
+	base = _choose_base_name(post).relative()
 	idx = 1
 	nb = base + " - %s"
 	while _get_matching(base=base, url=url, session=session):
@@ -25,14 +25,13 @@ def _get_matching(base, url, session):
 		return session.query(File).filter(File.path.like(base+"%")).first()
 
 
-def _choose_base_name(url):
+def _choose_base_name(post):
 	"""
 	Generate the base file name, missing any extensions.
 	Auto-converts "Album" URLs into directories, with the leading file index added.
-	:param url: An sql.URL object.
+	:param post: An sql.Post object.
 	:return: The RelFile generated, with the path variables inserted and formatted.
 	"""
-	post = url.post
 	dir_pattern = './%s' % settings.save_subdir()
 	file_pattern = '%s/%s' % (dir_pattern, settings.save_filename())
 

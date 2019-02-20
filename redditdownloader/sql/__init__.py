@@ -9,6 +9,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, scoped_session
 import os
 
+
 Base = declarative_base()
 
 _engine = None
@@ -39,6 +40,8 @@ def init(db_path=":memory:"):
 def _create():
 	Base.metadata.create_all(_engine)
 	print("\tCreated Database file.")
+	session().execute("PRAGMA journal_mode=WAL")
+	print("\t+Activated WAL Mode.")
 
 
 def session():
