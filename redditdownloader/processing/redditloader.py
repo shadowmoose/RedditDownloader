@@ -50,7 +50,7 @@ class RedditLoader(multiprocessing.Process):
 
 					urls = self._create_element_urls(r, post)
 					for u in urls:
-						self._create_url_files(u, post=post)
+						self._create_url_file(u, post=post)
 					self._session.add(post)
 					self._push_url_list(urls)
 				# Wait for any remaining ACKS to come in, before closing the writing pipe.
@@ -87,20 +87,19 @@ class RedditLoader(multiprocessing.Process):
 			post.urls.append(url)
 		return urls
 
-	def _create_album_urls(self, urls, post_id, album_key):
+	def _create_album_urls(self, urls, post, album_key):
 		""" Generates URL objects for Album URLs. """
-		post = self._session.query(sql.Post).filter(sql.Post.reddit_id == post_id).first()
 		if not post:
-			raise ValueError("The given Post ID does not exist - cannot generate Album URL: %s" % post_id)
+			raise ValueError("The given Post does not exist - cannot generate Album URL: %s" % post)
 		new_urls = []
 		for idx, u in enumerate(urls):
 			url = sql.URL.make_url(address=u, post=post, album_key=album_key, album_order=idx+1)
 			new_urls.append(url)
 			self._session.add(url)
 			post.urls.append(url)
-		return new_urls, post
+		return new_urls
 
-	def _create_url_files(self, url, post, album_size=1):
+	def _create_url_file(self, url, post, album_size=1):
 		"""
 		Builds the desired sql.File object for the given sql.URL Object.
 		Automatically adds the File object to the URL.
@@ -133,14 +132,17 @@ class RedditLoader(multiprocessing.Process):
 		:param handle_acks:
 		:return:
 		"""
-		# noinspection PyBroadException
+		self._safe_commit()
+		for u in url_list:
+			self._push_url(u.id, handle_acks=handle_acks)
+
+	def _safe_commit(self):
+		""" Commit and catch any exceptions, usually raised if the session is not dirty. """
 		try:
 			self._session.commit()  # After commiting, the URL generated IDs will be filled in.
 		except Exception as e:
 			stringutil.error("RedditLoader: Error persisting session: %s" % e)
 			pass
-		for u in url_list:
-			self._push_url(u.id, handle_acks=handle_acks)
 
 	def _push_url(self, url_id, handle_acks=True):
 		if handle_acks:
@@ -157,15 +159,19 @@ class RedditLoader(multiprocessing.Process):
 		"""
 		Process an Ack Packet in the queue, if there are any.
 		If not, this method will return without blocking - unless `timeout` is set.
-		:return:
 		"""
 		try:
 			packet = self._ack_queue.get(block=True, timeout=timeout)
+			url = self._session.query(sql.URL).filter(sql.URL.id == packet.url_id).first()
 			if packet.extra_urls:
-				urls, post = self._create_album_urls(packet.extra_urls, packet.post_id, packet.album_id)
+				urls = self._create_album_urls(packet.extra_urls, url.post, url.album_id)
 				for u in urls:
-					self._create_url_files(u, post=post, album_size=len(urls))
+					self._create_url_file(u, post=url.post, album_size=len(urls))
+				url.processed = True  # When the new URLs are committed, also prevent this URL from being reprocessed.
 				self._push_url_list(urls, handle_acks=False)
+			else:
+				url.processed = True
+				self._safe_commit()
 			self._open_ack.remove(packet.url_id)
 		except queue.Empty:
 			pass
