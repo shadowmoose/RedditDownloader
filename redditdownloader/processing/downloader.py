@@ -45,18 +45,21 @@ class Downloader(multiprocessing.Process):
 				task = handlers.HandlerTask(url=url.address, file_obj=path)
 				resp = handlers.handle(task, self.progress)
 
+				is_album_parent = False
+
 				if resp.album_urls:
 					if url.album_id:
 						resp.album_urls = []  # Ignore nested Albums to avoid recursion.
 					else:
 						url.album_id = str(uuid.uuid4())
+						is_album_parent = True
 				else:
 					resp.album_urls = []
 
-				url.downloaded = resp.success
 				url.failed = not resp.success
 				url.failure_reason = resp.failure_reason
 				url.last_handler = resp.handler
+				url.album_is_parent = is_album_parent
 
 				if resp.rel_file:
 					file.downloaded = True
@@ -70,16 +73,12 @@ class Downloader(multiprocessing.Process):
 				# If any additional Album URLS were located, they should be sent before the ACK.
 				self._ack_queue.put(AckPacket(
 					url_id=nxt_id,
-					post_id=url.post_id,
-					album_id=url.album_id,
 					extra_urls=resp.album_urls
 				))
 				self.progress.clear(status="Waiting for Post...")
 			except Exception:
 				self._ack_queue.put(AckPacket(
 					url_id=nxt_id,
-					post_id=None,
-					album_id=None,
 					extra_urls=[]
 				))
 				raise  # TODO: Error handling here.

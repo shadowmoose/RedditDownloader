@@ -4,10 +4,8 @@ from multiprocessing import Manager
 
 
 class AckPacket:
-	def __init__(self, url_id, post_id, album_id, extra_urls):
+	def __init__(self, url_id, extra_urls):
 		self.url_id = url_id
-		self.post_id = post_id
-		self.album_id = album_id
 		self.extra_urls = extra_urls
 
 

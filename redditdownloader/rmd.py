@@ -8,15 +8,8 @@ from processing.downloader import Downloader
 import sql
 from processing.wrappers import SanitizedRelFile
 import colorama
-
-'''
-	TODO: Probably need a special class for generating file location data.
-	It should accept a Post element from the DB, a URL, and if the URL is part of an Album,
-	It will output a File Path, which the Downloaders will be responsible to saving to.
-	
-	If the Downloaders find an Album URL, they could just use the same class to generate the File Path,
-	save the path to the DB, then report back the new ID so it can be queued.
-'''
+import time
+import multiprocessing
 
 
 class RMD(threading.Thread):
@@ -41,9 +34,11 @@ class RMD(threading.Thread):
 			dl.start()
 
 		# TODO: Remove this basic printout, and add wrapper UIs for the downloader to support Console/Web
+		min_timer = multiprocessing.Event()
 		while any(p.is_alive() for p in self._downloaders):
 			if settings.get('threading.display_clear_screen'):
 				print('\n'*10, colorama.ansi.clear_screen())
+			print(time.time(), 'Alive:', [p.name for p in self._downloaders if p.is_alive()])
 			for dl in self._downloaders:
 				print()
 				print('Downloader:', dl.name)
@@ -54,7 +49,10 @@ class RMD(threading.Thread):
 					print('Percent:'.rjust(20), '%s%%' % dl.progress.get_percent())
 				else:
 					print()
-			self.loader.get_stop_event().wait(settings.get("threading.display_refresh_rate"))
+			if not self.loader.get_stop_event().is_set():
+				self.loader.get_stop_event().wait(settings.get("threading.display_refresh_rate"))
+			else:
+				min_timer.wait(1)  # Minimum timeout, since the event will be set before processes close.
 
 		# Start Downloaders, with the Queue.
 		# Wait for Downloaders to finish.
