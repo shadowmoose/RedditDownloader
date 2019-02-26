@@ -31,7 +31,7 @@ class YTDLWrapper:
 			if self.do_prog_update:
 				self.do_prog_update = False
 				self.progress.set_status("Downloading video...")
-			self.progress.set_percent(d['_percent_str'].replace('%', ''))
+			self.progress.set_percent(d['_percent_str'].strip('% '))
 
 	def run(self, task):
 		task.file.mkdirs()
