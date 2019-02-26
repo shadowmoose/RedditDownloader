@@ -36,7 +36,7 @@ class RMD(threading.Thread):
 		# TODO: Remove this basic printout, and add wrapper UIs for the downloader to support Console/Web
 		min_timer = multiprocessing.Event()
 		while any(p.is_alive() for p in self._downloaders):
-			if settings.get('threading.display_clear_screen'):
+			if settings.get('threading.console_clear_screen'):
 				print('\n'*10, colorama.ansi.clear_screen())
 			print(time.time(), 'Alive:', [p.name for p in self._downloaders if p.is_alive()])
 			for dl in self._downloaders:
@@ -72,7 +72,7 @@ class RMD(threading.Thread):
 
 	def _create_downloaders(self):
 		dls = []
-		for i in range(settings.get('threading.max_handler_threads')):
+		for i in range(settings.get('threading.concurrent_downloads')):
 			tp = Downloader(
 				reader=self.loader.get_reader(),
 				ack_queue=self.loader.get_ack_queue(),

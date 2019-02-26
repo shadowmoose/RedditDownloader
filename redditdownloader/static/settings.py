@@ -140,21 +140,6 @@ def remove_source(source, save_after=True):
 	put('sources', [s.to_obj() for s in new_sources], save_after=save_after)
 
 
-def save_base():
-	""" The base folder pattern to save to. """
-	return get('output.base_dir')
-
-
-def save_subdir():
-	""" The save path's subdirectory pattern. """
-	return get('output.subdir_pattern')
-
-
-def save_filename():
-	""" The save path's filename pattern. """
-	return get('output.file_name_pattern')
-
-
 class Setting(object):
 	def __init__(self, name, value, desc='', etype='str', public=True, opts=None):
 		self.name = name
@@ -225,12 +210,12 @@ add("auth", Setting("user_agent", 'RMD-Scanner-%s' % uuid.uuid4(), desc="The use
 add("auth", Setting("oauth_key", str(uuid.uuid4()), desc="Internal key.", public=False))
 
 add("output", Setting("base_dir", './download/', desc="The base directory to save to. Cannot contain tags."))
-add("output", Setting("subdir_pattern", '/[subreddit]/', desc="The directory path, within the base_dir, to save files to. Supports tags."))
-add("output", Setting("file_name_pattern", '[title] - ([author])', desc="The ouput file name. Supports tags."))
-add("output", Setting("deduplicate_files", True, desc="Remove downloaded files if another copy already exists. Also compares images for visual similarity.", etype="bool"))
+add("output", Setting("file_name_pattern", '[title] - ([author])', desc="The ouput file name/path. Supports tags."))
 
-add("threading", Setting("max_handler_threads", 5, desc="How many threads can download media at once.", etype="int"))
-add("threading", Setting("display_clear_screen", True, desc="If it's okay to clear the terminal while running.", etype="bool"))
+add("processing", Setting("deduplicate_files", True, desc="Remove downloaded files if another copy already exists. Also compares images for visual similarity.", etype="bool"))
+
+add("threading", Setting("concurrent_downloads", 5, desc="How many threads can download media at once.", etype="int"))
+add("threading", Setting("console_clear_screen", True, desc="If it's okay to clear the terminal while running.", etype="bool"))
 add("threading", Setting("display_refresh_rate", 5, desc="How often the UI should update progress, in seconds.", etype="int"))
 
 add("interface", Setting("start_server", True, desc="If the WebUI should be available.", etype="bool"))
@@ -239,7 +224,7 @@ add("interface", Setting("keep_open", False, desc="If True, the WebUI will stay 
 add("interface", Setting("port", 7505, desc="The port to open the WebUI on.", etype="int"))
 add("interface", Setting("host", 'localhost', desc="The host to bind on."))
 
-add(None, Setting("meta-version", 4, etype="int", public=False))
+add(None, Setting("meta-version", 5, etype="int", public=False))
 add(None, Setting("sources", [{'alias': 'default-downloader', 'data': {}, 'filters': {}, 'type': 'personal-upvoted-saved'}], etype="list", public=False))
 # ======================================
 
@@ -296,6 +281,23 @@ def _adapt(obj):  # !cover
 		# obj['interface']['start_server'] = False  # Default to old behavior.
 		print("Adapted from Settings version 3 -> 4!")
 		converted = True
+		version = 4
+
+	if version == 4:
+		# Moved to SqlAlchemy and Multiprocessing.
+		obj['processing'] = {'deduplicate_files': obj['output']['deduplicate_files']}
+		obj['output']['file_name_pattern'] = \
+			('%s/%s' % (obj['output']['subdir_pattern'], obj['output']['file_name_pattern'])).replace('//', '/')
+		obj['threading']['console_clear_screen'] = obj['threading']['display_clear_screen']
+		obj['threading']['concurrent_downloads'] = obj['threading']['max_handler_threads']
+		del obj['output']['subdir_pattern']
+		del obj['output']['deduplicate_files']
+		del obj['threading']['display_clear_screen']
+		del obj['threading']['max_handler_threads']
+		print("Adapted from Settings version 4 -> 5!")
+		obj[_default_cat]['meta-version'] = 5
+		converted = True
+		# version = 5
 
 	return obj, converted
 
