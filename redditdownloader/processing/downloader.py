@@ -75,7 +75,7 @@ class Downloader(multiprocessing.Process):
 					url_id=nxt_id,
 					extra_urls=resp.album_urls
 				))
-				self.progress.clear(status="Waiting for Post...")
+				self.progress.clear(status="Waiting for URL...")
 			except Exception:
 				self._ack_queue.put(AckPacket(
 					url_id=nxt_id,
