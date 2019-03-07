@@ -32,7 +32,7 @@ def _choose_base_name(post):
 	:param post: An sql.Post object.
 	:return: The RelFile generated, with the path variables inserted and formatted.
 	"""
-	file_pattern = './%s' % settings.get('output.file_name_pattern').rstrip('/\\ ')
+	file_pattern = './%s' % settings.get('output.file_name_pattern').strip('/\\ .')
 
 	output = RelFile(base=settings.get("output.base_dir"), file_path=file_pattern)
 

@@ -79,8 +79,8 @@ class RelFile:
 class SanitizedRelFile(RelFile):
 	def __init__(self, base, file_path=None, full_file_path=None):
 		super().__init__(base, file_path, full_file_path)
-		self._path = pathvalidate.sanitize_filepath(self._path.replace("..", ""))
-		if not len(self._path.strip(". /\\")):
+		self._path = pathvalidate.sanitize_filepath(self._path, '_').strip(". /\\")
+		if not len(self._path):
 			raise RelError("File path is too short! {%s}" % file_path)
 
 

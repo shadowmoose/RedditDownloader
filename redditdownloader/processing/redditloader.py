@@ -27,7 +27,6 @@ class RedditLoader(multiprocessing.Process):
 
 	def run(self):
 		""" Threaded loading of elements. """
-		print("Loading elements...", self.sources)
 		settings.from_json(self.settings)
 		db_file = SanitizedRelFile(base=settings.get("output.base_dir"), file_path="manifest.sqldb")
 		db_file.mkdirs()
@@ -41,12 +40,25 @@ class RedditLoader(multiprocessing.Process):
 			.all()
 		self._push_url_list(unfinished)
 
+		self._scan_sources()
+
+		self.progress.set_scanning(False)
+		# Wait for any remaining ACKS to come in, before closing the writing pipe.
+		# ...Until the Downloaders have confirmed completion of everything, more album URLS may come in.
+		while len(self._open_ack) > 0 and not self._stop_event.is_set():
+			self._handle_acks(timeout=0.5)
+		print("Finished loading.")
+		sql.close()
+		self._stop_event.set()
+
+	def _scan_sources(self):
 		for source in self.sources:
 			try:
 				self.progress.set_source(source.get_alias())
 				for r in source.get_elements():
+					if self._stop_event.is_set():
+						return
 					r.set_source(source)
-					self.progress.increment_found()
 
 					# Create the SQL objects, then submit them to the queue.
 					post = self._session.query(sql.Post).filter(sql.Post.reddit_id == r.id).first()
@@ -60,15 +72,7 @@ class RedditLoader(multiprocessing.Process):
 					self._push_url_list(urls)
 			except ConnectionError as ce:
 				print(str(ce).upper())
-				# TODO: Log failure.
-		self.progress.set_scanning(False)
-		# Wait for any remaining ACKS to come in, before closing the writing pipe.
-		# ...Until the Downloaders have confirmed completion of everything, more album URLS may come in.
-		while len(self._open_ack) > 0 and not self._stop_event.is_set():
-			self._handle_acks(timeout=0.5)
-		print("Finished loading.")
-		sql.close()
-		self._stop_event.set()
+			# TODO: Log failure.
 
 	def _create_element_urls(self, reddit_element, post):
 		"""
@@ -147,6 +151,7 @@ class RedditLoader(multiprocessing.Process):
 	def _push_url(self, url_id, handle_acks=True):
 		if handle_acks:
 			self._handle_acks()  # passively process some ACKS in a non-blocking way to prevent queue bloat.
+		self.progress.increment_found()
 		while not self._stop_event.is_set():
 			try:  # Keep trying to add this element to the queue, with a timeout to catch any stop triggers.
 				self._queue.put(url_id, timeout=1)
