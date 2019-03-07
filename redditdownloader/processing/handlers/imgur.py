@@ -6,7 +6,7 @@ import shutil
 import urllib.parse
 from static import stringutil
 from static import settings
-from handlers import HandlerResponse
+from processing.handlers import HandlerResponse
 
 tag = 'imgur'
 order = 1

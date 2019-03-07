@@ -1,6 +1,6 @@
 import youtube_dl
 import os
-from handlers import HandlerResponse
+from processing.handlers import HandlerResponse
 from static import settings
 
 tag = 'ytdl'
