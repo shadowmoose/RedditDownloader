@@ -1,11 +1,9 @@
 import multiprocessing
 import queue
-import time
-from colorama import Fore
 from static import stringutil
 from static import settings
 from processing import name_generator
-from processing.wrappers import QueueReader, SanitizedRelFile
+from processing.wrappers import QueueReader, SanitizedRelFile, LoaderProgress
 import sql
 
 
@@ -23,6 +21,7 @@ class RedditLoader(multiprocessing.Process):
 		self._stop_event = multiprocessing.Event()  # This is a shared mp.Event, set when this reader should be done.
 		self._reader = QueueReader(input_queue=self._queue, stop_event=self._stop_event)
 		self._session = None
+		self.progress = LoaderProgress()
 		self.daemon = True
 		self.name = 'RedditElementLoader'
 
@@ -44,9 +43,10 @@ class RedditLoader(multiprocessing.Process):
 
 		for source in self.sources:
 			try:
-				stringutil.print_color(Fore.GREEN, 'Downloading from Source: %s' % source.get_alias())
+				self.progress.set_source(source.get_alias())
 				for r in source.get_elements():
 					r.set_source(source)
+					self.progress.increment_found()
 
 					# Create the SQL objects, then submit them to the queue.
 					post = self._session.query(sql.Post).filter(sql.Post.reddit_id == r.id).first()
@@ -58,19 +58,14 @@ class RedditLoader(multiprocessing.Process):
 						self._create_url_file(u, post=post)
 					self._session.add(post)
 					self._push_url_list(urls)
-				# Wait for any remaining ACKS to come in, before closing the writing pipe.
-				# ...Until the Downloaders have confirmed completion of everything, more album URLS may come in.
-				stringutil.print_color(Fore.GREEN, 'Waiting for acks...')
-				lt = time.time()
-				while len(self._open_ack) > 0 and not self._stop_event.is_set():
-					if time.time() - lt >= 10:  # TODO: Remove this debugging.
-						lt = time.time()
-						print("QUEUE [%s], AWAITING %s ACKS, {%s}" %
-							  (self._queue.qsize(), len(self._open_ack), self._open_ack))
-					self._handle_acks(timeout=0.5)
 			except ConnectionError as ce:
 				print(str(ce).upper())
-				# TODO: How to best log a failure here?
+				# TODO: Log failure.
+		self.progress.set_scanning(False)
+		# Wait for any remaining ACKS to come in, before closing the writing pipe.
+		# ...Until the Downloaders have confirmed completion of everything, more album URLS may come in.
+		while len(self._open_ack) > 0 and not self._stop_event.is_set():
+			self._handle_acks(timeout=0.5)
 		print("Finished loading.")
 		sql.close()
 		self._stop_event.set()
@@ -165,6 +160,7 @@ class RedditLoader(multiprocessing.Process):
 		Process an Ack Packet in the queue, if there are any.
 		If not, this method will return without blocking - unless `timeout` is set.
 		"""
+		self.progress.set_queue_size(self._queue.qsize() + len(self._open_ack))
 		try:
 			packet = self._ack_queue.get(block=True, timeout=timeout)
 			url = self._session.query(sql.URL).filter(sql.URL.id == packet.url_id).first()

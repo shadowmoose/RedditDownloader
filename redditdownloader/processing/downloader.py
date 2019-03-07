@@ -1,8 +1,8 @@
 import multiprocessing
 import sql
 from static import settings
-from processing.wrappers import SanitizedRelFile, AckPacket, Progress
-import handlers
+from processing.wrappers import SanitizedRelFile, AckPacket, DownloaderProgress
+from processing import handlers
 import uuid
 
 # TODO: Extend this to allow direct console input by wrapping the input/output queues.
@@ -16,7 +16,7 @@ class Downloader(multiprocessing.Process):
 		super().__init__()
 		self._reader = reader
 		self._settings = settings_json
-		self.progress = Progress()
+		self.progress = DownloaderProgress()
 		self._session = None
 		self._ack_queue = ack_queue
 		self.daemon = True
@@ -84,5 +84,4 @@ class Downloader(multiprocessing.Process):
 				raise  # TODO: Error handling here.
 
 		sql.close()
-		print("Finished reading.")
 		self.progress.clear("Finished.")
