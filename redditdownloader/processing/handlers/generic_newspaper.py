@@ -3,7 +3,7 @@ from newspaper import Article, Config
 import requests
 import mimetypes
 import shutil
-from handlers import HandlerResponse
+from processing.handlers import HandlerResponse
 from static import settings
 
 tag = 'newspaper'

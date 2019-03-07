@@ -7,7 +7,7 @@ import prawcore
 from colorama import Fore
 from static import stringutil
 from static import settings
-from processing.redditelement import RedditElement
+from processing.wrappers.redditelement import RedditElement
 
 
 _credentials = None

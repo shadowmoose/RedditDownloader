@@ -3,7 +3,7 @@ from static import stringutil
 
 def sorted_list():
 	""" A list of all available static Handlers, pre-sorted by order. """
-	from handlers import github, imgur, generic_newspaper, reddit_handler, ytdl
+	from processing.handlers import github, imgur, generic_newspaper, reddit_handler, ytdl
 	return sorted([
 		generic_newspaper, github, imgur, reddit_handler, ytdl
 	], key=lambda x: x.order, reverse=False)
