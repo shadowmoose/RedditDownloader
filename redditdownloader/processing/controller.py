@@ -6,13 +6,10 @@ from static import stringutil as su
 from processing.redditloader import RedditLoader
 from processing.downloader import Downloader
 import sql
-from processing.wrappers import SanitizedRelFile
-import colorama
-import time
-import multiprocessing
+from processing.wrappers import SanitizedRelFile, ProgressManifest
 
 
-class RMD(threading.Thread):
+class RMDController(threading.Thread):
 	def __init__(self, source_patterns=None):
 		super().__init__()
 		self.daemon = False
@@ -33,42 +30,33 @@ class RMD(threading.Thread):
 		for dl in self._downloaders:
 			dl.start()
 
-		# TODO: Remove this basic printout, and add wrapper UIs for the downloader to support Console/Web
-		min_timer = multiprocessing.Event()
-		while any(p.is_alive() for p in self._downloaders):
-			if settings.get('threading.console_clear_screen'):
-				print('\n'*10, colorama.ansi.clear_screen())
-			print(time.time(), 'Alive:', [p.name for p in self._downloaders if p.is_alive()])
-			for dl in self._downloaders:
-				print()
-				print('Downloader:', dl.name)
-				print('Handler:'.rjust(20), dl.progress.get_handler())
-				print('File:'.rjust(20), dl.progress.get_file())
-				print('Status:'.rjust(20), dl.progress.get_status())
-				if dl.progress.get_percent():
-					print('Percent:'.rjust(20), '%s%%' % dl.progress.get_percent())
-				else:
-					print()
-			if not self.loader.get_stop_event().is_set():
-				self.loader.get_stop_event().wait(settings.get("threading.display_refresh_rate"))
-			else:
-				min_timer.wait(1)  # Minimum timeout, since the event will be set before processes close.
-
-		# Start Downloaders, with the Queue.
-		# Wait for Downloaders to finish.
-		# TODO: status updating for console/UI.
-		# TODO: If any Downloaders are finished, but the Loader is still hung, an ACK failed and we should alert.
+		[t.join() for t in self._downloaders + [self.loader]]
 		sql.close()
-		print("All finished.")
 
 	def stop(self):
-		self.loader.get_stop_event().set()  # TODO: fully implement
+		self.loader.get_stop_event().set()
+		for d in self._downloaders:
+			d.terminate()
+		self.loader.terminate()
 
 	def is_running(self):
-		pass  # TODO: implement
+		return any(d.is_alive() for d in [*self._downloaders, self.loader])
 
 	def get_progress(self):
-		return [d.progress for d in self._downloaders]
+		return ProgressManifest(
+			downloaders=[d.progress for d in self._downloaders],
+			loader=self.loader.progress
+		)
+
+	def wait_refresh_rate(self):
+		"""
+		Waits for the "refresh delay" configured in the settings, or exits early if processing finished before then.
+		:return: True if the delay was fully awaited, or False if processing has completed.
+		"""
+		if not self.loader.get_stop_event().is_set():
+			self.loader.get_stop_event().wait(settings.get("threading.display_refresh_rate"))
+			return True
+		return False
 
 	def _create_downloaders(self):
 		dls = []

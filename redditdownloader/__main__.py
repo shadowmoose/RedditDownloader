@@ -9,6 +9,8 @@ from colorama import Fore
 import static.stringutil as su
 import static.settings as settings
 import static.console as console
+from interfaces.terminal import TerminalUI
+
 
 parser = argparse.ArgumentParser(
 	description="Tool for scanning Reddit and downloading media - Guide @ https://goo.gl/hgBxN4")
@@ -83,6 +85,5 @@ if __name__ == '__main__':
 		print("Starting WebUI...")
 		sys.exit(0)  # TODO: Start Eel server.
 	else:
-		import rmd as downloader
-		rmd = downloader.RMD()
-		rmd.start()
+		ui = TerminalUI()
+		ui.display()
