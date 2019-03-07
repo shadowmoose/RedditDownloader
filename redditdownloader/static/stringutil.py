@@ -67,7 +67,7 @@ def filename(f_name):
 		ret = '_'
 	if len(ret.strip(' .')) == 0:
 		return '_'
-	return ret.replace('..', '.').replace('..', '.')
+	return ret
 
 
 def normalize_file(str_file):
