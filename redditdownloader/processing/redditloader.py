@@ -15,7 +15,7 @@ class RedditLoader(multiprocessing.Process):
 		super().__init__()
 		self.sources = sources
 		self.settings = settings_json
-		self._queue = multiprocessing.Queue(maxsize=500)
+		self._queue = multiprocessing.Queue(maxsize=2500)
 		self._open_ack = set()
 		self._ack_queue = multiprocessing.Queue()
 		self._stop_event = multiprocessing.Event()  # This is a shared mp.Event, set when this reader should be done.
@@ -110,11 +110,10 @@ class RedditLoader(multiprocessing.Process):
 		"""
 		filename = name_generator.choose_file_name(url=url, post=post, session=self._session, album_size=album_size)
 		file = sql.File(
-			path=filename,
-			url_id=url.id
+			path=filename
 		)
 		self._session.add(file)
-		url.files.append(file)
+		url.file = file
 
 	def count_remaining(self):
 		""" Approximate the remaining elements in the queue. """
@@ -165,7 +164,7 @@ class RedditLoader(multiprocessing.Process):
 		Process an Ack Packet in the queue, if there are any.
 		If not, this method will return without blocking - unless `timeout` is set.
 		"""
-		self.progress.set_queue_size(self._queue.qsize() + len(self._open_ack))
+		self.progress.set_queue_size(len(self._open_ack))
 		try:
 			packet = self._ack_queue.get(block=True, timeout=timeout)
 			url = self._session.query(sql.URL).filter(sql.URL.id == packet.url_id).first()

@@ -56,6 +56,17 @@ class RelFile:
 	def exists(self):
 		return op.exists(self.absolute())
 
+	def is_file(self):
+		return op.isfile(self.absolute())
+
+	def size(self):
+		if not self.is_file():
+			return 0
+		return op.getsize(self.absolute())
+
+	def delete_file(self):
+		os.remove(self.absolute())
+
 	def set_ext(self, ext):
 		""" Sets the file extension at the end of the local path. """
 		ext = (''.join([c for c in ext if c.isalnum()])).strip()

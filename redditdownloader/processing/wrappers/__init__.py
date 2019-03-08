@@ -103,6 +103,7 @@ class ProgressManifest:
 	"""
 	Simple wrapper object for the full Progress Report the Controller object will assemble.
 	"""
-	def __init__(self, downloaders, loader):
+	def __init__(self, downloaders, loader, deduplication):
 		self.downloaders = downloaders
 		self.loader = loader
+		self.deduplication = deduplication

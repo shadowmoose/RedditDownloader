@@ -5,6 +5,7 @@ from static import settings
 from static import stringutil as su
 from processing.redditloader import RedditLoader
 from processing.downloader import Downloader
+from processing.post_processing import Deduplicator
 import sql
 from processing.wrappers import SanitizedRelFile, ProgressManifest
 
@@ -17,7 +18,11 @@ class RMDController(threading.Thread):
 		self.sources = self.load_sources()
 		# initialize Loader
 		self.loader = RedditLoader(sources=self.sources, settings_json=settings.to_json())
+		self.deduplicator = Deduplicator(settings_json=settings.to_json(), stop_event=self.loader.get_stop_event())
 		self._downloaders = self._create_downloaders()
+		self._all_processes = [self.loader, *self._downloaders]
+		if settings.get('processing.deduplicate_files'):
+			self._all_processes.append(self.deduplicator)
 
 	def run(self):
 		# Initialize Database
@@ -25,12 +30,10 @@ class RMDController(threading.Thread):
 		db_file.mkdirs()
 		sql.init(db_file.absolute())
 
-		# Start Post scanner, with a Queue
-		self.loader.start()
-		for dl in self._downloaders:
+		for dl in self._all_processes:
 			dl.start()
 
-		[t.join() for t in self._downloaders + [self.loader]]
+		[t.join() for t in self._all_processes]
 		sql.close()
 
 	def stop(self):
@@ -40,12 +43,13 @@ class RMDController(threading.Thread):
 		self.loader.terminate()
 
 	def is_running(self):
-		return any(d.is_alive() for d in [*self._downloaders, self.loader])
+		return any(d.is_alive() for d in self._all_processes)
 
 	def get_progress(self):
 		return ProgressManifest(
 			downloaders=[d.progress for d in self._downloaders],
-			loader=self.loader.progress
+			loader=self.loader.progress,
+			deduplication=self.deduplicator.is_alive()
 		)
 
 	def wait_refresh_rate(self):
