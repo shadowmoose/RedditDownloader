@@ -36,7 +36,7 @@ class Downloader(multiprocessing.Process):
 				if not url:
 					raise Exception("Unknown URL ID provided: (%s}" % nxt_id)  # TODO: Log this instead, after testing.
 
-				file = url.files[0]  # Eventually it may be prudent to support multiple files per URL.
+				file = url.file
 				path = SanitizedRelFile(base=settings.get("output.base_dir"), file_path=file.path)
 
 				self.progress.set_file(path.relative())
@@ -67,7 +67,6 @@ class Downloader(multiprocessing.Process):
 					file.hash = None
 
 				self._session.commit()
-				# TODO: Hash file and deduplicate.
 
 				# Once *all* processing is completed on this URL, the Downloader needs to ACK it.
 				# If any additional Album URLS were located, they should be sent before the ACK.

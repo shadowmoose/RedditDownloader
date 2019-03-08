@@ -9,7 +9,6 @@ class URL(sql.Base):
 	id = Column(Integer, primary_key=True)
 	address = Column(String, nullable=False, index=True)
 	processed = Column(Boolean, nullable=False, default=False)
-	files = relationship("File", back_populates="url")
 	failed = Column(Boolean, nullable=False, default=False)
 	failure_reason = Column(String, default=None)
 	post_id = Column(String, ForeignKey('posts.reddit_id'))
@@ -18,6 +17,8 @@ class URL(sql.Base):
 	album_order = Column(Integer, default=0)
 	album_is_parent = Column(Boolean, default=False, nullable=False)
 	last_handler = Column(String, default=None)
+	file_id = Column(String, ForeignKey('files.id'))
+	file = relationship("File", back_populates="urls")
 
 	def __repr__(self):
 		failure = ""
