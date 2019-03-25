@@ -7,5 +7,5 @@ beautifulsoup4
 colorama
 Pillow
 pathvalidate
-eel==0.9.10
+eel==0.10.4
 sqlalchemy
