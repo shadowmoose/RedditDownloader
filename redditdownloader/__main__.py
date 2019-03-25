@@ -10,6 +10,8 @@ import static.stringutil as su
 import static.settings as settings
 import static.console as console
 from interfaces.terminal import TerminalUI
+from interfaces.eelwrapper import WebUI
+import sql
 
 
 parser = argparse.ArgumentParser(
@@ -18,7 +20,7 @@ parser.add_argument("--settings", help="Path to custom Settings file.", type=str
 parser.add_argument("--source", '-s',
 					help="Run each loaded Source only if alias matches the given pattern. Can pass multiple patterns.",
 					type=str, action='append', metavar='')
-parser.add_argument("--category.setting", help="Override the given setting.", action="store_true")
+parser.add_argument("--category.setting", help="Override the given setting(s).", action="store_true")
 parser.add_argument("--list_settings", help="Display a list of overridable settings.", action="store_true")
 parser.add_argument("--version", '-v', help="Print the current version and exit.", action="store_true")
 args, unknown_args = parser.parse_known_args()
@@ -66,7 +68,7 @@ if __name__ == '__main__':
 
 	if not _loaded:
 		# First-time configuration.
-		su.error('Failed to load settings file! A new one will be generated!')
+		su.error('Could not find an existing settings file. A new one will be generated!')
 		if not console.confirm('Would you like to start the WebUI to help set things up?', True):
 			su.print_color(Fore.RED, "If you don't open the webUI now, you'll need to edit the settings file yourself.")
 			if console.confirm("Are you sure you'd like to edit settings without the UI (if 'yes', these prompts will not show again)?"):
@@ -81,9 +83,13 @@ if __name__ == '__main__':
 			settings.put('interface.browser', mode, save_after=False)
 			settings.put('interface.start_server', True)
 
+	# Initialize Database
+	sql.init_from_settings()
+
 	if settings.get('interface.start_server'):
 		print("Starting WebUI...")
-		sys.exit(0)  # TODO: Start Eel server.
+		ui = WebUI(__version__)
+		ui.display()
 	else:
-		ui = TerminalUI()
+		ui = TerminalUI(__version__)
 		ui.display()

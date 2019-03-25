@@ -24,9 +24,7 @@ class Downloader(multiprocessing.Process):
 	def run(self):
 		""" Threaded loading of elements. """
 		settings.from_json(self._settings)
-		db_file = SanitizedRelFile(base=settings.get("output.base_dir"), file_path="manifest.sqldb")
-		db_file.mkdirs()
-		sql.init(db_file.absolute())
+		sql.init_from_settings()
 		self._session = sql.session()
 		self.progress.clear(status="Starting up...")
 

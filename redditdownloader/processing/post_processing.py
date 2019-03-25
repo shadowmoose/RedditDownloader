@@ -4,7 +4,7 @@ from PIL import Image
 import sql
 from static import settings
 from processing.wrappers import SanitizedRelFile, DownloaderProgress
-from sql import File
+from sql import File, URL
 from sqlalchemy.orm import joinedload
 
 
@@ -23,9 +23,7 @@ class Deduplicator(multiprocessing.Process):
 	def run(self):
 		""" Threaded loading of elements. """
 		settings.from_json(self._settings)
-		db_file = SanitizedRelFile(base=settings.get("output.base_dir"), file_path="manifest.sqldb")
-		db_file.mkdirs()
-		sql.init(db_file.absolute())
+		sql.init_from_settings()
 		self._session = sql.session()
 		self.progress.clear(status="Starting up...")
 
@@ -61,6 +59,7 @@ class Deduplicator(multiprocessing.Process):
 				for o in others:
 					self._upgrade_file(new_file=best, old_file=o)
 			self._session.commit()
+		self._prune()
 
 	def _find_matching_files(self, search_hash, ignore_id):
 		all_hashes = self._session \
@@ -72,7 +71,7 @@ class Deduplicator(multiprocessing.Process):
 			.all()
 		matches = []
 		for pm in all_hashes:
-			if any(u.album_id for u in pm.urls):
+			if any(u.album_id for u in pm.urls) or any(not u.processed for u in pm.urls):
 				continue
 			if FileHasher.hamming_distance(search_hash, pm.hash) < 4:
 				matches.append(pm)
@@ -87,12 +86,19 @@ class Deduplicator(multiprocessing.Process):
 		return files[0], files[1:]
 
 	def _upgrade_file(self, new_file, old_file):
-		print('Upgrading old file:', old_file.id, old_file.path)
-		for u in old_file.urls:
-			print('\t+Switched Url', u.id, 'from', u.file.id, 'to', new_file.id)
-			u.file = new_file
-		SanitizedRelFile(base=settings.get("output.base_dir"), file_path=old_file.path).delete_file()
-		self._session.delete(old_file)
+		print('Upgrading old file:', old_file.id, old_file.path, ' -> ', new_file.id, new_file.path)
+		self._session.query(URL). \
+			filter(URL.file_id == old_file.id). \
+			update({URL.file_id: new_file.id})
+		file = SanitizedRelFile(base=settings.get("output.base_dir"), file_path=old_file.path)
+		if file.is_file():
+			file.delete_file()
+
+	def _prune(self):
+		orphans = self._session.query(File).filter(~File.urls.any()).delete(synchronize_session='fetch')
+		self._session.commit()
+		if orphans:
+			print("Deleted orphan Files:", orphans)
 
 
 class FileHasher:

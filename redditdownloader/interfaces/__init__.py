@@ -3,8 +3,9 @@ from abc import ABC, abstractmethod
 
 class UserInterface(ABC):
 
-	def __init__(self, ui_id):
+	def __init__(self, ui_id, rmd_version):
 		self.ui_id = ui_id
+		self.rmd_version = rmd_version
 
 	@abstractmethod
 	def display(self):

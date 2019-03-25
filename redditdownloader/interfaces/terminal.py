@@ -5,8 +5,8 @@ import colorama
 
 
 class TerminalUI(UserInterface):
-	def __init__(self):
-		super().__init__(ui_id="terminal")
+	def __init__(self, rmd_version):
+		super().__init__(ui_id="terminal", rmd_version=rmd_version)
 
 	def display(self):
 		controller = RMDController()

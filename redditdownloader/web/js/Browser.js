@@ -1,7 +1,7 @@
 class Browser extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = {posts:[[]], term:'', fields:[], autoplay: true, page_size: 50, page: 0};
+		this.state = {posts:[[]], term:'', fields:[], autoplay: true, page_size: 25, page: 0};
 		this.search_timer = null;
 		this._toggle_field = this.toggle_field.bind(this);
 		this._search_term = this.change_search_term.bind(this);
@@ -117,7 +117,7 @@ class Browser extends React.Component {
 		let chunks = this.chunkify(this.state.posts[this.state.page], 4, true);
 		chunks.forEach((ch)=>{
 			ch.forEach((p)=>{
-				group.push(<MediaContainer post={p} key={p.id} autoplay={this.state.autoplay}/>);
+				group.push(<MediaContainer post={p} key={p.reddit_id} autoplay={this.state.autoplay}/>);
 			});
 			groups.push(<div className="img_column" key={"img_group_"+groups.length}>{group}</div>);
 			group = [];
@@ -215,7 +215,7 @@ class MediaContainer extends React.Component {
 					ref={is_small_player?'video':null} // only mount the video control callback for the preview embed.
 					onVolumeChange={this._mute_toggle}
 					autoPlay={this.state.autoplay || this.state.lightbox && !is_small_player}
-					controls={this.state.autoplay || this.state.lightbox && !is_small_player}
+					controls={this.state.lightbox && !is_small_player}
 					preload={'metadata'}
 					muted={is_small_player?true: this.state.muted} //TODO: Maybe just implement local cookie storage.
 					loop>
@@ -223,7 +223,7 @@ class MediaContainer extends React.Component {
 				</video>;
 			default:
 				console.log('Cannot handle media:', file.path);
-				return <div style={{width:"100%", height:"100px"}} className={'media center invalid_media'}>Invalid Media</div>;
+				return <div style={{width:"100%", height:"100px"}} className={'media center invalid_media'}>Not Media</div>;
 		}
 	}
 
@@ -263,7 +263,7 @@ class MediaContainer extends React.Component {
 	}
 
 	render() {
-		let reddit_url = 'http://redd.it/' + (this.state.post.parent? this.state.post.parent : this.state.post.id).replace('t3_','');
+		let reddit_url = 'http://redd.it/' + (this.state.post.parent_id? this.state.post.parent_id : this.state.post.reddit_id).replace('t3_','');
 		let special = []; // Special elements to overlay on this box.
 		let media = this.parse_media(this.state.files[this.state.index], true);
 
