@@ -53,7 +53,7 @@ if args.wizard:
 	print('The Wizard has been replaced by the built-in WebUI.')
 	sys.exit(1)
 
-from webserver import eelwrapper
+from interfaces import eelwrapper
 import colorama
 from colorama import Fore
 from static import settings, console, manifest, stringutil

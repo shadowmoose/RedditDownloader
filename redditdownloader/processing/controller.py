@@ -6,8 +6,7 @@ from static import stringutil as su
 from processing.redditloader import RedditLoader
 from processing.downloader import Downloader
 from processing.post_processing import Deduplicator
-import sql
-from processing.wrappers import SanitizedRelFile, ProgressManifest
+from processing.wrappers import ProgressManifest
 
 
 class RMDController(threading.Thread):
@@ -25,16 +24,9 @@ class RMDController(threading.Thread):
 			self._all_processes.append(self.deduplicator)
 
 	def run(self):
-		# Initialize Database
-		db_file = SanitizedRelFile(base=settings.get("output.base_dir"), file_path="manifest.sqldb")
-		db_file.mkdirs()
-		sql.init(db_file.absolute())
-
 		for dl in self._all_processes:
 			dl.start()
-
 		[t.join() for t in self._all_processes]
-		sql.close()
 
 	def stop(self):
 		self.loader.get_stop_event().set()

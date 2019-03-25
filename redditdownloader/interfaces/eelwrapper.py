@@ -1,18 +1,14 @@
 import eel
 import sys
 import os
-import base64
 import filters
 import sources
 from static import settings
-from static import manifest
-from redditdownloader.classes import RMD
 from static import praw_wrapper
-
-_file_dir = None
-_web_dir = None
-_rmd_version = '0'
-_downloader = None
+from interfaces import UserInterface
+from processing.wrappers import SanitizedRelFile
+from processing.controller import RMDController
+import sql
 
 """
 	Eel is great, but doesn't expose everything we want.
@@ -22,16 +18,40 @@ _downloader = None
 """
 
 
-def start(web_dir, file_dir, rmd_version, relaunched=False):
-	global _file_dir, _web_dir, _rmd_version
+class WebUI(UserInterface):
+	def __init__(self, rmd_version):
+		super().__init__(ui_id="web", rmd_version=rmd_version)
+
+	def display(self):
+		if started:
+			return False
+		webdir = os.path.join(os.path.dirname(__file__), '../web/')
+		filedir = os.path.abspath(settings.get("output.base_dir"))
+		start(web_dir=webdir, file_dir=filedir, rmd_version=self.rmd_version)
+		while not stopped:
+			eel.sleep(1)
+
+
+started = False
+stopped = False
+_file_dir = None
+_web_dir = None
+_rmd_version = '0'
+_controller = None
+_session = None
+
+
+def start(web_dir, file_dir, rmd_version):
+	global _file_dir, _web_dir, _rmd_version, started, _session
 	_file_dir = os.path.abspath(file_dir)
 	_web_dir = os.path.abspath(web_dir)
 	_rmd_version = rmd_version
+	_session = sql.session()
 	if not settings.get('interface.start_server'):
 		print('WebUI is disabled by settings.')
 		return False
 	browser = settings.get('interface.browser').lower().strip()
-	browser = None if (browser == 'off' or relaunched) else browser
+	browser = None if (browser == 'off') else browser
 	options = {
 		'mode': browser,
 		'host': settings.get('interface.host'),
@@ -48,10 +68,12 @@ def start(web_dir, file_dir, rmd_version, relaunched=False):
 	else:
 		print('Browser auto-opening is disabled! Please open a browser to http://%s:%s/index.html !' %
 			  (options['host'], options['port']))
+	started = True
 	return True
 
 
 def _websocket_close(page, old_websockets):
+	global stopped
 	print('A WebUI just closed. Checking for other connections... (%s)[%s]' % (page, len(old_websockets)))
 	for i in range(80):
 		eel.sleep(.1)
@@ -60,10 +82,10 @@ def _websocket_close(page, old_websockets):
 			print('Open connections still exist. Not stopping UI server.')
 			return
 	if not settings.get('interface.keep_open'):
-		print('WebUI keep_open is disabled, and all open clients have closed.\nExiting.')
-		if _downloader:
-			_downloader.stop()
-		sys.exit(0)
+		print('WebUI keep_open is disabled, and all open clients have closed. Exiting.')
+		if _controller and _controller.is_alive():
+			_controller.stop()
+		stopped = True
 	else:
 		print('Keeping UI server open...')
 
@@ -74,8 +96,9 @@ def _downloaded_files():
 		In format: "./file?id=file_token"
 	"""
 	token = eel.btl.request.query.id
-	file_path = base64.decodebytes(token.replace(' ', '+').encode()).decode()
-	print('Requested RMD File: %s' % file_path)
+	file_obj = _session.query(sql.File).filter(sql.File.id == token).first()
+	file_path = file_obj.path
+	print('Requested RMD File: %s, %s' % (_file_dir, file_path))
 	return eel.btl.static_file(file_path, root=_file_dir)
 
 
@@ -174,49 +197,40 @@ def api_save_sources(new_obj):
 
 @eel.expose
 def api_searchable_fields():
-	return list(set(manifest.get_searchable_fields()))
+	return sql.PostSearcher(_session).get_searchable_fields()
 
 
 @eel.expose
 def api_search_posts(fields, term):
-	obj = {}
+	ret = []
 
-	def b64(str_in):
-		return base64.encodebytes(str_in.encode()).decode()
-
-	def explode(file):
-		if os.path.isfile(file):
-			return [{'token': b64(file), 'path': file}]
-		elif os.path.isdir(file):
-			return [{'token': b64(os.path.join(file, _f)), 'path': os.path.join(file, _f)} for _f in os.listdir(file) if os.path.isfile(os.path.join(file, _f))]
-		else:
-			return []
-
-	for p in manifest.search_posts(fields, term):
-		if p['id'] not in obj:
-			p['files'] = explode(p['file_path'])
-			del p['file_path']
-			if p['files']:
-				obj[p['id']] = p
-		else:
-			for f in explode(p['file_path']):
-				obj[p['id']]['files'].append(f)
-	return list(obj.values())
-
-
-@eel.expose
-def api_search_nested_posts(fields, term):
-	obj = {}
-	for p in manifest.search_posts(fields, term):
-		if p['type'] == 'Submission':
-			p['children'] = []
-			obj[p['id']] = p
-		else:
-			if p['parent'] in obj:
-				obj[p['parent']]['children'].append(p)
-			else:
-				obj[p['id']] = p
-	return list(obj.values())
+	searcher = sql.PostSearcher(_session)
+	for p in searcher.search_fields(fields, term.strip("%")):
+		files = []
+		for url in p.urls:
+			if not url.file:
+				print('Post URL Missing a File:', url)
+				continue
+			file = SanitizedRelFile(base=settings.get("output.base_dir"), file_path=url.file.path)
+			if file.is_file():
+				files.append({'token': url.file.id, 'path': file.absolute()})
+		if len(files):
+			ret.append({
+				'reddit_id': p.reddit_id,
+				'author': p.author,
+				'type': p.type,
+				'title': p.title,
+				'body': p.body,
+				'parent_id': p.parent_id,
+				'subreddit': p.subreddit,
+				'over_18': p.over_18,
+				'created_utc': p.created_utc,
+				'num_comments': p.num_comments,
+				'score': p.score,
+				'source_alias': p.source_alias,
+				'files': files
+			})
+	return ret
 
 
 @eel.expose
@@ -227,21 +241,21 @@ def api_restart():
 
 @eel.expose
 def start_download():
-	global _downloader
-	if _downloader is not None and _downloader.is_running():
+	global _controller
+	if _controller is not None and _controller.is_running():
 		return False
 	else:
-		_downloader = RMD()
-		_downloader.start()
+		_controller = RMDController()
+		_controller.start()
 		print('Started downloader.')
 		return True
 
 
 @eel.expose
 def download_status():
-	if _downloader is None:
+	if _controller is None:
 		return {'running': False}
-	return _downloader.get_progress()
+	return _controller.get_progress()
 
 
 def sleep(sec):

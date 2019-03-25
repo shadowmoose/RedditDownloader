@@ -28,9 +28,7 @@ class RedditLoader(multiprocessing.Process):
 	def run(self):
 		""" Threaded loading of elements. """
 		settings.from_json(self.settings)
-		db_file = SanitizedRelFile(base=settings.get("output.base_dir"), file_path="manifest.sqldb")
-		db_file.mkdirs()
-		sql.init(db_file.absolute())
+		sql.init_from_settings()
 		self._session = sql.session()
 
 		# Query for all unhandled URLs, and submit them before scanning for new Posts.
