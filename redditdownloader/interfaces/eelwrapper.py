@@ -234,9 +234,9 @@ def api_search_posts(fields, term):
 
 
 @eel.expose
-def api_restart():
-	""" API to terminate with special "restart" code, which the Bootstrap uses as a signal to relaunch. """
-	sys.exit(202)
+def api_shutdown():
+	""" Terminates Python. """
+	sys.exit(0)
 
 
 @eel.expose

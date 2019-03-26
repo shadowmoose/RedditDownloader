@@ -72,10 +72,11 @@ def get_direct_link(url):
 		return req.url
 	else:
 		# Load the page and parse for image.
-		for u in stringutil.html_elements(req.text, 'img', 'src'):
-			if base_img in u:
-				u = urllib.parse.urljoin('https://i.imgur.com/', u)
-				return u
+		possible_eles = [('link', 'href'), ('img', 'src')]
+		for pe in possible_eles:
+			for u in stringutil.html_elements(req.text, pe[0], pe[1]):
+				if base_img in u and 'i.imgur' in u and 'api.' not in u:
+					return urllib.parse.urljoin('https://i.imgur.com/', u)
 	return None
 
 
@@ -94,7 +95,8 @@ def handle(task, progress):
 		try:
 			album = ImgurAlbumDownloader(url, settings.get("auth.user_agent"))
 			return HandlerResponse(success=True, handler=tag, album_urls=album.get_urls())
-		except ImgurAlbumException:
+		except ImgurAlbumException as ex:
+			print('ImgurException:', ex)
 			return None
 
 	url = get_direct_link(url)
@@ -135,3 +137,4 @@ def handle(task, progress):
 		if task.file.exists():
 			os.remove(task.file.absolute())
 		return None
+
