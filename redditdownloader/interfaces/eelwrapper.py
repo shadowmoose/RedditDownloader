@@ -255,7 +255,7 @@ def start_download():
 def download_status():
 	if _controller is None:
 		return {'running': False}
-	return _controller.get_progress()
+	return _controller.get_progress().to_obj()
 
 
 def sleep(sec):
