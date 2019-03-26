@@ -86,10 +86,10 @@ if __name__ == '__main__':
 	# Initialize Database
 	sql.init_from_settings()
 
+	ui = None
 	if settings.get('interface.start_server'):
 		print("Starting WebUI...")
 		ui = WebUI(__version__)
-		ui.display()
 	else:
 		ui = TerminalUI(__version__)
-		ui.display()
+	ui.display()
