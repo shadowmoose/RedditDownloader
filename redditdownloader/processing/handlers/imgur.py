@@ -80,6 +80,14 @@ def get_direct_link(url):
 	return None
 
 
+def read_animation(page_text):
+	for u in stringutil.html_elements(page_text, 'source', 'src'):
+		if 'i.imgur' in u and '.mp4' in u:
+			url = urllib.parse.urljoin('https://i.imgur.com/', u)
+			return requests.get(url, headers={'User-Agent': settings.get('auth.user_agent')}, stream=True)
+	return None
+
+
 def handle(task, progress):
 	url = task.url
 	if 'imgur.com' not in url:
@@ -108,15 +116,16 @@ def handle(task, progress):
 	try:
 		# Verify filetype with imgur, because the URL can ignore extension.
 		r = requests.get(url, headers={'User-Agent': settings.get('auth.user_agent')}, stream=True)
-		if r.status_code != 200:
+		if r.status_code == 200 and any(_e in url for _e in ['gifv', 'webm']):  # !cover
+			r = read_animation(r.text)
+		if not r or r.status_code != 200:
 			return HandlerResponse(success=False,
 								   handler=tag,
-								   failure_reason="Imgur Server Error: %s->%s" % (url, r.status_code))
+								   failure_reason="Imgur Server Error: %s->%s" % (url, r.status_code if r else "None"))
 
 		content_type = r.headers['content-type']
 		ext = mimetypes.guess_extension(content_type)
-		if any(_e in url for _e in ['gifv', 'webm']):  # !cover
-			return False  # TODO: YTDL is bad at these suddenly, so add custom handling here.
+
 		if not ext or ext == '':  # !cover
 			# stringutil.error('IMGUR: Error locating file MIME Type: %s' % url)
 			return HandlerResponse(success=False, handler=tag, failure_reason="Unable to determine MIME Type: %s" % url)
@@ -137,4 +146,16 @@ def handle(task, progress):
 		if task.file.exists():
 			os.remove(task.file.absolute())
 		return None
+
+
+if __name__ == '__main__':
+	from processing.wrappers import SanitizedRelFile, DownloaderProgress
+	import processing.handlers as handlers
+	_dsk = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop')
+	_path = SanitizedRelFile(base=_dsk, file_path='test-image')
+	print(_path.absolute())
+	_task = handlers.HandlerTask(url=input("Enter an Imgur URL to download: ").strip(), file_obj=_path)
+	_prog = DownloaderProgress()
+	print(handle(_task, _prog))
+	print('Last Status:', _prog.get_status())
 
