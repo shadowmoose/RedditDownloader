@@ -26,7 +26,7 @@ class Downloader(multiprocessing.Process):
 		settings.from_json(self._settings)
 		sql.init_from_settings()
 		self._session = sql.session()
-		self.progress.clear(status="Starting up...")
+		self.progress.clear(status="Starting up...", running=True)
 
 		for nxt_id in self._reader:
 			try:
@@ -39,6 +39,7 @@ class Downloader(multiprocessing.Process):
 
 				self.progress.set_file(path.relative())
 				self.progress.set_status("Attempting to Handle URL...")
+				self.progress.set_running(True)
 
 				task = handlers.HandlerTask(url=url.address, file_obj=path)
 				resp = handlers.handle(task, self.progress)
@@ -81,4 +82,4 @@ class Downloader(multiprocessing.Process):
 				raise  # TODO: Error handling here.
 
 		sql.close()
-		self.progress.clear("Finished.")
+		self.progress.clear("Finished.", running=False)

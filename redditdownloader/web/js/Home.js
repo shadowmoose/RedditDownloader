@@ -77,15 +77,17 @@ class Home extends React.Component {
 			</details>
 		}else if(this.state.progress && this.state.progress.running){
 			console.log(this.state.progress);
-			let progress = this.state.progress.progress;
-			let loading = this.state.progress.loading;
-			let threads = progress.threads.map((thread)=>{
-				let lines = thread.lines.map((line, idx)=>{
-					return <div key={idx}>{line}</div>
-				});
-				return <details className={'progressThread '+ (thread.running? 'active':'inactive')} key={thread.thread} open='open'>
-					<summary className={thread.running? 'green':'orange'}>{thread.thread}</summary>
-					<div className='description'>{lines}</div>
+			let progress = this.state.progress;
+			let loading = progress.loader.scanning;
+			let threads = progress.downloaders.map((thread, idx)=>{
+				return <details className={'progressThread '+ (thread.running? 'active':'inactive')} key={idx} open='open'>
+					<summary className={thread.running? 'green':'orange'}>Downloader {idx+1}</summary>
+					<div className='description'>
+						<div><b>File: </b>{thread.file_name}</div>
+						<div><b>Handler: </b>{thread.handler}</div>
+						<div><b>Status: </b>{thread.status}</div>
+						{thread.percent ?<div><b>Percent Done: </b>{thread.percent}%</div> : <div/>}
+					</div>
 				</details>
 
 			});
@@ -97,13 +99,16 @@ class Home extends React.Component {
 					{loading? 'Scanning for Posts & Downloading':'Downloading'}
 				</h3>
 				<div className={'green'}>
-					<b>Posts Found: </b>{progress.found + (loading?' (so far)':'')}
+					<b>Files Found: </b>{progress.loader.total_found + (loading?' (so far)':'')}
 				</div>
 				<div className={'blue'}>
-					<b>Posts Completed: </b>{progress.found - progress.queue_size}
+					<b>Files Completed: </b>{progress.loader.total_found - progress.loader.queue_size}
 				</div>
 				<div className={'orange'}>
-					<b>In Queue: </b>{progress.queue_size}
+					<b>In Queue: </b>{progress.loader.queue_size}
+				</div>
+				<div className={progress.deduplication? 'yellow':'red'}>
+					<b>Deduplication: </b> {progress.deduplication? "Running": "Off"}
 				</div>
 				<details open={'open'}>
 					<summary>Running Threads</summary>

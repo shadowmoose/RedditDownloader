@@ -399,6 +399,9 @@ option:enabled {
 .orange {
 	color: darkorange !important;
 }
+.yellow {
+	color: #d5d632 !important;
+}
 
 .hover_shadow:hover {
 	text-shadow: 2px 2px black;
