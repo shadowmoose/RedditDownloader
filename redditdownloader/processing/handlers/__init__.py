@@ -3,9 +3,9 @@ from static import stringutil
 
 def sorted_list():
 	""" A list of all available static Handlers, pre-sorted by order. """
-	from processing.handlers import github, imgur, generic_newspaper, reddit_handler, ytdl
+	from processing.handlers import github, imgur, generic_newspaper, reddit_handler, ytdl, tumblr
 	return sorted([
-		generic_newspaper, github, imgur, reddit_handler, ytdl
+		generic_newspaper, github, imgur, reddit_handler, ytdl, tumblr
 	], key=lambda x: x.order, reverse=False)
 
 
@@ -35,7 +35,7 @@ def handle(handler_task, progress_obj):
 			if result:
 				return result
 		except Exception as ex:  # There are too many possible exceptions between all handlers to catch properly.
-			stringutil.error('Handler [%s] :: {%s} :: %s' % (h.tag, handler_task.url, ex))
+			stringutil.error('Handler Exception [%s] :: {%s} :: %s' % (h.tag, handler_task.url, ex))
 			# We don't *really* care if a Handler fails, since there are plenty of reasons a download could.
 			pass
 	return HandlerResponse(success=False, handler=None, failure_reason="No Handlers could process this URL.")
