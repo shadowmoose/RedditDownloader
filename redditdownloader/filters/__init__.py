@@ -34,7 +34,7 @@ def filter_fields():
 
 
 def get_filters(filter_dict=None):
-	""" Get a list of all availale Filter objects.
+	""" Get a list of all available Filter objects.
 		If passed a dict of {'field.operator':val} - as specified by the filter settings syntax -
 			it will return loaded filter objects.
 	"""
@@ -51,7 +51,7 @@ def get_filters(filter_dict=None):
 	else:
 		for loaded_field, loaded_value in filter_dict.items():
 			for f in get_filters(None):
-				if f.from_obj(loaded_field, loaded_value):
+				if f.from_keyval(loaded_field, loaded_value):
 					loaded.append(f)
 					break
 	return loaded

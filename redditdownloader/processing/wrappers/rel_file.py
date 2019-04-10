@@ -17,6 +17,7 @@ class RelFile:
 		if full_file_path:
 			full_file_path = op.abspath(full_file_path)
 			if not self._is_subpath(base, full_file_path):
+				# I'm not even sure this can happen, but better safe...
 				raise RelError("The given full file path does not contain the base! {%s}" % full_file_path)
 			file_path = op.abspath(full_file_path).replace(base, "", 1)
 		file_path = file_path.strip(" ./\\\n\t\r")
@@ -90,12 +91,15 @@ class RelFile:
 class SanitizedRelFile(RelFile):
 	def __init__(self, base, file_path=None, full_file_path=None):
 		super().__init__(base, file_path, full_file_path)
+		self._path = self.remove_dotslash(self._path)
+		# noinspection PyUnresolvedReferences
 		self._path = pathvalidate.sanitize_filepath(self._path, '_').strip(". /\\")
 		if not len(self._path):
 			raise RelError("File path is too short! {%s}" % file_path)
 
-
-if __name__ == '__main__':
-	rf = SanitizedRelFile(base="C:/Users", file_path="t/./test/[title].txt")
-	print('Absolute:', rf.absolute())
-	print('Relative:', rf.relative())
+	def remove_dotslash(self, path):
+		np = ''
+		while np != path:
+			np = path
+			path = path.replace('./', '/')
+		return path
