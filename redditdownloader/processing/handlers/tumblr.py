@@ -3,19 +3,23 @@ import html
 from collections import OrderedDict
 from lxml import html as lxhtml, etree
 import requests
+from processing.handlers import HandlerResponse
+from processing.wrappers import http_downloader
 
+
+tag = 'tumblr'
+order = 2
 regex = r"(?:https?)?(?::\/\/)?(?:www.)?(.+?)\.tumblr\.com\/post\/(\d+)"
 
-def _iprop(ele, tag, default=99999):
-	return int(ele.get(tag)) if ele.get(tag) else default
 
-def get_media_urls(url):
-	m = re.match(regex, url)
-	if m is None:
-		return None
-	gr = m.groups()
-	url = 'https://%s.tumblr.com/api/read?id=%s' % (gr[0], gr[1])
+def _iprop(ele, ele_tag, default=99999):
+	return int(ele.get(ele_tag)) if ele.get(ele_tag) else default
+
+
+def get_media_urls(base, post_id):
+	url = 'https://%s.tumblr.com/api/read?id=%s' % (base, post_id)
 	data = requests.get(url).content
+	# noinspection PyUnresolvedReferences
 	tree = etree.fromstring(data)
 	post = tree.find('posts').find('post')
 	found = []
@@ -49,6 +53,17 @@ def get_media_urls(url):
 	return distinct
 
 
-if __name__ == '__main__':
-	#  Random test posts from Tumblr frontpage:
-	print(get_media_urls(input('Enter a Tumblr Post url to test: ')))
+def handle(task, progress):
+	m = re.match(regex, task.url)
+	if m is None:
+		return False
+	gr = m.groups()
+	progress.set_status("Parsing Tumblr page...")
+	urls = get_media_urls(gr[0], gr[1])
+	if not urls:
+		return None
+	if len(urls) > 1:
+		return HandlerResponse(success=True, handler=tag, album_urls=urls)
+	return http_downloader.download_binary(urls[0], task.file, progress, tag)
+
+
