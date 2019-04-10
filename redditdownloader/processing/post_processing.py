@@ -17,6 +17,7 @@ class Deduplicator(multiprocessing.Process):
 		self._settings = settings_json
 		self._stop_event = stop_event
 		self.progress = DownloaderProgress()
+		self.progress.clear(status="Starting up...")
 		self._session = None
 		self.daemon = True
 
@@ -26,12 +27,15 @@ class Deduplicator(multiprocessing.Process):
 		sql.init_from_settings()
 		self._session = sql.session()
 		self.progress.clear(status="Starting up...")
+		self.progress.set_running(True)
 
 		while not self._stop_event.is_set():
+			self.progress.set_status("Deduplicating files...")
 			self._dedupe()
 			self._stop_event.wait(2)
 		self._dedupe()  # Run one final pass after downloading stops.
 
+		self.progress.set_running(False)
 		sql.close()
 		self.progress.clear("Finished.")
 

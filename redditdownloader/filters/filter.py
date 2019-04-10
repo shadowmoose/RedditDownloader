@@ -80,7 +80,7 @@ class Filter:
 		"""
 		return val
 
-	def from_obj(self, key, value):
+	def from_keyval(self, key, value):
 		"""
 			Expects key, value pair from Settings. Parses this setting into a Filter object.
 			Returns False if this Filter doesn't match the given key.
@@ -119,11 +119,11 @@ class Filter:
 			return False
 		op = self._get_operator_from_str(str_key)
 		if '.' not in str_key:
-			op = filters.Operators.EQUALS  # !cover
+			op = filters.Operators.EQUALS
 		if self._validate_operator(op):
 			self.operator = op
 		else:
-			raise Exception('Unable to parse operator for Filter: %s' % self.field)  # !cover
+			raise Exception('Unable to parse operator for Filter: %s' % self.field)
 		return True
 
 	def _validate_operator(self, op, return_value=False):
@@ -140,7 +140,7 @@ class Filter:
 			if k.value.lower().strip() in val.lower().strip():
 				return k
 
-	def __str__(self):  # !cover
+	def __str__(self):
 		lim = self._limit
 		if isinstance(lim, str):
 			lim = '"%s"' % lim

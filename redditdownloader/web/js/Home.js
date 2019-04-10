@@ -79,6 +79,7 @@ class Home extends React.Component {
 			console.log(this.state.progress);
 			let progress = this.state.progress;
 			let loading = progress.loader.scanning;
+			let dedupe_status = (progress.deduplication.running? progress.deduplication.status: "Off");
 			let threads = progress.downloaders.map((thread, idx)=>{
 				return <details className={'progressThread '+ (thread.running? 'active':'inactive')} key={idx} open='open'>
 					<summary className={thread.running? 'green':'orange'}>Downloader {idx+1}</summary>
@@ -108,7 +109,7 @@ class Home extends React.Component {
 					<b>In Queue: </b>{progress.loader.queue_size}
 				</div>
 				<div className={progress.deduplication? 'yellow':'red'}>
-					<b>Deduplication: </b> {progress.deduplication? "Running": "Off"}
+					<b>Deduplication: </b> {dedupe_status}
 				</div>
 				<details open={'open'}>
 					<summary>Running Threads</summary>

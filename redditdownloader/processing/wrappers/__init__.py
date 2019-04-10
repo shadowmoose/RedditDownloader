@@ -15,14 +15,14 @@ class Progress:
 	Progress is a wrapper for multiprocessing's Manager class.
 	It is capable of syncing status across multiple Processes.
 
-	This class specifically uses getters and setters, in order to avoid imporperly mutating shared data.
+	This class specifically uses getters and setters, in order to avoid improperly mutating shared data.
 	"""
 	_manager = None
 
 	def __init__(self):
 		if not Progress._manager:
 			Progress._manager = Manager()
-		self._ns= Progress._manager.dict()
+		self._ns = Progress._manager.dict()
 		self.clear()  # Initialize the progress variables as their defaults.
 
 	def clear(self):
@@ -58,7 +58,7 @@ class DownloaderProgress(Progress):
 		return str(self._ns['file_name'])
 
 	def set_running(self, running):
-		self._ns['running'] = running
+		self._ns['running'] = True if running else False
 
 	def get_running(self):
 		return self._ns['running']
@@ -108,6 +108,7 @@ class LoaderProgress(Progress):
 
 
 class ProgressEncoder(json.JSONEncoder):
+	# noinspection PyProtectedMember
 	def default(self, obj):
 		if isinstance(obj, Progress):
 			obj = {k: v for (k, v) in obj._ns.items() if not k.startswith("_")}

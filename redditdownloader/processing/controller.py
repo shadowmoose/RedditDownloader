@@ -41,7 +41,7 @@ class RMDController(threading.Thread):
 		return ProgressManifest(
 			downloaders=[d.progress for d in self._downloaders],
 			loader=self.loader.progress,
-			deduplication=self.deduplicator.is_alive(),
+			deduplication=self.deduplicator.progress,
 			running=self.is_alive()
 		)
 
