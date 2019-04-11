@@ -11,6 +11,7 @@ import static.settings as settings
 import static.console as console
 from interfaces.terminal import TerminalUI
 from interfaces.eelwrapper import WebUI
+import tests.runner
 import sql
 
 
@@ -19,26 +20,30 @@ parser = argparse.ArgumentParser(
 parser.add_argument("--settings", help="Path to custom Settings file.", type=str, metavar='', default="./settings.json")
 parser.add_argument("--source", '-s',
 					help="Run each loaded Source only if alias matches the given pattern. Can pass multiple patterns.",
-					type=str, action='append', metavar='')
+					type=str, action='append', metavar='')  # TODO: Reimplement
 parser.add_argument("--category.setting", help="Override the given setting(s).", action="store_true")
 parser.add_argument("--list_settings", help="Display a list of overridable settings.", action="store_true")
 parser.add_argument("--version", '-v', help="Print the current version and exit.", action="store_true")
+parser.add_argument("--run_tests", help="Run the given test directory, or * for all.", type=str, metavar='', default="")
 args, unknown_args = parser.parse_known_args()
 
 
 if __name__ == '__main__':
 	colorama.init(convert=True)
-	su.print_color(Fore.GREEN, """
-		\r====================================
-		\r	Reddit Media Downloader %s
-		\r====================================
-		\r	(By ShadowMoose @ Github)
-		""" % __version__)
+	su.print_color(Fore.GREEN, "\r\n" +
+		'====================================\r\n' +
+		('   Reddit Media Downloader %s\r\n' % __version__) +
+		'====================================\r\n' +
+		'    (By ShadowMoose @ Github)\r\n')
 
 	if args.version:
 		sys.exit(0)
 
-	if args.list_settings:  # !cover
+	if args.run_tests:
+		error_count = tests.runner.run_tests(test_subdir=args.run_tests)
+		sys.exit(error_count)
+
+	if args.list_settings:
 		print('All valid overridable settings:')
 		for _s in settings.get_all():
 			if _s.public:
