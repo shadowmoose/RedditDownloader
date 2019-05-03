@@ -17,7 +17,6 @@ class RelFile:
 		if full_file_path:
 			full_file_path = op.abspath(full_file_path)
 			if not self._is_subpath(base, full_file_path):
-				# I'm not even sure this can happen, but better safe...
 				raise RelError("The given full file path does not contain the base! {%s}" % full_file_path)
 			file_path = op.abspath(full_file_path).replace(base, "", 1)
 		file_path = file_path.strip(" ./\\\n\t\r")

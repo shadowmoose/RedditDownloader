@@ -8,6 +8,7 @@ from colorama import Fore
 from static import stringutil
 from static import settings
 from processing.wrappers.redditelement import RedditElement
+from praw.models import MoreComments
 
 
 _credentials = None
@@ -156,11 +157,22 @@ def multi_reddit(username, reddit_name, order_by='new', limit=None, time='all'):
 def get_submission_comments(t3_id):
 	""" Implemented initially for converting invalid IDs.
 	Returns a generator of top comments from the given Submission. """
-	assert t3_id.startswith('t3_')
-	t3_id = t3_id.lstrip('t3_')  # Convert to expected format.
-	submission = _reddit.submission(id=t3_id)
+	submission = get_submission(t3_id=t3_id)
 	for top_level_comment in submission.comments:
+		if isinstance(top_level_comment, MoreComments):
+			continue
+		setattr(top_level_comment, 'link_title', submission.title)
+		setattr(top_level_comment, 'over_18', submission.over_18)
+		setattr(top_level_comment, 'num_comments', submission.num_comments)
+		setattr(top_level_comment, 'score', submission.score)
 		yield top_level_comment
+
+
+@check_login
+def get_submission(t3_id):
+	assert t3_id.startswith('t3_')
+	t3_id = t3_id.replace('t3_', '', 1)  # Convert to expected format.
+	return _reddit.submission(id=t3_id)
 
 
 @check_login
