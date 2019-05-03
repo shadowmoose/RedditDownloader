@@ -1,5 +1,4 @@
 import praw.models
-import copy
 from static import stringutil
 
 
