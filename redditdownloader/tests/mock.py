@@ -21,11 +21,13 @@ class StagedTest(unittest.TestCase):
 		cls.dir = os.path.join(gettempdir(), randname)
 		os.makedirs(cls.dir)
 		if not cls.dir or not os.path.isdir(cls.dir):
+			cls.dir = None
 			raise FileNotFoundError("The test directory was not built!")
 
 	@classmethod
 	def tearDownClass(cls):
-		rmtree(cls.dir, ignore_errors=True)
+		if cls.dir:
+			rmtree(cls.dir, ignore_errors=True)
 
 	def temp_file(self, filename=None, ext=None):
 		""" Generate a temporary filepath scoped within this temp directory. """

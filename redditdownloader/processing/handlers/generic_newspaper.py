@@ -1,10 +1,6 @@
 # noinspection PyPackageRequirements
 from newspaper import Article, Config
-import requests
-import mimetypes
-import shutil
-from processing.handlers import HandlerResponse
-from static import settings
+from processing.wrappers import http_downloader
 
 tag = 'newspaper'
 order = 90000
@@ -16,18 +12,15 @@ order = 90000
 	This library will almost *certainly* find something to download, even if that image is a really bad option.
 	Still, though, it works on sites like Tumblr and other really fringe pages, 
 	so it's probably worthwhile to be correct more often than not.
-	Return filename/directory name of created file(s),
-	False if a failure is reached, or None if there was no issue, but there are no files.
 """
 
 
 def handle(task, progress):
-	user_agent = settings.get('auth.user_agent')
 	url = task.url
 	progress.set_status("Requesting page...")
-	resp = requests.get(url, headers={'User-Agent': user_agent})
-	if resp.status_code != 200:
-		return False  # !cover
+	resp = http_downloader.page_text(url, json=False)
+	if not resp:
+		return False
 
 	config = Config()
 	config.memoize_articles = False
@@ -41,7 +34,7 @@ def handle(task, progress):
 		return None
 
 	src = article.top_image
-	if 'http' not in src:  # !cover
+	if 'http' not in src:
 		if 'https' in url:
 			src = 'https://' + src.lstrip('/ ').strip()
 		else:
@@ -49,22 +42,4 @@ def handle(task, progress):
 
 	progress.set_status("Downloading image...")
 
-	r = requests.get(src, headers={'User-Agent': user_agent}, stream=True)
-	if r.status_code == 200:
-		content_type = r.headers['content-type']
-		ext = mimetypes.guess_extension(content_type)
-		if not ext or ext == '':  # !cover
-			return None
-		if '.jp' in ext:
-			ext = '.jpg'  # !cover
-
-		task.file.set_ext(ext)
-		task.file.mkdirs()
-		progress.set_file(task.file.relative())
-		with open(task.file.absolute(), 'wb') as f:
-			r.raw.decode_content = True
-			shutil.copyfileobj(r.raw, f)
-		return HandlerResponse(success=True, rel_file=task.file, handler=tag)
-	else:  # !cover
-		# log.out(0, ('\t\tError Reading Image: %s responded with code %i!' % (url, r.status_code)))
-		return None
+	return http_downloader.download_binary(src, task.file, prog=progress, handler_id=tag)

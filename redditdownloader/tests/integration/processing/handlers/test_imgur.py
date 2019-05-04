@@ -69,3 +69,11 @@ class ImgurHandlerTest(StagedTest):
 		self.assertTrue(res, "Imgur gif download failed!")
 		self.assertTrue(_file.exists(), "Imgur gif was not downloaded! %s" % res.failure_reason)
 		self.assertTrue(_file.relative().endswith('.mp4'), 'Failed to use .mp4 extension for .gif file!')
+
+	def test_gifv(self):
+		""" Test gifv download """
+		_task, _prog, _file = mock_handler_request(self.dir, 'https://imgur.com/MVPdV4a')
+		res = imgur.handle(_task, _prog)
+		self.assertTrue(res, "Imgur gifv download failed!")
+		self.assertTrue(_file.exists(), "Imgur gifv was not downloaded! %s" % res.failure_reason)
+		self.assertTrue(_file.relative().endswith('.mp4'), 'Failed to use .mp4 extension for .gifv file!')

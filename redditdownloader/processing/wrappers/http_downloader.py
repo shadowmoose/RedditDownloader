@@ -2,11 +2,10 @@ import requests
 import mimetypes
 from static import settings
 from processing.handlers import HandlerResponse
-import traceback
 
 
 def open_request(url, stream=True):
-	return requests.get(url, headers={'User-Agent': settings.get('auth.user_agent')}, stream=stream)
+	return requests.get(url, headers={'User-Agent': settings.get('auth.user_agent')}, stream=stream, timeout=10)
 
 
 def guess_mimetype(req):
@@ -31,7 +30,7 @@ def download_binary(url, rel_file, prog, handler_id):
 	:param rel_file: The RelFile to save to
 	:param prog: The progress object to update.
 	:param handler_id: The ID of the controlling Handler, for printout & Errors.
-	:return:
+	:return: a HandlerResponse object, with the download outcome.
 	"""
 	# noinspection PyBroadException
 	try:
@@ -60,7 +59,7 @@ def download_binary(url, rel_file, prog, handler_id):
 					prog.set_percent(round(100*(downloaded_size/size)))
 		return HandlerResponse(success=True, rel_file=rel_file, handler=handler_id)
 	except Exception as ex:
-		traceback.print_exc()
+		print(ex)
 		if rel_file.exists():
 			rel_file.delete_file()
 		return HandlerResponse(success=False, handler=handler_id, failure_reason="Error Downloading: %s" % ex)

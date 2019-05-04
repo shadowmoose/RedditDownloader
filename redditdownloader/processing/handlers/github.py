@@ -1,5 +1,5 @@
 tag = 'github'
-order = 2
+order = 1
 
 
 def handle(task, progress):  # !cover
