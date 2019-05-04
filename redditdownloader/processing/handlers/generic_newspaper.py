@@ -28,7 +28,7 @@ def handle(task, progress):
 	article = Article(url='', config=config)
 
 	article.download()
-	article.set_html(resp.text)
+	article.set_html(resp)
 	article.parse()
 	if not article.top_image:
 		return None
