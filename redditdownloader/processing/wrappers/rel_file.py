@@ -5,6 +5,7 @@ This file exposes a few RelFile classes to assist with this.
 import os.path as op
 import os
 import pathvalidate
+import hashlib
 
 
 class RelError(Exception):
@@ -67,6 +68,17 @@ class RelFile:
 	def delete_file(self):
 		os.remove(self.absolute())
 
+	def abs_hashed(self):
+		"""
+		Generate an absolute filepath string, replacing the file name with a unique (deterministic) hash.
+		Useful where resuming downloads is preferable, but the temp filename may be difficult to otherwise search for.
+		"""
+		hsh = hashlib.sha1(self.absolute().encode()).hexdigest()
+		return self._norm(op.join(op.dirname(self.absolute()), hsh))
+
+	def absolute_base(self):
+		return self._norm(op.abspath(self._base))
+
 	def set_ext(self, ext):
 		""" Sets the file extension at the end of the local path. """
 		ext = (''.join([c for c in ext if c.isalnum()])).strip()
@@ -92,7 +104,7 @@ class SanitizedRelFile(RelFile):
 		super().__init__(base, file_path, full_file_path)
 		self._path = self.remove_dotslash(self._path)
 		# noinspection PyUnresolvedReferences
-		self._path = pathvalidate.sanitize_filepath(self._path, '_').strip(". /\\")
+		self._path = pathvalidate.sanitize_filepath(self._path, '_').strip(". /\\").strip()
 		if not len(self._path):
 			raise RelError("File path is too short! {%s}" % file_path)
 
@@ -101,4 +113,5 @@ class SanitizedRelFile(RelFile):
 		while np != path:
 			np = path
 			path = path.replace('./', '/')
+			path = path.replace('/.', '/')
 		return path

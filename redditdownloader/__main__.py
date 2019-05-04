@@ -13,6 +13,7 @@ from interfaces.terminal import TerminalUI
 from interfaces.eelwrapper import WebUI
 import tests.runner
 import sql
+from tools import ffmpeg_download
 
 
 parser = argparse.ArgumentParser(
@@ -70,6 +71,12 @@ if __name__ == '__main__':
 		except KeyError:
 			print('Unknown setting: %s' % k)
 			sys.exit(50)
+
+	if not ffmpeg_download.install_local():
+		print("RMD was unable to locate (or download) a working FFmpeg binary.")
+		print("For downloading and post-processing, this is a required tool.")
+		print("Please Install FFmpeg manually, or download it from here: https://rmd.page.link/ffmpeg")
+		sys.exit(15)
 
 	if not _loaded:
 		# First-time configuration.

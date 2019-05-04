@@ -8,7 +8,7 @@ tag = 'imgur'
 order = 1
 
 
-imgur_animation_exts = ['.mp4', '.webm', '.gifv']
+imgur_animation_exts = ['.mp4', '.webm']
 
 
 # Code borrowed from: https://github.com/alexgisby/imgur-album-downloader and modified.
@@ -88,6 +88,7 @@ def is_direct_link(url, base_img=''):
 def clean_imgur_url(url):
 	""" Attempts to - very generously - clean the given URL into a valid Imgur location. Returns the url, if valid. """
 	url = url.lstrip(':/').replace('m.imgur.', 'imgur.')
+	url = url.replace('.gifv', '.mp4')
 	if not url.startswith('http'):
 		url = 'https://%s' % url
 	if re.match("^(?:https?[:/]*)?(?:www.)?(?:[mi]\.)?imgur\.com/", url):
