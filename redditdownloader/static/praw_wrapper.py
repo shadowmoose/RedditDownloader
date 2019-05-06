@@ -4,7 +4,6 @@
 """
 import praw
 import prawcore
-from colorama import Fore
 from static import stringutil
 from static import settings
 from processing.wrappers.redditelement import RedditElement
@@ -63,9 +62,9 @@ def login():
 	global _user, _logged_in
 	if not settings.get('auth.refresh_token'):
 		raise ConnectionError('Missing the Refresh Token from Reddit! Cannot auth.')
-	stringutil.print_color(Fore.LIGHTYELLOW_EX, "Authenticating via OAuth...")
+	stringutil.print_color('yellow', "Authenticating via OAuth...")
 	_user = _reddit.user.me()
-	stringutil.print_color(Fore.LIGHTYELLOW_EX, "Authenticated as [%s]\n" % _user.name)
+	stringutil.print_color('yellow', "Authenticated as [%s]\n" % _user.name)
 	_logged_in = True
 
 

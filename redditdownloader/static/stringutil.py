@@ -1,9 +1,21 @@
 import math
 from bs4 import BeautifulSoup
-from colorama import Fore, Style
+from colorama import Fore, Style, init
 from pprint import pformat
 import os.path
 import pathvalidate
+import sys
+
+init(convert=True, autoreset=True)
+
+_special_colors = {
+	'red': Fore.RED,
+	'blue': Fore.BLUE,
+	'cyan': Fore.CYAN,
+	'green': Fore.GREEN,
+	'yellow': Fore.YELLOW,
+	'magenta': Fore.MAGENTA
+}
 
 
 def fit(input_string, desired_len):  # !cover
@@ -14,7 +26,7 @@ def fit(input_string, desired_len):  # !cover
 		# Trim the input_string to a reasonable length for output:
 		h = math.floor(len(input_string)/2)
 		input_string = str(input_string[0:min(math.floor(desired_len/2) - 3, h)]) + '...' \
-					 + str(input_string[max(math.floor(desired_len/2)*-1, h*-1):])
+					   + str(input_string[max(math.floor(desired_len/2)*-1, h*-1):])
 	return input_string
 
 
@@ -29,17 +41,21 @@ def html_elements(html_string, tag='a', tag_val='href'):
 
 
 def error(string_output, **kwargs):  # !cover
-	print_color(Fore.RED, string_output, **kwargs)
+	print_color('red', string_output, **kwargs)
 
 
-def color(string_out, text_color):
-	""" Color the given string and return it. """
-	return '%s%s%s' % (text_color, string_out, Style.RESET_ALL)
-
-
-def print_color(fore_color, string_output, **kwargs):
-	""" Print() the given string colored as desired. """
-	print(color(fore_color, string_output), **kwargs)
+def print_color(fore_color, string_output, end='\n'):
+	"""
+	Print the given string with the desired color.
+	:param fore_color: Either a string matching a supported color, or a Colorama.Fore color.
+	:param string_output: The string to print.
+	:param end: The end-of-line character.
+	:return:
+	"""
+	if fore_color.lower() in _special_colors:
+		fore_color = _special_colors[fore_color]
+	st = "%s%s" % (fore_color+Style.BRIGHT, string_output) + end
+	sys.stdout.write(st)
 
 
 def out(obj, print_val=True, text_color=None):  # !cover

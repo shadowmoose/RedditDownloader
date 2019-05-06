@@ -4,8 +4,6 @@ __version__ = "3.0"
 
 import argparse
 import sys
-import colorama
-from colorama import Fore
 import static.stringutil as su
 import static.settings as settings
 import static.console as console
@@ -30,13 +28,11 @@ args, unknown_args = parser.parse_known_args()
 
 
 if __name__ == '__main__':
-	colorama.init(convert=True)
-	su.print_color(Fore.GREEN, "\r\n" +
+	su.print_color('green', "\r\n" +
 		'====================================\r\n' +
 		('   Reddit Media Downloader %s\r\n' % __version__) +
 		'====================================\r\n' +
 		'    (By ShadowMoose @ Github)\r\n')
-
 	if args.version:
 		sys.exit(0)
 
@@ -82,7 +78,7 @@ if __name__ == '__main__':
 		# First-time configuration.
 		su.error('Could not find an existing settings file. A new one will be generated!')
 		if not console.confirm('Would you like to start the WebUI to help set things up?', True):
-			su.print_color(Fore.RED, "If you don't open the webUI now, you'll need to edit the settings file yourself.")
+			su.print_color('red', "If you don't open the webUI now, you'll need to edit the settings file yourself.")
 			if console.confirm("Are you sure you'd like to edit settings without the UI (if 'yes', these prompts will not show again)?"):
 				settings.put('interface.start_server', False)  # Creates a save.
 				print('A settings file has been created for you, at "%s". Please customize it.' % args.settings)
