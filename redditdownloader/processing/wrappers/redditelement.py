@@ -1,5 +1,6 @@
 import praw.models
 from static import stringutil
+import re
 
 
 class RedditElement(object):
@@ -25,7 +26,7 @@ class RedditElement(object):
 		self.author = None
 		self.body = None
 		self.parent = None
-		self.subreddit = str(obj.subreddit.display_name)
+		self.subreddit = None
 		self.detect_type(obj)
 
 		self.over_18 = obj.over_18
@@ -35,26 +36,33 @@ class RedditElement(object):
 		self.link_count = len(self._urls)
 		self.source_alias = None
 
-		assert self.type is not None
+		assert self.type == 'Submission' or self.type == 'Comment'
 		assert self.id is not None
 
 	def detect_type(self, obj):
 		""" Simple function to call the proper Comment or Submission handler. """
 		# noinspection PyUnresolvedReferences
+		tp = type(obj)
+		stp = str(tp).lower()
 		if type(obj) == praw.models.Submission:
-			self.submission(obj)
+			self._submission(obj)
 		elif type(obj) == praw.models.reddit.comment.Comment:
-			self.comment(obj)
+			self._comment(obj)
+		elif 'submission' in stp:
+			self._ps_submission(obj)
+		elif 'comment' in stp:
+			self._ps_comment(obj)
 		else:
-			print('Unknown Element Type: '+str(type(obj)))
+			raise Exception('Unknown Element Type: '+str(type(obj)))
 	
-	def comment(self, c):
+	def _comment(self, c):
 		""" Handle a Comment object. """
 		# out("[Comment](%s): %s" % (c.subreddit.display_name, c.link_title) )
 		self.type = 'Comment'
 		self.id = str(c.name)
 		self.parent = str(c.link_id)
 		self.title = str(c.link_title)
+		self.subreddit = str(c.subreddit.display_name)
 		if c.author:
 			self.author = str(c.author.name)
 		else:
@@ -63,12 +71,16 @@ class RedditElement(object):
 		for url in stringutil.html_elements(c.body_html, 'a', 'href'):
 			self.add_url(url)
 
-	def submission(self, post):
+	def _ps_comment(self, c):
+		raise Exception("PushShift Comments cannot be wrapped - They are lacking crucial details!")
+
+	def _submission(self, post):
 		""" Handle a Submission. """
 		# out("[Post](%s): %s" % (post.subreddit.display_name, post.title) )
 		self.type = 'Submission'
 		self.id = str(post.name)
 		self.title = str(post.title)
+		self.subreddit = str(post.subreddit.display_name)
 		if post.author is None:
 			self.author = 'Deleted'
 		else:
@@ -80,6 +92,24 @@ class RedditElement(object):
 				self.add_url(url)
 		if post.url is not None and post.url.strip() != '':
 			self.add_url(post.url)
+
+	def _ps_submission(self, post):
+		self.type = 'Submission'
+		self.id = post.id
+		if 't3_' not in self.id:
+			self.id = 't3_%s' % self.id
+		self.title = post.title
+		self.subreddit = post.subreddit
+		if post.author is None or post.author == '[deleted]':
+			self.author = 'Deleted'
+		else:
+			self.author = str(post.author)
+		self.body = post.selftext if 'selftext' in post and post.selftext else ''
+		if post.url is not None and post.url.strip() != '' and 'reddit.com' not in post.url:
+			self.add_url(post.url)
+		if self.body.strip():
+			for u in re.findall(r'\[.+?\]\s*?\((.+?)\)', self.body):
+				self.add_url(u)
 
 	def add_url(self, url):
 		""" Add a URL to this element. """

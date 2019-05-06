@@ -5,6 +5,7 @@ from sources.my_upvoted_saved_source import UpvotedSaved
 from sources.subreddit_posts_source import SubredditPostsSource
 from sources.user_posts_source import UserPostsSource
 from sources.user_upvoted_saved_source import UserUpvotedSaved
+from sources.pushshift_subreddit import PushShiftSubmissionSource
 
 
 def all_sources():
@@ -14,7 +15,8 @@ def all_sources():
 		UpvotedSaved(),
 		SubredditPostsSource(),
 		UserPostsSource(),
-		UserUpvotedSaved()
+		UserUpvotedSaved(),
+		PushShiftSubmissionSource()
 	]
 
 
