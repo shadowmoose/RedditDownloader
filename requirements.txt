@@ -1,3 +1,4 @@
+psaw
 requests
 praw>=6.0.0
 lxml>=3.6.0
