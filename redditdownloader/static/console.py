@@ -39,7 +39,7 @@ def prompt_list(prompt, options, allow_none=False):
 	"""
 	if len(options) == 0:
 		return None
-	stringutil.print_color(stringutil.Fore.CYAN, prompt)
+	stringutil.print_color('cyan', prompt)
 	is_tuple = isinstance(options[0], tuple)
 	if not is_tuple:
 		options = [(o, o) for o in options]
@@ -76,7 +76,7 @@ def string(prompt, auto_strip=True):
 
 def pause():
 	""" Prompts the User to press any button to continue. """
-	stringutil.print_color(stringutil.Fore.GREEN, '[Press Enter to continue]')
+	stringutil.print_color('green', '[Press Enter to continue]')
 	input()
 
 
