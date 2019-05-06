@@ -27,7 +27,7 @@ class SubredditPostsSource(source.Source):
 	def get_config_summary(self):
 		lim = self.data['limit']
 		if lim > 0:
-			lim = 'first %s posts' % lim
+			lim = 'the first %s' % lim
 		else:
 			lim = ''
 		return 'Downloading %s %s submissions from subreddit "%s", within "%s" time.' % (

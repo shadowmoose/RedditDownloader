@@ -7,6 +7,8 @@ from processing.wrappers import SanitizedRelFile, DownloaderProgress
 from sql import File, URL
 from sqlalchemy.orm import joinedload
 
+# TODO: Once the stop_event is set, use the reader() class to submit filenames to the downloader threads, to split the Hashing job up.
+
 
 class Deduplicator(multiprocessing.Process):
 	def __init__(self, settings_json, stop_event):
@@ -47,7 +49,8 @@ class Deduplicator(multiprocessing.Process):
 			.filter(File.downloaded == True)\
 			.all()
 
-		for f in unfinished:
+		for idx, f in enumerate(unfinished):
+			self.progress.set_status("Deduplicating (%s) files..." % (len(unfinished) - idx))
 			path = SanitizedRelFile(base=settings.get("output.base_dir"), file_path=f.path)
 			if not path.is_file():
 				continue
