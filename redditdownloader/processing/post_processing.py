@@ -34,6 +34,7 @@ class Deduplicator(multiprocessing.Process):
 		while not self._stop_event.is_set():
 			self.progress.set_status("Deduplicating files...")
 			self._dedupe()
+			self.progress.set_status("Waiting for new files...")
 			self._stop_event.wait(2)
 		self._dedupe()  # Run one final pass after downloading stops.
 
@@ -55,7 +56,7 @@ class Deduplicator(multiprocessing.Process):
 			if not path.is_file():
 				continue
 			new_hash = FileHasher.get_best_hash(path.absolute())
-			print('New hash for File:', f.id, '::', new_hash)
+			# print('New hash for File:', f.id, '::', new_hash)
 			is_album = any(u.album_id for u in f.urls)
 			matches = [] if is_album else self._find_matching_files(new_hash, ignore_id=f.id)
 			f.hash = new_hash
