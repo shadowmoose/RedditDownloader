@@ -2,7 +2,7 @@ import re
 import html
 from collections import OrderedDict
 from lxml import html as lxhtml, etree
-import requests
+import sys
 from processing.handlers import HandlerResponse
 from processing.wrappers import http_downloader
 
@@ -18,9 +18,11 @@ def _iprop(ele, ele_tag, default=99999):
 
 def get_media_urls(base, post_id):
 	url = 'https://%s.tumblr.com/api/read?id=%s' % (base, post_id)
-	data = requests.get(url).content
+	data = http_downloader.open_request(url, stream=False)
+	if not data or data.status_code != 200:
+		return []
 	# noinspection PyUnresolvedReferences
-	tree = etree.fromstring(data)
+	tree = etree.fromstring(data.content)
 	post = tree.find('posts').find('post')
 	found = []
 	for vid in post.findall('video-player'):
@@ -55,15 +57,19 @@ def get_media_urls(base, post_id):
 
 def handle(task, progress):
 	m = re.match(regex, task.url)
-	if m is None:
+	if m is None or '.media.tumblr' in task.url:
 		return False
 	gr = m.groups()
 	progress.set_status("Parsing Tumblr page...")
-	urls = get_media_urls(gr[0], gr[1])
-	if not urls:
-		return None
-	if len(urls) > 1:
-		return HandlerResponse(success=True, handler=tag, album_urls=urls)
-	return http_downloader.download_binary(urls[0], task.file, progress, tag)
+	try:
+		urls = get_media_urls(gr[0], gr[1])
+		if not urls:
+			return None
+		if len(urls) > 1:
+			return HandlerResponse(success=True, handler=tag, album_urls=urls)
+		return http_downloader.download_binary(urls[0], task.file, progress, tag)
+	except Exception as ex:
+		print('Tumblr: ERROR:', ex, task.url, file=sys.stderr, flush=True)
+		return False
 
 

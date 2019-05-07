@@ -4,22 +4,49 @@ from static import settings
 from processing.handlers import HandlerResponse
 
 
+allowed_mimetypes = ['image/', 'audio/', 'video/']
+
+
+def _req_args():
+	""" Settings all Requests should use. """
+	return {
+		'headers': {'User-Agent': settings.get('auth.user_agent')},
+		'timeout': 10,
+		'allow_redirects': True
+	}
+
+
 def open_request(url, stream=True):
-	return requests.get(url, headers={'User-Agent': settings.get('auth.user_agent')}, stream=stream, timeout=10)
+	return requests.get(url, **_req_args(), stream=stream)
 
 
-def guess_mimetype(req):
+def is_media_url(url, return_status=False):
+	ret = (None, None)
+	try:
+		r = requests.head(url, **_req_args())
+		if not r or r.status_code != 200:
+			ret = (None, r.status_code)
+		else:
+			ret = (_guess_media_mimetype(r), r.status_code)
+	except Exception as ex:
+		print(ex)
+	if not return_status:
+		ret = ret[0]
+	return ret
+
+
+def _guess_media_mimetype(req):
 	if 'content-type' not in req.headers:
 		return None
 	content_type = req.headers['content-type']
 	ext = mimetypes.guess_extension(content_type)
 
-	if not ext:
+	if not ext or not any(content_type.startswith(t) for t in allowed_mimetypes):
 		return None
-	ext = ext.strip('.')
 
-	if 'jp' in ext:
-		ext = 'jpg'
+	if content_type == 'image/jpeg':
+		ext = '.jpg'
+	ext = ext.strip('.')
 	return ext
 
 
@@ -38,13 +65,13 @@ def download_binary(url, rel_file, prog, handler_id):
 		if not req or req.status_code != 200:
 			return HandlerResponse(success=False,
 								   handler=handler_id,
-								   failure_reason="Server Error: %s->%s" % (url, req.status_code if req else None))
+								   failure_reason="Server Error: %s->%s" % (url, req.status_code if req is not None else None))
 		size = req.headers.get('content-length')
 		if size:
 			size = int(size)
 		downloaded_size = 0
 
-		ext = guess_mimetype(req)
+		ext = _guess_media_mimetype(req)
 		if not ext:
 			return HandlerResponse(success=False, handler=handler_id, failure_reason="Unable to determine MIME Type.")
 		rel_file.set_ext(ext)
