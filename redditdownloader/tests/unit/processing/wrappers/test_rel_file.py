@@ -15,7 +15,7 @@ class RelFileTest(unittest.TestCase):
 		with self.assertRaises(rel.RelError, msg="Failed to catch dangerous file escalation!"):
 			rel.SanitizedRelFile(base='C://Users', file_path='t/../../nope.txt')
 		with self.assertRaises(rel.RelError, msg="Failed to catch non-character filename!"):
-			rel.SanitizedRelFile(base='C://Users', file_path=' . ./.')
+			rel.SanitizedRelFile(base='C://Users', file_path='  \n\t')
 
 	def test_path_concat(self):
 		""" Leading directory dots should be stripped in full paths """

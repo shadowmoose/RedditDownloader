@@ -70,7 +70,7 @@ def _dl_binary(output_dir, verbose=True):
 		raise Exception("Unable to download FFmpeg archive!")
 
 	with ZipFile(output_zip.absolute(), 'r') as z:
-		extracted = z.extract(_os_filename, path=output_dir)
+		extracted = abspath(z.extract(_os_filename, path=output_dir))
 		if not extracted:
 			raise Exception('Unable to extract FFmpeg binary!')
 		st = os.stat(extracted)
