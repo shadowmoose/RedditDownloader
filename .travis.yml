@@ -7,22 +7,16 @@ install:
 - pip install -r requirements.txt
 - pip install coveralls
 - pip install pycryptodome
-- python ./classes/tools/encryptor.py decrypt ./tests/test-settings.json.enc ./tests/test-settings.json
-- python ./classes/tools/encryptor.py decrypt ./tests/Legacy-Manifest.json.gz.enc ./download/Manifest.json.gz
 script:
-- coverage run --parallel-mode main.py --test --update_only --skip_pauses
-- coverage run --parallel-mode main.py --test --skip_pauses --interface.start_server=false
+- coverage run --parallel-mode ./redditdownloader --run_tests=*
 after_success:
 - coverage combine
 - COVERALLS_PARALLEL=true coveralls
 notifications:
-  email: false
-  webhooks:
-    urls:
-    - https://hook.rofl.wtf/
-    on_success: change
+  email:
+    on_success: never
     on_failure: change
-    on_start: change
+    on_start: never
     on_cancel: never
     on_error: change
 cache: pip
