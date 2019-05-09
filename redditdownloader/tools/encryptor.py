@@ -6,11 +6,17 @@ from Crypto.Random import get_random_bytes
 import base64
 import os
 import sys
+import glob
 
 
 class Cryptor:
 	def __init__(self):
-		self.key_file = './settings_key.key'  # for dumping key during encryption.
+		gl = glob.glob(os.path.join(os.path.dirname(__file__), '../../**/settings_key.key'), recursive=True)
+		if gl:
+			gl = os.path.normpath(gl[0])
+		else:
+			gl = os.path.join(os.path.dirname(__file__), '../../settings_key.key')
+		self.key_file = gl  # for dumping key during encryption.
 		self.env_key = 'TRAVIS_RMD_TEST_FILE_KEY'
 		self.key = self.load_key()
 
@@ -38,24 +44,23 @@ class Cryptor:
 					sf.write(base64.encodebytes(self.key))
 
 	def decrypt(self, file, file_out):
-		# noinspection PyBroadException
 		try:
 			file_in = open(file, "rb")
 			nonce, tag, ciphertext = [file_in.read(x) for x in (16, 16, -1)]
 			cipher = AES.new(self.key, AES.MODE_EAX, nonce)
 			data = cipher.decrypt_and_verify(ciphertext, tag)
 			os.makedirs(os.path.dirname(file_out), exist_ok=True)
+			file_in.close()
 			with open(file_out, 'wb') as o:
 				o.write(data)
-		except Exception:
+		except Exception as ex:
 			print('Failed decryption.')
-			sys.exit(1)
+			raise ex
 
 
 if __name__ == '__main__':
 	if len(sys.argv) < 4:
-		print('Invalid params. [encrypt/decrypt][file_in][file_out]')
-		sys.exit(1)
+		raise Exception('Invalid params. [encrypt/decrypt] [file_in] [file_out]')
 	en = Cryptor()
 	mode = sys.argv[1]
 	f_in = sys.argv[2]
@@ -66,3 +71,4 @@ if __name__ == '__main__':
 	else:
 		en.decrypt(f_in, f_out)
 		print('Decrypted file into: %s' % f_out)
+
