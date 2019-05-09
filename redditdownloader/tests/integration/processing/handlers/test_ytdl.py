@@ -19,5 +19,6 @@ class YTDLHandlerTest(StagedTest):
 		res = ytdl.handle(_task, _prog)
 		self.assertTrue(res, "Failed to download YouTube video!")
 		self.assertTrue(_file.exists(), "YouTube video was not downloaded! %s" % res.failure_reason)
-		self.assertTrue(_file.relative().endswith('.mkv'), 'Invalid extension for video file! (%s)' % _file)
+		self.assertTrue('.' in _file.relative(), "YTDL failed to apply file extension! (%s)" % _file.absolute())
+		self.assertTrue('unknown' not in _file.relative(), 'Invalid name for video file! (%s)' % _file.absolute())
 
