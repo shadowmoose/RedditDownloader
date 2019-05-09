@@ -169,9 +169,18 @@ def get_submission_comments(t3_id):
 
 @check_login
 def get_submission(t3_id):
-	assert t3_id.startswith('t3_')
+	if not t3_id.startswith('t3_'):
+		raise Exception('Invalid submission id: %s' % t3_id)
 	t3_id = t3_id.replace('t3_', '', 1)  # Convert to expected format.
 	return _reddit.submission(id=t3_id)
+
+
+@check_login
+def get_comment(t1_id):
+	if not t1_id.startswith('t1_'):
+		raise Exception('Invalid Comment id: %s' % t1_id)
+	t1_id = t1_id.replace('t1_', '', 1)  # Convert to expected format.
+	return _reddit.comment(id=t1_id)
 
 
 @check_login

@@ -27,17 +27,19 @@ class RedditElement(object):
 		self.body = None
 		self.parent = None
 		self.subreddit = None
+		self.over_18 = None
+		self.num_comments = None
+		self.score = None
 		self.detect_type(obj)
 
-		self.over_18 = obj.over_18
 		self.created_utc = obj.created_utc
-		self.num_comments = obj.num_comments
-		self.score = obj.score
 		self.link_count = len(self._urls)
 		self.source_alias = None
 
 		assert self.type == 'Submission' or self.type == 'Comment'
 		assert self.id is not None
+		assert not self.parent or 't3_' in self.parent
+		assert 't1_' in self.id or 't3_' in self.id
 
 	def detect_type(self, obj):
 		""" Simple function to call the proper Comment or Submission handler. """
@@ -59,14 +61,17 @@ class RedditElement(object):
 		""" Handle a Comment object. """
 		# out("[Comment](%s): %s" % (c.subreddit.display_name, c.link_title) )
 		self.type = 'Comment'
-		self.id = str(c.name)
-		self.parent = str(c.link_id)
-		self.title = str(c.link_title)
+		self.id = str(c.fullname)
+		self.parent = self._comment_field(c, 'link_id', 'fullname')
+		self.title = self._comment_field(c, 'link_title', 'title')
 		self.subreddit = str(c.subreddit.display_name)
 		if c.author:
 			self.author = str(c.author.name)
 		else:
 			self.author = 'Deleted'
+		self.over_18 = self._comment_field(c, 'over_18', 'over_18')
+		self.num_comments = self._comment_field(c, 'num_comments', 'num_comments')
+		self.score = self._comment_field(c, 'score', 'score')
 		self.body = c.body
 		for url in stringutil.html_elements(c.body_html, 'a', 'href'):
 			self.add_url(url)
@@ -78,13 +83,16 @@ class RedditElement(object):
 		""" Handle a Submission. """
 		# out("[Post](%s): %s" % (post.subreddit.display_name, post.title) )
 		self.type = 'Submission'
-		self.id = str(post.name)
+		self.id = str(post.fullname)
 		self.title = str(post.title)
 		self.subreddit = str(post.subreddit.display_name)
 		if post.author is None:
 			self.author = 'Deleted'
 		else:
 			self.author = str(post.author.name)
+		self.over_18 = post.over_18
+		self.num_comments = post.num_comments
+		self.score = post.score
 		self.body = post.selftext
 		if post.selftext.strip() != '':
 			# This post probably doesn't have a URL, and has selftext instead.
@@ -110,6 +118,9 @@ class RedditElement(object):
 		if self.body.strip():
 			for u in re.findall(r'\[.+?\]\s*?\((.+?)\)', self.body):
 				self.add_url(u)
+
+	def _comment_field(self, obj, attr, backup):
+		return getattr(obj, attr) if hasattr(obj, attr) else getattr(obj.submission, backup)
 
 	def add_url(self, url):
 		""" Add a URL to this element. """

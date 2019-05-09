@@ -58,7 +58,7 @@ def confirm(prompt, default=None):
 		defa = 'y/n'
 	elif not default:
 		defa = 'y/[n]'
-	inp = col_input("%s(%s): " % (prompt, defa))
+	inp = col_input("%s(%s): " % (prompt, defa)).strip()
 	if inp == '' and default is not None:
 		return default
 	return 'y' in inp.lower()
