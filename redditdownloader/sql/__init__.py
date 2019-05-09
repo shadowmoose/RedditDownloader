@@ -41,7 +41,7 @@ def init(db_path=":memory:"):
 
 def init_from_settings():
 	""" Builds the database file using the Settings currently loaded. """
-	db_file = SanitizedRelFile(base=settings.get("output.base_dir"), file_path="manifest.sqldb")
+	db_file = SanitizedRelFile(base=settings.get("output.base_dir"), file_path="manifest.sqlite")
 	db_file.mkdirs()
 	init(db_file.absolute())
 
