@@ -106,7 +106,7 @@ class SanitizedRelFile(RelFile):
 		# noinspection PyUnresolvedReferences
 		self._path = pathvalidate.sanitize_filepath(self._path, '_').strip(". /\\").strip()
 		if not len(self._path):
-			raise RelError("File path is too short! {%s}" % file_path)
+			self._path = '_'
 
 	def remove_dotslash(self, path):
 		np = ''
