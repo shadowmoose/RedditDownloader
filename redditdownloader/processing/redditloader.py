@@ -3,7 +3,7 @@ import queue
 from static import stringutil
 from static import settings
 from processing import name_generator
-from processing.wrappers import QueueReader, SanitizedRelFile, LoaderProgress
+from processing.wrappers import QueueReader, LoaderProgress
 import sql
 
 
@@ -26,6 +26,12 @@ class RedditLoader(multiprocessing.Process):
 		self.name = 'RedditElementLoader'
 
 	def run(self):
+		try:
+			self.load()
+		finally:
+			self._stop_event.set()
+
+	def load(self):
 		""" Threaded loading of elements. """
 		settings.from_json(self.settings)
 		sql.init_from_settings()
@@ -47,7 +53,6 @@ class RedditLoader(multiprocessing.Process):
 			self._handle_acks(timeout=0.5)
 		print("Finished loading.")
 		sql.close()
-		self._stop_event.set()
 
 	def _scan_sources(self):
 		for source in self.sources:

@@ -49,10 +49,12 @@ def _dl_binary(output_dir, verbose=True):
 
 	match = None
 	possible = None
-	for plat, files in dat['bin'].items():
+	for plat in sorted(dat['bin'].keys()):
+		files = dat['bin'][plat]
 		if _current_os in plat:
 			if _os_version in plat:
 				match = files
+				break
 			else:
 				possible = possible if possible else files
 	matches = [m for m in [match, possible] if m]

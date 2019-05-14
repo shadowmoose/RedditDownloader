@@ -14,8 +14,7 @@ class RelFileTest(unittest.TestCase):
 		""" Files cannot escalate above their Base """
 		with self.assertRaises(rel.RelError, msg="Failed to catch dangerous file escalation!"):
 			rel.SanitizedRelFile(base='C://Users', file_path='t/../../nope.txt')
-		with self.assertRaises(rel.RelError, msg="Failed to catch non-character filename!"):
-			rel.SanitizedRelFile(base='C://Users', file_path='  \n\t')
+		self.assertEqual('_', rel.SanitizedRelFile(base='C://Users', file_path=' \t\n ../ ./ . \\ ').relative())
 
 	def test_path_concat(self):
 		""" Leading directory dots should be stripped in full paths """

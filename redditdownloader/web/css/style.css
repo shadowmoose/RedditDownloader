@@ -301,8 +301,8 @@ option:enabled {
 	z-index: 1002;
 	transform: translate(-50%, -50%);
 	cursor: auto;
-	min-height: 300px;
-	min-width: 350px;
+	min-height: 32px;
+	min-width: 32px;
 }
 
 .lightbox .media{
