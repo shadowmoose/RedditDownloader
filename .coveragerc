@@ -3,10 +3,9 @@
 branch = False
 source = .
 omit =
-    ./classes/static/console.py
-    ./classes/static/updater.py
-    ./classes/tools/*
-    ./tests/*
+    ./redditdownloader/classes/static/console.py
+    ./redditdownloader/classes/tools/*
+    ./redditdownloader/tests/*
 [report]
 exclude_lines =
     pragma: no cover
@@ -14,6 +13,5 @@ exclude_lines =
     def __repr__
     except
     raise
-    if __name__ ==
 
 ignore_errors = True
