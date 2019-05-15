@@ -7,22 +7,22 @@ class FilterInitTest(unittest.TestCase):
 		self.fields = list(filters.filter_fields().keys())
 
 	def test_custom(self):
-		""" Make sure custom filters are loading properly. """
+		""" Make sure custom filters are loading properly """
 		self.assertGreater(len(filters.custom_filters()), 0, "Custom filters not loaded!")
 
 	def test_fields(self):
-		""" Assure default Filters can be loaded. """
+		""" Assure default Filters can be loaded """
 		self.assertIsNotNone(self.fields)
 		self.assertGreater(len(self.fields), 0)
 
 	def test_default_fields(self):
-		""" Assure that all filterable fields are properly loaded as Filters. """
+		""" Assure that all filterable fields are properly loaded as Filters """
 		loaded = [f.field for f in filters.get_filters(filter_dict=None)]
 		for field in self.fields:
 			self.assertIn(field, loaded, "Missing filter for field: %s" % field)
 
 	def test_load(self):
-		""" Test loading Filters using the string/dict notation. """
+		""" Test loading Filters using the string/dict notation """
 		loaded = filters.get_filters(filter_dict={'subreddit.equals': 1})
 		self.assertEqual(len(loaded), 1, "Loaded incorrect number of Filters!")
 
