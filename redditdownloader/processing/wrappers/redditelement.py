@@ -1,6 +1,10 @@
 import praw.models
 from static import stringutil
 import re
+import json
+from ttp import ttp
+
+url_parser = ttp.Parser()
 
 
 class RedditElement(object):
@@ -17,9 +21,10 @@ class RedditElement(object):
 			parent: The ID of this Post's parent Submission, if this Element is a Comment. Otherwise NULL.
 	"""
 
-	def __init__(self, obj):
+	def __init__(self, obj, ext_submission_obj=None):
 		""" Creates the object. Automatically calls its own detect_type() function to resolve variable name mappings. """
 		self._urls = []
+		self._ext_submission = ext_submission_obj
 		self.type = None
 		self.id = None
 		self.title = None
@@ -77,7 +82,27 @@ class RedditElement(object):
 			self.add_url(url)
 
 	def _ps_comment(self, c):
-		raise Exception("PushShift Comments cannot be wrapped - They are lacking crucial details!")
+		""" Handle a Pushshift Comment object. """
+		# out("[Comment](%s): %s" % (c.subreddit.display_name, c.link_title) )
+		self.type = 'Comment'
+		self.id = c.id
+		if 't1_' not in self.id:
+			self.id = 't1_%s' % self.id
+		self.parent = self._comment_field(c, 'link_id', 'fullname')
+		self.title = self._comment_field(c, 'link_title', 'title')
+		self.subreddit = c.subreddit
+		if c.author is None or c.author == '[deleted]':
+			self.author = 'Deleted'
+		else:
+			self.author = str(c.author)
+		self.over_18 = self._comment_field(c, 'over_18', 'over_18')
+		self.num_comments = self._comment_field(c, 'num_comments', 'num_comments')
+		self.score = self._comment_field(c, 'score', 'score')
+		self.body = str(c.body)
+		if self.body.strip():
+			result = url_parser.parse(self.body)
+			for u in result.urls:
+				self.add_url(u)
 
 	def _submission(self, post):
 		""" Handle a Submission. """
@@ -102,6 +127,7 @@ class RedditElement(object):
 			self.add_url(post.url)
 
 	def _ps_submission(self, post):
+		""" Handle a PushShift Submission. """
 		self.type = 'Submission'
 		self.id = post.id
 		if 't3_' not in self.id:
@@ -112,6 +138,9 @@ class RedditElement(object):
 			self.author = 'Deleted'
 		else:
 			self.author = str(post.author)
+		self.over_18 = post.over_18
+		self.num_comments = post.num_comments
+		self.score = post.score
 		self.body = post.selftext if 'selftext' in post and post.selftext else ''
 		if post.url is not None and post.url.strip() != '' and 'reddit.com' not in post.url:
 			self.add_url(post.url)
@@ -120,7 +149,14 @@ class RedditElement(object):
 				self.add_url(u)
 
 	def _comment_field(self, obj, attr, backup):
-		return getattr(obj, attr) if hasattr(obj, attr) else getattr(obj.submission, backup)
+		return getattr(obj, attr) if hasattr(obj, attr) else getattr(self._get_submission_obj(obj), backup)
+
+	def _get_submission_obj(self, obj):
+		""" Get the "submission" property of the given object, or fall back to the _ext_submission object. """
+		sub = obj.submission if hasattr(obj, 'submission') else self._ext_submission
+		if not sub:
+			raise Exception("Comment object is missing Submission, and has no extra provided!")
+		return sub
 
 	def add_url(self, url):
 		""" Add a URL to this element. """
@@ -146,3 +182,6 @@ class RedditElement(object):
 	def get_urls(self):
 		""" Returns a list of all this element's UNIQUE urls. """
 		return self._urls[:]
+
+	def __str__(self):
+		return json.dumps(self.__dict__)

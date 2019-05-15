@@ -32,7 +32,6 @@ class Deduplicator(multiprocessing.Process):
 		self.progress.set_running(True)
 
 		while not self._stop_event.is_set():
-			self.progress.set_status("Deduplicating files...")
 			self._dedupe()
 			self.progress.set_status("Waiting for new files...")
 			self._stop_event.wait(2)
@@ -50,14 +49,19 @@ class Deduplicator(multiprocessing.Process):
 			.filter(File.downloaded == True)\
 			.all()
 
+		unfinished = list(filter(lambda _f: not any(u.album_id for u in _f.urls), unfinished))  # Filter out albums.
+
+		if not unfinished:
+			return
+
 		for idx, f in enumerate(unfinished):
 			self.progress.set_status("Deduplicating (%s) files..." % (len(unfinished) - idx))
 			path = SanitizedRelFile(base=settings.get("output.base_dir"), file_path=f.path)
-			if not path.is_file():
+			is_album = any(u.album_id for u in f.urls)
+			if not path.is_file() or is_album:
 				continue
 			new_hash = FileHasher.get_best_hash(path.absolute())
 			# print('New hash for File:', f.id, '::', new_hash)
-			is_album = any(u.album_id for u in f.urls)
 			matches = [] if is_album else self._find_matching_files(new_hash, ignore_id=f.id)
 			f.hash = new_hash
 			if len(matches):
