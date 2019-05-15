@@ -73,11 +73,13 @@ class FilterTest(unittest.TestCase):
 			self.assertTrue(obj.from_keyval(key, val), 'Unable to convert filter from key/val.')
 			self.assertEqual(obj.field, self.filter.field, 'Converted Filter field was not equal to original.')
 			self.assertEqual(self.filter.get_limit(), obj.get_limit(), 'Converted Filter limit was not equal.')
-			self.assertEqual(self.filter.operator, obj.operator, 'Converted FIlter Operator was not equal.')
+			self.assertEqual(self.filter.operator, obj.operator, 'Converted Filter Operator was not equal.')
 
 	def test_json(self):
 		""" Should be JSON encodable """
-		self.assertIsNotNone(json.loads(json.dumps(self.filter.to_js_obj())), "JSON conversion failed!")
+		decoded = json.loads(json.dumps(self.filter.to_js_obj()))
+		self.assertIsNotNone(decoded, "JSON conversion failed!")
+		self.assertEqual(self.filter.to_js_obj(), decoded, "JSON conversion mismatch!")
 
 	def test_str(self):
 		""" Make sure string output works """
