@@ -29,33 +29,33 @@ class Source:
 		for _s in self.get_settings():
 			self.data[_s.name] = _s.val()
 
-	def get_elements(self):  # !cover
+	def get_elements(self):
 		"""  Tells this Source to build and return a generator for RedditElements. """
 		pass
 
-	def get_config_summary(self):  # !cover
+	def get_config_summary(self):
 		""" Override this method to print out a user-friendly string descriping this Source's current configuration. """
 		return "No status"
 
-	def get_settings(self):  # !cover
+	def get_settings(self):
 		"""  Make this Souce object prompt the user for the information it needs to retrieve data.
 			Returns if the Source was properly set up or not.
 		"""
 		return []
 
-	def available_filters(self):  # !cover
+	def available_filters(self):
 		""" Returns a list of the available filters this Source can listen to. """
 		return filters.get_filters()
 
-	def set_alias(self, alias):  # !cover
+	def set_alias(self, alias):
 		""" Set the alias of this Source. """
 		self._alias = alias
 
-	def get_alias(self):  # !cover
+	def get_alias(self):
 		""" Accessor for this Source's alias. """
 		return self._alias
 
-	def check_filters(self, ele):  # !cover
+	def check_filters(self, ele):
 		""" Checks if the given RedditElement can pass this Source's filters. """
 		for fi in self.filters:
 			if not fi.check(ele):
@@ -72,13 +72,13 @@ class Source:
 	def insert_data(self, key, val):
 		self.data[key] = val
 
-	def get_filters(self):  # !cover
+	def get_filters(self):
 		return self.filters
 
-	def remove_filter(self, rem_filter):  # !cover
+	def remove_filter(self, rem_filter):
 		self.filters.remove(rem_filter)
 
-	def add_filter(self, new_filter):  # !cover
+	def add_filter(self, new_filter):
 		self.filters.append(new_filter)
 
 	def from_obj(self, obj):
@@ -94,7 +94,7 @@ class Source:
 		self._load_filters(obj)
 		return True
 
-	def to_obj(self, for_webui=False):  # !cover
+	def to_obj(self, for_webui=False):
 		"""  Convert this Source into a data model that can be output to the Settings file.  """
 		out = {'type': self.type, 'filters': {}, 'data': self.data, 'alias': self._alias}
 		for fi in self.get_filters():
