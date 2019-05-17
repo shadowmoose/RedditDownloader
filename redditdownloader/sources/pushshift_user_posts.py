@@ -40,7 +40,7 @@ class PushShiftUserSourceSource(source.Source):
 			lim = 'the first %s' % lim
 		else:
 			lim = 'all'
-		return 'Downloading %s submissions from subreddit "%s".' % (
-			lim, self.data['subreddit']
+		return 'Downloading %s posts from user(s) "%s".' % (
+			lim, self.data['users']
 		)
 

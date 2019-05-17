@@ -174,7 +174,7 @@ def api_save_sources(new_obj):
 	print('Saving new source list:')
 	output_settings = []
 	for so in new_obj:
-		print('\tType:', so['type'], 'Alias:', so['alias'])
+		print('\tType:', so['type'], 'Alias:', so['alias'], so['filters'])
 		for s in sources.load_sources():
 			if s.type == so['type']:
 				s.set_alias(so['alias'])
