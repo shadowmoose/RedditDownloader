@@ -40,7 +40,6 @@ class SourceTest(EnvironmentTest):
 		""" Loading elements should work for all Sources """
 		for s in settings.get_sources():
 			eles = [re for re in s.get_elements()]
-			print(s.type, len(eles), eles)
 			self.assertGreater(len(eles), 0, "Failed to load any elements from test Source: %s" % s.type)
 			self.assertTrue(all(e for e in eles), "Loaded invalid RedditElements: %s" % eles)
 
