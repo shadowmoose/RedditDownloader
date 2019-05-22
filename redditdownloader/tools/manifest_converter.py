@@ -7,8 +7,8 @@ import gzip
 import json
 import argparse
 from static import settings
-from static import praw_wrapper as rd
-from static import stringutil
+from psaw import PushshiftAPI
+import html
 from processing.wrappers.redditelement import RedditElement
 import sql
 import uuid
@@ -28,6 +28,9 @@ parser.add_argument("--manifest_gz", help="The legacy Manifest.gz file, if exist
 parser.add_argument("--manifest_sql", help="The legacy SQLite db from 2.0+, if exists.", type=str, metavar='', default=None)
 parser.add_argument("--new_save_dir", help="The path to the new save directory.", type=str, metavar='', default=None)
 args, unknown_args = parser.parse_known_args()
+
+ps = PushshiftAPI()
+ps_query_size = 50
 
 
 class PendingPost:
@@ -57,7 +60,7 @@ class FailedPost(dict):
 class GZManifest:
 	def __init__(self, gz_file, og_base):
 		self.file = gz_file
-		self.og_base = stringutil.normalize_file(og_base).replace('\\', '/')
+		self.og_base = os.path.normpath(og_base).replace('\\', '/')
 		self.failed = []
 
 	def load_completed(self):
@@ -69,35 +72,37 @@ class GZManifest:
 		""" Legacy RedditElement Comments incorrectly grabbed the ID of their parent as their own. """
 		if len(e['urls']) == 0:
 			return None
-		for c in rd.get_submission_comments(e['id']):
-			try:
-				c_urls = stringutil.html_elements(c.body_html, 'a', 'href')
-			except AttributeError:
-				continue
-			if len(c_urls) == 0:
-				continue
-			if all(u in c_urls for u in e['urls']):
-				return c
+		best = (0, None)
+		for c in ps.search_comments(link_id=e['id']):
+			comp = len([u for u in e['urls'] if u in html.unescape(c.body)])
+			if str(c.author.lower() == e['author'].lower()):
+				comp = comp * 10
+			if comp > best[0]:
+				best = (comp, 't1_%s' % c.id)
+		return best[1]
 
 	def convert(self):
-		for e in self.load_completed():
-			com = None
+		loaded = self.load_completed()
+		comment_count = len([c for c in loaded if c['type'] == 'Comment'])
+		idx = 0
+		for e in loaded:
 			for k, v in e['files'].items():
 				if v:
-					fn = stringutil.normalize_file(v).replace('\\', '/')
+					fn = os.path.normpath(v).replace('\\', '/')
 					if self.og_base not in fn:
 						raise Exception("Invalid og_base_dir! Cannot convert from legacy!")
 					e['files'][k] = fn.replace(self.og_base, '').lstrip('/\\')
 			if e['type'] == 'Comment':
+				idx += 1
 				e['parent'] = e['id']  # Previous versions used Parent ID instead of their own.
-				print("Searching for Comment: %s" % e['id'], end='\r', flush=True)
+				print("Searching for Comment: %s (%s/%s)" % (e['id'], idx, comment_count), end='\r', flush=True)
 				com = self.find_comment(e)
 				if not com:
-					print('Could not match old Comment; Will re-download. [%s]' % e['id'])
+					print('Could not match old legacy Comment; It will be re-downloaded. [%s]' % e['id'])
 					self.failed.append(FailedPost(e['id'], e['title'], e['files'], "Comment ID could not be converted from parent"))
 					continue
-				e['id'] = com.name
-			yield PendingPost(e['id'], e['files'], e['source_alias'], title=e['title'], reddit_ele=com)
+				e['id'] = com
+			yield PendingPost(e['id'], e['files'], e['source_alias'], title=e['title'])
 
 
 class SQLDBManifest:
@@ -136,8 +141,8 @@ class Converter:
 		self.manifest_gz = manifest_gz
 		self.og_base_dir_path = os.path.abspath(og_base_dir_path)
 		self.gz_base_dir_name = gz_base_dir_name
-		self.sqlite_path = os.path.abspath(sqlite_path)
-		if stringutil.normalize_file(self.new_save_base) == stringutil.normalize_file(og_base_dir_path):
+		self.sqlite_path = os.path.abspath(sqlite_path) if sqlite_path else None
+		if os.path.normpath(self.new_save_base) == os.path.normpath(og_base_dir_path):
 			raise Exception("ERROR: You must specify a NEW directory to save the converted Posts!")
 		# internal:
 		self.session = None
@@ -188,18 +193,21 @@ class Converter:
 
 	def process_posts(self):
 		""" Iterate through all the located PendingPosts, and process them. """
+		submissions = [p.reddit_id for p in self.posts.values() if p.reddit_id.startswith('t3_')]
+		comments = [p.reddit_id for p in self.posts.values() if p.reddit_id.startswith('t1_')]
+
+		submissions = [RedditElement(s) for s in batch_submission_lookup(submissions)]
+		comments = [c for c in batch_comment_lookup(comments)]
+
 		for idx, pend in enumerate(self.posts.values()):
 			r = pend.ele
 			if not r:
 				try:
-					if pend.reddit_id.startswith('t3_'):
-						print("Searching for Submission:", pend.reddit_id)
-						r = RedditElement(rd.get_submission(pend.reddit_id))
-					else:
-						print("Searching for Comment:", pend.reddit_id)
-						r = RedditElement(rd.get_comment(pend.reddit_id))
+					found = [re for re in submissions+comments if re.id == pend.reddit_id]
+					if not found:
+						raise Exception('Unable to locate via PushShift!')
+					r = found[0]
 				except Exception as ex:
-					print(ex)
 					self.failures.append(FailedPost(pend.reddit_id, pend.title, pend.files, reason="Error parsing: %s" % ex))
 					continue
 			r.source_alias = pend.source + '-imported'
@@ -271,7 +279,7 @@ class Converter:
 			ret.append(path)
 		elif os.path.isdir(path):
 			ret.extend(os.path.join(path, p) for p in os.listdir(path) if not os.path.isdir(p))
-		return [stringutil.normalize_file(_r) for _r in ret if _r]
+		return [os.path.normpath(_r) for _r in ret if _r]
 
 	def create_url_file(self, sql_url, sql_post, album_size, downloaded=True):
 		""" Creates a SQL File object for the given SQL URL & Post. """
@@ -285,6 +293,31 @@ class Converter:
 		sql_url.file = file
 		file.downloaded = downloaded
 		return file
+
+
+def batch_submission_lookup(submission_ids):
+	chunks = [submission_ids[x:x + ps_query_size] for x in range(0, len(submission_ids), ps_query_size)]
+	for idx, ch in enumerate(chunks):
+		print("Scanning Submissions... Batch: %s/%s" % (idx+1, len(chunks)))
+		for sub in ps.search_submissions(limit=len(ch), ids=[c for c in ch]):
+			yield sub
+
+
+def batch_comment_lookup(comments):
+	chunks = [comments[x:x+ps_query_size] for x in range(0, len(comments), ps_query_size)]
+	found = []
+	for idx, ch in enumerate(chunks):
+		print("Scanning comments... Batch: %s/%s" % (idx+1, len(chunks)))
+		for com in ps.search_comments(limit=len(ch), ids=[c for c in ch]):
+			found.append(com)
+	subs = [s for s in batch_submission_lookup([c.link_id for c in found])]
+	for s in subs:
+		search = list(filter(lambda c: c.link_id.replace('t3_', '', 1) == s.id, found))
+		if not search:
+			continue
+		com = search[0]
+		found.remove(com)
+		yield RedditElement(com, ext_submission_obj=s)
 
 
 def arg_or_input(arg, prompt):
