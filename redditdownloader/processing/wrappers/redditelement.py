@@ -2,6 +2,7 @@ import praw.models
 from static import stringutil
 import re
 import json
+import html
 from ttp import ttp
 
 url_parser = ttp.Parser()
@@ -98,7 +99,7 @@ class RedditElement(object):
 		self.over_18 = self._comment_field(c, 'over_18', 'over_18')
 		self.num_comments = self._comment_field(c, 'num_comments', 'num_comments')
 		self.score = self._comment_field(c, 'score', 'score')
-		self.body = str(c.body)
+		self.body = html.unescape(str(c.body))
 		if self.body.strip():
 			result = url_parser.parse(self.body)
 			for u in result.urls:
@@ -141,7 +142,7 @@ class RedditElement(object):
 		self.over_18 = post.over_18
 		self.num_comments = post.num_comments
 		self.score = post.score
-		self.body = post.selftext if 'selftext' in post and post.selftext else ''
+		self.body = html.unescape(str(post.selftext)) if 'selftext' in post and post.selftext else ''
 		if post.url is not None and post.url.strip() != '' and 'reddit.com' not in post.url:
 			self.add_url(post.url)
 		if self.body.strip():
@@ -149,7 +150,14 @@ class RedditElement(object):
 				self.add_url(u)
 
 	def _comment_field(self, obj, attr, backup):
-		return getattr(obj, attr) if hasattr(obj, attr) else getattr(self._get_submission_obj(obj), backup)
+		if hasattr(obj, attr):
+			return getattr(obj, attr)
+		else:
+			sub = self._get_submission_obj(obj)
+			val = getattr(sub, backup)
+			if sub == self._ext_submission and isinstance(val, str):
+				return html.unescape(val)
+			return val
 
 	def _get_submission_obj(self, obj):
 		""" Get the "submission" property of the given object, or fall back to the _ext_submission object. """
