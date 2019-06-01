@@ -75,7 +75,7 @@ def start(web_dir, file_dir, rmd_version):
 def _websocket_close(page, old_websockets):
 	global stopped
 	print('A WebUI just closed. Checking for other connections... (%s)[%s]' % (page, len(old_websockets)))
-	for i in range(80):
+	for i in range(40):
 		eel.sleep(.1)
 		# noinspection PyProtectedMember
 		if len(eel._websockets) > 0:
