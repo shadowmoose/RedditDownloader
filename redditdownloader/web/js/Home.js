@@ -7,6 +7,15 @@ class Home extends React.Component {
 	componentDidMount(){
 		eel.api_current_status()(r=>{
 			this.setState({version: r['current_version']}, ()=> {
+				let last = localStorage.getItem('last-update-check'); // TODO: Wrap localStorage.
+				if(last){
+					last = JSON.parse(last);
+					if(new Date().getTime() - last < 1000*60*60){
+						console.debug("Skipping update check until:", new Date(last+1000*60*60).toLocaleString());
+						return;
+					}
+				}
+				localStorage.setItem('last-update-check', JSON.stringify(new Date().getTime()));
 				let xhttp = new XMLHttpRequest();
 				let self = this;
 				xhttp.onreadystatechange = function () {
@@ -24,9 +33,9 @@ class Home extends React.Component {
 		let data = JSON.parse(resp);
 		let converter = new showdown.Converter();
 		let body = data[0].body;
-		let tag = parseFloat(data[0].tag_name);
+		let tag = data[0].tag_name;
 		console.log('Current version:', this.state.version, 'Latest Release:', tag);
-		if(tag <= parseFloat(this.state.version)) {
+		if(tag !== this.state.version) {
 			return;
 		}
 		body  = body.replace(/</g, '&lt').replace(/>/g, '&gt');

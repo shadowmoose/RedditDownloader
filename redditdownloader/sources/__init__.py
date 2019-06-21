@@ -7,6 +7,7 @@ from sources.user_posts_source import UserPostsSource
 from sources.user_upvoted_saved_source import UserUpvotedSaved
 from sources.pushshift_subreddit import PushShiftSubmissionSource
 from sources.pushshift_user_posts import PushShiftUserSourceSource
+from sources.direct_input_source import DirectInputSource
 
 
 def all_sources():
@@ -33,8 +34,10 @@ def load_sources(source_list=None):
 		return all_sources()
 	else:
 		for s in source_list:
-			for l in all_sources():
+			for l in all_sources() + [DirectInputSource()]:
 				if l.from_obj(s):
 					loaded.append(l)
 					break
+			else:
+				raise Exception("Unable to load Source: %s" % s)
 	return loaded

@@ -6,7 +6,6 @@ from static.settings import Setting
 class MultiRedditSource(source.Source):
 	def __init__(self):
 		super().__init__(source_type='multi-reddit-source', description="The submissions from a user-curated MultiReddit.")
-		self._elements = []
 
 	def get_elements(self):
 		for p in reddit.multi_reddit(username=self.data['owner'], reddit_name=self.data['multi_name'],

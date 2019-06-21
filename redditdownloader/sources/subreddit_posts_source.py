@@ -6,7 +6,6 @@ from static.settings import Setting
 class SubredditPostsSource(source.Source):
 	def __init__(self):
 		super().__init__(source_type='subreddit-posts-source', description="The submissions in one or more subreddits")
-		self._elements = []
 
 	def get_elements(self):
 		for sub in self.data['subreddit'].split(','):

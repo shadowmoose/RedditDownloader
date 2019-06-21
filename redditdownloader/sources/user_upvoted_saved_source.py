@@ -7,7 +7,6 @@ class UserUpvotedSaved(source.Source):
 	def __init__(self):
 		super().__init__(source_type='user-upvoted-saved',
 						 description="Submissions and Comments a Redditor has Upvoted or Saved.")
-		self._elements = []
 
 	def get_elements(self):
 		dat = self.data

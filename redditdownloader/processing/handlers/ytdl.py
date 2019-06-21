@@ -5,6 +5,7 @@ from processing.handlers import HandlerResponse
 from tools import ffmpeg_download
 from static import settings
 import glob
+import time
 
 tag = 'ytdl'
 order = 100
@@ -49,17 +50,25 @@ class YTDLWrapper:
 			'socket_timeout': 10,
 			'ffmpeg_location': ffmpeg_download.install_local()
 		}
-		with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-			self.progress.set_status("Looking for video...")
-			ydl.download([url])
+		failed = False
+		try:
+			with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+				self.progress.set_status("Looking for video...")
+				ydl.download([url])
+		except Exception as ex:
+			if 'unsupported url' not in str(ex).lower():
+				print('YTDL:', ex, '[%s]' % url, file=sys.stderr, flush=True)
+				time.sleep(1)
+			failed = True
 
 		# YTDL can mangle paths, so find the temp file it generated.
 		tmp_file = glob.glob('%s/**/%s.*' % (file.absolute_base(), tmp_hash), recursive=True)
 		if tmp_file:
+			for t in tmp_file:
+				self.files.add(t)
 			tmp_file = tmp_file[0]
-			self.files.add(tmp_file)
 
-		failed = not tmp_file or any(str(f).endswith('.unknown_video') for f in self.files)
+		failed = failed or not tmp_file or any(str(f).endswith('.unknown_video') for f in self.files)
 		if failed:
 			for f in self.files:
 				if os.path.isfile(f):
@@ -80,7 +89,6 @@ def handle(task, progress):
 		file = wrapper.run(task.url, task.file)
 		return HandlerResponse(success=True, rel_file=file, handler=tag)
 	except Exception as ex:
-		if 'unsupported url' not in str(ex).lower():
-			print('YTDL:', ex, task.url, file=sys.stderr, flush=True)
+		print('YTDL Handler:', ex, ' URL:', task.url, file=sys.stderr, flush=True)
 		# Don't allow the script to crash due to a YTDL exception.
 		return False

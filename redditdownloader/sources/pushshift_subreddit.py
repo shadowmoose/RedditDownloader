@@ -7,7 +7,6 @@ from processing.wrappers.redditelement import RedditElement
 class PushShiftSubmissionSource(source.Source):
 	def __init__(self):
 		super().__init__(source_type='pushshift-submission-source', description="PushShift: The (possibly unlimited) submissions in one or more subreddits.")
-		self._elements = []
 
 	def get_elements(self):
 		ps = PushshiftAPI()
@@ -31,6 +30,6 @@ class PushShiftSubmissionSource(source.Source):
 			lim = 'the first %s' % lim
 		else:
 			lim = 'all'
-		return 'Downloading %s submissions from subreddit "%s".' % (
+		return 'Downloading %s submissions from subreddit(s) "%s".' % (
 			lim, self.data['subreddit']
 		)

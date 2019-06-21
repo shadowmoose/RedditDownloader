@@ -18,6 +18,11 @@ def save():
 	return True
 
 
+def disable_saving():
+	global _file
+	_file = None
+
+
 def to_json():
 	"""
 	Converts the Settings into a JSON String, which this class is guaranteed to be capable of loading.
@@ -122,7 +127,7 @@ def has_source_alias(alias):  # !cover - no sources yet
 	return False
 
 
-def add_source(new_source, prevent_duplicate=True, save_after=True):  # !cover - no sources yet
+def add_source(new_source, prevent_duplicate=True, save_after=True):
 	""" Adds the given source to the JSON-encoded Settings data. Will not add a duplicate Source alias.
 		Returns if the Source was added
 	"""

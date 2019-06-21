@@ -6,7 +6,6 @@ from static.settings import Setting
 class FrontpagePostsSource(source.Source):
 	def __init__(self):
 		super().__init__(source_type='frontpage-posts-source', description="The submissions on your front page.")
-		self._elements = []
 
 	def get_elements(self):
 		for p in reddit.frontpage_posts(order_by=self.data['order'], limit=self.data['limit'], time=self.data['time']):

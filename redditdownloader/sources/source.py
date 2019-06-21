@@ -38,9 +38,7 @@ class Source:
 		return "No status"
 
 	def get_settings(self):
-		"""  Make this Souce object prompt the user for the information it needs to retrieve data.
-			Returns if the Source was properly set up or not.
-		"""
+		"""  Fetch an iterable of Settings() objects, which are needed to configure this source. """
 		return []
 
 	def available_filters(self):
@@ -113,3 +111,6 @@ class Source:
 		if 'filters' not in data:
 			return False  # !cover
 		self.filters = filters.get_filters(data['filters'])
+
+	def __repr__(self):
+		return "(Source: %s :: %s)" % (self.type, self.get_config_summary())

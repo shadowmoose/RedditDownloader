@@ -6,7 +6,6 @@ from static.settings import Setting
 class UserPostsSource(source.Source):
 	def __init__(self):
 		super().__init__(source_type='user-posts-source', description="A User's Submission and/or Comment history.")
-		self._elements = []
 
 	def get_elements(self):
 		for re in reddit.user_posts(

@@ -7,24 +7,30 @@ import sys
 import static.stringutil as su
 import static.settings as settings
 import static.console as console
+from sources import DirectInputSource
 from interfaces.terminal import TerminalUI
 from interfaces.eelwrapper import WebUI
 import tests.runner
 import sql
 from tools import ffmpeg_download
+import re
 
 
 parser = argparse.ArgumentParser(
 	description="Tool for scanning Reddit and downloading media - Guide @ https://goo.gl/hgBxN4")
 parser.add_argument("--settings", help="Path to custom Settings file.", type=str, metavar='', default="./settings.json")
 parser.add_argument("--source", '-s',
-					help="Run each loaded Source only if alias matches the given pattern. Can pass multiple patterns.",
+					help="Run each configured Source only if its alias matches the given pattern. Can pass multiple patterns.",
 					type=str, action='append', metavar='')  # TODO: Reimplement
 parser.add_argument("--category.setting", help="Override the given setting(s).", action="store_true")
 parser.add_argument("--list_settings", help="Display a list of overridable settings.", action="store_true")
 parser.add_argument("--version", '-v', help="Print the current version and exit.", action="store_true")
 parser.add_argument("--run_tests", help="Run the given test directory, or * for all.", type=str, metavar='', default="")
+parser.add_argument("--limit", help="For direct downloading of user/subreddit, set the limit here.", type=int, default=1000)
 args, unknown_args = parser.parse_known_args()
+
+
+direct_sources = []
 
 
 if __name__ == '__main__':
@@ -58,8 +64,12 @@ if __name__ == '__main__':
 	_loaded = settings.load(args.settings)
 	for ua in unknown_args:
 		if '=' not in ua:
-			su.error("ERROR: Unkown argument: %s" % ua)
-			sys.exit(1)
+			if 'r/' or 'u/' in ua:
+				direct_sources.append(DirectInputSource(txt=ua, args={'limit': args.limit}))
+				continue
+			else:
+				su.error("ERROR: Unkown argument: %s" % ua)
+				sys.exit(1)
 		k = ua.split('=')[0].strip('- ')
 		v = ua.split('=', 2)[1].strip()
 		try:
@@ -68,13 +78,21 @@ if __name__ == '__main__':
 			print('Unknown setting: %s' % k)
 			sys.exit(50)
 
+	if args.source:
+		matched_sources = set()
+		for s in args.source:
+			for stt in settings.get_sources():
+				if re.match(s, stt.get_alias()):
+					matched_sources.add(stt)
+		direct_sources.extend(matched_sources)
+
 	if not ffmpeg_download.install_local():
 		print("RMD was unable to locate (or download) a working FFmpeg binary.")
 		print("For downloading and post-processing, this is a required tool.")
 		print("Please Install FFmpeg manually, or download it from here: https://rmd.page.link/ffmpeg")
 		sys.exit(15)
 
-	if not _loaded:
+	if not _loaded and not direct_sources:
 		# First-time configuration.
 		su.error('Could not find an existing settings file. A new one will be generated!')
 		if not console.confirm('Would you like to start the WebUI to help set things up?', True):
@@ -94,8 +112,15 @@ if __name__ == '__main__':
 	# Initialize Database
 	sql.init_from_settings()
 
+	if direct_sources:
+		settings.disable_saving()
+		for s in settings.get_sources():
+			settings.remove_source(s, save_after=False)
+		for d in direct_sources:
+			settings.add_source(d, prevent_duplicate=False, save_after=False)
+
 	ui = None
-	if settings.get('interface.start_server'):
+	if settings.get('interface.start_server') and not direct_sources:
 		print("Starting WebUI...")
 		ui = WebUI(__version__)
 	else:

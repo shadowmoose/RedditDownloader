@@ -5,8 +5,6 @@ from processing.wrappers import SanitizedRelFile, AckPacket, DownloaderProgress
 from processing import handlers
 import uuid
 
-# TODO: Extend this to allow direct console input by wrapping the input/output queues.
-
 
 class Downloader(multiprocessing.Process):
 	def __init__(self, reader, ack_queue, settings_json):
@@ -79,7 +77,7 @@ class Downloader(multiprocessing.Process):
 					url_id=nxt_id,
 					extra_urls=[]
 				))
-				raise  # TODO: Error handling here.
+				break  # TODO: Error handling here.
 
 		sql.close()
 		self.progress.clear("Finished.", running=False)

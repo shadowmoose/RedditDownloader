@@ -7,7 +7,6 @@ from processing.wrappers.redditelement import RedditElement
 class PushShiftUserSourceSource(source.Source):
 	def __init__(self):
 		super().__init__(source_type='pushshift-user-source', description="PushShift: The (possibly unlimited) posts made by a User.")
-		self._elements = []
 
 	def get_elements(self):
 		ps = PushshiftAPI()
