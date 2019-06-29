@@ -11,6 +11,10 @@ tag = 'ytdl'
 order = 100
 
 
+class YTDLError(Exception):
+	pass
+
+
 class Logger(object):
 	def debug(self, msg):
 		pass
@@ -58,7 +62,7 @@ class YTDLWrapper:
 		except Exception as ex:
 			if 'unsupported url' not in str(ex).lower():
 				print('YTDL:', ex, '[%s]' % url, file=sys.stderr, flush=True)
-				time.sleep(1)
+				time.sleep(1)  # Give YTDL time to shut down before deleting file parts.
 			failed = True
 
 		# YTDL can mangle paths, so find the temp file it generated.
@@ -73,7 +77,7 @@ class YTDLWrapper:
 			for f in self.files:
 				if os.path.isfile(f):
 					os.remove(f)
-			raise Exception("YTDL Download filetype failure.")
+			raise YTDLError("YTDL Download filetype failure.")
 
 		file.set_ext(str(tmp_file).split(".")[-1])
 		os.rename(tmp_file, file.absolute())
@@ -88,6 +92,8 @@ def handle(task, progress):
 		wrapper = YTDLWrapper(progress)
 		file = wrapper.run(task.url, task.file)
 		return HandlerResponse(success=True, rel_file=file, handler=tag)
+	except YTDLError:
+		return False
 	except Exception as ex:
 		print('YTDL Handler:', ex, ' URL:', task.url, file=sys.stderr, flush=True)
 		# Don't allow the script to crash due to a YTDL exception.
