@@ -29,7 +29,7 @@ class PushShiftSubmissionSource(source.Source):
 	def get_settings(self):
 		yield Setting('subreddit', '', etype='str', desc='Name of the desired subreddit(s), separated by commas:')
 		yield Setting('limit', 1000, etype='int', desc='How many would you like to download? (0 for no limit):')
-		yield Setting("time", 'All Time', desc='Select a time span to filter by:', etype="str", opts=[('All Time', 'All posts ever made'), ('Day', 'Posts with the last 24hrs'), ('Week', 'Posts within the last 7 days'), ('Month', "Posts within the last 31 days"), ('Year', 'Posts within the last 265 days')])
+		yield Setting("time", 'All Time', desc='Select a time span to filter by:', etype="str", opts=[('All Time', 'All posts ever made'), ('Day', 'Posts with the last 24hrs'), ('Week', 'Posts within the last 7 days'), ('Month', "Posts within the last 31 days"), ('Year', 'Posts within the last 365 days')])
 		yield Setting("sort_by", 'score', desc="Sort results by:", etype="str", opts=[('score', 'Sort by highest score'), ('created_utc', 'The datetime the Submission was created')])
 		yield Setting("sort_order", 'Descending', desc="Sort order:", etype="str", opts=[('Descending', 'Descending order'), ('Ascending', "Ascending order")])
 
