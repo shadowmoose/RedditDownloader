@@ -184,6 +184,7 @@ class MediaContainer extends React.Component {
 		this._next = this.next.bind(this);
 		this._close = this.close.bind(this);
 		this._mute_toggle = this.mute_toggle.bind(this);
+		this._handle_key = this.handleKey.bind(this);
 	}
 
 	static getDerivedStateFromProps(props, state) {
@@ -192,6 +193,26 @@ class MediaContainer extends React.Component {
 			files: props.post.files,
 			autoplay: props.autoplay
 		};
+	}
+
+	handleKey(e){
+		if(!this.state.lightbox) return;
+		// right
+		if (e.keyCode === 39) {
+			this._next(e, 1)
+		}
+		// left
+		if (e.keyCode === 37) {
+			this._next(e, -1)
+		}
+	}
+
+	componentDidMount() {
+		window.addEventListener('keydown', this._handle_key)
+	}
+
+	componentWillUnmount() {
+		window.removeEventListener('keydown', this._handle_key)
 	}
 
 	parse_media(file, is_small_player=false){
