@@ -11,7 +11,7 @@ assignees: shadowmoose
 [A clear and concise description of what the bug is.]
 
 ### Environment Info
- - **OS:** [e.g. Windows/Mac/Linux]
+ - **OS:** [e.g. Windows/Mac/Linux - include version if possible]
  - **RMD Version:** [e.g. "3.0.0" - run with "-v" to find this]
 
 ### Screenshots/Information
