@@ -43,6 +43,5 @@ you can launch this program anywhere - and it's built from the ground-up to make
 **Please see [Here](https://shadowmoose.github.io/RedditDownloader/docs/site/User_Guide.html) for the guide to getting started.**
 
 
-# Issues?
-This program uses multiple Handlers, included in the *handlers* directory, to process the various links it finds. Many are extremely generic to allow for the widest possible site coverage.
-If you hit any links which it does not support, find anything broken, or just need assistance, please open a new request [here](https://github.com/shadowmoose/RedditDownloader/issues/new).
+# New Feature Requests or Issues?
+If you hit any links which RMD does not support, find anything broken, need assistance, or just want to suggest new features, please open a new request [here](https://github.com/shadowmoose/RedditDownloader/issues/new/choose).
