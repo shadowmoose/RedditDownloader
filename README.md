@@ -1,5 +1,5 @@
 # Reddit Media Downloader 
-[![badge](https://action-badges.now.sh/shadowmoose/RedditDownloader)](https://github.com/shadowmoose/RedditDownloader/actions) [![codecov](https://codecov.io/gh/shadowmoose/RedditDownloader/branch/master/graph/badge.svg)](https://codecov.io/gh/shadowmoose/RedditDownloader)
+[![badge](https://github.com/shadowmoose/RedditDownloader/workflows/Pytest/badge.svg)](https://github.com/shadowmoose/RedditDownloader/actions) [![codecov](https://codecov.io/gh/shadowmoose/RedditDownloader/branch/master/graph/badge.svg)](https://codecov.io/gh/shadowmoose/RedditDownloader)
 
 **Let's face it:** In this day and age, the internet is ephemeral. Anything anybody posts might be here one day,
 and gone the next. Websites take down or move their images and videos, posts get hidden or removed, and their
