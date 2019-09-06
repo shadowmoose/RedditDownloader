@@ -38,8 +38,11 @@ jobs:
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
       - name: Test with pytest
+        env:
+          RMD_REFRESH_TOKEN: ${{secrets.RMD_REFRESH_TOKEN}}
         run: |
-          pytest --cov=./ --cov-report=xml --verbose redditdownloader/tests/
+          pytest --cov=./ --cov-report=xml --verbose redditdownloader/
+
       - name: Upload coverage to Codecov
         run: |
           pip install codecov

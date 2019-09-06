@@ -31,6 +31,17 @@ class WebUI(UserInterface):
 		while not stopped:
 			eel.sleep(1)
 
+	@property
+	def running(self):
+		return started and not stopped
+
+	def waitFor(self, max_time=10):
+		for i in range(max_time*10):
+			sleep(.1)
+			if self.running:
+				return True
+		return False
+
 
 started = False
 stopped = False
@@ -61,7 +72,6 @@ def start(web_dir, file_dir, rmd_version):
 
 	eel.init(web_dir)
 	eel.start('index.html', options=options, block=False, callback=_websocket_close)
-	# interface.port
 	print('Started WebUI!')
 	if browser:
 		print('Awaiting connection from browser...')
