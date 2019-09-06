@@ -2,12 +2,15 @@ import static.settings as settings
 from tests.mock import EnvironmentTest
 from interfaces.terminal import TerminalUI
 from os.path import join, isfile
+import os
 import sql
+import unittest
 
 download_ran = False
 session = None
 
 
+@unittest.skipIf('GITHUB_ACTION' in os.environ, "Cannot reliably test full download on GitHub's internet.")
 class TerminalDownloadTest(EnvironmentTest):
 	env = 'controlled_sources'
 

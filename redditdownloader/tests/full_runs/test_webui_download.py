@@ -5,12 +5,15 @@ from os.path import join
 import sql
 import requests
 from threading import Thread
+import unittest
+
 
 download_ran = False
 session = None
 thread = None
 
 
+@unittest.skip("Not ready to test yet.")
 class WebUIDownloadTest(EnvironmentTest):
 	env = 'controlled_sources'
 
