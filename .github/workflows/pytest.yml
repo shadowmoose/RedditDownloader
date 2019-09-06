@@ -10,7 +10,7 @@ jobs:
     name: ${{ matrix.os }}, ${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}-latest
     strategy:
-      max-parallel: 9
+      max-parallel: 3
       matrix:
         os: [ubuntu, windows, macOS]
         python-version: [3.5, 3.6, 3.7]
