@@ -22,6 +22,9 @@ class TerminalDownloadTest(EnvironmentTest):
 			sql.init_from_settings()
 			session = sql.session()
 
+	def tearDown(self):
+		sql.close()
+
 	def test_db_exists(self):
 		""" The Database file should be created """
 		self.assertTrue(isfile(self.db_path), 'The Database was not created!')
