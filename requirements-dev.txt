@@ -1,2 +1,3 @@
-coveralls
-pycryptodome
+flake8
+pytest
+pytest-cov
