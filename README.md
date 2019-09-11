@@ -27,7 +27,7 @@ you're looking for (*"I only want Submissions with 'Unicorn' in the title, and n
 RMD makes automatically saving things a simple process. Built in Python and runnable headless (without a GUI) or as its own server, 
 you can launch this program anywhere - and it's built from the ground-up to make automation a breeze.
 
-[Check out the different places RMD can scan!](docs/site/Supported_Sources.md)
+[Check out the different places RMD can scan!](https://shadowmoose.github.io/RedditDownloader/Getting_Started/Sources/#list-of-supported-sources)
 
 # Things RMD Can Do:
 * Extract links inside comments, links in Submissions, and links within selfpost text.
