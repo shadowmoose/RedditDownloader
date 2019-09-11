@@ -83,11 +83,11 @@
         
             <li><a class="toctree-l4" href="#output">Output</a></li>
         
+            <li><a class="toctree-l4" href="#processing">Processing</a></li>
+        
             <li><a class="toctree-l4" href="#threading">Threading</a></li>
         
             <li><a class="toctree-l4" href="#interface">Interface</a></li>
-        
-            <li><a class="toctree-l4" href="#output-format">Output Format</a></li>
         
         </ul>
     
@@ -199,14 +199,14 @@
             <div class="section">
               
                 <h1 id="list-of-settings">List of Settings<a class="headerlink" href="#list-of-settings" title="Permanent link">&para;</a></h1>
-<p><strong>This is a full list of all RMD settings, their types, and their default values.</strong></p>
+<p><strong>This is a full list of all RMD settings, their types, and their default values. They are sorted by category.</strong></p>
 <hr />
 <h2 id="auth">Auth<a class="headerlink" href="#auth" title="Permanent link">&para;</a></h2>
 <ul>
 <li>refresh_token<ul>
 <li><strong>Description:</strong> <em>Use this to safely authorize RMD to read your Reddit account.</em> </li>
 <li><strong>Expected Type:</strong> str </li>
-<li><strong>Default value:</strong> [blank]</li>
+<li><strong>Default value:</strong> [blank] </li>
 </ul>
 </li>
 <li>user_agent<ul>
@@ -221,21 +221,18 @@
 <li>base_dir<ul>
 <li><strong>Description:</strong> <em>The base directory to save to. Cannot contain tags.</em> </li>
 <li><strong>Expected Type:</strong> str </li>
-<li><strong>Default value:</strong> ./download/ </li>
-</ul>
-</li>
-<li>subdir_pattern<ul>
-<li><strong>Description:</strong> <em>The directory path, within the base_dir, to save files to. Supports tags.</em> </li>
-<li><strong>Expected Type:</strong> str </li>
-<li><strong>Default value:</strong> /[subreddit]/ </li>
+<li><strong>Default value:</strong> [Path to RMD Directory] </li>
 </ul>
 </li>
 <li>file_name_pattern<ul>
-<li><strong>Description:</strong> <em>The ouput file name. Supports tags.</em> </li>
+<li><strong>Description:</strong> <em>The ouput file name/path. Supports tags.</em> </li>
 <li><strong>Expected Type:</strong> str </li>
-<li><strong>Default value:</strong> [title] - ([author]) </li>
+<li><strong>Default value:</strong> [subreddit]/[title] - ([author]) </li>
 </ul>
 </li>
+</ul>
+<h2 id="processing">Processing<a class="headerlink" href="#processing" title="Permanent link">&para;</a></h2>
+<ul>
 <li>deduplicate_files<ul>
 <li><strong>Description:</strong> <em>Remove downloaded files if another copy already exists. Also compares images for visual similarity.</em> </li>
 <li><strong>Expected Type:</strong> bool </li>
@@ -245,13 +242,13 @@
 </ul>
 <h2 id="threading">Threading<a class="headerlink" href="#threading" title="Permanent link">&para;</a></h2>
 <ul>
-<li>max_handler_threads<ul>
+<li>concurrent_downloads<ul>
 <li><strong>Description:</strong> <em>How many threads can download media at once.</em> </li>
 <li><strong>Expected Type:</strong> int </li>
 <li><strong>Default value:</strong> 5 </li>
 </ul>
 </li>
-<li>display_clear_screen<ul>
+<li>console_clear_screen<ul>
 <li><strong>Description:</strong> <em>If it's okay to clear the terminal while running.</em> </li>
 <li><strong>Expected Type:</strong> bool </li>
 <li><strong>Default value:</strong> True </li>
@@ -276,10 +273,12 @@
 <li><strong>Description:</strong> <em>Browser to auto-open UI in.</em> </li>
 <li><strong>Expected Type:</strong> str </li>
 <li><strong>Default value:</strong> chrome-app </li>
-<li><strong>Options:</strong> </li>
+<li><strong>Options:</strong> <ul>
 <li>chrome-app - <em>Chrome Application Mode (recommended)</em> </li>
 <li>default browser - <em>The default system browser</em> </li>
 <li>off - <em>Don't auto-open a browser</em> </li>
+</ul>
+</li>
 </ul>
 </li>
 <li>keep_open<ul>
@@ -298,26 +297,6 @@
 <li><strong>Description:</strong> <em>The host to bind on.</em> </li>
 <li><strong>Expected Type:</strong> str </li>
 <li><strong>Default value:</strong> localhost </li>
-</ul>
-</li>
-</ul>
-<h2 id="output-format">Output Format<a class="headerlink" href="#output-format" title="Permanent link">&para;</a></h2>
-<p>The patterns allow for data insertion, based off the currently-processing post.</p>
-<p>To insert them, include <em>'[tag_name]'</em> in the path. EG: <em>'/custom/[subreddit]/[user]/'</em></p>
-<p><strong>Available tags:</strong> <code>type</code> <em>(will be 'Post'/'Comment')</em>, <code>id</code>, <code>title</code>, <code>author</code>, <code>subreddit</code>, <code>source_alias</code></p>
-<p><strong>Files are saved as:</strong> <em>base_dir/subdir_pattern/file_pattern</em></p>
-<ul>
-<li><strong>base_dir</strong>    <ul>
-<li>override base directory. This changes where the files are saved, and can be absolute or relative. Cannot contain inserted data.</li>
-</ul>
-</li>
-<li><strong>file_pattern</strong> - override filename output pattern. <em>Do not include a file extension.</em><ul>
-<li>URLs pointing to albums or groups of multiple files will save file_pattern as a directory, containing the incrementally-named files.
-+</li>
-</ul>
-</li>
-<li><strong>subdir_pattern</strong> - override subdirectory name pattern. <ul>
-<li>Supports the same tags as <em>file_pattern</em>, but should always end with a path separator slash.</li>
 </ul>
 </li>
 </ul>
