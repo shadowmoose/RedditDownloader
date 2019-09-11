@@ -1,9 +1,9 @@
-# Release 2.0:
+# Release 2.0
 This major release brings threaded downloading.
 
 RMD is now capable of concurrently downloading media files, massively shortening total run time.
 
-### Changelog:
+### Changelog
 
 + Fix for multiple filename-related bugs
   + This includes auto-shortening of long paths for Windows. This fixes #19, and closes #20.

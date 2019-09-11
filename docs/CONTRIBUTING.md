@@ -1,4 +1,4 @@
-# Contribution Guidelines:
+# Contribution Guidelines
 
 All contributions to RMD are welcome! I appreciate any help I can get, and I'm always open to suggestions. I'll make sure any contributors get credit for their work on each release cycle.
 
@@ -10,20 +10,19 @@ That said; There are a few things to keep in mind in order to make the process r
 * If you're adding something new or changing existing systems, either open an Issue or message shadowmoose about it.
 * This is simply to avoid doubling effort and wasting time.
 
-### 2. I'm going to have to review everything submitted.
+### 2. ShadowMoose going to have to review everything submitted.
 * Obviously, I'm going to have to review all the code submitted to the project.
 * Depending on my schedule, this could take some time, so please be patient!
   
-### 3. TravisCI is probably not going to run your PR properly.
-* The test build uses some private testing data that will not be exposed to outside builds.
-* In most/all cases, this will mean your build will fail the initial test once it's submitted.
-* This is fine. Your changes will be manually evaluated after review. Just make sure you've tested it locally.
+### 3. CI Requires that you set an Environment Variable.
+* You need your own Reddit account to test RMD locally. 
+    + Generate a Refresh Code, then set it in the env variable `RMD_REFRESH_TOKEN`.
 
 ### 4. Document your reasoning behind the changes.
 * This one is pretty obvious, but please make the description of your changes as detailed as is appropriate.
 
 ### 5. If you bring in a new library or change an existing one, document it.
-* For any new or changed links to external libraries, I expect an explanation for why it is needed.
+* For any new or changed links to external libraries, an explanation for why it is required.
 * Additionally, you *must* provide a link to the lib's home page.
 * However the lib is imported/embeded, you should also include where to find the link used on the lib's documentation.
 * Any PRs requiring undocumented packages or embedding CDN links without explanation will be denied.
