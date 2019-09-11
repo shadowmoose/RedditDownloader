@@ -21,7 +21,7 @@ parser = argparse.ArgumentParser(
 parser.add_argument("--settings", help="Path to custom Settings file.", type=str, metavar='', default="./settings.json")
 parser.add_argument("--source", '-s',
 					help="Run each configured Source only if its alias matches the given pattern. Can pass multiple patterns.",
-					type=str, action='append', metavar='')  # TODO: Reimplement
+					type=str, action='append', metavar='')
 parser.add_argument("--category.setting", help="Override the given setting(s).", action="store_true")
 parser.add_argument("--list_settings", help="Display a list of overridable settings.", action="store_true")
 parser.add_argument("--version", '-v', help="Print the current version and exit.", action="store_true")

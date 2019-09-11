@@ -1,4 +1,4 @@
-# Release 1.5:
+# Release 1.5
 
 This version sees the implementation of Sources & Filters.
 
@@ -6,7 +6,7 @@ With this release RMD's functionality has been massively expanded, going beyond 
 posts. RMD now sports a full engine for multiple different sources of posts, as well as filters to weed out
 unwanted content.
 
-### Change Log (Mostly Complete):
+### Change Log (Mostly Complete)
 
 + Now supports Sources
 + Now supports Filters

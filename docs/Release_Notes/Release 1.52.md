@@ -1,4 +1,4 @@
-# Happy New Year, Everyone!
+# Release 1.52
 
 While I was away, a few of you found a couple bugs that I deemed important enough to push a small release for.
 
