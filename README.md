@@ -12,7 +12,6 @@ because Reddit Media Downloader is here for you!
 
 ![RMD Preview Image](https://thumbs.gfycat.com/UniqueBigFinnishspitz-size_restricted.gif)
 
-[Click here to visit the documentation site!](https://shadowmoose.github.io/RedditDownloader/docs/site/User_Guide.html)
 
 # What is this?
 **Reddit Media Downloader** is a program built to scan Comments & Submissions from multiple sources on Reddit, 
@@ -37,12 +36,8 @@ you can launch this program anywhere - and it's built from the ground-up to make
 * Automatically seek to - and resume - where it last left off downloading.
 * Launch a web-based UI (locally or remotely) to make even the most complex configuration setups simple.
 
-# Requirements:
-**Python**: You can download Python 3.5+ for your operating system from [https://www.python.org/downloads/](https://www.python.org/downloads/).
-
-*The program will launch its interface to help you set everything up, when run for the first time.*
-
-**Please see [Here](https://shadowmoose.github.io/RedditDownloader/docs/site/User_Guide.html) for the guide to getting started.**
+# Getting Started:
+[Click here to visit the documentation site!](https://shadowmoose.github.io/RedditDownloader/)
 
 
 # New Feature Requests or Issues?
