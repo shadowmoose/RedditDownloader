@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <meta name="author" content="ShadowMoose">
+  <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>Sources - Reddit Media Downloader</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Sources";
+    var mkdocs_page_input_path = "Getting_Started/Sources.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href="../.." class="icon icon-home"> Reddit Media Downloader</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../..">Introduction</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../../CONTRIBUTING/">Contribution Guidelines</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Advanced Usage</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../../Advanced_Usage/Filters/">What is a Filter?</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../Advanced_Usage/Settings/">Settings & Arguments</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../Advanced_Usage/Settings_List/">Settings - Full List</a>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Getting Started</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../Installing/">Installing</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Running_&_Configuring/">Running & Configuring</a>
+                </li>
+                <li class=" current">
+                    
+    <a class="current" href="./">Sources</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l3"><a href="#what-is-a-source">What is a Source?</a></li>
+    
+        <ul>
+        
+            <li><a class="toctree-l4" href="#using-sources">Using Sources</a></li>
+        
+            <li><a class="toctree-l4" href="#list-of-supported-sources">List of Supported Sources:</a></li>
+        
+        </ul>
+    
+
+    </ul>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../User_FAQ/">FAQ</a>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Release Notes</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../../Release_Notes/Release 1.3/">Release 1.3</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../Release_Notes/Release 1.4/">Release 1.4</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../Release_Notes/Release 1.5/">Release 1.5</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../Release_Notes/Release 1.52/">Release 1.52</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../Release_Notes/Release 1.53/">Release 1.53</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../Release_Notes/Release 2.0/">Release 2.0</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../Release_Notes/Release 2.01/">Release 2.01</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../Release_Notes/Release 3.0.0/">Release 3.0.0</a>
+                </li>
+    </ul>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../..">Reddit Media Downloader</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Getting Started &raquo;</li>
+        
+      
+    
+    <li>Sources</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/shadowmoose/rmd-mkdocs-test/edit/master/docs/Getting_Started/Sources.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="what-is-a-source">What is a Source?<a class="headerlink" href="#what-is-a-source" title="Permanent link">&para;</a></h1>
+<p><em>A "Source" is, simply, represents a place from Reddit where RMD should look for posts. 
+You can individually configure Sources to pull Submissions or Comments from all over Reddit, 
+including Subreddits, User Profiles, Multireddits, and your own Liked/Saved feed.</em></p>
+<h2 id="using-sources">Using Sources<a class="headerlink" href="#using-sources" title="Permanent link">&para;</a></h2>
+<p>By default, RMD will include a Source to find &amp; download your personal Liked &amp; Saved posts. 
+This is the default behavior since RMD's release.</p>
+<p>To change this in the WebUI, simply remove that source and add new ones. 
+You can have as many as you'd like - including duplicates of the same Source type.</p>
+<p>Most sources have some options to let you sort and filter the posts they find. 
+If you'd like to filter them further, <a href="../../Advanced_Usage/Filters/">add as many extra Filters</a> as you need. 
+Filters are applied per-Source, to allow maximum customization.</p>
+<p>You give each Source a unique name when you set them up, and - if you desire - this alias can be embedded into 
+the final file output paths <a href="../../Advanced_Usage/Settings/">(See "Output Format" in Settings.md)</a> to further differentiate 
+the various sources.</p>
+<hr />
+<h2 id="list-of-supported-sources">List of Supported Sources:<a class="headerlink" href="#list-of-supported-sources" title="Permanent link">&para;</a></h2>
+<p><em>This is a list of all supported Sources.</em></p>
+<h4 id="subreddit-submissions">Subreddit Submissions<a class="headerlink" href="#subreddit-submissions" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Scan Submissions from the target subreddit.</li>
+<li>As with many sources, supports sorting by "Hot/Top/Etc"</li>
+<li>Also supports sorting by time. (Last Hour/Day/Month/All Time/Etc)</li>
+</ul>
+<h4 id="your-reddit-front-page">Your Reddit Front Page<a class="headerlink" href="#your-reddit-front-page" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Supports all standard methods of sorting.</li>
+<li>Personalized to the authorized account.</li>
+<li>This Source is added by default on setup, but can be removed.</li>
+</ul>
+<h4 id="your-upvoted-andor-saved-submissions-comments">Your Upvoted and/or Saved Submissions &amp; Comments<a class="headerlink" href="#your-upvoted-andor-saved-submissions-comments" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Scan all the posts you've personally Upvoted or Saved.</li>
+<li>For more flexible configuration, use the <em>User Upvoted/Saved</em> source.</li>
+<li>For Comments, only comments you've Saved can be located.</li>
+</ul>
+<h4 id="user-upvotedsaved-submissions-comments">User Upvoted/Saved Submissions &amp; Comments<a class="headerlink" href="#user-upvotedsaved-submissions-comments" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Allows you to choose a Username, and scan their Upvoted and/or Saved posts</li>
+<li>This Source only works for Users who are set to Public, or for your authorized account.</li>
+</ul>
+<h4 id="user-curated-multireddit">User-curated MultiReddit<a class="headerlink" href="#user-curated-multireddit" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Great for tracking personal or public groups of subs.</li>
+<li>Provide a username and multireddit name to use.</li>
+</ul>
+<h4 id="users-submission-comment-history">User's Submission &amp; Comment History<a class="headerlink" href="#users-submission-comment-history" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Choose a username, and scan their full Submission and/or Comment History.</li>
+</ul>
+<h4 id="pushshift-subreddit-submissions">PushShift: Subreddit Submissions<a class="headerlink" href="#pushshift-subreddit-submissions" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Load Submissions from a Subreddit, from the <a href="https://pushshift.io/">PushShift</a> database. </li>
+<li>This allows unlimited Posts to be found, and even (usually) includes submissions deleted from Reddit.</li>
+</ul>
+<h4 id="pushshift-user-submission-comment-history">PushShift: User Submission &amp; Comment History<a class="headerlink" href="#pushshift-user-submission-comment-history" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Load Posts from a User's history, from the <a href="https://pushshift.io/">PushShift</a> database.</li>
+<li>This allows unlimited Posts to be found, and even (usually) includes Posts deleted from Reddit.</li>
+</ul>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../User_FAQ/" class="btn btn-neutral float-right" title="FAQ">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../Running_&_Configuring/" class="btn btn-neutral" title="Running & Configuring"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/shadowmoose/rmd-mkdocs-test/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../Running_&_Configuring/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../User_FAQ/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+
+</body>
+</html>

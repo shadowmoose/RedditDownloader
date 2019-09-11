@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <meta name="author" content="ShadowMoose">
+  <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>Release 3.0.0 - Reddit Media Downloader</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Release 3.0.0";
+    var mkdocs_page_input_path = "Release_Notes/Release 3.0.0.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href="../.." class="icon icon-home"> Reddit Media Downloader</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../..">Introduction</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../../CONTRIBUTING/">Contribution Guidelines</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Advanced Usage</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../../Advanced_Usage/Filters/">What is a Filter?</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../Advanced_Usage/Settings/">Settings & Arguments</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../Advanced_Usage/Settings_List/">Settings - Full List</a>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Getting Started</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../../Getting_Started/Installing/">Installing</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../Getting_Started/Running_&_Configuring/">Running & Configuring</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../Getting_Started/Sources/">Sources</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../Getting_Started/User_FAQ/">FAQ</a>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Release Notes</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../Release 1.3/">Release 1.3</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Release 1.4/">Release 1.4</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Release 1.5/">Release 1.5</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Release 1.52/">Release 1.52</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Release 1.53/">Release 1.53</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Release 2.0/">Release 2.0</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Release 2.01/">Release 2.01</a>
+                </li>
+                <li class=" current">
+                    
+    <a class="current" href="./">Release 3.0.0</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l3"><a href="#release-300">Release 3.0.0</a></li>
+    
+        <ul>
+        
+            <li><a class="toctree-l4" href="#sqlite-manifest">SQLite Manifest</a></li>
+        
+            <li><a class="toctree-l4" href="#user-interface-webui">User Interface (WebUI)</a></li>
+        
+            <li><a class="toctree-l4" href="#settings-and-command-line-argument-overhaul">Settings (and Command Line Argument) Overhaul</a></li>
+        
+            <li><a class="toctree-l4" href="#ding-dong-the-wizards-dead">Ding Dong, the Wizard's Dead</a></li>
+        
+            <li><a class="toctree-l4" href="#new-authentication">New Authentication</a></li>
+        
+            <li><a class="toctree-l4" href="#more-reddit-options">More Reddit Options</a></li>
+        
+            <li><a class="toctree-l4" href="#pushshift-support">PushShift Support</a></li>
+        
+            <li><a class="toctree-l4" href="#multiprocessing-support">Multiprocessing Support</a></li>
+        
+            <li><a class="toctree-l4" href="#bug-fixes">Bug Fixes</a></li>
+        
+            <li><a class="toctree-l4" href="#upgrading">Upgrading</a></li>
+        
+        </ul>
+    
+
+    </ul>
+                </li>
+    </ul>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../..">Reddit Media Downloader</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Release Notes &raquo;</li>
+        
+      
+    
+    <li>Release 3.0.0</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/shadowmoose/rmd-mkdocs-test/edit/master/docs/Release_Notes/Release 3.0.0.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="release-300">Release 3.0.0<a class="headerlink" href="#release-300" title="Permanent link">&para;</a></h1>
+<p><strong>Bugfixes, SQLite, and a User Interface!</strong></p>
+<p><em>Yes, I know I'm jumping a whole major version again.
+Before I get into further detail, the major jump is because this release may bring breaking changes to some preexisting users.
+If you're a previous user with a <em>lot</em> of Posts saved, or you've been running RMD in automated server-side setups,
+please read the patch notes before updating.</em></p>
+<p><em>See <a href="#upgrading">Upgrading</a> at the bottom of this file, before running the upgraded RMD on an old database.</em></p>
+<hr />
+<h2 id="sqlite-manifest">SQLite Manifest<a class="headerlink" href="#sqlite-manifest" title="Permanent link">&para;</a></h2>
+<ul>
+<li>
+<p>The manifest (and all other non-setting data) is now stored in a SQLite database.</p>
+<ul>
+<li>This massively shrinks the memory requirements for users downloading thousands of Posts.</li>
+<li>Startup speed, as well as overall runtime, will likely be noticably faster for users.</li>
+</ul>
+</li>
+<li>
+<p>File hashes (used for deduplication) are now archived and timestamped.</p>
+<ul>
+<li>This will prevent files from being re-hashed unless RMD finds one that has been modified since it last checked.</li>
+<li>Being able to skip checking known files means RMD is massively faster when checking old Posts.</li>
+</ul>
+</li>
+<li>
+<p>File paths are now stored relative to the base download directory.</p>
+<ul>
+<li>RMD can now be booted from anywhere (provided you tell it where the settings file is)</li>
+<li>Moving the RMD base storage directory will no longer impact RMD's performance.</li>
+</ul>
+</li>
+</ul>
+<h2 id="user-interface-webui">User Interface (WebUI)<a class="headerlink" href="#user-interface-webui" title="Permanent link">&para;</a></h2>
+<ul>
+<li>RMD now has a User Interface!<ul>
+<li>It's has an awesome media viewer.</li>
+<li>it's browser-based.</li>
+<li>It's also enabled by default after converting, so be sure to disable it if you're running on a headless server.</li>
+</ul>
+</li>
+</ul>
+<h2 id="settings-and-command-line-argument-overhaul">Settings (and Command Line Argument) Overhaul<a class="headerlink" href="#settings-and-command-line-argument-overhaul" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Settings have been rebuild from the ground up to provide much-needed features for supporting a UI.<ul>
+<li>Your old settings file will be automatically converted on the first post-update RMD launch.</li>
+<li>Settings are still stored in <code>settings.json</code>, and most of them are the same.</li>
+<li>Several new settings have been added, relating the to WebUI.</li>
+</ul>
+</li>
+<li>As a result of the Settings changes, there have been several added and removed command-line parameters.<ul>
+<li>Most notably, all parameters relating to things controlled by settings are now passed in a new format. <a href="../../Advanced_Usage/Settings/#arguments-in-rmd">Check the new options here</a></li>
+</ul>
+</li>
+</ul>
+<h2 id="ding-dong-the-wizards-dead">Ding Dong, the Wizard's Dead<a class="headerlink" href="#ding-dong-the-wizards-dead" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Because the UI is just so much better at managing Settings, the wizard has been replaced by it.</li>
+<li>Users running on external servers can either access the UI remotely, or run an RMD instance locally to generate the settings file.</li>
+</ul>
+<h2 id="new-authentication">New Authentication<a class="headerlink" href="#new-authentication" title="Permanent link">&para;</a></h2>
+<ul>
+<li>RMD no longer accepts usernames and passwords for authentication. Instead, it uses oAuth.<ul>
+<li>Big thanks to the PRAW Devs for fixing <a href="https://github.com/praw-dev/praw/issues/955">the oAuth bug</a> previously preventing this</li>
+<li>This also enables accounts with 2FA to authorize smoothly.</li>
+</ul>
+</li>
+</ul>
+<h2 id="more-reddit-options">More Reddit Options<a class="headerlink" href="#more-reddit-options" title="Permanent link">&para;</a></h2>
+<ul>
+<li>RMD can now sort all applicable Sources by "best".</li>
+<li>Many Sources now optionally accept a list of comma-separated subreddits/users/etc to individually scan.</li>
+</ul>
+<h2 id="pushshift-support">PushShift Support<a class="headerlink" href="#pushshift-support" title="Permanent link">&para;</a></h2>
+<ul>
+<li>PushShift has been added for scanning Subreddits and Users.<ul>
+<li>The PushShift API allows you to scan beyond the 1000 post limit Reddit's site has, and it's fast!</li>
+</ul>
+</li>
+</ul>
+<h2 id="multiprocessing-support">Multiprocessing Support<a class="headerlink" href="#multiprocessing-support" title="Permanent link">&para;</a></h2>
+<ul>
+<li>RMD now uses multiple processes, instead of multiple threads.<ul>
+<li>This allows RMD to use multiple CPU cores, and prevents bottlenecking during heavy downloading.</li>
+</ul>
+</li>
+</ul>
+<h2 id="bug-fixes">Bug Fixes<a class="headerlink" href="#bug-fixes" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Comments now properly set their own ID, rather than their parent ID.<ul>
+<li>This requires a one-time conversion, which will attempt to prevent RMD from re-downloading those Posts.</li>
+<li>While most Comments will likely be converted, if you've got an especially large amount of comments already saved, you may notice several end up downloading duplicates.</li>
+<li>If you're still concerned, <a href="https://github.com/shadowmoose/RedditDownloader/issues/31#issuecomment-395538681">see here</a> for more information.</li>
+</ul>
+</li>
+<li>Long filenames on non-windows systems should be properly trimmed to OS length constraints.</li>
+<li>Fixed a possible (but unlikely) race condition where the same Post could be processed twice when the stars aligned.</li>
+</ul>
+<h2 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h2>
+<p>Upgrading to this RMD version will require you to first run a conversion utility, which is bundled with RMD.</p>
+<p>This tool can be launched, using <code>python redditdownloader/tools/manifest_converter.py</code>. 
+You can also directly launch it directly from within its folder.</p>
+<p>The tool exists to convert old database formats to the new one, as well as fix a few data bugs from older versions. 
+Because of these bugs, not all posts may be correctly migrated to the new format. These will be logged in a file inside the new output folder, for you to manually handle.</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="../Release 2.01/" class="btn btn-neutral" title="Release 2.01"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/shadowmoose/rmd-mkdocs-test/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../Release 2.01/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+    </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+
+</body>
+</html>

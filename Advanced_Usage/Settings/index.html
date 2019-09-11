@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <meta name="author" content="ShadowMoose">
+  <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>Settings & Arguments - Reddit Media Downloader</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Settings & Arguments";
+    var mkdocs_page_input_path = "Advanced_Usage/Settings.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href="../.." class="icon icon-home"> Reddit Media Downloader</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../..">Introduction</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../../CONTRIBUTING/">Contribution Guidelines</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Advanced Usage</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../Filters/">What is a Filter?</a>
+                </li>
+                <li class=" current">
+                    
+    <a class="current" href="./">Settings & Arguments</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l3"><a href="#settings-arguments">Settings &amp; Arguments</a></li>
+    
+        <ul>
+        
+            <li><a class="toctree-l4" href="#changing-settings">Changing Settings</a></li>
+        
+            <li><a class="toctree-l4" href="#notable-settings">Notable Settings</a></li>
+        
+            <li><a class="toctree-l4" href="#file-name-patterns">File Name Patterns</a></li>
+        
+            <li><a class="toctree-l4" href="#arguments-in-rmd">Arguments in RMD</a></li>
+        
+            <li><a class="toctree-l4" href="#direct-downloading">Direct Downloading</a></li>
+        
+        </ul>
+    
+
+    </ul>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Settings_List/">Settings - Full List</a>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Getting Started</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../../Getting_Started/Installing/">Installing</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../Getting_Started/Running_&_Configuring/">Running & Configuring</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../Getting_Started/Sources/">Sources</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../Getting_Started/User_FAQ/">FAQ</a>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Release Notes</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../../Release_Notes/Release 1.3/">Release 1.3</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../Release_Notes/Release 1.4/">Release 1.4</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../Release_Notes/Release 1.5/">Release 1.5</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../Release_Notes/Release 1.52/">Release 1.52</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../Release_Notes/Release 1.53/">Release 1.53</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../Release_Notes/Release 2.0/">Release 2.0</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../Release_Notes/Release 2.01/">Release 2.01</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../Release_Notes/Release 3.0.0/">Release 3.0.0</a>
+                </li>
+    </ul>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../..">Reddit Media Downloader</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Advanced Usage &raquo;</li>
+        
+      
+    
+    <li>Settings & Arguments</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/shadowmoose/rmd-mkdocs-test/edit/master/docs/Advanced_Usage/Settings.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="settings-arguments">Settings &amp; Arguments<a class="headerlink" href="#settings-arguments" title="Permanent link">&para;</a></h1>
+<p>There are many ways to customize Reddit Media Downloader to your liking, and this page attempts to document them.</p>
+<h2 id="changing-settings">Changing Settings<a class="headerlink" href="#changing-settings" title="Permanent link">&para;</a></h2>
+<p>Settings can be adjusted within the WebUI, the <code>settings.json</code> file RMD generates,
+or they can be overridden by passing the setting category and name from the command line, like so:</p>
+<p><code>--category.setting_name</code> </p>
+<p>If a setting has multiple options, its value <strong>must</strong> be one of its options.</p>
+<p>To see all the possible settings, <a href="../Settings_List/">check out the Settings List page.</a></p>
+<hr />
+<h2 id="notable-settings">Notable Settings<a class="headerlink" href="#notable-settings" title="Permanent link">&para;</a></h2>
+<p><em>There are a few settings that many people will specifically want to change, so they are documented here.</em></p>
+<h3 id="auth">Auth<a class="headerlink" href="#auth" title="Permanent link">&para;</a></h3>
+<p>This is automatically set in the WebUI, by requesting authorization from Reddit.</p>
+<h3 id="interface">Interface<a class="headerlink" href="#interface" title="Permanent link">&para;</a></h3>
+<p>The settings in this group all control how RMD handles displaying itself. 
+By default, RMD will use a Web-based interface. if you would prefer to use a console-based interface, change these settings.</p>
+<h3 id="base_dir">base_dir<a class="headerlink" href="#base_dir" title="Permanent link">&para;</a></h3>
+<p>This is the base directory RMD will save all your files to. For best results, use an absolute path.</p>
+<h3 id="file_name_pattern">file_name_pattern<a class="headerlink" href="#file_name_pattern" title="Permanent link">&para;</a></h3>
+<p>This is the pattern RMD will use, within the base directory, to name the downloaded files. It supports folders, and should be relative.</p>
+<p>This is a <em>pattern</em>, which means it can inject tagged data from each Post into the filename.
+See <a href="#file-name-patterns">File Name Patterns</a> for how to use this feature.</p>
+<h3 id="concurrent_downloads">concurrent_downloads<a class="headerlink" href="#concurrent_downloads" title="Permanent link">&para;</a></h3>
+<p>This controls how many concurrent downloads are allowed. Adjust this to control RMD's speed and resource usage.</p>
+<h3 id="deduplicate_files">deduplicate_files<a class="headerlink" href="#deduplicate_files" title="Permanent link">&para;</a></h3>
+<p>If enabled, RMD will delete any files - after downloading them - if it discovers a copy of the same file already exists.</p>
+<p>Additionally, for images, RMD will perform a visual comparison between all images it downloads, 
+and will remove images that are visually the same. This enables RMD to ignore lower-quality, compressed duplicates of the same pictures.</p>
+<p>On the WebUI Browser side, RMD will remember which images have been deduplicated, and all unique posts will still be searchable.</p>
+<hr />
+<h2 id="file-name-patterns">File Name Patterns<a class="headerlink" href="#file-name-patterns" title="Permanent link">&para;</a></h2>
+<p>Anywhere File Patterns are used, they allow for data insertion based off the Post being saved.</p>
+<p>To insert them, include <em>'[tag_name]'</em> in the path. EG: <em>'/custom/[subreddit]/[author]/'</em></p>
+<p><strong>Available tags:</strong> <code>type</code> <em>(will be 'Post'/'Comment')</em>, <code>id</code>, <code>title</code>, <code>author</code>, <code>subreddit</code>, <code>source_alias</code></p>
+<p>For example, you could tell RMD to output Posts to subdirectories based off Username by setting the pattern to 
+something like <code>/[author]/[type]/[subreddit]/[title]</code>.</p>
+<hr />
+<h2 id="arguments-in-rmd">Arguments in RMD<a class="headerlink" href="#arguments-in-rmd" title="Permanent link">&para;</a></h2>
+<p>While it's suggested you make any settings changes with the WebUI, or in the 'settings.json' file generated, 
+you may find yourself instead wanting to pass a few things in for one-off runs (or automation).</p>
+<p>All arguments are optional:</p>
+<p><strong>-h, --help</strong> -        show help message and exit</p>
+<p><strong>--settings</strong> -        path to custom Settings file.</p>
+<p><strong>--run_tests</strong> -       launch in Test Mode. This will only work in testing environments.</p>
+<p><strong>--category.setting</strong> -  See <a href="#changing-settings">Changing Settings</a> for usage.</p>
+<p><strong>list_settings</strong> - Print a list of all Settings, their descriptions, and their default values. Exits after printing.</p>
+<p><strong>--source, -s</strong> - Regex pattern. If specified, only sources - loaded from the settings file - with aliases matching a supplied pattern 
+will be checked. This argument can be passed multiple times, to specify multiple patterns. 
+<em>(EX: "main.py -s filter1 -s filter2 ...etc")</em></p>
+<p><strong>--version, -v</strong> - Print the current RMD version, then exit.</p>
+<p><strong>--limit</strong> - See <a href="#direct-downloading">Direct Downloading</a> for this usage.</p>
+<hr />
+<h2 id="direct-downloading">Direct Downloading<a class="headerlink" href="#direct-downloading" title="Permanent link">&para;</a></h2>
+<p>If you would like to, you can directly download from Users or Subreddits using only the command line, 
+without a configured Source.</p>
+<p>To do this, simply call RMD with the desired usernames or subreddits - including the <code>u/</code> or <code>r/</code> prefixes - separated by spaces.</p>
+<p>When you use this feature, you may also specify a limit to the amount of Posts to be loaded. 
+Do this by passing the <code>--limit</code> flag. if this is not specified, the default limit is 1000.</p>
+<p><strong>EG:</strong> <code>python redditdownloader /u/theshadowmoose r/funny --limit=500</code></p>
+<p>Calling RMD like this will disable any other preconfigured Sources for this run, and RMD will use the Terminal to display progress.</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../Settings_List/" class="btn btn-neutral float-right" title="Settings - Full List">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../Filters/" class="btn btn-neutral" title="What is a Filter?"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/shadowmoose/rmd-mkdocs-test/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../Filters/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../Settings_List/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+
+</body>
+</html>

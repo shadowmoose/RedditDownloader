@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <meta name="author" content="ShadowMoose">
+  <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>What is a Filter? - Reddit Media Downloader</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "What is a Filter?";
+    var mkdocs_page_input_path = "Advanced_Usage/Filters.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href="../.." class="icon icon-home"> Reddit Media Downloader</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../..">Introduction</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../../CONTRIBUTING/">Contribution Guidelines</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Advanced Usage</span>
+    <ul class="subnav">
+                <li class=" current">
+                    
+    <a class="current" href="./">What is a Filter?</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l3"><a href="#what-is-a-filter">What is a Filter?</a></li>
+    
+        <ul>
+        
+            <li><a class="toctree-l4" href="#getting-started-with-filters">Getting started with Filters</a></li>
+        
+            <li><a class="toctree-l4" href="#note-filter-comparisons-logic">Note: Filter Comparisons Logic</a></li>
+        
+        </ul>
+    
+
+    </ul>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Settings/">Settings & Arguments</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Settings_List/">Settings - Full List</a>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Getting Started</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../../Getting_Started/Installing/">Installing</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../Getting_Started/Running_&_Configuring/">Running & Configuring</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../Getting_Started/Sources/">Sources</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../Getting_Started/User_FAQ/">FAQ</a>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Release Notes</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../../Release_Notes/Release 1.3/">Release 1.3</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../Release_Notes/Release 1.4/">Release 1.4</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../Release_Notes/Release 1.5/">Release 1.5</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../Release_Notes/Release 1.52/">Release 1.52</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../Release_Notes/Release 1.53/">Release 1.53</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../Release_Notes/Release 2.0/">Release 2.0</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../Release_Notes/Release 2.01/">Release 2.01</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../Release_Notes/Release 3.0.0/">Release 3.0.0</a>
+                </li>
+    </ul>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../..">Reddit Media Downloader</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Advanced Usage &raquo;</li>
+        
+      
+    
+    <li>What is a Filter?</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/shadowmoose/rmd-mkdocs-test/edit/master/docs/Advanced_Usage/Filters.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="what-is-a-filter">What is a Filter?<a class="headerlink" href="#what-is-a-filter" title="Permanent link">&para;</a></h1>
+<p><em>Filters are, as the name implies, tiny bits of logic
+ you can add to any Sources to filter out any posts you might not want. They allow you to choose from all manner of
+ ways to screen posts - such as Upvotes, Title, Body Text, SFW Warnings, Date Posted, etc.</em></p>
+<h2 id="getting-started-with-filters">Getting started with Filters<a class="headerlink" href="#getting-started-with-filters" title="Permanent link">&para;</a></h2>
+<p><em>Filters can be added/removed from a Source simply, using the WebUI.</em></p>
+<p>Filters are simple logic. They require 3 things:</p>
+<ul>
+<li>A field to check from each post. (Upvotes, Title, Time Posted, etc)</li>
+<li>A comparator value. (Minimum, Maximum, Equal to, or Regex Match)</li>
+<li>"Regex Match", while more advanced, is very powerful. It allows you to filter by text values in creative ways.</li>
+<li>The value to compare against. This is whatever you want the limit to be.</li>
+</ul>
+<h2 id="note-filter-comparisons-logic">Note: Filter Comparisons Logic<a class="headerlink" href="#note-filter-comparisons-logic" title="Permanent link">&para;</a></h2>
+<p>With Filter comparisons, numeric comparison (for "min"/"max") is only done if both values can be converted to numbers.</p>
+<p>Make sure the comparators you're using make sense for the values they're compared against, 
+or you may have unexpected results.</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../Settings/" class="btn btn-neutral float-right" title="Settings & Arguments">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../../CONTRIBUTING/" class="btn btn-neutral" title="Contribution Guidelines"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/shadowmoose/rmd-mkdocs-test/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../../CONTRIBUTING/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../Settings/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+
+</body>
+</html>
