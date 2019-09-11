@@ -34,7 +34,6 @@ class SourceTest(EnvironmentTest):
 		""" All config summaries should work once loaded """
 		for s in settings.get_sources():
 			self.assertTrue(s.get_config_summary(), 'Source %s is missing a config summary!' % s.type)
-			print(s.type)
 
 	def test_load_elements(self):
 		""" Loading elements should work for all Sources """

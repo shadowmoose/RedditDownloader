@@ -12,7 +12,7 @@ download_ran = False
 session = None
 thread = None
 
-
+"""
 @unittest.skip("Not ready to test yet.")
 class WebUIDownloadTest(EnvironmentTest):
 	env = 'controlled_sources'
@@ -37,3 +37,4 @@ class WebUIDownloadTest(EnvironmentTest):
 	def test_ui_running(self):
 		resp = requests.get(self.url)
 		self.assertTrue(resp.text)
+"""
