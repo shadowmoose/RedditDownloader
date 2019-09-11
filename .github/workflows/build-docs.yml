@@ -1,9 +1,6 @@
 name: Docs
 
-on:
-  push:
-    branches:
-      - master
+on: push
 
 jobs:
   build:
@@ -24,6 +21,7 @@ jobs:
         
     - name: Build Documentation
       run: |
+        python redditdownloader/tools/doc_builder.py
         mkdocs build
         
     - name: Deploy to gh-pages branch
