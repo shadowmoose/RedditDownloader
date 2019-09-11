@@ -7,7 +7,6 @@ from processing.wrappers import http_downloader
 tag = 'imgur'
 order = 1
 
-
 imgur_animation_exts = ['.mp4', '.webm']
 
 
@@ -25,14 +24,14 @@ class ImgurAlbumDownloader:
 		self.album_url = album_url
 
 		# Check the URL is actually imgur:
-		match = re.match("(https?)://(www\.)?(?:m\.)?imgur\.com/(a|gallery)/([a-zA-Z0-9]+)(#[0-9]+)?", album_url)
+		match = re.match(r"(https?)://(www\.)?(?:m\.)?imgur\.com/(a|gallery)/([a-zA-Z0-9]+)(#[0-9]+)?", album_url)
 		if not match:
 			raise ImgurAlbumException("URL must be a valid Imgur Album")
 
 		self.protocol = match.group(1)
 		self.album_key = match.group(4)
 		self.custom_path = None
-		
+
 		# Read the no-script version of the page for all the images:
 		full_list_url = "https://imgur.com/a/" + self.album_key + "/layout/blog"
 
@@ -41,9 +40,9 @@ class ImgurAlbumDownloader:
 		if not html:
 			raise ImgurAlbumException("Error reading Imgur Album Page: %s" % full_list_url)
 
-		self.imageIDs = re.findall('.*?{"hash":"([a-zA-Z0-9]+)".*?"ext":"(\.[a-zA-Z0-9]+)".*?', html)
+		self.imageIDs = re.findall(r'.*?{"hash":"([a-zA-Z0-9]+)".*?"ext":"(\.[a-zA-Z0-9]+)".*?', html)
 		seen = set()
-		self.urls = ["https://i.imgur.com/" + x[0]+x[1] for x in self.imageIDs if x not in seen and not seen.add(x)]
+		self.urls = ["https://i.imgur.com/" + x[0] + x[1] for x in self.imageIDs if x not in seen and not seen.add(x)]
 
 	def get_urls(self):
 		return list(self.urls)
@@ -91,7 +90,7 @@ def clean_imgur_url(url):
 	url = url.replace('.gifv', '.mp4')
 	if not url.startswith('http'):
 		url = 'https://%s' % url
-	if re.match("^(?:https?[:/]*)?(?:www.)?(?:[mi]\.)?imgur\.com/", url):
+	if re.match(r"^(?:https?[:/]*)?(?:www.)?(?:[mi]\.)?imgur\.com/", url):
 		return url
 	return False
 
@@ -125,5 +124,3 @@ def handle(task, progress):
 			print("ImgurAlbumException:", album_exception)
 		return False  # Unable to parse proper URL.
 	return http_downloader.download_binary(url, task.file, prog=progress, handler_id=tag)
-
-
