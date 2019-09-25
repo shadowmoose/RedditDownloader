@@ -5,6 +5,7 @@ import filters
 import sources
 from static import settings
 from static import praw_wrapper
+from static import metadata
 from interfaces import UserInterface
 from processing.wrappers import SanitizedRelFile
 from processing.controller import RMDController
@@ -19,15 +20,15 @@ import sql
 
 
 class WebUI(UserInterface):
-	def __init__(self, rmd_version):
-		super().__init__(ui_id="web", rmd_version=rmd_version)
+	def __init__(self):
+		super().__init__(ui_id="web")
 
 	def display(self):
 		if started:
 			return False
 		webdir = os.path.join(os.path.dirname(__file__), '../web/')
 		filedir = os.path.abspath(settings.get("output.base_dir"))
-		start(web_dir=webdir, file_dir=filedir, rmd_version=self.rmd_version)
+		start(web_dir=webdir, file_dir=filedir)
 		while not stopped:
 			eel.sleep(1)
 
@@ -47,16 +48,14 @@ started = False
 stopped = False
 _file_dir = None
 _web_dir = None
-_rmd_version = '0'
 _controller = None
 _session = None
 
 
-def start(web_dir, file_dir, rmd_version):
-	global _file_dir, _web_dir, _rmd_version, started, _session
+def start(web_dir, file_dir):
+	global _file_dir, _web_dir, started, _session
 	_file_dir = os.path.abspath(file_dir)
 	_web_dir = os.path.abspath(web_dir)
-	_rmd_version = rmd_version
 	_session = sql.session()
 	if not settings.get('interface.start_server'):
 		print('WebUI is disabled by settings.')
@@ -129,7 +128,8 @@ def _authorize_rmd_token():
 # ======  JS->Python API functions:  ======
 @eel.expose
 def api_current_status():
-	return {'current_version': _rmd_version}
+	return {'current_version': metadata.current_version}
+
 
 
 @eel.expose
@@ -211,11 +211,14 @@ def api_searchable_fields():
 
 
 @eel.expose
-def api_search_posts(fields, term):
+def api_search_posts(fields, term, page_size, page):
+	print('Searching posts:', fields, term, page_size, page)
 	ret = []
-
 	searcher = sql.PostSearcher(_session)
-	for p in searcher.search_fields(fields, term.strip("%")):
+	res = searcher.search_fields(fields, term.strip("%"))
+	full_len = len(res)
+	res = res[page*page_size:page*page_size+page_size]
+	for p in res:
 		files = []
 		for url in p.urls:
 			if not url.file:
@@ -240,7 +243,11 @@ def api_search_posts(fields, term):
 				'source_alias': p.source_alias,
 				'files': files
 			})
-	return ret
+	print('returned:', len(ret))
+	return {
+		'total': full_len,
+		'results': ret
+	}
 
 
 @eel.expose

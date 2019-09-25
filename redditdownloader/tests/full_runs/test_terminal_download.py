@@ -19,7 +19,7 @@ class TerminalDownloadTest(EnvironmentTest):
 		if not download_ran:
 			download_ran = True
 			settings.load(self.settings_file)
-			tui = TerminalUI('test_version')
+			tui = TerminalUI()
 			tui.display()
 			self.db_path = join(settings.get('output.base_dir'), 'manifest.sqlite')
 			sql.init_from_settings()

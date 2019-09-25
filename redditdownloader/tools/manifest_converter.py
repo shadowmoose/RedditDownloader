@@ -58,12 +58,13 @@ class FailedPost(dict):
 
 
 class GZManifest:
-	def __init__(self, gz_file, og_base):
+	def __init__(self, gz_file):
 		self.file = gz_file
-		self.og_base = os.path.normpath(og_base).replace('\\', '/')
+		base = self.guess_base() or arg_or_input(args.og_base_dir_name, "Enter the EXACT path (exactly as is written!) that RMD used in settings.json -> 'base_dir'")
+		self.og_base = os.path.normpath(base).replace('\\', '/')
 		self.failed = []
 
-	def load_completed(self):
+	def load_all(self):
 		with gzip.GzipFile(self.file, 'rb') as data_file:
 			eles = json.loads(data_file.read().decode('utf8'))
 			return eles['elements']['completed'] + eles['elements']['failed']
@@ -82,9 +83,10 @@ class GZManifest:
 		return best[1]
 
 	def convert(self):
-		loaded = self.load_completed()
+		loaded = self.load_all()
 		comment_count = len([c for c in loaded if c['type'] == 'Comment'])
 		idx = 0
+		print('Converting from GZip Manifest. May take a while...')
 		for e in loaded:
 			for k, v in e['files'].items():
 				if v:
@@ -103,6 +105,29 @@ class GZManifest:
 					continue
 				e['id'] = com
 			yield PendingPost(e['id'], e['files'], e['source_alias'], title=e['title'])
+
+	def guess_base(self):
+		if args.no_guess_base:
+			return None
+		loaded = []
+		idx = 0
+		for l in self.load_all():
+			for k, v in l['files'].items():
+				if v:
+					fn = os.path.normpath(v).replace('\\', '/')
+					loaded.append(fn)
+		if not len(loaded):
+			return None
+		guess = ''
+		while True:
+			poss = guess + loaded[0][idx]
+			idx += 1
+			if not all(f.startswith(poss) for f in loaded):
+				break
+			guess = poss
+			if guess == loaded[0]:
+				break
+		return guess
 
 
 class SQLDBManifest:
@@ -134,13 +159,12 @@ class SQLDBManifest:
 
 
 class Converter:
-	def __init__(self, new_save_base=None, settings_file=None, manifest_gz=None, og_base_dir_path=None, gz_base_dir_name=None, sqlite_path=None):
+	def __init__(self, new_save_base=None, settings_file=None, manifest_gz=None, og_base_dir_path=None, sqlite_path=None):
 		self.posts = {}
 		self.new_save_base = os.path.abspath(new_save_base)
 		self.settings_file = settings_file
 		self.manifest_gz = manifest_gz
 		self.og_base_dir_path = os.path.abspath(og_base_dir_path)
-		self.gz_base_dir_name = gz_base_dir_name
 		self.sqlite_path = os.path.abspath(sqlite_path) if sqlite_path else None
 		if os.path.normpath(self.new_save_base) == os.path.normpath(og_base_dir_path):
 			raise Exception("ERROR: You must specify a NEW directory to save the converted Posts!")
@@ -162,7 +186,7 @@ class Converter:
 		print("Found %s elements total." % len(self.posts.keys()))
 		self.process_posts()
 		self.session.commit()
-		print("Processed:", len(self.posts), "Posts.")
+		print("\n\nProcessed:", len(self.posts), "Posts.")
 		print("Failed to convert %s Posts." % len(self.failures))
 		outfile = os.path.join(self.new_save_base, 'failed_conversion_posts.json')
 		with open(outfile, 'w') as o:
@@ -172,7 +196,7 @@ class Converter:
 	def scan(self):
 		if self.manifest_gz:
 			print("Loading manifest.gz data...")
-			self.gz = GZManifest(self.manifest_gz, self.gz_base_dir_name)
+			self.gz = GZManifest(self.manifest_gz)
 			for _e in self.gz.convert():
 				self.posts[_e.reddit_id] = _e
 			print("Failed GZ conversions:", len(self.gz.failed))
@@ -336,7 +360,6 @@ if __name__ == '__main__':
 	check_sql = os.path.isfile(path_sql)
 	if check_gz and console.confirm('Detected a "Manifest.json.gz" file (from RMD <2.0) - do you want to convert this?', default=True):
 		opts['manifest_gz'] = os.path.abspath(path_gz)
-		opts['gz_base_dir_name'] = arg_or_input(args.og_base_dir_name, "Enter the EXACT path (exactly as is written!) that RMD used in settings.json -> 'base_dir'")
 	if check_sql and console.confirm('Detected a "manifest.sqldb" file (from RMD <3.0) - do you want to convert this?', default=True):
 		opts['sqlite_path'] = os.path.abspath(path_sql)
 
@@ -345,3 +368,4 @@ if __name__ == '__main__':
 		sys.exit(1)
 	converter = Converter(**opts)
 	converter.start()
+	input('-Press [Enter] to quit-')

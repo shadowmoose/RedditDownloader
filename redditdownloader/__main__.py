@@ -1,24 +1,24 @@
 #!/usr/bin/env python3
 
-__version__ = "3.0.0"
-
 import argparse
 import sys
 import static.stringutil as su
 import static.settings as settings
 import static.console as console
+import static.metadata as meta
 from sources import DirectInputSource
 from interfaces.terminal import TerminalUI
 from interfaces.eelwrapper import WebUI
 import tests.runner
 import sql
 from tools import ffmpeg_download
+import static.filesystem as fs
 import re
 
 
 parser = argparse.ArgumentParser(
 	description="Tool for scanning Reddit and downloading media - Guide @ https://goo.gl/hgBxN4")
-parser.add_argument("--settings", help="Path to custom Settings file.", type=str, metavar='', default="./settings.json")
+parser.add_argument("--settings", help="Path to custom Settings file.", type=str, metavar='', default=None)
 parser.add_argument("--source", '-s',
 					help="Run each configured Source only if its alias matches the given pattern. Can pass multiple patterns.",
 					type=str, action='append', metavar='')
@@ -33,10 +33,10 @@ args, unknown_args = parser.parse_known_args()
 direct_sources = []
 
 
-if __name__ == '__main__':
+def run():
 	su.print_color('green', "\r\n" +
 		'====================================\r\n' +
-		('   Reddit Media Downloader %s\r\n' % __version__) +
+		('   Reddit Media Downloader %s\r\n' % meta.current_version) +
 		'====================================\r\n' +
 		'    (By ShadowMoose @ Github)\r\n')
 	if args.version:
@@ -61,7 +61,8 @@ if __name__ == '__main__':
 				print()
 		sys.exit()
 
-	_loaded = settings.load(args.settings)
+	settings_file = args.settings or fs.find_file('settings.json')
+	_loaded = settings.load(settings_file)
 	for ua in unknown_args:
 		if '=' not in ua:
 			if 'r/' or 'u/' in ua:
@@ -99,7 +100,7 @@ if __name__ == '__main__':
 			su.print_color('red', "If you don't open the webUI now, you'll need to edit the settings file yourself.")
 			if console.confirm("Are you sure you'd like to edit settings without the UI (if 'yes', these prompts will not show again)?"):
 				settings.put('interface.start_server', False)  # Creates a save.
-				print('A settings file has been created for you, at "%s". Please customize it.' % args.settings)
+				print('A settings file has been created for you, at "%s". Please customize it.' % settings_file)
 			else:
 				print('Please re-run RMD to configure again.')
 			sys.exit(1)
@@ -122,7 +123,11 @@ if __name__ == '__main__':
 	ui = None
 	if settings.get('interface.start_server') and not direct_sources:
 		print("Starting WebUI...")
-		ui = WebUI(__version__)
+		ui = WebUI()
 	else:
-		ui = TerminalUI(__version__)
+		ui = TerminalUI()
 	ui.display()
+
+
+if __name__ == '__main__':
+	run()

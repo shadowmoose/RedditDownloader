@@ -7,7 +7,7 @@ class Home extends React.Component {
 	componentDidMount(){
 		eel.api_current_status()(r=>{
 			this.setState({version: r['current_version']}, ()=> {
-				let last = localStorage.getItem('last-update-check'); // TODO: Wrap localStorage.
+				let last = window.lRead('last-update-check');
 				if(last){
 					last = JSON.parse(last);
 					if(new Date().getTime() - last < 1000*60*60){
@@ -15,7 +15,7 @@ class Home extends React.Component {
 						return;
 					}
 				}
-				localStorage.setItem('last-update-check', JSON.stringify(new Date().getTime()));
+				window.lStore('last-update-check',new Date().getTime());
 				let xhttp = new XMLHttpRequest();
 				let self = this;
 				xhttp.onreadystatechange = function () {

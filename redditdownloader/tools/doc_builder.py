@@ -5,7 +5,6 @@ import sys
 import os
 
 dr = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../'))
-print(dr)
 sys.path.insert(0, dr)
 
 from static import settings
