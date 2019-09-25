@@ -12,6 +12,7 @@ import os.path as path
 from subprocess import Popen, PIPE, STDOUT
 import traceback
 import sys
+import importlib
 
 print('Python %s on %s' % (sys.version, sys.platform))
 dr = path.abspath(path.dirname(path.abspath(__file__)))
@@ -51,6 +52,7 @@ if __name__ == '__main__':
 		print('Requirements up to date!')
 	# noinspection PyBroadException
 	try:
+		importlib.invalidate_caches()
 		import redditdownloader.__main__ as rmd
 		rmd.run()
 	except Exception:
