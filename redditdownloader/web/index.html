@@ -25,4 +25,17 @@
 		<div id="root"></div>
 	</body>
 	<script src="js/libs/alertify-1.0.11.js"></script><!-- Must call at end, so alertify can mount body properly. -->
+	<script>
+		/**  Store the given Key/Value pair in localStorage. */
+		window.lStore = (key, value) => {
+			localStorage.setItem(key, JSON.stringify(value))
+		};
+
+		/** Load the given key from localStorage. */
+		window.lRead = (key, def=null) => {
+			let v = localStorage.getItem(key);
+			if(!v) return def;
+			return JSON.parse(v);
+		}
+	</script>
 </HTML>

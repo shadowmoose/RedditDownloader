@@ -11,13 +11,13 @@ class URL(sql.Base):
 	processed = Column(Boolean, nullable=False, default=False)
 	failed = Column(Boolean, nullable=False, default=False)
 	failure_reason = Column(String, default=None)
-	post_id = Column(String, ForeignKey('posts.reddit_id'))
+	post_id = Column(String, ForeignKey('posts.reddit_id'), index=True)
 	post = relationship("Post", back_populates="urls")
-	album_id = Column(String, default=None)
+	album_id = Column(String, default=None, index=True)
 	album_order = Column(Integer, default=0)
 	album_is_parent = Column(Boolean, default=False, nullable=False)
 	last_handler = Column(String, default=None)
-	file_id = Column(String, ForeignKey('files.id'))
+	file_id = Column(String, ForeignKey('files.id'), index=True)
 	file = relationship("File", back_populates="urls")
 
 	def __repr__(self):

@@ -87,9 +87,9 @@ class Searcher:
 		return [c.name for c in self.clazz.__table__.columns if self._is_searchable(c.name, c.type)]
 
 	def search_field_conditions(self, search_fields, term):
-		term = term.strip("%")
+		term = str(term).strip("%")
 		ok_fields = self.get_searchable_fields()
-		conds = [(getattr(self.clazz, field).like("%" + term + "%")) for field in search_fields if field in ok_fields]
+		conds = [getattr(self.clazz, field).like("%" + term + "%") for field in search_fields if field in ok_fields]
 		return conds
 
 
@@ -107,5 +107,4 @@ class PostSearcher(Searcher):
 			.join(File)\
 			.filter(or_(*conds)) \
 			.filter((URL.processed != False))\
-			.filter(URL.failed != True)\
-			.all()
+			.filter(URL.failed != True).all()

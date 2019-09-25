@@ -8,7 +8,7 @@ class File(sql.Base):
 	__tablename__ = 'files'
 	id = Column(Integer, primary_key=True)
 	path = Column(String, nullable=False, unique=True)
-	hash = Column(String, default=None)
+	hash = Column(String, default=None, index=True)
 	downloaded = Column(Boolean, nullable=False, default=False)
 	urls = relationship("URL", back_populates="file")
 

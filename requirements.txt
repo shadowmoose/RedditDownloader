@@ -1,7 +1,7 @@
 psaw
-requests
-sqlalchemy
 youtube_dl
+requests>=2.22.0
+sqlalchemy>=1.3.8
 praw>=6.0.0
 lxml>=3.6.0
 newspaper3k==0.2.8
@@ -11,3 +11,4 @@ Pillow==6.0.0
 pathvalidate==0.28.1
 eel==0.10.4
 twitter-text-python==1.1.1
+appdirs==1.4.3

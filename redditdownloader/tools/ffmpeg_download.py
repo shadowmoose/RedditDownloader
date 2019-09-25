@@ -8,6 +8,7 @@ import os
 import stat
 import glob
 from multiprocessing import Lock
+import static.filesystem as fs
 
 """
 	THANKS TO https://ffbinaries.com/api/v1/version/latest, FOR PROVIDING THE BACKUP FFMPEG BINARIES RMD USES.
@@ -40,8 +41,9 @@ def _find_ffmpeg(abs_dir):
 def _dl_binary(output_dir, verbose=True):
 	output_dir = abspath(output_dir)
 	output_zip = RelFile(base=output_dir, file_path='tmp-ffmpeg.zip')
-	if _find_ffmpeg(output_dir):
-		return _find_ffmpeg(output_dir)
+	found = _find_ffmpeg(output_dir)
+	if found:
+		return found
 	os.makedirs(output_dir, exist_ok=True)
 	if verbose:
 		print("Searching for FFmpeg binary...")
@@ -89,7 +91,7 @@ def install_local(local_dir=None, verbose=True, force_download=False):
 			return abspath(existing)
 	_lock.acquire()
 	try:
-		local_dir = local_dir if local_dir else join(abspath(dirname(dirname(dirname(__file__)))), 'bin')
+		local_dir = local_dir if local_dir else fs.app_base
 		return _dl_binary(local_dir, verbose=verbose)
 	except Exception as ex:
 		print(ex)
@@ -99,5 +101,5 @@ def install_local(local_dir=None, verbose=True, force_download=False):
 
 
 if __name__ == '__main__':
-	print('FFmpeg location:', install_local())
+	print('FFmpeg location:', install_local(force_download=True))
 

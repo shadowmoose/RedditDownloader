@@ -6,6 +6,7 @@ import os.path as op
 import os
 import pathvalidate
 import hashlib
+import static.filesystem as fs
 
 
 class RelError(Exception):
@@ -17,12 +18,12 @@ class RelFile:
 		base = op.abspath(base)
 		if full_file_path:
 			full_file_path = op.abspath(full_file_path)
-			if not self._is_subpath(base, full_file_path):
+			if not fs.is_subpath(base, full_file_path):
 				raise RelError("The given full file path does not contain the base! {%s}" % full_file_path)
 			file_path = op.abspath(full_file_path).replace(base, "", 1)
 		file_path = file_path.strip(" ./\\\n\t\r")
 		join_test = op.abspath(op.abspath(op.join(base, file_path)))
-		if not self._is_subpath(base, join_test):
+		if not fs.is_subpath(base, join_test):
 			raise RelError("The relative path cannot elevate above the Base Parent: {%s}" % file_path)
 		self._base = op.abspath(base)
 		self._path = self._norm(file_path)
@@ -32,18 +33,6 @@ class RelFile:
 		File paths should be stored and handled in a cross-platform manner. This normalizes paths.
 		"""
 		return op.normpath(path).replace("\\", "/")
-
-	def _is_subpath(self, base, path):
-		base = op.abspath(base)
-		path = op.abspath(path)
-		while path:
-			if path == base:
-				return True
-			np = op.dirname(path)
-			if np == path:
-				break
-			path = np
-		return False
 
 	def absolute(self):
 		return self._norm(op.abspath(op.join(self._base, self._path)))
@@ -65,8 +54,11 @@ class RelFile:
 			return 0
 		return op.getsize(self.absolute())
 
-	def delete_file(self):
-		os.remove(self.absolute())
+	def delete_file(self, recursive_cleanup=True):
+		if recursive_cleanup:
+			fs.r_unlink(self.absolute())
+		else:
+			os.remove(self.absolute())
 
 	def abs_hashed(self):
 		"""

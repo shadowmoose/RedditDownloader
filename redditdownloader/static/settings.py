@@ -12,6 +12,7 @@ _default_cat = 'misc'
 def save():
 	if _file is None:
 		return False
+	os.makedirs(os.path.dirname(_file), exist_ok=True)
 	with open(_file, 'w') as o:
 		o.write(to_json())
 		print('-Saved Settings-')
@@ -214,7 +215,7 @@ add("auth", Setting("rmd_client_key", 'v4XVrdEH_A-ZaA', desc="Change only if you
 add("auth", Setting("user_agent", 'RMD-Scanner-%s' % uuid.uuid4(), desc="The user agent to identify as, wherever possible."))
 add("auth", Setting("oauth_key", str(uuid.uuid4()), desc="Internal key.", public=False))
 
-add("output", Setting("base_dir", os.getcwd() + '/download/', desc="The base directory to save to. Cannot contain tags."))
+add("output", Setting("base_dir", os.path.join(os.getcwd(), 'download/'), desc="The base directory to save to. Cannot contain tags."))
 add("output", Setting("file_name_pattern", '[subreddit]/[title] - ([author])', desc="The ouput file name/path. Supports tags."))
 
 add("processing", Setting("deduplicate_files", True, desc="Remove downloaded files if another copy already exists. Also compares images for visual similarity.", etype="bool"))

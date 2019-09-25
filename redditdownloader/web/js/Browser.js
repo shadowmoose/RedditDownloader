@@ -1,7 +1,15 @@
 class Browser extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = {posts:[[]], term:'', fields:[], autoplay: true, page_size: 25, page: 0};
+		this.state = {
+			posts:[],
+			total: 0,
+			term:'',
+			fields:[],
+			autoplay: window.lRead('browser-autoplay', true),
+			page_size: 25,
+			page: 0
+		};
 		this.search_timer = null;
 		this._toggle_field = this.toggle_field.bind(this);
 		this._search_term = this.change_search_term.bind(this);
@@ -17,33 +25,28 @@ class Browser extends React.Component {
 			});
 			this.setState({fields: fields});
 		});
-		//this.schedule_search();
+		this.schedule_search();
 	}
 
-	search(){
-		console.log('Running search');
+	search(page=0){
+		console.log('Running search, Page:', page);
 		let fields = Object.keys(this.state.fields).filter((f)=> {
 			return this.state.fields[f];
 		});
 		let term = this.state.term;
 		console.log("Searching:", fields, term);
-		eel.api_search_posts(fields, term)(n => {
+		eel.api_search_posts(fields, term, this.state.page_size, page)(n => {
 			console.log("Searched posts:", n);
-			let posts = this.paginate(n, this.state.page_size);
-			console.log('posts:', posts);
-			this.setState({posts: posts, page: 0});
+			let posts = n.results;
+			this.setState({posts, page, total: n.total});
+			console.debug('New Browser State:', this.state);
 		});
 	}
 
-	schedule_search(){
+	schedule_search(delay=250){
 		if(this.search_timer !== false)
 			clearTimeout(this.search_timer);
-		this.search_timer = setTimeout(this.search.bind(this), 250);
-	}
-
-	on_open(){
-		console.log("Browser opening..");
-		this.schedule_search()
+		this.search_timer = setTimeout(() => {this.search(0)}, delay);
 	}
 
 	toggle_field(event){
@@ -62,12 +65,13 @@ class Browser extends React.Component {
 	}
 
 	autoplay(event){
+		window.lStore('browser-autoplay', event.target.checked);
 		this.setState({autoplay: event.target.checked});
 	}
 
 	setPage(evt, idx){
 		evt.preventDefault();
-		this.setState({page: idx});
+		this.setState({page: idx}, ()=>{this.search(this.state.page)});
 	}
 
 	chunkify(a, n, balanced) {// Split array [a] into [n] arrays of roughly-equal length.
@@ -102,19 +106,10 @@ class Browser extends React.Component {
 		return out;
 	}
 
-	paginate(arr, size=10){
-		// Split the given array into smaller arrays limited by [size]
-		let arrs = [];
-		while(arr.length) {
-			arrs.push(arr.splice(0,size));
-		}
-		return arrs;
-	}
-
 	render() {
 		let groups = [];
 		let group = [];
-		let chunks = this.chunkify(this.state.posts[this.state.page], 4, true);
+		let chunks = this.chunkify(this.state.posts, 4, true);
 		chunks.forEach((ch)=>{
 			ch.forEach((p)=>{
 				group.push(<MediaContainer post={p} key={p.reddit_id} autoplay={this.state.autoplay}/>);
@@ -134,10 +129,11 @@ class Browser extends React.Component {
 		let idx = this.state.page;
 		let start = idx-2;
 		let end = idx+3;
+		let pages = Math.ceil(this.state.total / this.state.page_size);
 		if(start<0)end+=Math.abs(0-start);
-		if(end>=this.state.posts.length)start-=(end - this.state.posts.length);
+		if(end>=pages)start-=(end - pages);
 		start = Math.max(0, start);
-		end = Math.min(this.state.posts.length, end);
+		end = Math.min(pages, end);
 		for(let i=start; i<end; i++){
 			page_buttons.push(
 				<a
@@ -159,10 +155,10 @@ class Browser extends React.Component {
 					</div>
 				</div>
 				<div className={'center'}>
-					<div className={'pagination '+(this.state.posts.length>0 && this.state.posts[0].length>0?'':'hidden')}>
+					<div className={'pagination '+(this.state.total>0?'':'hidden')}>
 						<a onClick={(e)=>(this._set_page(e, 0))}>&laquo;</a>
 						{page_buttons}
-						<a onClick={(e)=>(this._set_page(e, this.state.posts.length-1))}>&raquo;</a>
+						<a onClick={(e)=>(this._set_page(e, pages-1))}>&raquo;</a>
 					</div>
 				</div>
 				<div className="img_row">
@@ -179,7 +175,6 @@ class MediaContainer extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {index:0, lightbox:false, post: props.post, files: props.post.files, autoplay: props.autoplay, muted: true};
-		// TODO: Empty list support (display text block?)
 		this.is_video = false;
 		this._next = this.next.bind(this);
 		this._close = this.close.bind(this);
@@ -187,7 +182,7 @@ class MediaContainer extends React.Component {
 		this._handle_key = this.handleKey.bind(this);
 	}
 
-	static getDerivedStateFromProps(props, state) {
+	static getDerivedStateFromProps(props) {
 		return {
 			post: props.post,
 			files: props.post.files,
@@ -225,7 +220,7 @@ class MediaContainer extends React.Component {
 			case 'bmp':
 			case 'gif':
 			case 'ico':
-				return <img src={'/file?id='+file.token} style={{width:"100%"}} className={'media'}/>;
+				return <img src={'/file?id='+file.token} style={{width:"100%"}} className={'media'} alt={this.state.post.title}/>;
 			case 'mp4':
 			case "webm":
 				this.is_video = true;
@@ -238,7 +233,7 @@ class MediaContainer extends React.Component {
 					autoPlay={this.state.autoplay || this.state.lightbox && !is_small_player}
 					controls={this.state.lightbox && !is_small_player}
 					preload={'metadata'}
-					muted={is_small_player?true: this.state.muted} //TODO: Maybe just implement local cookie storage.
+					muted={is_small_player?true: this.state.muted}
 					loop>
 					<source src={'/file?id='+file.token} type={"video/"+ext} />
 				</video>;
@@ -252,18 +247,29 @@ class MediaContainer extends React.Component {
 		event.stopPropagation();
 		let nidx = this.state.index;
 		if(this.state.lightbox) {
-			nidx = (nidx + step) % this.state.files.length;
+			let clickTarget = event.target;
+			while(!clickTarget.classList.contains('lightbox') && clickTarget.parentElement) {
+				// Elevate target to the Lightbox parent.
+				clickTarget = clickTarget.parentElement;
+			}
+			const clickTargetWidth = clickTarget.offsetWidth;
+			const xCoordInClickTarget = event.clientX - clickTarget.getBoundingClientRect().left;
+			if (clickTargetWidth / 2 > xCoordInClickTarget) {
+				nidx = (nidx - step);
+			} else {
+				nidx = (nidx + step) % this.state.files.length;
+			}
 		}
-		console.log('New index:', nidx);
 		if(nidx<0)
 			nidx = this.state.files.length - 1;
+		console.log('New index:', nidx);
 		this.setState({index: nidx, lightbox: true})
 	}
 
 	mute_toggle(evt){
 		if(evt.target.buffered.length===0){
 			console.log('No mute changes while loading.');
-			return; //TODO: This could probably be made more reliable, if there's a better way to detect unloading.
+			return; // This could probably be made more reliable, if there's a better way to detect unloading.
 		}
 		this.setState({muted: evt.target.muted})
 	}
@@ -274,7 +280,7 @@ class MediaContainer extends React.Component {
 		this.setState({lightbox: false})
 	}
 
-	componentDidUpdate(prevProps, prevState, snapshot){
+	componentDidUpdate(prevProps, prevState){
 		if(this.refs.video) {
 			if(!prevState.autoplay && this.state.autoplay)
 				this.refs.video.play();
@@ -303,8 +309,9 @@ class MediaContainer extends React.Component {
 					</div>
 					{this.state.files.length > 1 &&
 						<div className={'lightbox_overlay'}>
-							<i className={'vcenter left icon shadow fa fa-arrow-circle-o-left'} onClick={(e)=>{this._next(e, -1)}} title={'Previous'}/>
-							<i className={'vcenter right icon shadow fa fa-arrow-circle-o-right'} onClick={(e)=>{this._next(e, 1)}} title={'Next'}/>
+							<i className={'vcenter left icon shadow fa fa-arrow-circle-o-left'} title={'Previous'}/>
+							<i className={'vcenter right icon shadow fa fa-arrow-circle-o-right'} title={'Next'}/>
+							<span className={'bottom black_bkg'}>{this.state.index+1}/{this.state.files.length}</span>
 						</div>
 					}
 				</div>
@@ -319,30 +326,5 @@ class MediaContainer extends React.Component {
 				</div>
 			</div>
 		);
-	}
-}
-
-
-class LightBox extends React.Component {
-	constructor(props) {
-		super(props);
-		this.media = props.media;
-		this.index = props.index;
-		this.post = props.post;
-		console.log("Lightbox:", this.media[this.index]);
-		this._close = this.close.bind(this);
-	}
-
-	close(){
-		console.log('Closing lightbox.');
-	}
-
-	render() {
-		return (<div>
-			<div className={'lightbox_fade'} onClick={this._close} />
-			<div className={'lightbox'}>
-				{this.media[this.index]}
-			</div>
-		</div>);
 	}
 }
