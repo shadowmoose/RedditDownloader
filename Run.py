@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 	This is a basic launcher, built to bootstrap RMD.
 	This exists to simplify the installation process for users who are unfamiliar with python.
