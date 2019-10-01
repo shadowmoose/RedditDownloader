@@ -26,7 +26,7 @@ def find_file(name):
 
 def mkpath(path):
 	"""
-	Build the subdirectory chain required to sasfely create the given file path.
+	Build the subdirectory chain required to safely create the given file path.
 	The path should lead to a file, and not a directory.
 	"""
 	return makedirs(dirname(path), exist_ok=True)
@@ -42,7 +42,7 @@ def copen(file, mode='r', autofind=False):
 	:return: The handle of the opened File.
 	"""
 	file_path = find_file(file) if autofind else abspath(file)
-	if 'w' in mode:
+	if any(m in mode for m in ['w', 'a']):
 		mkpath(file_path)
 	return open(file_path, mode)
 
@@ -71,18 +71,3 @@ def r_unlink(path):
 		removedirs(dirname(path))
 	except OSError:
 		pass
-
-
-if __name__ == '__main__':
-	fo = find_file('test.json')
-	with copen(fo, 'w') as o:
-		o.write('This is a test write.')
-
-	assert exists(fo), 'failed to create file.'
-
-	r_unlink(fo)
-
-	assert not exists(app_base), 'Empty parent directory was not deleted.'
-
-	print('Done with FS check.')
-	print(project_base)
