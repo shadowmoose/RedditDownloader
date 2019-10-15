@@ -6,7 +6,7 @@ class App extends React.Component {
 		this._openPage = this.openPage.bind(this);
 		this._start_download = this.startDownload.bind(this);
 		this.pages = [
-			// [Element, Name, Disable_while_running]
+			// [Element, Name, enabled_while_running]
 			[<Home ref={ele => {this.home = ele}}/>, 'Home', true],
 			[<Sources />, 'Sources', false],
 			[<Settings />, 'Settings', false],
@@ -21,10 +21,6 @@ class App extends React.Component {
 	}
 
 	checkStatus() {
-		async function run() {
-			// Inside a function marked 'async' we can use the 'await' keyword.
-			return await eel.download_status()(); // Must prefix call with 'await'
-		}
 		let warning = setTimeout(()=>{
 			alertify.alert('<b>RMD has been disconnected!</b>' +
 				'<br>The backend may not be running, or is not reachable with current configuration.' +
@@ -32,7 +28,7 @@ class App extends React.Component {
 				'<br><br>Please refresh this window once RMD has been restarted.').then(()=>{location.reload()})
 		}, 5000);
 
-		run().then((r)=>{
+		eel.download_status()().then((r)=>{
 			let page = this.state.page;
 			let name = this.pages[page][1];
 			console.log('RMD running status: ', r);

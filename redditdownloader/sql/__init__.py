@@ -138,7 +138,7 @@ def _encode_obj(obj):
 	return ret
 
 
-def encode_safe(obj, encode=False, indent=None):
+def encode_safe(obj, stringify=False, indent=None):
 	"""
 		Encode the given object(s), into new Objects that are safe for serialization.
 		Supports automatic JSON encoding, single DB objects, or lists of DB Objects.
@@ -147,6 +147,6 @@ def encode_safe(obj, encode=False, indent=None):
 		obj = [_encode_obj(o) for o in obj]
 	else:
 		obj = _encode_obj(obj)
-	if encode:
+	if stringify:
 		obj = json.dumps(obj, indent=indent)
 	return obj

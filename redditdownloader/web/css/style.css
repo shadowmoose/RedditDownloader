@@ -129,6 +129,21 @@ option:enabled {
 	color:#3b3b3b;
 }
 
+table {
+	border-collapse: collapse;
+	border: 2px solid black;
+	width: 95%;
+}
+
+th {
+	border: 1px solid black;
+}
+
+tr {
+	border: 1px solid black;
+	overflow-x: hidden;
+}
+
 .msg {
 	color: black;
 }
@@ -476,4 +491,12 @@ option:enabled {
 .black_bkg {
 	background: rgba(0,0,0,.8);
 	padding: 1px 2px;
+}
+
+.clickable {
+	cursor: pointer;
+}
+
+.small_font {
+	font-size: 15px;
 }
