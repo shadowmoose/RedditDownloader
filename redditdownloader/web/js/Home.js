@@ -145,7 +145,7 @@ class Home extends React.Component {
 				).replace('/t3_','/').replace('/t1_', '/');
 				let urls = f.urls.map(u => {
 					if(u.album_id && !u.album_isparent) return null;
-					let normURL = u.address.startsWith('/')? 'https://reddit.com/'+u.address : u.address;
+					let normURL = u.address.startsWith('/')? 'https://reddit.com'+u.address : u.address;
 					let prettyUrl = u.address.length < 50 ? u.address : u.address.substring(0, 47)+'...';
 					prettyUrl = prettyUrl.replace('https://', '').replace('http://', '');
 
