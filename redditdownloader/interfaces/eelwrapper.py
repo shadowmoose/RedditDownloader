@@ -131,7 +131,6 @@ def api_current_status():
 	return {'current_version': metadata.current_version}
 
 
-
 @eel.expose
 def api_get_oauth_url():
 	port = 7505
@@ -273,6 +272,18 @@ def download_status():
 	if _controller is None:
 		return {'running': False}
 	return _controller.get_progress().to_obj()
+
+
+@eel.expose
+def get_failed():
+	fails = _session\
+		.query(sql.Post)\
+		.join(sql.URL)\
+		.filter(sql.URL.failed == True)\
+		.all()
+
+	print(sql.encode_safe(fails, indent=4))
+	return sql.encode_safe(fails)
 
 
 def sleep(sec):
