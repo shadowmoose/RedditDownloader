@@ -8,8 +8,8 @@ class URL(sql.Base):
 	__tablename__ = 'urls'
 	id = Column(Integer, primary_key=True)
 	address = Column(String, nullable=False, index=True)
-	processed = Column(Boolean, nullable=False, default=False)
-	failed = Column(Boolean, nullable=False, default=False)
+	processed = Column(Boolean, nullable=False, default=False, index=True)
+	failed = Column(Boolean, nullable=False, default=False, index=True)
 	failure_reason = Column(String, default=None)
 	post_id = Column(String, ForeignKey('posts.reddit_id'), index=True)
 	post = relationship("Post", back_populates="urls")

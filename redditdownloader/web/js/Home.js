@@ -1,7 +1,7 @@
 class Home extends React.Component {
 	constructor(props){
 		super(props);
-		this.state = {version: '', progress: null};
+		this.state = {version: '', progress: null, failed: null};
 	}
 
 	componentDidMount(){
@@ -57,6 +57,14 @@ class Home extends React.Component {
 		alertify.reset();
 	}
 
+	open_failed_urls(){
+		eel.get_failed()(res => {
+			console.debug('Failed Files:', res);
+			res.sort((a, b) => (a.subreddit > b.subreddit) ? 1 : -1);
+			this.setState({failed: res})
+		})
+	}
+
 	set_download_progress(prog){
 		// Hook used by App to update all child pages that can accept this data.
 		this.setState({progress: clone(prog)});
@@ -64,24 +72,24 @@ class Home extends React.Component {
 
 	render() {
 		let progress_display = null;
+		let failed_display = null;
 		if(this.state.progress && 'summary' in this.state.progress){
 			let summ = this.state.progress.summary;
 			progress_display = <details open={'open'}>
 				<summary className={'center'}>
-					Download Progress
+					Total Summary:
 				</summary>
-				<h3 className={'center'}>Complete</h3>
 				<div className={'green'}>
-					<b>New Posts: </b>{summ.total}
+					<b>Total Submissions: </b>{summ.total_submissions}
+				</div>
+				<div className={'yellow'}>
+					<b>Total Comments: </b>{summ.total_comments}
 				</div>
 				<div className={'blue'}>
-					<b>New Files Downloaded: </b>{summ.new_files}
+					<b>Files Downloaded: </b>{summ.total_files_dl}
 				</div>
-				<div className={'red'}>
-					<b>Total Failed File Downloads: </b>{summ.failed}
-				</div>
-				<div className={'orange'}>
-					<b>Completed In: </b>{(summ.time)}
+				<div className={[summ.total_urls_failed > 0 ? 'red': 'orange', 'clickable', 'hover_shadow'].join(' ')} onClick={this.open_failed_urls.bind(this)}>
+					<b>Failed URLs: </b>{summ.total_urls_failed} ({summ.total_urls} total)
 				</div>
 			</details>
 		}else if(this.state.progress && this.state.progress.running){
@@ -127,6 +135,60 @@ class Home extends React.Component {
 			</details>
 		}
 
+		if(this.state.failed){
+			let fails = this.state.failed.map(f => {
+				let totalFail = f.urls.every((u)=>u.failed);
+				let reddit_url = (
+					f.type === 'Comment' ?
+						`https://www.reddit.com/r/${f.subreddit}/comments/${f.parent_id}/_/${f.reddit_id}/`:
+						'http://redd.it/'+ f.reddit_id
+				).replace('/t3_','/').replace('/t1_', '/');
+				let urls = f.urls.map(u => {
+					if(u.album_id && !u.album_isparent) return null;
+					let normURL = u.address.startsWith('/')? 'https://reddit.com'+u.address : u.address;
+					let prettyUrl = u.address.length < 50 ? u.address : u.address.substring(0, 47)+'...';
+					prettyUrl = prettyUrl.replace('https://', '').replace('http://', '');
+
+					return <tr key={'url-'+u.id}>
+						<td>
+							<a className={u.processed?(u.failed? 'red':'green'):'orange'} href={normURL} target={'_blank'}>
+								{prettyUrl}
+							</a>
+						</td>
+						<td className={'description center'}>
+							{u.failure_reason}
+						</td>
+						<td>
+							{u.last_handler}
+						</td>
+					</tr>
+				});
+				return <details key={'fail-post-'+f.reddit_id} style={{marginBottom: '20px'}}>
+					<summary className={'small_font'}>
+						<span className={totalFail?'red':'orange'} style={{marginRight: '5px'}}>{f.subreddit} </span>
+						{f.title.length<100? f.title : f.title.substring(0, 97)+'...'}
+					</summary>
+					<a href={reddit_url} target={'_blank'}>Go to {f.type}</a>
+					<table>
+						<tbody>
+							<tr key={'failed-headers'}>
+								<th>URL</th>
+								<th>Failure Reason</th>
+								<th>Handler</th>
+							</tr>
+							{urls}
+						</tbody>
+					</table>
+				</details>
+			});
+			failed_display = <details open={'open'} style={{marginTop: '20px'}}>
+				<summary className={'center'}>
+					Failed Downloads
+				</summary>
+				{fails}
+			</details>
+		}
+
 		return (
 			<div>
 				<h2>Welcome to the RMD {this.state.version} WebUI!</h2>
@@ -136,6 +198,7 @@ class Home extends React.Component {
 					RMD needs this in order to access Reddit! <i className="left_pad red icon fa fa-heart"/>
 				</p>
 				{progress_display}
+				{failed_display}
 			</div>
 		);
 	}

@@ -11,6 +11,7 @@ from sqlalchemy import or_
 from processing.wrappers import SanitizedRelFile
 from static import settings
 import os
+import json
 
 Base = declarative_base()
 
@@ -107,4 +108,45 @@ class PostSearcher(Searcher):
 			.join(File)\
 			.filter(or_(*conds)) \
 			.filter((URL.processed != False))\
-			.filter(URL.failed != True).all()
+			.filter(URL.failed != True)\
+			.all()
+
+
+def _iterable(obj):
+	""" Check if the given Object is an iterable, non-string collection. """
+	if str(obj) == obj:
+		return False
+	try:
+		iter(obj)
+		return True
+	except TypeError:
+		return False
+
+
+def _encode_obj(obj):
+	""" Recursively collapse the given Object into one that can be JSON-encoded."""
+	ret = {}
+	for k, v in obj.__dict__.items():
+		if k.startswith('_'):
+			continue
+		if isinstance(v, Base):
+			ret[k] = _encode_obj(v)
+		elif _iterable(v):
+			ret[k] = [_encode_obj(i) for i in v]
+		else:
+			ret[k] = v
+	return ret
+
+
+def encode_safe(obj, stringify=False, indent=None):
+	"""
+		Encode the given object(s), into new Objects that are safe for serialization.
+		Supports automatic JSON encoding, single DB objects, or lists of DB Objects.
+	"""
+	if _iterable(obj):
+		obj = [_encode_obj(o) for o in obj]
+	else:
+		obj = _encode_obj(obj)
+	if stringify:
+		obj = json.dumps(obj, indent=indent)
+	return obj

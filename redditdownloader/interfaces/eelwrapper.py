@@ -50,6 +50,7 @@ _file_dir = None
 _web_dir = None
 _controller = None
 _session = None
+_stat_cache = None
 
 
 def start(web_dir, file_dir):
@@ -99,6 +100,21 @@ def _websocket_close(page, old_websockets):
 		print('Keeping UI server open...')
 
 
+def get_cached_stats():
+	""" Track and cache misc stats for RMD. Cache is invalidated when downloading starts. """
+	global _stat_cache
+	if not _stat_cache:
+		_stat_cache = {
+			'total_files': _session.query(sql.File).count(),
+			'total_files_dl': _session.query(sql.File).filter(sql.File.downloaded).count(),
+			'total_submissions': _session.query(sql.Post).filter(sql.Post.type == 'Submission').count(),
+			'total_comments': _session.query(sql.Post).filter(sql.Post.type == 'Comment').count(),
+			'total_urls': _session.query(sql.URL).filter(sql.URL.processed).count(),
+			'total_urls_failed': _session.query(sql.URL).filter(sql.URL.failed).count()
+		}
+	return _stat_cache
+
+
 @eel.btl.route('/file')
 def _downloaded_files():
 	""" Allows the UI to request files RMD has scraped.
@@ -129,7 +145,6 @@ def _authorize_rmd_token():
 @eel.expose
 def api_current_status():
 	return {'current_version': metadata.current_version}
-
 
 
 @eel.expose
@@ -258,12 +273,13 @@ def api_shutdown():
 
 @eel.expose
 def start_download():
-	global _controller
+	global _controller, _stat_cache
 	if _controller is not None and _controller.is_running():
 		return False
 	else:
 		_controller = RMDController()
 		_controller.start()
+		_stat_cache = None
 		print('Started downloader.')
 		return True
 
@@ -271,8 +287,21 @@ def start_download():
 @eel.expose
 def download_status():
 	if _controller is None:
-		return {'running': False}
+		return {
+			'running': False,
+			'summary': get_cached_stats()
+		}
 	return _controller.get_progress().to_obj()
+
+
+@eel.expose
+def get_failed():
+	fails = _session\
+		.query(sql.Post)\
+		.join(sql.URL)\
+		.filter(sql.URL.failed == True)\
+		.all()
+	return sql.encode_safe(fails)
 
 
 def sleep(sec):
