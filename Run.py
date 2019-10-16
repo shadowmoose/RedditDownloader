@@ -24,8 +24,14 @@ issues = set()
 
 def update_reqs():
 	print("Updating requirements. This may take a while on first-time installs..")
-	p = Popen([sys.executable, "-m", "pip", "install", "--upgrade", "-r", "requirements.txt", "--user"], stdout=PIPE,
-			  stderr=STDOUT, shell=True, cwd=dr)
+	p = Popen([
+		sys.executable,
+		"-m", "pip",
+		"install", "--upgrade",
+		"-r", "requirements.txt",
+		"--user",
+		"--no-warn-script-location"
+	], stdout=PIPE, stderr=STDOUT, shell=True, cwd=dr)
 
 	for line in p.stdout:
 		line = line.decode().rstrip()
