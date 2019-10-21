@@ -129,7 +129,7 @@ def _encode_obj(obj):
 	for k, v in obj.__dict__.items():
 		if k.startswith('_'):
 			continue
-		if isinstance(v, Base):
+		if hasattr(v, '_sa_instance_state'):
 			ret[k] = _encode_obj(v)
 		elif _iterable(v):
 			ret[k] = [_encode_obj(i) for i in v]
