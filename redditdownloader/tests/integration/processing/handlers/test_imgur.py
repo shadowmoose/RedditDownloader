@@ -2,8 +2,10 @@ from tests.mock import StagedTest, mock_handler_request
 from processing.handlers import imgur
 from static import settings
 import os
+import unittest
 
 
+@unittest.skipIf('RMD_IMGUR_ID' not in os.environ, "Cannot test Imgur Handler without API credentials set in Env.")
 class ImgurHandlerTest(StagedTest):
 	""" Test the Imgur Handler's downloading capabilities """
 
