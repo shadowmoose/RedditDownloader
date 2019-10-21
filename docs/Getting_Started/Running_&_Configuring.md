@@ -6,11 +6,16 @@ to help you get exactly what you want downloaded.
 We'll briefly cover the basics you'll need to get started here.*
 
 ## Starting RMD
-Once [you've installed RMD](Installing.md), you can run RMD at any time by using the terminal command:
+Once [you've installed RMD](Installing.md), you can run RMD at any time by launching ```Run.py```.
 
-```python redditdownloader```
+If you'd prefer to use a terminal, RMD can be started using using the terminal command:
 
-*Note: If there are multiple Python installations on your machine, make sure you're running python3.*
+```python Run.py```
+
+*Note: If there are multiple Python installations on your machine, make sure you're running with python3.*
+
+When run for the first time, RMD will download any additional libraries it requires. 
+Once finished, you may be required to re-launch RMD.
 
 ## First-time setup
 Once you've launched RMD for the first time, the terminal will prompt you to enter some first-time setup configs. 
