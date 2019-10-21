@@ -1,6 +1,6 @@
 site_name: Reddit Media Downloader
 theme: readthedocs
-repo_url: https://github.com/shadowmoose/rmd-mkdocs-test/
+repo_url: https://github.com/shadowmoose/RedditDownloader/
 site_author: ShadowMoose
 remote_branch: gh-pages
 strict: true
