@@ -16,6 +16,10 @@ import sys
 import importlib
 
 print('Python %s on %s' % (sys.version, sys.platform))
+if sys.version_info < (3, 5):
+	print('Error: RMD cannot run on a python version < 3.5. Please update your python installation, or run with "python3".')
+	input("-Press [Enter] to quit-")
+	sys.exit(1)
 dr = path.abspath(path.dirname(path.abspath(__file__)))
 sys.path.insert(0, path.join(dr, 'redditdownloader'))
 
