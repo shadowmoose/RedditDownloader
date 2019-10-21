@@ -19,7 +19,7 @@ To see all the possible settings, [check out the Settings List page.](Settings_L
 *There are a few settings that many people will specifically want to change, so they are documented here.*
 
 ### Auth
-This is automatically set in the WebUI, by requesting authorization from Reddit.
+This is set using the WebUI, by requesting authorization from Reddit.
 
 ### Interface
 The settings in this group all control how RMD handles displaying itself. 
@@ -44,6 +44,28 @@ Additionally, for images, RMD will perform a visual comparison between all image
 and will remove images that are visually the same. This enables RMD to ignore lower-quality, compressed duplicates of the same pictures.
 
 On the WebUI Browser side, RMD will remember which images have been deduplicated, and all unique posts will still be searchable.
+
+### Imgur Settings
+Imgur is a major media host on Reddit. 
+For direct imgur links, or links to public albums, RMD will work just fine without configuring these settings.
+Some imgur albums, however, are hidden from the public view.
+
+In order to support hidden/private albums or galleries, 
+you'll need to [register an imgur application](http://api.imgur.com/oauth2/addclient) and provide the ID & Secret to RMD.
+
+[The imgur API has limits.](https://api.imgur.com/#limits)
+RMD will try as hard as it can to avoid using the API, 
+but it will use the API if it encounters a private album/gallery that it otherwise cannot scrape.
+Links to single images will not use the API.
+
+*If you do not want to use the imgur API, and are okay with some albums failing, you can leave these settings blank.*
+
+To register an imgur Application:
++ Visit [http://api.imgur.com/oauth2/addclient](http://api.imgur.com/oauth2/addclient) while signed in to imgur.
++ On the registration page, the Name/Callback URL/Website/Description can be any values. 
++ Check the box for "Anonymous usage without user authorization"
++ Fill in a valid email address
++ Click submit, then copy the Client ID & Secret from the following page.
 
 ---
 

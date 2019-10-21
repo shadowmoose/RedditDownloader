@@ -64,8 +64,9 @@ class EnvironmentTest(StagedTest):
 				txt = o.read()
 			txt = txt.replace('[TEST_DIR]', json.dumps(cls.dir))
 			txt = txt.replace('[REFRESH_TOKEN]', json.dumps(os.environ['RMD_REFRESH_TOKEN']))
-			txt = txt.replace('[RMD_IMGUR_ID]', json.dumps(os.environ['RMD_IMGUR_ID']))
-			txt = txt.replace('[RMD_IMGUR_SECRET]', json.dumps(os.environ['RMD_IMGUR_SECRET']))
+			for k in ['RMD_IMGUR_ID', 'RMD_IMGUR_SECRET']:
+				val = os.environ[k] if k in os.environ else ''
+				txt = txt.replace('[%s]' % k, json.dumps(val))
 			with open(js, 'w') as o:
 				o.write(txt)
 
