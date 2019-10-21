@@ -1,3 +1,4 @@
+imgurpython
 psaw
 youtube_dl
 requests>=2.22.0

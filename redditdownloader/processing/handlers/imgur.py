@@ -1,13 +1,17 @@
 import re
-import urllib.parse
-from static import stringutil
+import urllib.parse as urlp
+from os.path import splitext, basename
 from processing.handlers import HandlerResponse
 from processing.wrappers import http_downloader
+from imgurpython import ImgurClient
+from static import settings
+
 
 tag = 'imgur'
 order = 1
 
-imgur_animation_exts = ['.mp4', '.webm']
+imgur_animation_exts = ['mp4', 'webm', 'gif', 'gifv']
+_imgur_client = None
 
 
 # Code borrowed from: https://github.com/alexgisby/imgur-album-downloader and modified.
@@ -48,79 +52,90 @@ class ImgurAlbumDownloader:
 		return list(self.urls)
 
 
-def get_direct_link(url):
-	"""
-	If we've got a non-gallery, and missing the direct image url, correct to the direct image link.
-	"""
-	if is_direct_link(url):
-		return url
-	base_img = url.split("/")[-1]
-	req = http_downloader.open_request(url, stream=False)
-	if 'i.img' in req.url:
-		# Redirected to valid Image.
-		return req.url
-	else:
-		# Load the page and parse for image.
-		possible_eles = [('link', 'href'), ('img', 'src')]
-		for pe in possible_eles:
-			for u in stringutil.html_elements(req.text, pe[0], pe[1]):
-				if is_direct_link(u, base_img):
-					return urllib.parse.urljoin('https://i.imgur.com/', u)
-		# Check for embedded video:
-		possible_eles = [('meta', 'content'), ('source', 'src')]
-		for pe in possible_eles:
-			for u in stringutil.html_elements(req.text, pe[0], pe[1]):
-				if is_direct_link(u, base_img) and any((ext in u) for ext in imgur_animation_exts):
-					return urllib.parse.urljoin('https://i.imgur.com/', u)
-	return None
+def make_api_client():
+	global _imgur_client
+	client_id = settings.get('imgur.client_id')
+	client_secret = settings.get('imgur.client_secret')
+	if not _imgur_client and client_id and client_secret:
+		_imgur_client = ImgurClient(client_id, client_secret)
+	return _imgur_client
 
 
-def is_direct_link(url, base_img=''):
-	""" Check if the given URL matches an expected direct Imgur URL. """
-	return base_img in url \
-		   and 'i.imgur' in url \
-		   and 'api.' not in url \
-		   and '?' not in url \
-		   and '.' in url.split('/')[-1]
-
-
-def clean_imgur_url(url):
-	""" Attempts to - very generously - clean the given URL into a valid Imgur location. Returns the url, if valid. """
-	url = url.lstrip(':/').replace('m.imgur.', 'imgur.')
-	url = url.replace('.gifv', '.mp4')
+def parse_url(url):
+	url = url.lstrip(':/')
 	if not url.startswith('http'):
-		url = 'https://%s' % url
-	if re.match(r"^(?:https?[:/]*)?(?:www.)?(?:[mi]\.)?imgur\.com/", url):
-		return url
-	return False
+		url = 'https://' + url
+	return urlp.urlparse(url)
+
+
+def is_imgur(url):
+	sp = parse_url(url)
+	tloc = '.'.join(sp.netloc.split('.')[-2:])
+	return tloc == 'imgur.com'
+
+
+def is_gallery(url):
+	sp = parse_url(url)
+	return sp.path and any(sp.path.startswith(x) for x in ['/a/', '/gallery/'])
+
+
+def build_direct_link(url):
+	sp = parse_url(url)
+	filename, ext = splitext(basename(sp.path))
+	if not ext:
+		ext = '.png'  # Guess the type: Imgur will auto-resolve to the direct image, even if the extension is wrong.
+	if ext == '.gifv':
+		ext = '.mp4'
+	return urlp.urljoin('https://i.imgur.com/', '%s%s' % (filename, ext))
+
+
+def extract_id(url):
+	sp = parse_url(url)
+	filename, ext = splitext(basename(sp.path))
+	return filename
 
 
 def handle(task, progress):
-	url = clean_imgur_url(task.url)
-	if not url:
+	url = task.url
+	if not is_imgur(url):
 		return False
-	direct_url = url.replace('/gallery/', '/').replace('/a/', '/')
-
-	progress.set_status("Parsing url & verifying format...")
-
-	album_exception = None
 
 	# Check for an album/gallery.
-	if any(x in url for x in ['gallery', '/a/']):
+	if is_gallery(url):
 		if 'i.' in url:
 			# Imgur redirects this, but we correct for posterity.
 			url = url.replace('i.', '')
+		urls = []
 		try:
 			album = ImgurAlbumDownloader(url)
-			return HandlerResponse(success=True, handler=tag, album_urls=album.get_urls())
-		except ImgurAlbumException as ex:
-			album_exception = ex
-			pass  # It's possible an image incorrectly has a Gallery location, which Imgur can resolve. Try direct dl:
+			urls = album.get_urls()
+		except ImgurAlbumException:
+			pass  # It's possible an image incorrectly has a Gallery location prepended. Ignore error.
 
-	url = get_direct_link(direct_url)
+		if not len(urls):  # Try using the imgur API to locate this album.
+			try:
+				# fallback to imgur API client, if enabled, for hidden albums.
+				client = make_api_client()
+				if not client:
+					return HandlerResponse(success=False,
+										   handler=tag,
+										   failure_reason="Could not locate hidden album, and API client is disabled.")
+				items = client.get_album_images(extract_id(url))
+				urls = [i.link for i in items]
+			except Exception as e:
+				print('Imgur API:', e)
+				pass  # It's possible an image incorrectly has a Gallery location prepended. Ignore error.
+		if len(urls) == 1:
+			url = urls[0]  # For single-image albums, set up to directly download the image.
+		elif len(urls):
+			return HandlerResponse(success=True, handler=tag, album_urls=urls)
 
-	if not url:
-		if album_exception:
-			print("ImgurAlbumException:", album_exception)
-		return False  # Unable to parse proper URL.
+	url = build_direct_link(url)
+	ext, stat = http_downloader.is_media_url(url, return_status=True)  # Do some pre-processing, mostly to screen filetypes.
+	if not ext or stat != 200:
+		return HandlerResponse(success=False,
+							   handler=tag,
+							   failure_reason="Unable to determine imgur filetype: HTTP %s: %s" % (stat, url))
+	if ext in imgur_animation_exts:
+		url = '.'.join(url.split('.')[:-1]) + '.mp4'
 	return http_downloader.download_binary(url, task.file, prog=progress, handler_id=tag)

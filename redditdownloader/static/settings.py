@@ -230,6 +230,9 @@ add("interface", Setting("keep_open", False, desc="If True, the WebUI will stay 
 add("interface", Setting("port", 7505, desc="The port to open the WebUI on.", etype="int"))
 add("interface", Setting("host", 'localhost', desc="The host to bind on."))
 
+add("imgur", Setting("client_id", '', desc="The API client ID to use when accessing private Imgur albums."))
+add("imgur", Setting("client_secret", '', desc="The API client secret to use when accessing private Imgur albums."))
+
 add(None, Setting("meta-version", 5, etype="int", public=False))
 add(None, Setting("sources", [{'alias': 'default-downloader', 'data': {}, 'filters': {}, 'type': 'personal-upvoted-saved'}], etype="list", public=False))
 # ======================================
@@ -296,6 +299,8 @@ def _adapt(obj):  # !cover
 			('%s/%s' % (obj['output']['subdir_pattern'], obj['output']['file_name_pattern'])).replace('//', '/')
 		obj['threading']['console_clear_screen'] = obj['threading']['display_clear_screen']
 		obj['threading']['concurrent_downloads'] = obj['threading']['max_handler_threads']
+		obj['imgur']['client_id'] = ''
+		obj['imgur']['client_secret'] = ''
 		del obj['output']['subdir_pattern']
 		del obj['output']['deduplicate_files']
 		del obj['threading']['display_clear_screen']
