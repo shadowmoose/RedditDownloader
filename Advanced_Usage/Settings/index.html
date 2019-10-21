@@ -210,7 +210,7 @@ or they can be overridden by passing the setting category and name from the comm
 <h2 id="notable-settings">Notable Settings<a class="headerlink" href="#notable-settings" title="Permanent link">&para;</a></h2>
 <p><em>There are a few settings that many people will specifically want to change, so they are documented here.</em></p>
 <h3 id="auth">Auth<a class="headerlink" href="#auth" title="Permanent link">&para;</a></h3>
-<p>This is automatically set in the WebUI, by requesting authorization from Reddit.</p>
+<p>This is set using the WebUI, by requesting authorization from Reddit.</p>
 <h3 id="interface">Interface<a class="headerlink" href="#interface" title="Permanent link">&para;</a></h3>
 <p>The settings in this group all control how RMD handles displaying itself. 
 By default, RMD will use a Web-based interface. if you would prefer to use a console-based interface, change these settings.</p>
@@ -227,6 +227,23 @@ See <a href="#file-name-patterns">File Name Patterns</a> for how to use this fea
 <p>Additionally, for images, RMD will perform a visual comparison between all images it downloads, 
 and will remove images that are visually the same. This enables RMD to ignore lower-quality, compressed duplicates of the same pictures.</p>
 <p>On the WebUI Browser side, RMD will remember which images have been deduplicated, and all unique posts will still be searchable.</p>
+<h3 id="imgur-settings">Imgur Settings<a class="headerlink" href="#imgur-settings" title="Permanent link">&para;</a></h3>
+<p>Imgur is a major media host on Reddit. 
+For direct imgur links, or links to public albums, RMD will work just fine without configuring these settings.
+Some imgur albums, however, are hidden from the public view.</p>
+<p>In order to support hidden/private albums or galleries, 
+you'll need to <a href="http://api.imgur.com/oauth2/addclient">register an imgur application</a> and provide the ID &amp; Secret to RMD.</p>
+<p><a href="https://api.imgur.com/#limits">The imgur API has limits.</a>
+RMD will try as hard as it can to avoid using the API, 
+but it will use the API if it encounters a private album/gallery that it otherwise cannot scrape.
+Links to single images will not use the API.</p>
+<p><em>If you do not want to use the imgur API, and are okay with some albums failing, you can leave these settings blank.</em></p>
+<p><strong>To register an imgur Application:</strong>
++ Visit <a href="http://api.imgur.com/oauth2/addclient">http://api.imgur.com/oauth2/addclient</a> while signed in to imgur.
++ On the registration page, the Name/Callback URL/Website/Description can be any values. 
++ Check the box for "Anonymous usage without user authorization"
++ Fill in a valid email address
++ Click submit, then copy the Client ID &amp; Secret from the following page.</p>
 <hr />
 <h2 id="file-name-patterns">File Name Patterns<a class="headerlink" href="#file-name-patterns" title="Permanent link">&para;</a></h2>
 <p>Anywhere File Patterns are used, they allow for data insertion based off the Post being saved.</p>
