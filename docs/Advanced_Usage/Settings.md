@@ -60,7 +60,7 @@ Links to single images will not use the API.
 
 *If you do not want to use the imgur API, and are okay with some albums failing, you can leave these settings blank.*
 
-To register an imgur Application:
+**To register an imgur Application:**
 + Visit [http://api.imgur.com/oauth2/addclient](http://api.imgur.com/oauth2/addclient) while signed in to imgur.
 + On the registration page, the Name/Callback URL/Website/Description can be any values. 
 + Check the box for "Anonymous usage without user authorization"

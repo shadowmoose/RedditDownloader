@@ -1,6 +1,6 @@
-imgurpython
 psaw
 youtube_dl
+imgurpython==1.1.7
 requests>=2.22.0
 sqlalchemy>=1.3.8
 praw>=6.0.0
