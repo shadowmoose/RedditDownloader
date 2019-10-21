@@ -4,7 +4,7 @@ from static import settings
 from processing.handlers import HandlerResponse
 
 
-allowed_mimetypes = ['image/', 'audio/', 'video/']
+allowed_mimetypes = ('image/', 'audio/', 'video/')
 
 
 def _req_args():

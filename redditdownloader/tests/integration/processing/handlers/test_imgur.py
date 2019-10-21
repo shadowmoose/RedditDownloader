@@ -1,9 +1,17 @@
 from tests.mock import StagedTest, mock_handler_request
 from processing.handlers import imgur
+from static import settings
+import os
+import unittest
 
 
+@unittest.skipIf('RMD_IMGUR_ID' not in os.environ, "Cannot test Imgur Handler without API credentials set in Env.")
 class ImgurHandlerTest(StagedTest):
 	""" Test the Imgur Handler's downloading capabilities """
+
+	def setUp(self):
+		settings.put('imgur.client_id', os.environ['RMD_IMGUR_ID'])
+		settings.put('imgur.client_secret', os.environ['RMD_IMGUR_SECRET'])
 
 	def test_correct_urls(self):
 		""" Handler should be able to identify valid Imgur URLs """
@@ -24,22 +32,22 @@ class ImgurHandlerTest(StagedTest):
 			'https://imgur.org': False,
 			'https://not-imgur.com': False,
 			'https://google.com': False,
+			'imgur': False
 		}
 		for url, valid in test_urls.items():
-			clean = imgur.clean_imgur_url(url)
+			clean = imgur.is_imgur(url)
 			self.assertEqual(valid, bool(clean), "Imgur improperly handled a test URL: [%s]->(%s)" % (url, clean))
-			if clean:
-				self.assertTrue(clean.startswith('http'), 'Imgur did not add http protocol during clean! %s' % url)
 
 	def test_gallery(self):
 		""" Attempt Imgur gallery Download """
 		_task, _prog, _file = mock_handler_request(self.dir, 'https://imgur.com/gallery/plN58')
 		res = imgur.handle(_task, _prog)
-		self.assertTrue(res, "Imgur gallery search failed! %s" % res.failure_reason)
+		self.assertTrue(res, "Imgur gallery search failed!")
+		self.assertTrue(res.success, "Imgur gallery failed to download: %s" % res.failure_reason)
 		self.assertEqual(len(res.album_urls), 134, "Handler didn't find all gallery URLS!")
 
-	def test_album_animation(self):
-		""" Attempt to download an Animation, (improperly) listed as within an album """
+	def test_invalid_album(self):
+		""" Attempt to download an Animation, which (improperly) has an album prefix """
 		_task, _prog, _file = mock_handler_request(self.dir, 'https://imgur.com/a/KEVkAWf')
 		res = imgur.handle(_task, _prog)
 		self.assertTrue(res, "Imgur album download failed!")

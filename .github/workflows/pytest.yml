@@ -38,6 +38,8 @@ jobs:
       - name: Test with pytest
         env:
           RMD_REFRESH_TOKEN: ${{secrets.RMD_REFRESH_TOKEN}}
+          RMD_IMGUR_ID: ${{secrets.RMD_IMGUR_ID}}
+          RMD_IMGUR_SECRET: ${{secrets.RMD_IMGUR_SECRET}}
         run: |
           pytest --cov=./ --cov-report=xml --verbose redditdownloader/
 
