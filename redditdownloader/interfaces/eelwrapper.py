@@ -27,8 +27,7 @@ class WebUI(UserInterface):
 		if started:
 			return False
 		webdir = os.path.join(os.path.dirname(__file__), '../web/')
-		filedir = os.path.abspath(settings.get("output.base_dir"))
-		start(web_dir=webdir, file_dir=filedir)
+		start(web_dir=webdir)
 		while not stopped:
 			eel.sleep(1)
 
@@ -46,16 +45,14 @@ class WebUI(UserInterface):
 
 started = False
 stopped = False
-_file_dir = None
 _web_dir = None
 _controller = None
 _session = None
 _stat_cache = None
 
 
-def start(web_dir, file_dir):
-	global _file_dir, _web_dir, started, _session
-	_file_dir = os.path.abspath(file_dir)
+def start(web_dir):
+	global _web_dir, started, _session
 	_web_dir = os.path.abspath(web_dir)
 	_session = sql.session()
 	if not settings.get('interface.start_server'):
@@ -123,8 +120,8 @@ def _downloaded_files():
 	token = eel.btl.request.query.id
 	file_obj = _session.query(sql.File).filter(sql.File.id == token).first()
 	file_path = file_obj.path
-	print('Requested RMD File: %s, %s' % (_file_dir, file_path))
-	return eel.btl.static_file(file_path, root=_file_dir)
+	print('Requested RMD File: %s, %s' % (settings.get("output.base_dir"), file_path))
+	return eel.btl.static_file(file_path, root=os.path.abspath(settings.get("output.base_dir")))
 
 
 @eel.btl.route('/authorize')
