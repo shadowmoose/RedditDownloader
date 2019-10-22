@@ -59,3 +59,8 @@ class PrawWrapperTest(EnvironmentTest):
 		posts = [p for p in pw.user_posts('test_reddit_scraper', find_comments=True, find_submissions=True)]
 		for p in posts:
 			self.assertEqual(p.author, 'test_reddit_scraper', msg='Invalid Post author!')
+
+	def test_get_submission_comments(self):
+		""" Findina a Submission's comments should work """
+		posts = list(pw.get_submission_comments('t3_79pp8r'))
+		self.assertGreater(len(posts), 0, msg="Failed to load child comments from Submission!")
