@@ -81,7 +81,7 @@ def get(key, full_obj=False, cat=None):
 	if cat in _settings and key in _settings[cat]:
 		rs = _settings[cat][key]
 		return rs.val() if not full_obj else rs
-	raise KeyError('The given setting (%s) does not exist!' % key)
+	raise KeyError('The given setting (%s%s) does not exist!' % (cat+'.' if cat else '', key))
 
 
 def put(key, value, cat=None, save_after=True):
@@ -250,7 +250,7 @@ def _adapt(obj):  # !cover
 	if version == 1:
 		# Version 1->2 saw addition of Sources & Filters.
 		obj['meta-version'] = 2
-		obj['sources'] = {}
+		obj['sources'] = []
 		from sources import UpvotedSaved
 		us = UpvotedSaved()  # This Source doesn't need any extra info, and it simulates original behavior.
 		us.set_alias('default-downloader')
@@ -260,13 +260,18 @@ def _adapt(obj):  # !cover
 		converted = True
 
 	if version == 2:
-		# Version 2->3 saw addition of display config, for Threading.
+		# Version 2->3 saw addition of display config, for Threading, as well as oAuth.
+		del obj['auth']['client_id']
+		del obj['auth']['client_secret']
+		del obj['auth']['password']
+		del obj['auth']['username']
 		obj['meta-version'] = 3
 		obj['threading'] = {
 			"max_handler_threads": 5,
 			"display_clear_screen": True,
 			"display_refresh_rate": 5
 		}
+		obj['deduplicate_files'] = True
 		version = 3
 		print("Adapted from Settings version 2 -> 3!")
 		converted = True
@@ -299,8 +304,7 @@ def _adapt(obj):  # !cover
 			('%s/%s' % (obj['output']['subdir_pattern'], obj['output']['file_name_pattern'])).replace('//', '/')
 		obj['threading']['console_clear_screen'] = obj['threading']['display_clear_screen']
 		obj['threading']['concurrent_downloads'] = obj['threading']['max_handler_threads']
-		obj['imgur']['client_id'] = ''
-		obj['imgur']['client_secret'] = ''
+		obj['imgur'] = {'client_id': '', 'client_secret': ''}
 		del obj['output']['subdir_pattern']
 		del obj['output']['deduplicate_files']
 		del obj['threading']['display_clear_screen']
@@ -312,9 +316,3 @@ def _adapt(obj):  # !cover
 
 	return obj, converted
 
-
-if __name__ == '__main__':
-	for _k, _v in _settings.items():
-		print(_k.title() + ':')
-		for _key, stt in _v.items():
-			print('\t%s: %s' % (_key, stt))

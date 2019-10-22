@@ -5,6 +5,9 @@ from shutil import rmtree
 import uuid
 import zipfile
 import json
+import importlib
+from static import settings
+import sql
 
 
 class Object:
@@ -19,6 +22,8 @@ class StagedTest(unittest.TestCase):
 
 	@classmethod
 	def setUpClass(cls):
+		importlib.reload(settings)
+		importlib.reload(sql)
 		randname = 'rmd-test-%s' % uuid.uuid4()
 		cls.dir = os.path.abspath(os.path.join(gettempdir(), randname))
 		os.makedirs(cls.dir)
