@@ -38,6 +38,7 @@ class ImgurHandlerTest(StagedTest):
 			clean = imgur.is_imgur(url)
 			self.assertEqual(valid, bool(clean), "Imgur improperly handled a test URL: [%s]->(%s)" % (url, clean))
 
+	@unittest.skipIf('GITHUB_ACTION' in os.environ, "Cannot reliably test imgur albums on GitHub's internet.")
 	def test_gallery(self):
 		""" Attempt Imgur gallery Download """
 		_task, _prog, _file = mock_handler_request(self.dir, 'https://imgur.com/gallery/plN58')
