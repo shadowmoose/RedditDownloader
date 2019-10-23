@@ -2,6 +2,7 @@ from interfaces import UserInterface
 from processing.controller import RMDController
 from static import settings
 import colorama
+import os
 
 
 class TerminalUI(UserInterface):
@@ -21,8 +22,13 @@ class TerminalUI(UserInterface):
 		print("All finished.")
 
 	def print_info(self, prog):
-		if settings.get('threading.console_clear_screen'):
-			print('\n'*10, colorama.ansi.clear_screen())
+		if not settings.get('threading.console_clear_screen'):
+			print('\n'*10)
+		else:
+			try:
+				print(colorama.ansi.clear_screen())
+			except AttributeError:
+				os.system('cls' if os.name == 'nt' else 'clear')
 		scanning = '+' if prog.loader.get_scanning() else ''
 		print("Remaining: %s/%s%s" % (prog.loader.get_queue_size(), prog.loader.get_found(), scanning))
 		rj = 10
