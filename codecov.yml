@@ -1,2 +1,3 @@
 ignore:
   - "redditdownloader/interfaces"  # ignore all interface files in Github CI, as they cannot be tested remotely.
+  - "redditdownloader/tests/full_runs"
