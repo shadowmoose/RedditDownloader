@@ -33,6 +33,8 @@ class StagedTest(unittest.TestCase):
 
 	@classmethod
 	def tearDownClass(cls):
+		if sql._Session:
+			sql.close()
 		if cls.dir:
 			rmtree(cls.dir)
 

@@ -4,6 +4,7 @@ from static import settings
 from processing.wrappers import SanitizedRelFile, AckPacket, DownloaderProgress
 from processing import handlers
 import uuid
+import traceback
 
 
 class Downloader(multiprocessing.Process):
@@ -30,7 +31,7 @@ class Downloader(multiprocessing.Process):
 			try:
 				url = self._session.query(sql.URL).filter(sql.URL.id == nxt_id).first()
 				if not url:
-					raise Exception("Unknown URL ID provided: (%s}" % nxt_id)  # TODO: Log this instead, after testing.
+					raise Exception("Unknown URL ID provided: (%s}" % nxt_id)
 
 				file = url.file
 				path = SanitizedRelFile(base=settings.get("output.base_dir"), file_path=file.path)
@@ -72,12 +73,14 @@ class Downloader(multiprocessing.Process):
 					extra_urls=resp.album_urls
 				))
 				self.progress.clear(status="Waiting for URL...")
-			except Exception:
+			except Exception as ex:
 				self._ack_queue.put(AckPacket(
 					url_id=nxt_id,
 					extra_urls=[]
 				))
-				break  # TODO: Error handling here.
+				print(ex)
+				traceback.print_exc()
+				break
 
 		sql.close()
 		self.progress.clear("Finished.", running=False)
