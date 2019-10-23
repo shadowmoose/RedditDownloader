@@ -28,7 +28,7 @@ class SqlitePostSearcherTest(EnvironmentTest):
 	def test_post_search_author(self):
 		""" Posts should be searchable """
 		posts = self.ps.search_fields(['author'], 'testuser')
-		self.assertEqual(3, len(posts), msg="Found incorrect number of posts!")
+		self.assertEqual(1, len(posts), msg="Found incorrect number of posts!")
 
 	def test_empty_post_search(self):
 		""" Empty results are possible """

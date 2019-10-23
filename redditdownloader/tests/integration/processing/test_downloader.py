@@ -10,7 +10,7 @@ import time
 import queue
 
 
-class NameGeneratorTest(EnvironmentTest):
+class DownloaderTest(EnvironmentTest):
 	env = 'rmd_staged_db'
 
 	def setUp(self):
