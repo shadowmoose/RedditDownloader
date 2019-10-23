@@ -28,12 +28,18 @@ class RelFileTest(unittest.TestCase):
 	def test_sanitize(self):
 		""" Certain special characters should be stripped """
 		r = rel.SanitizedRelFile("/Fake\\", './test\\!@#$%^&*()_+-=.../...\\.1234567890abcd...file..')
-		self.assertEqual(r.relative(), 'test/!@#$%^&_()_+-=/1234567890abcd...file', 'The crazy (valid) file failed!')
+		self.assertEqual(r.relative(), 'test/!@#$%%^&_()_+-=/1234567890abcd...file', 'The crazy (valid) file failed!')
 
 	def test_hash_path(self):
 		""" Hashed paths should reliably work """
 		r = rel.SanitizedRelFile(base="/Users", file_path="/test/[title].txt")
 		self.assertTrue(r.abs_hashed(), msg='abs_hashed() returned an invalid value!')
+
+	def test_sanitized_formatting(self):
+		""" Formatting strings should be sanitized """
+		r = rel.SanitizedRelFile(base="/Users", file_path="/test/[title] %s yep.txt")
+		with self.assertRaises(TypeError, msg="Failed to sanitize formatting character from file name!"):
+			print(r.absolute() % 1)
 
 
 def norm(fn):

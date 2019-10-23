@@ -94,6 +94,7 @@ class RelFile:
 class SanitizedRelFile(RelFile):
 	def __init__(self, base, file_path=None, full_file_path=None):
 		super().__init__(base, file_path, full_file_path)
+		self._path = self._path.replace('%', '%%')
 		self._path = self.remove_dotslash(self._path)
 		# noinspection PyUnresolvedReferences
 		self._path = pathvalidate.sanitize_filepath(self._path, '_').strip(". /\\").strip()

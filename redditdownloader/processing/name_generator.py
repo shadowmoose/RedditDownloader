@@ -1,5 +1,5 @@
 import static.settings as settings
-from processing.wrappers.rel_file import RelFile, SanitizedRelFile
+from processing.wrappers.rel_file import SanitizedRelFile
 import pathvalidate
 from sql import File, URL
 
@@ -10,10 +10,10 @@ _pattern_array = None
 def choose_file_name(url, post, session, album_size=1):
 	base = _choose_base_name(post).relative()
 	idx = 1
-	nb = base + " - %s"
+	nb = base
 	while _get_matching(base=base, url=url, session=session):
 		idx += 1
-		base = nb % idx
+		base = "%s - %s" % (nb, idx)
 	base = _add_album(url, base, album_size=album_size)
 	return base
 
