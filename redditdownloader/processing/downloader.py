@@ -26,6 +26,7 @@ class Downloader(multiprocessing.Process):
 		sql.init_from_settings()
 		self._session = sql.session()
 		self.progress.clear(status="Starting up...", running=True)
+		failed = False
 
 		for nxt_id in self._reader:
 			try:
@@ -74,6 +75,7 @@ class Downloader(multiprocessing.Process):
 				))
 				self.progress.clear(status="Waiting for URL...")
 			except Exception as ex:
+				failed = str(ex)
 				self._ack_queue.put(AckPacket(
 					url_id=nxt_id,
 					extra_urls=[]
@@ -83,4 +85,4 @@ class Downloader(multiprocessing.Process):
 				break
 
 		sql.close()
-		self.progress.clear("Finished.", running=False)
+		self.progress.clear("Finished." if not failed else "Exited with error: %s" % failed, running=False)
