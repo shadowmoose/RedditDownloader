@@ -40,7 +40,7 @@ jobs:
         uses: actions/cache@preview
         if: startsWith(matrix.os, 'windows')
         with:
-          path: $LOCALAPPDATA/pip/
+          path: %LOCALAPPDATA%/pip/
           key: pytest-${{ matrix.os }}-${{ matrix.python-version }}-pip
 
       - name: Install dev dependencies
