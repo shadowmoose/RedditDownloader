@@ -36,6 +36,13 @@ jobs:
           path: ~/Library/Caches/pip
           key: pytest-${{ matrix.os }}-${{ matrix.python-version }}-pip-${{ hashFiles('**/requirement*.txt') }}
 
+      - name: windows cache
+        uses: actions/cache@preview
+        if: startsWith(matrix.os, 'windows')
+        with:
+          path: $LOCALAPPDATA/pip/
+          key: pytest-${{ matrix.os }}-${{ matrix.python-version }}-pip-${{ hashFiles('**/requirement*.txt') }}
+
       - name: Install dev dependencies
         run: |
           python -m pip install --upgrade pip setuptools wheel
