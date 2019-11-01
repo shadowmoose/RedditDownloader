@@ -41,7 +41,7 @@ jobs:
         if: startsWith(matrix.os, 'windows')
         with:
           path: $LOCALAPPDATA/pip/
-          key: pytest-${{ matrix.os }}-${{ matrix.python-version }}-pip-${{ hashFiles('**/requirement*.txt') }}
+          key: pytest-${{ matrix.os }}-${{ matrix.python-version }}-pip
 
       - name: Install dev dependencies
         run: |
