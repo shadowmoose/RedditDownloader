@@ -2,7 +2,7 @@
 [![badge](https://github.com/shadowmoose/RedditDownloader/workflows/Pytest/badge.svg)](https://github.com/shadowmoose/RedditDownloader/actions) 
 [![badge](https://github.com/shadowmoose/RedditDownloader/workflows/Docs/badge.svg)](https://shadowmoose.github.io/RedditDownloader/)
 [![codecov](https://codecov.io/gh/shadowmoose/RedditDownloader/branch/master/graph/badge.svg)](https://codecov.io/gh/shadowmoose/RedditDownloader)
-![img](https://aws.rofl.wtf/loc?repo=RedditDownloader&ignore=**/js/libs/**,**/web/img/**,**.zip,**/alertify.css)
+![lines of code](https://prod.my-api.link/gh/lines?repo=RedditDownloader&ignore=**/js/libs/**,**/web/img/**,**.zip,**/alertify.css)
 
 **Let's face it:** In this day and age, the internet is ephemeral. Anything anybody posts might be here one day,
 and gone the next. Websites take down or move their images and videos, posts get hidden or removed, and their
