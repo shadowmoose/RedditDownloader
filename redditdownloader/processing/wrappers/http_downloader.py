@@ -53,6 +53,7 @@ def _guess_media_mimetype(req):
 def download_binary(url, rel_file, prog, handler_id):
 	"""
 	Downloads the given URL into a binary file, updating the provided status as it goes.
+
 	:param url: The URL to download
 	:param rel_file: The RelFile to save to
 	:param prog: The progress object to update.

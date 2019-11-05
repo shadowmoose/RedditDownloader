@@ -1,4 +1,5 @@
 import multiprocessing
+import traceback
 import hashlib
 from PIL import Image
 import sql
@@ -27,19 +28,24 @@ class Deduplicator(multiprocessing.Process):
 		""" Threaded loading of elements. """
 		settings.from_json(self._settings)
 		sql.init_from_settings()
-		self._session = sql.session()
-		self.progress.clear(status="Starting up...")
-		self.progress.set_running(True)
+		try:
+			self._session = sql.session()
+			self.progress.clear(status="Starting up...")
+			self.progress.set_running(True)
 
-		while not self._stop_event.is_set():
-			self._dedupe()
-			self.progress.set_status("Waiting for new files...")
-			self._stop_event.wait(2)
-		self._dedupe()  # Run one final pass after downloading stops.
-
-		self.progress.set_running(False)
-		sql.close()
-		self.progress.clear("Finished.")
+			while not self._stop_event.is_set():
+				self._dedupe()
+				self.progress.set_status("Waiting for new files...")
+				self._stop_event.wait(2)
+			self._dedupe()  # Run one final pass after downloading stops.
+			self.progress.clear(status="Finished.", running=False)
+		except Exception as ex:
+			print('Deduplication Process Error:', ex)
+			self.progress.set_error(ex)
+			self.progress.set_running(False)
+			traceback.print_exc()
+		finally:
+			sql.close()
 
 	def _dedupe(self):
 		unfinished = self._session\

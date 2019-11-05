@@ -109,6 +109,9 @@ class Home extends React.Component {
 				</details>
 
 			});
+			if (progress.deduplication.error) {
+				dedupe_status = `Disabled by Error: {${progress.deduplication.error}}`
+			}
 			progress_display = <details open={'open'}>
 				<summary className={'center'}>
 					Download Progress
@@ -125,7 +128,7 @@ class Home extends React.Component {
 				<div className={'orange'}>
 					<b>In Queue: </b>{progress.loader.queue_size}
 				</div>
-				<div className={progress.deduplication? 'yellow':'red'}>
+				<div className={(progress.deduplication.running && !progress.deduplication.error)? 'yellow':'red'}>
 					<b>Deduplication: </b> {dedupe_status}
 				</div>
 				<details open={'open'}>

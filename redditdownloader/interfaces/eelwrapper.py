@@ -283,7 +283,7 @@ def start_download():
 
 @eel.expose
 def download_status():
-	if _controller is None:
+	if _controller is None or not _controller.is_alive():
 		return {
 			'running': False,
 			'summary': get_cached_stats()

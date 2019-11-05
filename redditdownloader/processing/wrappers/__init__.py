@@ -63,6 +63,12 @@ class DownloaderProgress(Progress):
 	def get_running(self):
 		return self._ns['running']
 
+	def set_error(self, err):
+		self._ns['error'] = str(err)
+
+	def get_error(self):
+		return self._ns['error']
+
 	def clear(self, status="", running=False):
 		""" Reset this Progress to the default values. Optionally accepts `status` as a convenience. """
 		self._ns['percent'] = None
@@ -70,6 +76,7 @@ class DownloaderProgress(Progress):
 		self._ns['handler'] = None
 		self._ns['running'] = running
 		self._ns['file_name'] = None
+		self._ns['error'] = None
 
 
 class LoaderProgress(Progress):
