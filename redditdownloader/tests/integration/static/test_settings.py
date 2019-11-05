@@ -19,7 +19,7 @@ class SettingsTest(EnvironmentTest):
 		""" Settings from v1 should load """
 		self.assertEqual(settings.get('auth.refresh_token'), "", msg="Refresh key was incorrectly loaded!")
 		self.assertNotEqual(settings.get('auth.rmd_client_key'), '', msg='Failed to set default RMD client key!')
-		self.assertEqual(settings.get('output.base_dir'), './download/', msg='Legacy download dir was not preserved!')
+		self.assertTrue(os.path.isabs(settings.get('output.base_dir')), msg='Legacy download dir was not converted!')
 
 	def test_get(self):
 		""" get() method should work """
