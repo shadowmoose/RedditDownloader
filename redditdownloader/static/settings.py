@@ -215,7 +215,7 @@ add("auth", Setting("rmd_client_key", 'v4XVrdEH_A-ZaA', desc="Change only if you
 add("auth", Setting("user_agent", 'RMD-Scanner-%s' % uuid.uuid4(), desc="The user agent to identify as, wherever possible."))
 add("auth", Setting("oauth_key", str(uuid.uuid4()), desc="Internal key.", public=False))
 
-add("output", Setting("base_dir", os.path.join(os.getcwd(), 'download/'), desc="The base directory to save to. Cannot contain tags."))
+add("output", Setting("base_dir", os.path.join(os.getcwd(), 'download'), desc="The base directory to save to. Cannot contain tags."))
 add("output", Setting("file_name_pattern", '[subreddit]/[title] - ([author])', desc="The ouput file name/path. Supports tags."))
 
 add("processing", Setting("deduplicate_files", True, desc="Remove downloaded files if another copy already exists. Also compares images for visual similarity.", etype="bool"))
@@ -302,6 +302,7 @@ def _adapt(obj):  # !cover
 		obj['processing'] = {'deduplicate_files': obj['output']['deduplicate_files']}
 		obj['output']['file_name_pattern'] = \
 			('%s/%s' % (obj['output']['subdir_pattern'], obj['output']['file_name_pattern'])).replace('//', '/')
+		obj['output']['base_dir'] = os.path.abspath(obj['output']['base_dir'])
 		obj['threading']['console_clear_screen'] = obj['threading']['display_clear_screen']
 		obj['threading']['concurrent_downloads'] = obj['threading']['max_handler_threads']
 		obj['imgur'] = {'client_id': '', 'client_secret': ''}

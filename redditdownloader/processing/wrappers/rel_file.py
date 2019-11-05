@@ -24,7 +24,7 @@ class RelFile:
 		file_path = file_path.strip(" ./\\\n\t\r")
 		join_test = op.abspath(op.abspath(op.join(base, file_path)))
 		if not fs.is_subpath(base, join_test):
-			raise RelError("The relative path cannot elevate above the Base Parent: {%s}" % file_path)
+			raise RelError("The relative path cannot elevate above the Base Parent: {%s -> %s}" % (file_path, join_test))
 		self._base = op.abspath(base)
 		self._path = self._norm(file_path)
 
