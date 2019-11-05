@@ -22,8 +22,12 @@ class PushShiftUserSourceSource(source.Source):
 						yield p
 			if self.data['scan_comments']:
 				for post in ps.search_comments(**_params):
-					sub = list(ps.search_submissions(ids=post.link_id.replace('t3_', '', 1), limit=1))[0]
-					p = RedditElement(post, ext_submission_obj=sub)
+					parents = list(ps.search_submissions(ids=post.link_id.replace('t3_', '', 1), limit=1))
+					if not len(parents):
+						print("PushShift Warning: Unable to locate parent Submission:", post.link_id)
+						continue
+					submission = parents[0]
+					p = RedditElement(post, ext_submission_obj=submission)
 					if self.check_filters(p):
 						yield p
 
