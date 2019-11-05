@@ -76,7 +76,6 @@ class DownloaderProgress(Progress):
 		self._ns['handler'] = None
 		self._ns['running'] = running
 		self._ns['file_name'] = None
-		self._ns['error'] = None
 
 
 class LoaderProgress(Progress):

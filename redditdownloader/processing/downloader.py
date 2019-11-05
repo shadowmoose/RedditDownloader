@@ -82,6 +82,7 @@ class Downloader(multiprocessing.Process):
 				))
 				print(ex)
 				traceback.print_exc()
+				self.progress.set_error("Exited with error: {%s}" % failed)
 				break
 
 		sql.close()

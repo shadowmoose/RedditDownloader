@@ -98,16 +98,19 @@ class Home extends React.Component {
 			let loading = progress.loader.scanning;
 			let dedupe_status = (progress.deduplication.running? progress.deduplication.status: "Off");
 			let threads = progress.downloaders.map((thread, idx)=>{
+				let color = thread.running? 'green':'orange';
+				if (thread.error) {
+					color = 'red';
+				}
 				return <details className={'progressThread '+ (thread.running? 'active':'inactive')} key={idx} open='open'>
-					<summary className={thread.running? 'green':'orange'}>Downloader {idx+1}</summary>
+					<summary className={color}>Downloader {idx+1}</summary>
 					<div className='description'>
 						<div><b>File: </b>{thread.file_name}</div>
 						<div><b>Handler: </b>{thread.handler}</div>
-						<div><b>Status: </b>{thread.status}</div>
+						<div><b>Status: </b>{thread.error || thread.status}</div>
 						{thread.percent ?<div><b>Percent Done: </b>{thread.percent}%</div> : <div/>}
 					</div>
 				</details>
-
 			});
 			if (progress.deduplication.error) {
 				dedupe_status = `Disabled by Error: {${progress.deduplication.error}}`
