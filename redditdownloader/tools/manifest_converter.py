@@ -277,6 +277,8 @@ class Converter:
 			sql_url.last_handler = 'legacy-importer'
 			if not has_file:
 				sql_url.failure_reason = 'Unable to convert from legacy.'
+			else:
+				sql_url.failure_reason = None
 			self.session.add(sql_url)
 			post.urls.append(sql_url)
 			file = self.create_url_file(sql_url=sql_url, sql_post=post, album_size=len(files), downloaded=has_file)
