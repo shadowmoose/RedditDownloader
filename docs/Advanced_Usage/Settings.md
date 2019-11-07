@@ -96,7 +96,7 @@ All arguments are optional:
 
 **--category.setting** -  See [Changing Settings](#changing-settings) for usage.
 
-**list_settings** - Print a list of all Settings, their descriptions, and their default values. Exits after printing.
+**--list_settings** - Print a list of all Settings, their descriptions, and their default values. Exits after printing.
 
 **--source, -s** - Regex pattern. If specified, only sources - loaded from the settings file - with aliases matching a supplied pattern 
 will be checked. This argument can be passed multiple times, to specify multiple patterns. 
