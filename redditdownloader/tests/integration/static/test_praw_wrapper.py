@@ -64,3 +64,7 @@ class PrawWrapperTest(EnvironmentTest):
 		""" Findina a Submission's comments should work """
 		posts = list(pw.get_submission_comments('t3_79pp8r'))
 		self.assertGreater(len(posts), 0, msg="Failed to load child comments from Submission!")
+
+	def test_get_current_username(self):
+		""" Getting the signed-in user should work """
+		self.assertTrue(pw.get_current_username(), msg="Failed to load the active username!")

@@ -104,6 +104,8 @@ will be checked. This argument can be passed multiple times, to specify multiple
 
 **--version, -v** - Print the current RMD version, then exit.
 
+**--authorize, -a** - Manually use the in-console authentication method to grant RMD access to Reddit.
+
 **--limit** - See [Direct Downloading](#direct-downloading) for this usage.
 
 ---

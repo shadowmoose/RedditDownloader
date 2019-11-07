@@ -150,7 +150,8 @@ def api_get_oauth_url():
 	url = False
 	message = ''
 	if settings.get('interface.port') != port:
-		message = 'The UI is not using the default port (%s), and cannot use the premade App to authenticate!' % port
+		message = 'The UI is not using the default port (%s), and cannot use the Web App to authenticate! ' \
+				  'Run RMD with "--authorize" to manually authenticate!' % port
 	else:
 		url = praw_wrapper.get_reddit_token_url()
 	return {
@@ -299,6 +300,15 @@ def get_failed():
 		.filter(sql.URL.failed == True)\
 		.all()
 	return sql.encode_safe(fails)
+
+
+@eel.expose
+def get_authed_user():
+	# noinspection PyBroadException
+	try:
+		return praw_wrapper.get_current_username()
+	except Exception as ex:
+		return None
 
 
 def sleep(sec):

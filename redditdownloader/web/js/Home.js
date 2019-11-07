@@ -2,6 +2,7 @@ class Home extends React.Component {
 	constructor(props){
 		super(props);
 		this.state = {version: '', progress: null, failed: null};
+		this._openFailed = this.open_failed_urls.bind(this);
 	}
 
 	componentDidMount(){
@@ -88,7 +89,7 @@ class Home extends React.Component {
 				<div className={'blue'}>
 					<b>Files Downloaded: </b>{summ.total_files_dl}
 				</div>
-				<div className={[summ.total_urls_failed > 0 ? 'red': 'orange', 'clickable', 'hover_shadow'].join(' ')} onClick={this.open_failed_urls.bind(this)}>
+				<div className={[summ.total_urls_failed > 0 ? 'red': 'orange', 'clickable', 'hover_shadow'].join(' ')} onClick={this._openFailed}>
 					<b>Failed URLs: </b>{summ.total_urls_failed} ({summ.total_urls} total)
 				</div>
 			</details>

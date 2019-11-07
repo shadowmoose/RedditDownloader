@@ -97,7 +97,7 @@ class SettingsGroup extends React.Component {
 			<SettingsField key={field.name} obj={field} change={this.props.change}/>
 		);
 		if(list.length === 0){
-			return (null); // Render nothing if this group is empty.
+			return null; // Render nothing if this group is empty.
 		}
 		return <form className={"settings_group"}>
 			<details open='open'>
@@ -114,7 +114,16 @@ class SettingsGroup extends React.Component {
 class SettingsField extends React.Component {
 	constructor(props) {
 		super(props);
-		//console.log(this.obj)
+		this.state = {username: null, ...this.state};
+	}
+
+	componentDidMount() {
+		if(this.ele_id() === 'auth.refresh_token') {
+			eel.get_authed_user()(username => {
+				console.log('Got authed username:', username);
+				this.setState({username})
+			})
+		}
 	}
 
 	ele_id(){
@@ -152,28 +161,23 @@ class SettingsField extends React.Component {
 			let url = data['url'];
 			if(!url){
 				alertify.closeLogOnClick(true).delay(10000).error(data['message']);
-			}else {
+			} else {
 				win.location = url;
 				win.focus();
-				let popupTick = setInterval(function() {
-					if (!win || win.closed) {
-						clearInterval(popupTick);
-						console.log('window closed!');
-						alertify.confirm('Auth closed. Reload UI now?', (evt2)=> {
-							evt2.preventDefault();
-							location.reload(true);
-						});
-					}
-				}, 500);
+				alertify.confirm('Reload UI now?', (evt2)=> {
+					evt2.preventDefault();
+					location.reload();
+				});
 			}
 		})
 	}
 
 	render(){
 		let obj = this.props.obj;
-		if(this.ele_id() === 'auth.refresh_token'){
+		if(this.ele_id() === 'auth.refresh_token') {
+			const msg = this.state.username? `Switch Accounts: ${this.state.username}` : 'Change Authorized Account';
 			return <div className='settings_input_wrapper' title={obj.description.toString()}>
-				<a className={"center"} onClick={this.open_oauth.bind(this)}>{obj.value?"Change Authorized Account":"Authorize an account!"}</a>
+				<a className={"center"} onClick={this.open_oauth.bind(this)}>{obj.value? msg : "Authorize an account!"}</a>
 			</div>
 		}
 		return <div className='settings_input_wrapper' title={obj.description.toString()}>

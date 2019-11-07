@@ -25,6 +25,7 @@ parser.add_argument("--source", '-s',
 parser.add_argument("--category.setting", help="Override the given setting(s).", action="store_true")
 parser.add_argument("--list_settings", help="Display a list of overridable settings.", action="store_true")
 parser.add_argument("--version", '-v', help="Print the current version and exit.", action="store_true")
+parser.add_argument("--authorize", '-a', help="Authorize RMD with Reddit oAuth.", action="store_true")
 parser.add_argument("--run_tests", help="Run the given test directory, or * for all.", type=str, metavar='', default="")
 parser.add_argument("--limit", help="For direct downloading of user/subreddit, set the limit here.", type=int, default=1000)
 args, unknown_args = parser.parse_known_args()
@@ -87,28 +88,58 @@ def run():
 					matched_sources.add(stt)
 		direct_sources.extend(matched_sources)
 
-	if not ffmpeg_download.install_local():
-		print("RMD was unable to locate (or download) a working FFmpeg binary.")
-		print("For downloading and post-processing, this is a required tool.")
-		print("Please Install FFmpeg manually, or download it from here: https://rmd.page.link/ffmpeg")
-		sys.exit(15)
+	first_time_auth = False
 
-	if not _loaded and not direct_sources:
-		# First-time configuration.
+	if not _loaded and not direct_sources:  # First-time configuration.
 		su.error('Could not find an existing settings file. A new one will be generated!')
 		if not console.confirm('Would you like to start the WebUI to help set things up?', True):
 			su.print_color('red', "If you don't open the webUI now, you'll need to edit the settings file yourself.")
 			if console.confirm("Are you sure you'd like to edit settings without the UI (if 'yes', these prompts will not show again)?"):
-				settings.put('interface.start_server', False)  # Creates a save.
+				settings.put('interface.start_server', False, save_after=True)  # Creates a save.
 				print('A settings file has been created for you, at "%s". Please customize it.' % settings_file)
+				first_time_auth = True
 			else:
 				print('Please re-run RMD to configure again.')
-			sys.exit(1)
+				sys.exit(1)
 		else:
 			mode = console.prompt_list('How would you like to open the UI?',
 									   settings.get('interface.browser', full_obj=True).opts)
 			settings.put('interface.browser', mode, save_after=False)
 			settings.put('interface.start_server', True)
+
+	if args.authorize or first_time_auth:  # In-console oAuth authentication flow
+		from static import praw_wrapper
+		from urllib.parse import urlparse, parse_qs
+		url = praw_wrapper.get_reddit_token_url()
+		su.print_color('green', '\nTo manually authorize your account, visit the below URL.')
+		su.print_color('yellow', 'Once there, authorize RMD, then copy the URL it redirects you to.')
+		su.print_color('yellow', 'NOTE: The redirect page will likely not load, and that is ok.')
+		su.print_color('cyan', '\n%s\n' % url)
+		token_url = console.col_input('Paste the URL you are redirected to here: ')
+		if token_url.strip():
+			qs = parse_qs(urlparse(token_url).query)
+			if 'state' not in qs or 'code' not in qs:
+				su.error('The url provided was not a valid reddit redirect. Please make sure you copied it right!')
+			elif qs['state'][0].strip() != settings.get('auth.oauth_key').strip():
+				su.error('Invalid reddit redirect state. Please restart and try again.')
+			else:
+				code = qs['code'][0]
+				su.print_color('green', 'Got code. Authorizing account...')
+				refresh = praw_wrapper.get_refresh_token(code)
+				if refresh:
+					usr = praw_wrapper.get_current_username()
+					settings.put('auth.refresh_token', refresh)
+					su.print_color('cyan', 'Authorized to view account: %s' % usr)
+					su.print_color('green', 'Saved authorization token! Please restart RMD to begin downloading!')
+				else:
+					su.error('Failed to gain an account access token from Reddit with that code. Please try again.')
+		sys.exit(0)
+
+	if not ffmpeg_download.install_local():
+		print("RMD was unable to locate (or download) a working FFmpeg binary.")
+		print("For downloading and post-processing, this is a required tool.")
+		print("Please Install FFmpeg manually, or download it from here: https://rmd.page.link/ffmpeg")
+		sys.exit(15)
 
 	# Initialize Database
 	sql.init_from_settings()

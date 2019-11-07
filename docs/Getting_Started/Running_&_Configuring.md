@@ -23,6 +23,8 @@ I suggest using the defaults, which will open a "WebUI" user interface to make c
 
 Once the WebUI has started, you'll want to authorize RMD to read from Reddit on your behalf.
 
+*If you do not wish to (or cannot) use the WebUI, run RMD with the ```--authorize``` flag, to enable in-console authentication.*
+
 ## Authorizing RMD
 Allowing RMD read-only access to Reddit is very simple from the Web Interface.
 Simply navigate to the __"Settings"__ tab, and click the link under the "Auth" section.

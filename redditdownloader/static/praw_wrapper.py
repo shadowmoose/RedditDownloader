@@ -89,6 +89,11 @@ def time_filters():
 
 
 @check_login
+def get_current_username():
+	return _user.name
+
+
+@check_login
 def my_liked_saved():
 	""" Get the upvoted/saved posts & comments for the signed-in user. """
 	if not _user:

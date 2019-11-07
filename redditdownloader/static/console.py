@@ -4,7 +4,7 @@
 import static.stringutil as stringutil
 
 
-def col_input(prompt, color=stringutil.Fore.LIGHTYELLOW_EX):
+def col_input(prompt, color='yellow'):
 	""" Prints a colorized input prompt. """
 	stringutil.print_color(color, prompt, end='')
 	return input()
