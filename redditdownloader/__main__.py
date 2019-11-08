@@ -127,8 +127,8 @@ def run():
 				su.print_color('green', 'Got code. Authorizing account...')
 				refresh = praw_wrapper.get_refresh_token(code)
 				if refresh:
-					usr = praw_wrapper.get_current_username()
 					settings.put('auth.refresh_token', refresh)
+					usr = praw_wrapper.get_current_username()
 					su.print_color('cyan', 'Authorized to view account: %s' % usr)
 					su.print_color('green', 'Saved authorization token! Please restart RMD to begin downloading!')
 				else:
