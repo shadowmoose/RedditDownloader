@@ -12,13 +12,14 @@ from sqlalchemy.orm import joinedload
 
 
 class Deduplicator(multiprocessing.Process):
-	def __init__(self, settings_json, stop_event):
+	def __init__(self, settings_json, stop_event, db_lock):
 		"""
 		Create a Hasher Process, which will be bound to the stop_event, performing post-processing on downloaded Files.
 		"""
 		super().__init__()
 		self._settings = settings_json
 		self._stop_event = stop_event
+		self._lock = db_lock
 		self.progress = DownloaderProgress()
 		self.progress.clear(status="Starting up...")
 		self._session = None
@@ -69,14 +70,15 @@ class Deduplicator(multiprocessing.Process):
 			new_hash = FileHasher.get_best_hash(path.absolute())
 			# print('New hash for File:', f.id, '::', new_hash)
 			matches = [] if is_album else self._find_matching_files(new_hash, ignore_id=f.id)
-			f.hash = new_hash
-			if len(matches):
-				print("Found duplicate files: ", new_hash, "::", [(m.id, m.path) for m in matches])
-				best, others = self._choose_best_file(matches + [f])
-				print('Chose best File:', best.id)
-				for o in others:
-					self._upgrade_file(new_file=best, old_file=o)
-			self._session.commit()
+			with self._lock:
+				f.hash = new_hash
+				if len(matches):
+					print("Found duplicate files: ", new_hash, "::", [(m.id, m.path) for m in matches])
+					best, others = self._choose_best_file(matches + [f])
+					print('Chose best File:', best.id)
+					for o in others:
+						self._upgrade_file(new_file=best, old_file=o)
+				self._session.commit()
 		self._prune()
 
 	def _find_matching_files(self, search_hash, ignore_id):
@@ -113,10 +115,11 @@ class Deduplicator(multiprocessing.Process):
 			file.delete_file()
 
 	def _prune(self):
-		orphans = self._session.query(File).filter(~File.urls.any()).delete(synchronize_session='fetch')
-		self._session.commit()
-		if orphans:
-			print("Deleted orphan Files:", orphans)
+		with self._lock:
+			orphans = self._session.query(File).filter(~File.urls.any()).delete(synchronize_session='fetch')
+			self._session.commit()
+			if orphans:
+				print("Deleted orphan Files:", orphans)
 
 
 class FileHasher:

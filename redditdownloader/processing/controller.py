@@ -7,6 +7,7 @@ from processing.redditloader import RedditLoader
 from processing.downloader import Downloader
 from processing.post_processing import Deduplicator
 from processing.wrappers import ProgressManifest
+from multiprocessing import RLock
 
 
 class RMDController(threading.Thread):
@@ -15,9 +16,14 @@ class RMDController(threading.Thread):
 		self.daemon = False
 		self.sources = source_patterns
 		self.sources = self.load_sources()
+		self.db_lock = RLock()
 		# initialize Loader
-		self.loader = RedditLoader(sources=self.sources, settings_json=settings.to_json())
-		self.deduplicator = Deduplicator(settings_json=settings.to_json(), stop_event=self.loader.get_stop_event())
+		self.loader = RedditLoader(sources=self.sources, settings_json=settings.to_json(), db_lock=self.db_lock)
+		self.deduplicator = Deduplicator(
+			settings_json=settings.to_json(),
+			stop_event=self.loader.get_stop_event(),
+			db_lock=self.db_lock
+		)
 		self._downloaders = self._create_downloaders()
 		self._all_processes = [self.loader, *self._downloaders]
 		if settings.get('processing.deduplicate_files'):
@@ -61,7 +67,8 @@ class RMDController(threading.Thread):
 			tp = Downloader(
 				reader=self.loader.get_reader(),
 				ack_queue=self.loader.get_ack_queue(),
-				settings_json=settings.to_json()
+				settings_json=settings.to_json(),
+				db_lock = self.db_lock
 			)
 			dls.append(tp)
 		return dls

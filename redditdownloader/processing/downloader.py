@@ -8,7 +8,7 @@ import traceback
 
 
 class Downloader(multiprocessing.Process):
-	def __init__(self, reader, ack_queue, settings_json):
+	def __init__(self, reader, ack_queue, settings_json, db_lock):
 		"""
 		Create a Downloader Process, which will be bound to the queue given, listening for URLs to download.
 		"""
@@ -17,6 +17,7 @@ class Downloader(multiprocessing.Process):
 		self._settings = settings_json
 		self.progress = DownloaderProgress()
 		self._session = None
+		self._db_lock = db_lock
 		self._ack_queue = ack_queue
 		self.daemon = True
 
@@ -46,26 +47,27 @@ class Downloader(multiprocessing.Process):
 
 				is_album_parent = False
 
-				if resp.album_urls:
-					if url.album_id:
-						resp.album_urls = []  # Ignore nested Albums to avoid recursion.
+				with self._db_lock:
+					if resp.album_urls:
+						if url.album_id:
+							resp.album_urls = []  # Ignore nested Albums to avoid recursion.
+						else:
+							url.album_id = str(uuid.uuid4())
+							is_album_parent = True
 					else:
-						url.album_id = str(uuid.uuid4())
-						is_album_parent = True
-				else:
-					resp.album_urls = []
+						resp.album_urls = []
 
-				url.failed = not resp.success
-				url.failure_reason = resp.failure_reason
-				url.last_handler = resp.handler
-				url.album_is_parent = is_album_parent
+					url.failed = not resp.success
+					url.failure_reason = resp.failure_reason
+					url.last_handler = resp.handler
+					url.album_is_parent = is_album_parent
 
-				if resp.rel_file:
-					file.downloaded = True
-					file.path = resp.rel_file.relative()
-					file.hash = None
+					if resp.rel_file:
+						file.downloaded = True
+						file.path = resp.rel_file.relative()
+						file.hash = None
 
-				self._session.commit()
+					self._session.commit()
 
 				# Once *all* processing is completed on this URL, the Downloader needs to ACK it.
 				# If any additional Album URLS were located, they should be sent before the ACK.
