@@ -9,7 +9,7 @@ and gone the next. Websites take down or move their images and videos, posts get
 content is lost. Even more so on Reddit, where accounts are constantly springing into existence -
 and then vanishing as quickly without a trace. How's anybody supposed to keep their cherished cat picture 
 collection around with all this change? Well fear not, my data-hoarding friend,
-because Reddit Media Downloader is here for you!
+because Reddit Media Downloader is here for you!!
 
 ![RMD Preview Image](https://thumbs.gfycat.com/UniqueBigFinnishspitz-size_restricted.gif)
 
