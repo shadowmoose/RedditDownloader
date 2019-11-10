@@ -46,7 +46,7 @@ class NameGeneratorTest(EnvironmentTest):
 		settings.put('output.file_name_pattern', '[type]-[reddit_id]-[title]-[author]-[subreddit]-[source_alias]-[created_utc]-[created_date]-[created_time]')
 		tp = self.sess.query(sql.Post).filter(sql.Post.title == 'test').first()
 		file = ng.choose_file_name(tp.urls[0], tp, sql.session(), album_size=1)
-		self.assertEqual('Submission-t3_b1rycu-test-testuser-aww-newsource-1552739416-2019-03-16-05.30.16', file, msg='Failed to convert basic Test post!')
+		self.assertRegex(file, r'Submission-t3_b1rycu-test-testuser-aww-newsource-1552739416-2019-..-..-..\...\...', msg='Failed to convert basic Test post!')
 
 	def test_pattern_fail_load(self):
 		""" Invalid patterns should fail """
