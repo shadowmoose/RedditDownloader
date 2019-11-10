@@ -75,7 +75,7 @@ Anywhere File Patterns are used, they allow for data insertion based off the Pos
 
 To insert them, include *'[tag_name]'* in the path. EG: *'/custom/[subreddit]/[author]/'*
 
-**Available tags:** ```type``` *(will be 'Post'/'Comment')*, ```id```, ```title```, ```author```, ```subreddit```, ```source_alias```
+**Available tags:** ```type``` *(will be 'Post'/'Comment')*, ```reddit_id```, ```title```, ```author```, ```subreddit```, ```source_alias```, ```created_utc```
 
 For example, you could tell RMD to output Posts to subdirectories based off Username by setting the pattern to 
 something like `/[author]/[type]/[subreddit]/[title]`.
