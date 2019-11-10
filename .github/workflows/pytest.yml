@@ -27,7 +27,7 @@ jobs:
 
       - name: Get Python Package Location
         run: |
-          echo "::set-output name=path::$(python -c 'import site; print(site.getusersitepackages().replace(chr(92), chr(47)))')"
+          echo "::set-output name=path::$(python -c 'import site; print(site.getusersitepackages())')"
         id: get_location
 
       - name: Activate Cache
