@@ -52,6 +52,7 @@ class YTDLWrapper:
 			'outtmpl': tmp_file + '.%(ext)s',  # single_file only needs the extension.
 			'http_headers': {'User-Agent': settings.get('auth.user_agent')},
 			'socket_timeout': 10,
+			'format': 'bestvideo+bestaudio/best',
 			'ffmpeg_location': ffmpeg_download.install_local()
 		}
 		failed = False

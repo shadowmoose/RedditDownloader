@@ -2,11 +2,11 @@ from tests.mock import StagedTest, mock_handler_request
 from processing.handlers import tumblr
 
 
-class ImgurHandlerTest(StagedTest):
+class TumblrHandlerTest(StagedTest):
 	""" Test the Tumblr Handler's downloading capabilities """
 
 	def test_gallery(self):
-		""" Attempt Imgur gallery Download """
+		""" Attempt Tumblr gallery Download """
 		_task, _prog, _file = mock_handler_request(self.dir, 'https://theshadowmoose.tumblr.com/post/184562233420/test-rmd-image-upload')
 		res = tumblr.handle(_task, _prog)
 		self.assertTrue(res, "Tumblr gallery search failed! %s" % res.failure_reason)

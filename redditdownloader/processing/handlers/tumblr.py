@@ -2,7 +2,6 @@ import re
 import html
 from collections import OrderedDict
 from lxml import html as lxhtml, etree
-import sys
 from processing.handlers import HandlerResponse
 from processing.wrappers import http_downloader
 
@@ -61,6 +60,7 @@ def handle(task, progress):
 		return False
 	gr = m.groups()
 	progress.set_status("Parsing Tumblr page...")
+	# noinspection PyBroadException
 	try:
 		urls = get_media_urls(gr[0], gr[1])
 		if not urls:
@@ -69,7 +69,7 @@ def handle(task, progress):
 			return HandlerResponse(success=True, handler=tag, album_urls=urls)
 		return http_downloader.download_binary(urls[0], task.file, progress, tag)
 	except Exception as ex:
-		print('Tumblr: ERROR:', ex, task.url, file=sys.stderr, flush=True)
+		# print('Tumblr: ERROR:', ex, task.url, file=sys.stderr, flush=True)
 		return False
 
 

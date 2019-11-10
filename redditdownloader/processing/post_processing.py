@@ -71,9 +71,9 @@ class Deduplicator(multiprocessing.Process):
 			matches = [] if is_album else self._find_matching_files(new_hash, ignore_id=f.id)
 			f.hash = new_hash
 			if len(matches):
-				print("Found duplicate files: ", new_hash, "::", [(m.id, m.path) for m in matches])
+				# print("Found duplicate files: ", new_hash, "::", [(m.id, m.path) for m in matches])
 				best, others = self._choose_best_file(matches + [f])
-				print('Chose best File:', best.id)
+				# print('Chose best File:', best.id)
 				for o in others:
 					self._upgrade_file(new_file=best, old_file=o)
 			self._session.commit()
@@ -104,7 +104,7 @@ class Deduplicator(multiprocessing.Process):
 		return files[0], files[1:]
 
 	def _upgrade_file(self, new_file, old_file):
-		print('Upgrading old file:', old_file.id, old_file.path, ' -> ', new_file.id, new_file.path)
+		# print('Upgrading old file:', old_file.id, old_file.path, ' -> ', new_file.id, new_file.path)
 		self._session.query(URL). \
 			filter(URL.file_id == old_file.id). \
 			update({URL.file_id: new_file.id})
