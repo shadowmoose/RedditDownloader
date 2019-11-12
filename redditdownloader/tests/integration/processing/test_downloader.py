@@ -29,7 +29,7 @@ class DownloaderTest(EnvironmentTest):
 		in_queue = multiprocessing.Queue()
 		ack_queue = multiprocessing.Queue()
 		reader = QueueReader(in_queue, stop_event)
-		dl = downloader.Downloader(reader, ack_queue, settings.to_json())
+		dl = downloader.Downloader(reader, ack_queue, settings.to_json(), multiprocessing.RLock())
 		stats = {'ack': 0, 'sent': 0}
 
 		def add_test(inf):

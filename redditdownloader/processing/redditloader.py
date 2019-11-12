@@ -1,6 +1,5 @@
 import multiprocessing
 import queue
-from static import stringutil
 from static import settings
 from processing import name_generator
 from processing.wrappers import QueueReader, LoaderProgress
@@ -8,7 +7,7 @@ import sql
 
 
 class RedditLoader(multiprocessing.Process):
-	def __init__(self, sources, settings_json):
+	def __init__(self, sources, settings_json, db_lock):
 		""" This is a daemon Loader class, which facilitates loading from multiple Sources
 		 	and safely submitting their Posts to an internal queue.
 		"""
@@ -21,6 +20,7 @@ class RedditLoader(multiprocessing.Process):
 		self._stop_event = multiprocessing.Event()  # This is a shared mp.Event, set when this reader should be done.
 		self._reader = QueueReader(input_queue=self._queue, stop_event=self._stop_event)
 		self._session = None
+		self._lock = db_lock
 		self.progress = LoaderProgress()
 		self.daemon = True
 		self.name = 'RedditElementLoader'
@@ -65,13 +65,15 @@ class RedditLoader(multiprocessing.Process):
 
 					# Create the SQL objects, then submit them to the queue.
 					post = self._session.query(sql.Post).filter(sql.Post.reddit_id == r.id).first()
-					if not post:
-						post = sql.Post.convert_element_to_post(r)
+					with self._lock:
+						if not post:
+							post = sql.Post.convert_element_to_post(r)
 
-					urls = self._create_element_urls(r, post)
-					for u in urls:
-						self._create_url_file(u, post=post)
-					self._session.add(post)
+						urls = self._create_element_urls(r, post)
+						for u in urls:
+							self._create_url_file(u, post=post)
+						self._session.add(post)
+						self._session.commit()
 					self._push_url_list(urls)
 			except ConnectionError as ce:
 				print(str(ce).upper())
@@ -133,34 +135,22 @@ class RedditLoader(multiprocessing.Process):
 
 	def _push_url_list(self, url_list, handle_acks=True):
 		"""
-		Commits the session, then submits the list of URLs to the Download Queue.
+		Submits the list of URLs to the Download Queue.
 		:param url_list:
 		:param handle_acks:
 		:return:
 		"""
-		self._safe_commit()
 		for u in url_list:
-			self._push_url(u.id, handle_acks=handle_acks)
-
-	def _safe_commit(self):
-		""" Commit and catch any exceptions, usually raised if the session is not dirty. """
-		try:
-			self._session.commit()  # After commiting, the URL generated IDs will be filled in.
-		except Exception as e:
-			stringutil.error("RedditLoader: Error persisting session: %s" % e)
-			pass
-
-	def _push_url(self, url_id, handle_acks=True):
-		if handle_acks:
-			self._handle_acks()  # passively process some ACKS in a non-blocking way to prevent queue bloat.
-		self.progress.increment_found()
-		while not self._stop_event.is_set():
-			try:  # Keep trying to add this element to the queue, with a timeout to catch any stop triggers.
-				self._queue.put(url_id, timeout=1)
-				self._open_ack.add(url_id)  # Replace after testing.
-				break
-			except queue.Full:
-				pass
+			if handle_acks:
+				self._handle_acks()  # passively process some ACKS in a non-blocking way to prevent queue bloat.
+			self.progress.increment_found()
+			while not self._stop_event.is_set():
+				try:  # Keep trying to add this element to the queue, with a timeout to catch any stop triggers.
+					self._queue.put(u.id, timeout=1)
+					self._open_ack.add(u.id)  # Replace after testing.
+					break
+				except queue.Full:
+					pass
 
 	def _handle_acks(self, timeout=0):
 		"""
@@ -172,14 +162,17 @@ class RedditLoader(multiprocessing.Process):
 			packet = self._ack_queue.get(block=True, timeout=timeout)
 			url = self._session.query(sql.URL).filter(sql.URL.id == packet.url_id).first()
 			if packet.extra_urls:
-				urls = self._create_album_urls(packet.extra_urls, url.post, url.album_id)
-				for u in urls:
-					self._create_url_file(u, post=url.post, album_size=len(urls))
-				url.processed = True  # When the new URLs are committed, also prevent this URL from being reprocessed.
+				with self._lock:
+					urls = self._create_album_urls(packet.extra_urls, url.post, url.album_id)
+					for u in urls:
+						self._create_url_file(u, post=url.post, album_size=len(urls))
+					url.processed = True  # When the new URLs are committed, also prevent this URL from being reprocessed.
+					self._session.commit()
 				self._push_url_list(urls, handle_acks=False)
 			else:
-				url.processed = True
-				self._safe_commit()
+				with self._lock:
+					url.processed = True
+					self._session.commit()
 			self._open_ack.remove(packet.url_id)
 		except queue.Empty:
 			pass
