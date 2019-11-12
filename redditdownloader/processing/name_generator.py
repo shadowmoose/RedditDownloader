@@ -2,6 +2,8 @@ import static.settings as settings
 from processing.wrappers.rel_file import SanitizedRelFile
 import pathvalidate
 from sql import File, URL
+from datetime import datetime
+import json
 
 
 _pattern_array = None
@@ -35,13 +37,16 @@ def _choose_base_name(post):
 	:return: The RelFile generated, with the path variables inserted and formatted.
 	"""
 	global _pattern_array
+	dct = json.loads(json.dumps(post.__dict__, default=lambda o: None))  # Deep copy, safely removing any handles/refs.
+	dct['created_date'] = datetime.fromtimestamp(dct['created_utc']).strftime('%Y-%m-%d')
+	dct['created_time'] = datetime.fromtimestamp(dct['created_utc']).strftime('%H.%M.%S')
 	if not _pattern_array:
 		file_pattern = './%s' % settings.get('output.file_name_pattern').strip('/\\ .')
-		_pattern_array = _parse_pattern(file_pattern, post.__dict__)
+		_pattern_array = _parse_pattern(file_pattern, dct)
 	max_len = 200
-	length = min(max_len, max(len(str(post.__dict__[k])) for k in post.__dict__.keys()))
+	length = min(max_len, max(len(str(dct[k])) for k in dct.keys()))
 	while max_len:
-		output = SanitizedRelFile(base=settings.get("output.base_dir"), file_path=_build_str(post.__dict__, length))
+		output = SanitizedRelFile(base=settings.get("output.base_dir"), file_path=_build_str(dct, length))
 		if len(output.absolute()) <= max_len:
 			return output
 		length -= 1

@@ -75,10 +75,23 @@ Anywhere File Patterns are used, they allow for data insertion based off the Pos
 
 To insert them, include *'[tag_name]'* in the path. EG: *'/custom/[subreddit]/[author]/'*
 
-**Available tags:** ```type``` *(will be 'Post'/'Comment')*, ```id```, ```title```, ```author```, ```subreddit```, ```source_alias```
+**Available tags:** 
+
++ ```type``` *(will be 'Post'/'Comment')*
++ ```reddit_id```
++ ```title```
++ ```author``` 
++ ```subreddit```
++ ```source_alias```
++ ```created_utc``` *(A numeric Unix Timestamp, eg: 1552739416)*
++ ```[created_date]``` *(Formatted as 'YYYY-MM-DD')*
++ ```[created_time]```*(Formatted as 'HH.MM.SS')*
 
 For example, you could tell RMD to output Posts to subdirectories based off Username by setting the pattern to 
-something like `/[author]/[type]/[subreddit]/[title]`.
+something like `/[author]/[type]/[subreddit]/[created_date] [created_time] - [title]`.
+
+The above pattern would generate a file path similar to 
+```/ShadowMoose/Submission/DataHoarder/2019-10-21 02.20.15 - Test Post.jpg``` for each file downloaded.
 
 ---
 
