@@ -4,17 +4,28 @@ The Sessions created are Thread-safe, but Thread-local in scope.
 Its objects should not be shared across Processes or Threads.
 """
 
+import json
+import traceback
+
 import sqlalchemy
+from alembic import command
+from alembic import script
+from alembic.config import Config
+from alembic.runtime import migration
+from sqlalchemy import or_
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, scoped_session
-from sqlalchemy import or_
+import os
+import shutil
+import tempfile
+import sys
 from processing.wrappers import SanitizedRelFile
 from static import settings
-import os
-import json
 
 Base = declarative_base()
 
+_sqlite_uri = None
+_db_path = None
 _engine = None
 _Session = None
 
@@ -26,18 +37,21 @@ def init(db_path=":memory:"):
 	:param db_path:
 	:return:
 	"""
-	global _engine, _Session
+	global _engine, _Session, _sqlite_uri, _db_path
 	if _Session and _engine:
 		return
+	_sqlite_uri = 'sqlite:///%s' % db_path
 	create_new = False
 	if db_path != ':memory:':
 		db_path = os.path.abspath(db_path)
 		create_new = not os.path.exists(db_path)
-	_engine = sqlalchemy.create_engine('sqlite:///%s' % db_path)  # , echo=True)
+	_db_path = db_path
+	_engine = sqlalchemy.create_engine(_sqlite_uri)  # , echo=True)
 	session_factory = sessionmaker(bind=_engine)
 	_Session = scoped_session(session_factory)
 	if create_new:
 		_create()
+	_run_migrations(session())
 
 
 def init_from_settings():
@@ -49,9 +63,16 @@ def init_from_settings():
 
 def _create():
 	Base.metadata.create_all(_engine)
+	input('Built 1:')
 	print("\tCreated Database file.")
-	session().execute("PRAGMA journal_mode=WAL")
+	sess = session()
+	sess.execute("PRAGMA journal_mode=WAL")
+	sess.commit()
 	print("\t+Activated WAL Mode.")
+	input('Built:')
+	alembic_cfg, _, _ = get_alembic_ctx(sess)
+	command.stamp(config=alembic_cfg, revision='head')  # Tell Alembic we are on the latest version, having just built.
+	sess.commit()
 
 
 def session():
@@ -69,8 +90,62 @@ def close():
 	_Session.close()
 
 
+class make_backup(object):
+	""" Context handler, creates backup file that is deleted on close, or reverted on Exception. """
+	def __init__(self, original_path):
+		self.original_path = original_path
+
+	def __enter__(self):
+		temp_dir = tempfile.gettempdir()
+		base_path = os.path.basename(self.original_path)
+		self.bkup_path = os.path.join(temp_dir, base_path)
+		shutil.copy2(self.original_path, self.bkup_path)
+		return self.bkup_path
+
+	def __exit__(self, exc_type, exc_val, exc_tb):
+		try:
+			if any([exc_type, exc_tb, exc_val]):
+				print(exc_val)
+				shutil.copy(self.bkup_path, self.original_path)
+				print('Rolled back file:', self.original_path, '  From:', self.bkup_path)
+				os.remove(self.bkup_path)
+				sys.exit(45)
+			os.remove(self.bkup_path)
+		except Exception as err:
+			print(err)
+
+
+def get_alembic_ctx(conn):
+	""" Gets a full suite of Alembic objects, pre-initialized with all relevant details. """
+	conf = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../alembic.ini'))
+	alem_conf_loc = os.path.abspath(os.path.join(os.path.dirname(__file__), './alembic_files/'))
+	alembic_cfg = Config(conf)
+	connection = conn.connection()
+	alembic_cfg.attributes['connection'] = connection
+	alembic_cfg.set_main_option('script_location', alem_conf_loc)
+	scr = script.ScriptDirectory.from_config(alembic_cfg)
+	context = migration.MigrationContext.configure(alembic_cfg.attributes['connection'])
+	return alembic_cfg, scr, context
+
+
+def _run_migrations(conn) -> None:
+	alembic_cfg, script_, context = get_alembic_ctx(conn)
+	if context.get_current_revision() != script_.get_current_head():
+		print('Database is not up to date! %s -> %s' % (context.get_current_revision(), script_.get_current_head()))
+		with make_backup(_db_path):
+			# noinspection PyBroadException
+			try:
+				command.upgrade(alembic_cfg, 'head')
+				conn.commit()
+			except Exception:
+				traceback.print_exc()
+				conn.rollback()
+				conn.close()
+				raise Exception('Failed to upgrade database!')
+
+
 # Import ORM classes at bottom so they can access this package safely.
-from sql.file import File
+from sql.file import File, Hash
 from sql.post import Post
 from sql.url import URL
 
