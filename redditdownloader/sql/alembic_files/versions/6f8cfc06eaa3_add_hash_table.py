@@ -1,8 +1,8 @@
-"""Added hash model
+"""Add Hash table.
 
-Revision ID: 12701595f686
-Revises: 
-Create Date: 2019-11-13 21:48:45.249259
+Revision ID: 6f8cfc06eaa3
+Revises: f8035abd1974
+Create Date: 2019-11-13 23:51:51.341826
 
 """
 from alembic import op
@@ -10,8 +10,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '12701595f686'
-down_revision = None
+revision = '6f8cfc06eaa3'
+down_revision = 'patch_3_0_0'
 branch_labels = None
 depends_on = None
 

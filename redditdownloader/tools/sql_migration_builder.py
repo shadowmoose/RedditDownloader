@@ -14,12 +14,17 @@ from alembic import command
 from static import console
 from static import settings
 import static.filesystem as fs
+import shutil
+from datetime import datetime
 
 
 def make_migration():
 	conn = sql.session()
 	alembic_cfg, script_, context = sql.get_alembic_ctx(conn)
 	message = console.string('Enter a message for the migration')
+	if not message:
+		print('Skipping migration.')
+		return
 	res = command.revision(message=message, autogenerate=True, config=alembic_cfg)
 	print('Generated Migration:', res)
 	print('Finished.')
@@ -28,4 +33,8 @@ def make_migration():
 if __name__ == '__main__':
 	settings.load(fs.find_file('settings.json'))
 	sql.init_from_settings()
+	# noinspection PyProtectedMember
+	pth = sql._db_path
+	bkup = ('%s-bkup-%s.sqlite' % (pth, str(datetime.now()).replace(':', '.')))
+	shutil.copy2(pth, bkup)
 	make_migration()

@@ -14,10 +14,8 @@ from multiprocessing import RLock
 class RMDController(threading.Thread):
 	def __init__(self, source_patterns=None):
 		super().__init__()
-		sql.init_from_settings()
+		sql.init_from_settings()  # Make sure the database is built & migrated before starting threads.
 		sql.close()
-		print(sql._db_path)
-		input("Created DB & Paused:")
 		self.daemon = False
 		self.sources = source_patterns
 		self.sources = self.load_sources()

@@ -62,14 +62,10 @@ def init_from_settings():
 
 
 def _create():
-	Base.metadata.create_all(_engine)
-	print("\tCreated Database file.")
 	sess = session()
 	sess.execute("PRAGMA journal_mode=WAL")
 	sess.commit()
 	print("\t+Activated WAL Mode.")
-	alembic_cfg, _, _ = get_alembic_ctx(sess)
-	command.stamp(config=alembic_cfg, revision='head')  # Tell Alembic we are on the latest version, having just built.
 	sess.commit()
 
 
@@ -127,6 +123,7 @@ def get_alembic_ctx(conn):
 
 
 def _run_migrations(conn) -> None:
+	_check_legacy(conn)
 	alembic_cfg, script_, context = get_alembic_ctx(conn)
 	if context.get_current_revision() != script_.get_current_head():
 		print('Database is not up to date! %s -> %s' % (context.get_current_revision(), script_.get_current_head()))
@@ -140,6 +137,17 @@ def _run_migrations(conn) -> None:
 				conn.rollback()
 				conn.close()
 				raise Exception('Failed to upgrade database!')
+
+
+def _check_legacy(sess):
+	""" Check if there is a valid table structure, but it is unversioned. If so, apply default base 3.0.0 version. """
+	rs = sess.execute('SELECT name FROM sqlite_master WHERE type="table" AND name="posts";')
+	if rs.fetchone():
+		alembic_cfg, script_, context = get_alembic_ctx(sess)
+		if not context.get_current_revision():
+			print("+Versioning < 3.0.1 DB.")
+			command.stamp(config=alembic_cfg, revision='f8035abd1974')  # Stamp to 3.0.0 structure, which predates Alembic.
+			sess.commit()
 
 
 # Import ORM classes at bottom so they can access this package safely.
