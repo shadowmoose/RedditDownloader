@@ -63,13 +63,11 @@ def init_from_settings():
 
 def _create():
 	Base.metadata.create_all(_engine)
-	input('Built 1:')
 	print("\tCreated Database file.")
 	sess = session()
 	sess.execute("PRAGMA journal_mode=WAL")
 	sess.commit()
 	print("\t+Activated WAL Mode.")
-	input('Built:')
 	alembic_cfg, _, _ = get_alembic_ctx(sess)
 	command.stamp(config=alembic_cfg, revision='head')  # Tell Alembic we are on the latest version, having just built.
 	sess.commit()
