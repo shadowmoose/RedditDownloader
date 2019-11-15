@@ -34,8 +34,6 @@ if path.isfile('/proc/version'):
 dr = path.abspath(path.dirname(path.abspath(__file__)))
 sys.path.insert(0, path.join(dr, 'redditdownloader'))
 
-issues = set()
-
 
 def update_reqs():
 	print("Updating requirements. This may take a while on first-time installs..")
@@ -59,6 +57,8 @@ if __name__ == '__main__':
 		importlib.invalidate_caches()
 		import redditdownloader.__main__ as rmd
 		rmd.run()
+	except KeyboardInterrupt:
+		pass
 	except Exception:
 		traceback.print_exc()
 		print('\n\nCaught a fatal error running RMD. Cannot continue.')
