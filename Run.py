@@ -10,10 +10,10 @@
 """
 
 import os.path as path
-from subprocess import Popen, PIPE, STDOUT
 import traceback
 import sys
 import importlib
+import os
 
 print('Python %s on %s' % (sys.version, sys.platform))
 if sys.version_info < (3, 5):
@@ -40,16 +40,20 @@ issues = set()
 def update_reqs():
 	print("Updating requirements. This may take a while on first-time installs..")
 	try:
-		from pip import main as pipmain
-	except ImportError:
-		from pip._internal import main as pipmain
-	pipmain(['install', '--upgrade', '-r', 'requirements.txt'])
+		try:
+			from pip import main as pipmain
+		except ImportError:
+			from pip._internal import main as pipmain
+		pipmain(['install', '--upgrade', '-r', path.join(dr, 'requirements.txt')])
+		print('\n'*10)
+		os.system('cls' if os.name == 'nt' else 'clear')
+	except Exception as ex:
+		print(ex)
 
 
 if __name__ == '__main__':
 	if update_reqs():
 		print('Requirements up to date!')
-	print('\n'*10)
 	# noinspection PyBroadException
 	try:
 		importlib.invalidate_caches()
