@@ -39,39 +39,17 @@ issues = set()
 
 def update_reqs():
 	print("Updating requirements. This may take a while on first-time installs..")
-	p = Popen([
-		sys.executable,
-		"-m", "pip",
-		"install", "--upgrade",
-		"-r", "requirements.txt",
-		"--user",
-		"--no-warn-script-location"
-	], stdout=PIPE, stderr=STDOUT, shell=True, cwd=dr)
-
-	for line in p.stdout:
-		line = line.decode().rstrip()
-		if ' already ' in line:
-			continue
-		if 'Access is denied' in line:
-			issues.add('access')
-		print('    ', line)
-
-	cde = p.wait()
-	if cde != 0:
-		print('\n\n\nError: Unable to update all packages correctly! Cannot run RMD!', file=sys.stderr)
-		print('Please try manually updating, using "pip install -r requirements.txt".', file=sys.stderr)
-		if len(issues):
-			print('\nOther possible solutions:')
-			if 'access' in issues:
-				print('\t-Hit a permissions issue installing requirements. Try running this script as Administrator/Sudo.')
-		input("\n\n-Press [Enter] to try launching anyways-")
-		print('\n\n')
-	return cde == 0
+	try:
+		from pip import main as pipmain
+	except ImportError:
+		from pip._internal import main as pipmain
+	pipmain(['install', '--upgrade', '-r', 'requirements.txt'])
 
 
 if __name__ == '__main__':
 	if update_reqs():
 		print('Requirements up to date!')
+	print('\n'*10)
 	# noinspection PyBroadException
 	try:
 		importlib.invalidate_caches()
