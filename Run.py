@@ -15,22 +15,6 @@ import sys
 import importlib
 import os
 
-print('Python %s on %s' % (sys.version, sys.platform))
-if sys.version_info < (3, 5):
-	print('Error: RMD cannot run on a python version < 3.5. Please update your python installation, or run with "python3".')
-	input("-Press [Enter] to quit-")
-	sys.exit(1)
-
-if path.isfile('/proc/version'):
-	# Attempt to screen out WSL users, since it is currently (2019/10/21) known to be broken.
-	try:
-		with open('/proc/version', 'r') as o:
-			txt = o.read()
-			if 'microsoft' in txt.lower():
-				print('Warning: Running RMD through a Windows-Linux subsystem is not supported, and will likely fail.')
-				input("-Press [Enter] to continue anyways-")
-	except Exception as e:
-		print(e)
 dr = path.abspath(path.dirname(path.abspath(__file__)))
 sys.path.insert(0, path.join(dr, 'redditdownloader'))
 
@@ -50,6 +34,22 @@ def update_reqs():
 
 
 if __name__ == '__main__':
+	print('Python %s on %s' % (sys.version, sys.platform))
+	if sys.version_info < (3, 5):
+		print('Error: RMD cannot run on a python version < 3.5. Please update your python installation, or run with "python3".')
+		input("-Press [Enter] to quit-")
+		sys.exit(1)
+
+	if path.isfile('/proc/version'):
+		# Attempt to screen out WSL users, since it is currently (2019/10/21) known to be broken.
+		try:
+			with open('/proc/version', 'r') as o:
+				txt = o.read()
+				if 'microsoft' in txt.lower():
+					print('Warning: Running RMD through a Windows-Linux subsystem is not supported, and will likely fail.')
+					input("-Press [Enter] to continue anyways-")
+		except Exception as e:
+			print(e)
 	if update_reqs():
 		print('Requirements up to date!')
 	# noinspection PyBroadException

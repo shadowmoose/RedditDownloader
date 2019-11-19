@@ -20,7 +20,6 @@ class PushShiftSubmissionSource(source.Source):
 				_params['sort'] = 'desc'
 			else:
 				_params['sort'] = 'asc'
-			print(_params)
 			for post in ps.search_submissions(**_params):
 				p = RedditElement(post)
 				if self.check_filters(p):

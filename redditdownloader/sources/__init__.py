@@ -8,6 +8,7 @@ from sources.user_upvoted_saved_source import UserUpvotedSaved
 from sources.pushshift_subreddit import PushShiftSubmissionSource
 from sources.pushshift_user_posts import PushShiftUserSourceSource
 from sources.direct_input_source import DirectInputSource
+from sources.pushshift_search_source import PushShiftSearchSource
 
 
 def all_sources():
@@ -19,7 +20,8 @@ def all_sources():
 		UserPostsSource(),
 		UserUpvotedSaved(),
 		PushShiftSubmissionSource(),
-		PushShiftUserSourceSource()
+		PushShiftUserSourceSource(),
+		PushShiftSearchSource()
 	]
 
 
