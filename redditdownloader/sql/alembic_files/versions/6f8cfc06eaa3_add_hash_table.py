@@ -1,4 +1,4 @@
-"""Add Hash table.
+"""Add Hash table. Performs some manual migration to copy over existing File hash values.
 
 Revision ID: 6f8cfc06eaa3
 Revises: f8035abd1974
@@ -37,10 +37,19 @@ def upgrade():
         batch_op.create_index(batch_op.f('ix_hashes_p3'), ['p3'], unique=False)
         batch_op.create_index(batch_op.f('ix_hashes_p4'), ['p4'], unique=False)
 
+    conn = op.get_bind()
+    res = conn.execute("select hash, id from files WHERE hash is not NULL")
+    results = res.fetchall()
+
+    for idx, row in enumerate(results):
+        hsh = row[0]
+        fid = row[1]
+        vals = (idx+1, fid, hsh, *split_hash(hsh))
+        conn.execute('INSERT INTO hashes (id, file_id, full_hash, p1, p2, p3, p4) VALUES (?, ?, ?, ?, ?, ?, ?)', vals)
+
     with op.batch_alter_table('files', schema=None) as batch_op:
         batch_op.drop_index('ix_files_hash')
         batch_op.drop_column('hash')
-
     # ### end Alembic commands ###
 
 
@@ -60,3 +69,10 @@ def downgrade():
 
     op.drop_table('hashes')
     # ### end Alembic commands ###
+
+
+def split_hash(hash_string):
+    """ Split the given Hash string into sections, formatted to fit in the Hash table. """
+    if len(hash_string) != 16:
+        return [None, None, None, None]
+    return [hash_string[i:i + 4] for i in range(0, len(hash_string), 4)]
