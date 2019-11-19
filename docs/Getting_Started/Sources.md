@@ -60,3 +60,8 @@ the various sources.
 #### PushShift: User Submission & Comment History
 + Load Posts from a User's history, from the [PushShift](https://pushshift.io/) database.
 + This allows unlimited Posts to be found, and even (usually) includes Posts deleted from Reddit.
+
+#### PushShift: Search Submissions
++ Search the [PushShift](https://pushshift.io/) database for Submissions matching the specified term.
++ Supports an (optional) list of Subreddits, which can limit the search. If not provided, searches all of Reddit.
++ This allows unlimited Posts to be found, and even (usually) includes Posts deleted from Reddit.
