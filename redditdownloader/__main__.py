@@ -14,6 +14,7 @@ import sql
 from tools import ffmpeg_download
 import static.filesystem as fs
 import re
+import logging
 
 
 parser = argparse.ArgumentParser(
@@ -35,6 +36,7 @@ direct_sources = []
 
 
 def run():
+	logging.basicConfig(level=logging.WARN, format='%(levelname)-5.5s [%(name)s] %(message)s', datefmt='%H:%M:%S')
 	su.print_color('green', "\r\n" +
 		'====================================\r\n' +
 		('   Reddit Media Downloader %s\r\n' % meta.current_version) +

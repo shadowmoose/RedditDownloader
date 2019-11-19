@@ -1,10 +1,14 @@
 """
-	This is a tool to build Alembic SQLite Migration files.
+	This is a development tool to build Alembic SQLite Migration files.
 	It should not be useful for any end-user, and only exists to simplify generating database changes between releases.
 
+	Any migration deltas generated will be based off the current DB Model state at the time of execution.
+	The suggested method of updating to the "head" migration is to simply run RMD, and confirm the migration works.
+
 	To Use:
-		Assure that your database is at the "head" migration: `alembic -x dbPath=../path-to/sqlite.sqlite upgrade head`
-		Run this util, and enter a Migration name.
+		1. Assure that your database is at the "head" migration. RMD should do this autmatically, or run:
+		 	`alembic -x dbPath=../path-to/sqlite.sqlite upgrade head`
+		2. Run this util, and enter a Migration name.
 """
 import sys
 import os

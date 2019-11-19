@@ -17,7 +17,6 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, scoped_session
 import os
 import shutil
-import tempfile
 import sys
 from processing.wrappers import SanitizedRelFile
 from static import settings
@@ -90,9 +89,7 @@ class make_backup(object):
 		self.original_path = original_path
 
 	def __enter__(self):
-		temp_dir = tempfile.gettempdir()
-		base_path = os.path.basename(self.original_path)
-		self.bkup_path = os.path.join(temp_dir, base_path)
+		self.bkup_path = self.original_path + '-bkup.sqlite'
 		shutil.copy2(self.original_path, self.bkup_path)
 		return self.bkup_path
 
@@ -123,20 +120,23 @@ def get_alembic_ctx(conn):
 
 
 def _run_migrations(conn) -> None:
-	_check_legacy(conn)
-	alembic_cfg, script_, context = get_alembic_ctx(conn)
-	if context.get_current_revision() != script_.get_current_head():
-		print('Database is not up to date! %s -> %s' % (context.get_current_revision(), script_.get_current_head()))
-		with make_backup(_db_path):
-			# noinspection PyBroadException
-			try:
-				command.upgrade(alembic_cfg, 'head')
-				conn.commit()
-			except Exception:
-				traceback.print_exc()
-				conn.rollback()
-				conn.close()
-				raise Exception('Failed to upgrade database!')
+	try:
+		_check_legacy(conn)
+		alembic_cfg, script_, context = get_alembic_ctx(conn)
+		if context.get_current_revision() != script_.get_current_head():
+			print('Database is not up to date! %s < %s' % (context.get_current_revision(), script_.get_current_head()))
+			with make_backup(_db_path):
+				# noinspection PyBroadException
+				try:
+					command.upgrade(alembic_cfg, 'head')
+					print('\t+Upgraded manifest to version', context.get_current_revision())
+					conn.commit()
+				except Exception:
+					traceback.print_exc()
+					conn.rollback()
+					raise Exception('Failed to upgrade database!')
+	finally:
+		conn.close()
 
 
 def _check_legacy(sess):
@@ -145,7 +145,7 @@ def _check_legacy(sess):
 	if rs.fetchone():
 		alembic_cfg, script_, context = get_alembic_ctx(sess)
 		if not context.get_current_revision():
-			print("+Versioning < 3.0.1 DB.")
+			print("Versioning pre-alembic < 3.0.0 DB.")
 			command.stamp(config=alembic_cfg, revision='f8035abd1974')  # Stamp to 3.0.0 structure, which predates Alembic.
 			sess.commit()
 
