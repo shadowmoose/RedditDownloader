@@ -16,7 +16,7 @@ class File(sql.Base):
 		return '<File ID: %s, Path: "%s", Hash: "%s">' % (self.id, self.path, self.hash)
 
 
-class Hash(sql.Base):
+class Hash(sql.Base):  # TODO: Use this table.
 	__tablename__ = 'hashes'
 	id = Column(Integer, primary_key=True)
 	file_id = Column(String, ForeignKey('files.id'), index=True)

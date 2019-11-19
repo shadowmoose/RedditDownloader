@@ -1,4 +1,4 @@
-from logging.config import fileConfig
+from logging import basicConfig, INFO
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
@@ -22,7 +22,8 @@ config = context.config
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
-fileConfig(config.config_file_name)
+# fileConfig(config.config_file_name)
+basicConfig(level=INFO, format='%(levelname)-5.5s [%(name)s] %(message)s', datefmt='%H:%M:%S')
 
 # add your model's MetaData object here
 # for 'autogenerate' support
