@@ -5,6 +5,8 @@ from processing.wrappers import SanitizedRelFile, AckPacket, DownloaderProgress
 from processing import handlers
 import uuid
 import traceback
+from os import utime
+from time import time
 
 
 class Downloader(multiprocessing.Process):
@@ -66,6 +68,7 @@ class Downloader(multiprocessing.Process):
 						file.downloaded = True
 						file.path = resp.rel_file.relative()
 						file.hash = None
+						utime(resp.rel_file.absolute(), times=(time(), time()))
 
 					self._session.commit()
 
