@@ -37,6 +37,8 @@ class RedditLoader(multiprocessing.Process):
 		sql.init_from_settings()
 		self._session = sql.session()
 
+		self.progress.set_scanning(True)
+
 		# Query for all unhandled URLs, and submit them before scanning for new Posts.
 		unfinished = self._session\
 			.query(sql.URL)\

@@ -5,7 +5,7 @@ from PIL import Image
 import sql
 from static import settings
 from processing.wrappers import SanitizedRelFile, DownloaderProgress
-from sql import File, URL
+from sql import File, URL, Hash
 from sqlalchemy.orm import joinedload
 
 # TODO: Once the stop_event is set, use the reader() class to submit filenames to the downloader threads, to split the Hashing job up.
@@ -69,9 +69,10 @@ class Deduplicator(multiprocessing.Process):
 				continue
 			new_hash = FileHasher.get_best_hash(path.absolute())
 			# print('New hash for File:', f.id, '::', new_hash)
-			matches = [] if is_album else self._find_matching_files(new_hash, ignore_id=f.id)
+			matches = self._find_matching_files(new_hash, ignore_id=f.id)
+			print('\tActual matches:', matches)
 			with self._lock:
-				f.hash = new_hash
+				f.hash = Hash.make_hash(f, new_hash)
 				if len(matches):
 					# print("Found duplicate files: ", new_hash, "::", [(m.id, m.path) for m in matches])
 					best, others = self._choose_best_file(matches + [f])
@@ -82,20 +83,30 @@ class Deduplicator(multiprocessing.Process):
 		self._prune()
 
 	def _find_matching_files(self, search_hash, ignore_id):
+		sp = Hash.split_hash(search_hash)
 		all_hashes = self._session \
 			.query(File) \
-			.options(joinedload(File.urls)) \
-			.filter(File.hash != None) \
-			.filter(File.downloaded == True) \
-			.filter(File.id != ignore_id) \
-			.all()
-		matches = []
-		for pm in all_hashes:
-			if any(u.album_id for u in pm.urls) or any(not u.processed for u in pm.urls):
-				continue
-			if FileHasher.hamming_distance(search_hash, pm.hash) < 4:
-				matches.append(pm)
-		return matches
+			.join(Hash, File.hash) \
+			.filter(
+				(Hash.full_hash == search_hash) |
+				(Hash.p1 == sp[0]) |
+				(Hash.p2 == sp[1]) |
+				(Hash.p3 == sp[2]) |
+				(Hash.p4 == sp[3])
+			).all()
+		print(sp)
+		print('Potential matches:', len(all_hashes), all_hashes)
+		return list(filter(lambda f: self._check_hash_match(f, search_hash), all_hashes))
+
+	def _check_hash_match(self, file, search_hash):
+		""" Compare the given hash against the given SQL File.
+			Returns invalid if the target File has albums, or is not fully processed.
+		"""
+		if not file.hash or any(u.album_id or not u.processed for u in file.urls):
+			return False
+		if FileHasher.hamming_distance(search_hash, file.hash.full_hash) >= 4:
+			return False
+		return True
 
 	def _choose_best_file(self, files):
 		files = sorted(
