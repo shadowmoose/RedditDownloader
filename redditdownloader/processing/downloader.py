@@ -38,7 +38,7 @@ class Downloader(multiprocessing.Process):
 					raise Exception("Unknown URL ID provided: (%s}" % nxt_id)
 
 				file = url.file
-				path = SanitizedRelFile(base=settings.get("output.base_dir"), file_path=file.path)
+				path = SanitizedRelFile(base=settings.get("output.base_dir"), file_path=str(file.path))
 
 				self.progress.set_file(path.relative())
 				self.progress.set_status("Attempting to Handle URL...")

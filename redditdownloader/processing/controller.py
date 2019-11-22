@@ -1,6 +1,7 @@
 import re
 import sys
 import threading
+import sql
 from static import settings
 from static import stringutil as su
 from processing.redditloader import RedditLoader
@@ -13,6 +14,8 @@ from multiprocessing import RLock
 class RMDController(threading.Thread):
 	def __init__(self, source_patterns=None):
 		super().__init__()
+		sql.init_from_settings()  # Make sure the database is built & migrated before starting threads.
+		sql.close()
 		self.daemon = False
 		self.sources = source_patterns
 		self.sources = self.load_sources()

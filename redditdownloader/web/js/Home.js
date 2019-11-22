@@ -97,6 +97,7 @@ class Home extends React.Component {
 			console.log(this.state.progress);
 			let progress = this.state.progress;
 			let loading = progress.loader.scanning;
+			let currentSource = progress.loader.current_source;
 			let dedupe_status = (progress.deduplication.running? progress.deduplication.status: "Off");
 			let threads = progress.downloaders.map((thread, idx)=>{
 				let color = thread.running? 'green':'orange';
@@ -124,7 +125,7 @@ class Home extends React.Component {
 					{loading? 'Scanning for Posts & Downloading':'Downloading'}
 				</h3>
 				<div className={'green'}>
-					<b>Files Found: </b>{progress.loader.total_found + (loading?' (so far)':'')}
+					<b>Files Found: </b>{progress.loader.total_found + (loading?` (so far, from "${currentSource}")`:'')}
 				</div>
 				<div className={'blue'}>
 					<b>Files Completed: </b>{progress.loader.total_found - progress.loader.queue_size}
