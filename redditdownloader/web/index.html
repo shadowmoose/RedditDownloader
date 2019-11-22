@@ -1,4 +1,4 @@
-<HTML>
+<HTML lang="en">
 	<head>
 		<title>Reddit Media Downloader</title>
 		<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
@@ -36,6 +36,19 @@
 			let v = localStorage.getItem(key);
 			if(!v) return def;
 			return JSON.parse(v);
-		}
+		};
+
+		// Build an EventTarget for publishing events, and set up a few convenience wrapper methods:
+		window.eventStream = new EventTarget();
+		window.eventStream.send = (type, value) => {
+			const evt = new Event(type);
+			evt.value = value;
+			window.eventStream.dispatchEvent(evt);
+		};
+		window.eventStream.on = (type, callback) => {
+			return window.eventStream.addEventListener(type, evt => {
+				callback(evt.value)
+			});
+		};
 	</script>
 </HTML>

@@ -8,7 +8,8 @@ class Browser extends React.Component {
 			fields:[],
 			autoplay: window.lRead('browser-autoplay', true),
 			page_size: 25,
-			page: 0
+			page: 0,
+			downloading: false
 		};
 		this.search_timer = null;
 		this._toggle_field = this.toggle_field.bind(this);
@@ -18,6 +19,12 @@ class Browser extends React.Component {
 	}
 
 	componentDidMount(){
+		window.eventStream.on('downloading', running => {
+			this.setState({downloading: running});
+			if (!running) {
+				this.schedule_search(5000)
+			}
+		});
 		eel.api_searchable_fields()(n => {
 			let fields = {};
 			n.forEach((p)=>{
@@ -46,7 +53,7 @@ class Browser extends React.Component {
 	schedule_search(delay=250){
 		if(this.search_timer !== false)
 			clearTimeout(this.search_timer);
-		this.search_timer = setTimeout(() => {this.search(0)}, delay);
+		this.search_timer = setTimeout(() => {this.search(this.state.page)}, delay);
 	}
 
 	toggle_field(event){
@@ -54,14 +61,14 @@ class Browser extends React.Component {
 		let val = event.target.checked;
 		let fields = clone(this.state.fields);
 		fields[id] = val;
-		this.setState({fields: fields}, ()=>{this.schedule_search()});
+		this.setState({fields: fields, page: 0}, ()=>{this.schedule_search()});
 	}
 
 	change_search_term(event){
 		let val = event.target.value;
 		if(this.search_timer !== false)
 			clearTimeout(this.search_timer);
-		this.setState({term: val}, ()=>{this.schedule_search()});
+		this.setState({term: val, page: 0}, ()=>{this.schedule_search()});
 	}
 
 	autoplay(event){
@@ -143,6 +150,10 @@ class Browser extends React.Component {
 			);
 		}
 
+		const refreshBanner = !this.state.downloading? null : <span className={'center yellow hover_shadow'} onClick={() => this.search(this.state.page)}>
+			Currently downloading. Click here to refresh!
+		</span>;
+
 		return(
 			<div>
 				<div className={'center'}>
@@ -153,6 +164,7 @@ class Browser extends React.Component {
 					<div className={'search_group'}>
 						<div className={'search_categories'}> {categories}</div>
 					</div>
+					{refreshBanner}
 				</div>
 				<div className={'center'}>
 					<div className={'pagination '+(this.state.total>0?'':'hidden')}>

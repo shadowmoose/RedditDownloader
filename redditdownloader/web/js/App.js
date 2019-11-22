@@ -7,7 +7,7 @@ class App extends React.Component {
 		this._start_download = this.startDownload.bind(this);
 		this.pages = [
 			// [Element, Name, enabled_while_running]
-			[<Home ref={ele => {this.home = ele}}/>, 'Home', true],
+			[<Home />, 'Home', true],
 			[<Sources />, 'Sources', false],
 			[<Settings />, 'Settings', false],
 			[<Browser />, 'Browser', true]
@@ -36,12 +36,16 @@ class App extends React.Component {
 				page = 0;
 				alertify.log('The '+name+' panel is disabled while RMD is downloading!')
 			}
+
+			if (r.running !== this.state.downloading) {
+				window.eventStream.send('downloading', r.running)
+			}
 			this.setState({
 				downloading: r.running,
 				page: page
 			});
 
-			this.home.set_download_progress(r);
+			window.eventStream.send('download_progress', r);
 
 			clearTimeout(warning);
 			this.check_timer = setTimeout(this.checkStatus.bind(this), 1500)
