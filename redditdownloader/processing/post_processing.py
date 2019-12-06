@@ -94,8 +94,8 @@ class Deduplicator(multiprocessing.Process):
 				(Hash.p3 == sp[2]) |
 				(Hash.p4 == sp[3])
 			).all()
-		print(sp)
-		print('Potential matches:', len(all_hashes), all_hashes)
+		# print(sp)
+		# print('Potential matches:', len(all_hashes), all_hashes)
 		return list(filter(lambda f: self._check_hash_match(f, search_hash), all_hashes))
 
 	def _check_hash_match(self, file, search_hash):
