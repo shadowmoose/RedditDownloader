@@ -61,14 +61,18 @@ def start(web_dir):
 	browser = settings.get('interface.browser').lower().strip()
 	browser = None if (browser == 'off') else browser
 	options = {
-		'mode': browser,
+		'app_mode': '-app' in browser,
+		'mode': browser.replace('-app', ''),
 		'host': settings.get('interface.host'),
 		'port': settings.get('interface.port'),
-		'chromeFlags': []
+		'block': False,
+		'close_callback': _websocket_close,
+		'all_interfaces': False,
+		# 'app': btl.default_app()
 	}
 
 	eel.init(web_dir)
-	eel.start('index.html', options=options, block=False, callback=_websocket_close)
+	eel.start('index.html', **options)
 	print('Started WebUI!')
 	if browser:
 		print('Awaiting connection from browser...')
@@ -121,7 +125,9 @@ def _downloaded_files():
 	file_obj = _session.query(sql.File).filter(sql.File.id == token).first()
 	file_path = file_obj.path
 	print('Requested RMD File: %s, %s' % (settings.get("output.base_dir"), file_path))
-	return eel.btl.static_file(file_path, root=os.path.abspath(settings.get("output.base_dir")))
+	response = eel.btl.static_file(file_path, root=os.path.abspath(settings.get("output.base_dir")))
+	response.set_header("Cache-Control", "public, max-age=0")
+	return response
 
 
 @eel.btl.route('/authorize')
