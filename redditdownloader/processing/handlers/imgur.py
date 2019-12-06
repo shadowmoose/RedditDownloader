@@ -121,7 +121,12 @@ def handle(task, progress):
 										   handler=tag,
 										   failure_reason="Could not locate hidden album, and API client is disabled.")
 				items = client.get_album_images(extract_id(url))
-				urls = [i.link for i in items]
+
+				def best(o):  # Find the best-quality link available within the given Imgur object.
+					for b in ['mp4', 'gifv', 'gif', 'link']:
+						if hasattr(o, b):
+							return getattr(o, b)
+				urls = [best(i) for i in items if not getattr(i, 'is_ad', False)]
 			except Exception as e:
 				print('Imgur API:', e)
 				pass  # It's possible an image incorrectly has a Gallery location prepended. Ignore error.

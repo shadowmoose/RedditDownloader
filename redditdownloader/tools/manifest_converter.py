@@ -27,6 +27,7 @@ parser.add_argument("--og_base_dir_name", help="The exact 'base_dir' path used i
 parser.add_argument("--manifest_gz", help="The legacy Manifest.gz file, if exists.", type=str, metavar='', default=None)
 parser.add_argument("--manifest_sql", help="The legacy SQLite db from 2.0+, if exists.", type=str, metavar='', default=None)
 parser.add_argument("--new_save_dir", help="The path to the new save directory.", type=str, metavar='', default=None)
+parser.add_argument("--no_guess_base", '-v', help="Print the current version and exit.", action="store_true")
 args, unknown_args = parser.parse_known_args()
 
 ps = PushshiftAPI()
