@@ -105,13 +105,17 @@ class Home extends React.Component {
 				if (thread.error) {
 					color = 'red';
 				}
+				const progress = <progress value={thread.percent || '50'} max="100"/>;
 				return <details className={'progressThread '+ (thread.running? 'active':'inactive')} key={idx} open='open'>
 					<summary className={color}>Downloader {idx+1}</summary>
 					<div className='description'>
 						<div><b>File: </b>{thread.file_name}</div>
 						<div><b>Handler: </b>{thread.handler}</div>
-						<div><b>Status: </b>{thread.error || thread.status}</div>
-						{thread.percent ?<div><b>Percent Done: </b>{thread.percent}%</div> : <div/>}
+						<div>
+							<b>Status: </b>
+							{thread.error || (thread.status + (thread.percent ? ` (${thread.percent}%)` : ''))}
+						</div>
+						{thread.percent ?<div>{progress}</div> : <div/>}
 					</div>
 				</details>
 			});
@@ -123,10 +127,11 @@ class Home extends React.Component {
 					Download Progress
 				</summary>
 				<h3 className={'center'}>
-					{loading? 'Scanning for Posts & Downloading':'Downloading'}
+					{loading? 'Scanning for Posts':'Downloading Files'}
+					{loading? <div className="spinner"/> : null}
 				</h3>
 				<div className={'green'}>
-					<b>Files Found: </b>{progress.loader.total_found + (loading?` (so far, from "${currentSource}")`:'')}
+					<b>Files Found: </b>{progress.loader.total_found + (loading?` (searching "${currentSource}")`:'')}
 				</div>
 				<div className={'blue'}>
 					<b>Files Completed: </b>{progress.loader.total_found - progress.loader.queue_size}

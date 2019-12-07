@@ -144,6 +144,53 @@ tr {
 	overflow-x: hidden;
 }
 
+
+progress[value]::-webkit-progress-value {
+	color: #4caf50;
+	border-radius: 2px;
+}
+
+progress {
+	font-size: .6em;
+	line-height: 1.5em;
+	text-indent: .5em;
+	width: 90%;
+	height: 1.3em;
+	background-color: #eee;
+	border: 1px solid gray;
+	border-radius: 2px;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25) inset;
+	text-align: center;
+}
+
+progress:before {
+	color: white;
+	content: attr(value)'%';
+	font-size: 1em;
+	vertical-align: 0;
+
+	/*Position text over the progress bar */
+	position:absolute;
+	left:0;
+	right:0;
+}
+
+.spinner {
+	border: 6px solid #f3f3f3; /* Light grey */
+	border-top: 6px solid #4caf50;
+	border-radius: 50%;
+	width: 25px;
+	height: 25px;
+	margin-left: 10px;
+	animation: spin 2s linear infinite;
+	display: inline-block;
+}
+
+@keyframes spin {
+	0% { transform: rotate(0deg); }
+	100% { transform: rotate(360deg); }
+}
+
 .msg {
 	color: black;
 }

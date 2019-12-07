@@ -36,7 +36,7 @@ class Deduplicator(multiprocessing.Process):
 
 			while not self._stop_event.is_set():
 				self._dedupe()
-				self.progress.set_status("Waiting for new files...")
+				self.progress.set_status("Ready for new files...")
 				self._stop_event.wait(2)
 			self._dedupe()  # Run one final pass after downloading stops.
 			self.progress.clear(status="Finished.", running=False)
@@ -70,7 +70,7 @@ class Deduplicator(multiprocessing.Process):
 			new_hash = FileHasher.get_best_hash(path.absolute())
 			# print('New hash for File:', f.id, '::', new_hash)
 			matches = self._find_matching_files(new_hash, ignore_id=f.id)
-			print('\tActual matches:', matches)
+			# print('\tActual matches:', matches)
 			with self._lock:
 				f.hash = Hash.make_hash(f, new_hash)
 				if len(matches):
@@ -129,8 +129,8 @@ class Deduplicator(multiprocessing.Process):
 		with self._lock:
 			orphans = self._session.query(File).filter(~File.urls.any()).delete(synchronize_session='fetch')
 			self._session.commit()
-			if orphans:
-				print("Deleted orphan Files:", orphans)
+			# if orphans:
+			#	print("Deleted orphan Files:", orphans)
 
 
 class FileHasher:
