@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+import multiprocessing
 import sys
 import static.stringutil as su
 import static.settings as settings
@@ -163,4 +164,5 @@ def run():
 
 
 if __name__ == '__main__':
+	multiprocessing.freeze_support()
 	run()
