@@ -30,7 +30,7 @@ block_cipher = None
 print('Project base:', project_base)
 
 
-a = Analysis(['redditdownloader\\__main__.py'],
+a = Analysis(['redditdownloader/__main__.py'],
              pathex=['./redditdownloader', project_base],
              binaries=[],
              datas=datas,
