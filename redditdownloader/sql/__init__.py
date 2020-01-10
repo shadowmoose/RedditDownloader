@@ -146,7 +146,8 @@ def _check_legacy(sess):
 		alembic_cfg, script_, context = get_alembic_ctx(sess)
 		if not context.get_current_revision():
 			print("Versioning pre-alembic < 3.0.0 DB.")
-			command.stamp(config=alembic_cfg, revision='f8035abd1974')  # Stamp to 3.0.0 structure, which predates Alembic.
+			# Stamp to 3.0.0 structure, which predated Alembic:
+			command.stamp(config=alembic_cfg, revision='f8035abd1974', purge=True)
 			sess.commit()
 
 
