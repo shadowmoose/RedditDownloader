@@ -12,10 +12,16 @@ project_base = abspath('./')
 package_imports = {
     'eel': ['eel.js'],
     'newspaper': [''],
-    'praw': ['praw.ini']
+    'praw': ['praw.ini'],
+    'pip': ['']
 }
 
-datas = [('./redditdownloader/sql/alembic_files', 'sql/alembic_files'), ('./redditdownloader/web', 'web/')]
+datas = [
+    ('./redditdownloader/sql/alembic_files', 'sql/alembic_files'),
+    ('./redditdownloader/web', 'web/'),
+    ('./redditdownloader/tests', 'tests')
+]
+
 for package, files in package_imports.items():
     proot = dirname(importlib.import_module(package).__file__)
     print('Found package data:', package, proot)
@@ -30,11 +36,11 @@ block_cipher = None
 print('Project base:', project_base)
 
 
-a = Analysis(['redditdownloader/__main__.py'],
+a = Analysis(['Run.py'],
              pathex=['./redditdownloader', project_base],
              binaries=[],
              datas=datas,
-             hiddenimports=['bottle_websocket'],
+             hiddenimports=['bottle_websocket', './redditdownloader'],
              hookspath=[],
              runtime_hooks=[],
              excludes=['nltk'],
