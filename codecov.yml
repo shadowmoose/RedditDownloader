@@ -2,3 +2,10 @@ ignore:
   - "redditdownloader/interfaces"  # ignore all interface files in Github CI, as they cannot be tested remotely.
   - "redditdownloader/tests/full_runs"
   - "Run.py"
+
+# https://docs.codecov.io/docs/commit-status
+coverage:
+  status:
+    project:
+      default:
+        informational: True
