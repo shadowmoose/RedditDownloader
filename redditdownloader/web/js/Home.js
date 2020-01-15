@@ -77,6 +77,7 @@ class Home extends React.Component {
 		let failed_display = null;
 		if(this.state.progress && 'summary' in this.state.progress){
 			let summ = this.state.progress.summary;
+			// ({summ.total_urls} total)
 			progress_display = <details open={'open'}>
 				<summary className={'center'}>
 					Total Summary:
@@ -91,7 +92,7 @@ class Home extends React.Component {
 					<b>Files Downloaded: </b>{summ.total_files_dl}
 				</div>
 				<div className={[summ.total_urls_failed > 0 ? 'red': 'orange', 'clickable', 'hover_shadow'].join(' ')} onClick={this._openFailed}>
-					<b>Failed URLs: </b>{summ.total_urls_failed} ({summ.total_urls} total)
+					<b>Failed URLs: </b>{summ.total_urls_failed}
 				</div>
 			</details>
 		}else if(this.state.progress && this.state.progress.running){
