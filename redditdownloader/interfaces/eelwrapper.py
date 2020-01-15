@@ -46,7 +46,7 @@ class WebUI(UserInterface):
 started = False
 stopped = False
 _web_dir = None
-_controller: RMDController = None
+_controller = None  # type: RMDController
 _session = None
 _stat_cache = None
 
