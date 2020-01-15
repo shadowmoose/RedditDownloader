@@ -12,19 +12,19 @@ on:
 jobs:
   publish:
     name: Publish for ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       max-parallel: 3
       matrix:
-        os: [windows, ubuntu, macOS]
+        os: [windows-latest, ubuntu-16.04, macOS-latest]
         include:
-          - os: windows
+          - os: windows-latest
             artifact: RMD-windows.exe
             path: ./dist/RedditDownloader.exe
-          - os: ubuntu
+          - os: ubuntu-16.04
             artifact: RMD-ubuntu
             path: ./dist/RedditDownloader
-          - os: macOS
+          - os: macOS-latest
             artifact: RMD-macOS
             path: ./dist/RedditDownloader
 
