@@ -4,7 +4,7 @@ from appdirs import AppDirs
 import static.metadata as metadata
 
 
-app_base = AppDirs('RMD', metadata.pypy_name).user_data_dir
+app_base = AppDirs('RMD', metadata.project_name).user_data_dir
 project_base = abspath(join(dirname(abspath(__file__)), '../../'))
 
 

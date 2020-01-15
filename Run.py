@@ -18,10 +18,14 @@ import json
 import platform
 import hashlib
 import traceback
+import multiprocessing
+
+dr = abspath(dirname(abspath(__file__)))
+sys.path.insert(0, join(dr, 'redditdownloader'))
 
 OWNER = 'shadowmoose'
 REPO = 'RedditDownloader'
-DATA_BRANCH = 'release-metadata'
+DATA_BRANCH = 'release-metadata-3.x'
 
 
 UPDATE_URL = 'https://raw.githubusercontent.com/%s/%s/%s/release.json' % (OWNER, REPO, DATA_BRANCH)
@@ -39,7 +43,6 @@ check_update = not any('--skip_update' in a for a in sys.argv)
 
 def resource_path(relative_path):
 	""" Get the absolute path to resources, even if frozen. """
-	dr = abspath(dirname(abspath(__file__)))
 	base_path = getattr(sys, '_MEIPASS', dr)
 	return abspath(join(base_path, relative_path))
 
@@ -147,14 +150,12 @@ def make_executable(path):
 
 
 if __name__ == '__main__':
+	multiprocessing.freeze_support()
 	print('Python %s on %s' % (sys.version, sys.platform))
 	if sys.version_info < (3, 5):
 		print('Error: RMD cannot run on a python version < 3.5. Please update your python installation, or run with "python3".')
 		input("-Press [Enter] to quit-")
 		sys.exit(1)
-
-	print('File loc:', application_path)
-	print('args:', sys.argv)
 
 	if check_update:
 		try:
@@ -167,7 +168,7 @@ if __name__ == '__main__':
 		except Exception as ex:
 			print(ex)
 			traceback.print_exc()
-			print('\n\nUnable to download upate! Please manually check the project: %s' % PROJECT_URL)
+			print('\n\nUnable to download upate! Please manually check the project: %s' % PROJECT_URL, file=sys.stderr)
 
 	# noinspection PyBroadException
 	try:

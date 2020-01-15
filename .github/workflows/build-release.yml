@@ -3,7 +3,8 @@ name: Build Release Assets
 on:
   release:
     types: [published]
-
+  schedule:  # Check for package updates every 6 hours.
+    - cron:  '0 */6 * * *'
 
 jobs:
   publish:
@@ -90,6 +91,6 @@ jobs:
         uses: peaceiris/actions-gh-pages@v2.1.0
         env:
           ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
-          PUBLISH_BRANCH: release-metadata
+          PUBLISH_BRANCH: release-metadata-3.x
           PUBLISH_DIR: ./_public
 

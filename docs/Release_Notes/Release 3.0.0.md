@@ -60,6 +60,12 @@ _See [Upgrading](#upgrading) at the bottom of this file, before running the upgr
 - RMD now uses multiple processes, instead of multiple threads.
     + This allows RMD to use multiple CPU cores, and prevents bottlenecking during heavy downloading.
 
+## Prebuilt Binaries & Automatic updater
+- RMD releases now come with prebuilt binary executables - supporting Windows, MacOS, and Ubuntu.
+- If you use one of these binaries, it will (by default) automatically update itself to the latest packages.
+    + This auto-update feature makes sure that you're using the latest packages to download the broadest site support.
+    + To disable this feature, either use the python version, or launch the binary with `--skip_update`.
+
 ## Bug Fixes
 - Comments now properly set their own ID, rather than their parent ID.
     + This requires a one-time conversion, which will attempt to prevent RMD from re-downloading those Posts.
