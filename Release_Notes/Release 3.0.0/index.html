@@ -157,6 +157,8 @@
         
             <li><a class="toctree-l4" href="#multiprocessing-support">Multiprocessing Support</a></li>
         
+            <li><a class="toctree-l4" href="#prebuilt-binaries-automatic-updater">Prebuilt Binaries &amp; Automatic updater</a></li>
+        
             <li><a class="toctree-l4" href="#bug-fixes">Bug Fixes</a></li>
         
             <li><a class="toctree-l4" href="#upgrading">Upgrading</a></li>
@@ -291,6 +293,15 @@ please read the patch notes before updating.</em></p>
 <ul>
 <li>RMD now uses multiple processes, instead of multiple threads.<ul>
 <li>This allows RMD to use multiple CPU cores, and prevents bottlenecking during heavy downloading.</li>
+</ul>
+</li>
+</ul>
+<h2 id="prebuilt-binaries-automatic-updater">Prebuilt Binaries &amp; Automatic updater<a class="headerlink" href="#prebuilt-binaries-automatic-updater" title="Permanent link">&para;</a></h2>
+<ul>
+<li>RMD releases now come with prebuilt binary executables - supporting Windows, MacOS, and Ubuntu.</li>
+<li>If you use one of these binaries, it will (by default) automatically update itself to the latest packages.<ul>
+<li>This auto-update feature makes sure that you're using the latest packages to download the broadest site support.</li>
+<li>To disable this feature, either use the python version, or launch the binary with <code>--skip_update</code>.</li>
 </ul>
 </li>
 </ul>
