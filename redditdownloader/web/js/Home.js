@@ -37,7 +37,7 @@ class Home extends React.Component {
 		let body = data[0].body;
 		let tag = data[0].tag_name;
 		console.log('Current version:', this.state.version, 'Latest Release:', tag);
-		if(tag !== this.state.version) {
+		if(tag === this.state.version) {
 			return;
 		}
 		body  = body.replace(/</g, '&lt').replace(/>/g, '&gt');
