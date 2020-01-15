@@ -51,7 +51,7 @@ For direct imgur links, or links to public albums, RMD will work just fine witho
 Some imgur albums, however, are hidden from the public view.
 
 In order to support hidden/private albums or galleries, 
-you'll need to [register an imgur application](http://api.imgur.com/oauth2/addclient) and provide the ID & Secret to RMD.
+you'll need to [register an imgur application](https://api.imgur.com/oauth2/addclient) and provide the ID & Secret to RMD.
 
 [The imgur API has limits.](https://api.imgur.com/#limits)
 RMD will try as hard as it can to avoid using the API, 
@@ -62,7 +62,7 @@ Links to single images will not use the API.
 
 **To register an imgur Application:**
 
-+ Visit [http://api.imgur.com/oauth2/addclient](http://api.imgur.com/oauth2/addclient) while signed in to imgur.
++ Visit [https://api.imgur.com/oauth2/addclient](http://api.imgur.com/oauth2/addclient) while signed in to imgur.
 + On the registration page, the Name/Callback URL/Website/Description can be any values. 
 + Check the box for "Anonymous usage without user authorization"
 + Fill in a valid email address
