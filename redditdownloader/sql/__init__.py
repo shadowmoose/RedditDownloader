@@ -108,9 +108,8 @@ class make_backup(object):
 
 def get_alembic_ctx(conn):
 	""" Gets a full suite of Alembic objects, pre-initialized with all relevant details. """
-	conf = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../alembic.ini'))
 	alem_conf_loc = os.path.abspath(os.path.join(os.path.dirname(__file__), './alembic_files/'))
-	alembic_cfg = Config(conf)
+	alembic_cfg = Config()
 	connection = conn.connection()
 	alembic_cfg.attributes['connection'] = connection
 	alembic_cfg.set_main_option('script_location', alem_conf_loc)

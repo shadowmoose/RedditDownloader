@@ -6,9 +6,11 @@ to help you get exactly what you want downloaded.
 We'll briefly cover the basics you'll need to get started here.*
 
 ## Starting RMD
-Once [you've installed RMD](Installing.md), you can run RMD at any time by launching ```Run.py```.
+Once [you've installed RMD](Installing.md), you can run RMD at any time by launching ```Run.py``` 
+(if you downloaded a release binary, just launch the executable).
 
-If you'd prefer to use a terminal, RMD can be started using using the terminal command:
+If you'd prefer to use a terminal, and you're running from the source code, 
+RMD can be started using using the terminal command:
 
 ```python Run.py```
 
@@ -23,7 +25,7 @@ I suggest using the defaults, which will open a "WebUI" user interface to make c
 
 Once the WebUI has started, you'll want to authorize RMD to read from Reddit on your behalf.
 
-*If you do not wish to (or cannot) use the WebUI, run RMD with the ```--authorize``` flag, to enable in-console authentication.*
+*If you cannot use the WebUI, run RMD with the ```--authorize``` flag to enable in-console authentication.*
 
 ## Authorizing RMD
 Allowing RMD read-only access to Reddit is very simple from the Web Interface.
