@@ -3,8 +3,8 @@ name: Build Release Assets
 on:
   release:
     types: [published]
-#  schedule:  # Check for package updates every 6 hours.
-#    - cron:  '0 */6 * * *'
+  schedule:  # Check for package updates every 6 hours.
+    - cron:  '0 */6 * * *'
 #  push:
 #    branches:
 #      - master
