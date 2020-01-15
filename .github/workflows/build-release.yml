@@ -5,6 +5,9 @@ on:
     types: [published]
   schedule:  # Check for package updates every 6 hours.
     - cron:  '0 */6 * * *'
+  push:
+    branches:
+      - master
 
 jobs:
   publish:
@@ -31,6 +34,8 @@ jobs:
         id: update
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          owner: shadowmoose
+          repo: RedditDownloader
           asset: ${{ matrix.artifact }}
           files: requirements.txt
 
@@ -85,6 +90,8 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           outFile: ./_public/release.json
+          owner: shadowmoose
+          repo: RedditDownloader
 
       - name: Deploy to release-metadata branch
         if: steps.build.outputs.is_released == 'true'
