@@ -46,7 +46,7 @@ class WebUI(UserInterface):
 started = False
 stopped = False
 _web_dir = None
-_controller = None
+_controller: RMDController = None
 _session = None
 _stat_cache = None
 
@@ -61,8 +61,8 @@ def start(web_dir):
 	browser = settings.get('interface.browser').lower().strip()
 	browser = None if (browser == 'off') else browser
 	options = {
-		'app_mode': '-app' in browser,
-		'mode': browser.replace('-app', ''),
+		'app_mode': '-app' in browser if browser else None,
+		'mode': browser.replace('-app', '') if browser else None,
 		'host': settings.get('interface.host'),
 		'port': settings.get('interface.port'),
 		'block': False,

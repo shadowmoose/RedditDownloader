@@ -65,13 +65,13 @@ class RMDController(threading.Thread):
 		return False
 
 	def _create_downloaders(self):
-		dls = []
+		dls: [Downloader] = []
 		for i in range(settings.get('threading.concurrent_downloads')):
 			tp = Downloader(
 				reader=self.loader.get_reader(),
 				ack_queue=self.loader.get_ack_queue(),
 				settings_json=settings.to_json(),
-				db_lock = self.db_lock
+				db_lock=self.db_lock
 			)
 			dls.append(tp)
 		return dls

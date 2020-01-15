@@ -65,7 +65,7 @@ class Deduplicator(multiprocessing.Process):
 			self.progress.set_status("Deduplicating (%s) files..." % (len(unfinished) - idx))
 			path = SanitizedRelFile(base=settings.get("output.base_dir"), file_path=f.path)
 			is_album = any(u.album_id for u in f.urls)
-			if not path.is_file() or is_album:
+			if not path.is_file() or is_album or self._stop_event.is_set():
 				continue
 			new_hash = FileHasher.get_best_hash(path.absolute())
 			# print('New hash for File:', f.id, '::', new_hash)
