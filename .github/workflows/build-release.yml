@@ -1,0 +1,96 @@
+name: Build Release Assets
+
+on:
+  release:
+    types: [published]
+  schedule:  # Check for package updates every 6 hours.
+    - cron:  '0 */6 * * *'
+
+jobs:
+  publish:
+    name: Publish for ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}-latest
+    strategy:
+      max-parallel: 3
+      matrix:
+        os: [windows, ubuntu, macOS]
+        include:
+          - os: windows
+            artifact: RMD-windows.exe
+            path: ./dist/RedditDownloader.exe
+          - os: ubuntu
+            artifact: RMD-ubuntu
+            path: ./dist/RedditDownloader
+          - os: macOS
+            artifact: RMD-macOS
+            path: ./dist/RedditDownloader
+
+    steps:
+      - name: Check for Required Package Updates
+        uses: shadowmoose/GHA-Compare-PyPi@1.1.1
+        id: update
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          asset: ${{ matrix.artifact }}
+          files: requirements.txt
+
+      - name: Print Update Info
+        run: |
+          echo "Artifact Name: ${{ matrix.artifact }}"
+          echo "Latest Release Tag: ${{ steps.update.outputs.release_tag }}"
+          echo "Update Packages: ${{ steps.update.outputs.updated_packages }}"
+          echo "Needs Update: ${{ steps.update.outputs.update_available }}"
+
+      - uses: actions/checkout@v1
+        if: steps.update.outputs.update_available == 'true'
+        with:
+          ref: ${{ steps.update.outputs.release_tag }}
+
+      - name: Set up Python 3.7
+        if: steps.update.outputs.update_available == 'true'
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.7
+
+      - name: Install Requirements
+        if: steps.update.outputs.update_available == 'true'
+        run: |
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+
+      - name: Build with PyInstaller
+        if: steps.update.outputs.update_available == 'true'
+        run: |
+          pyinstaller build-rmd.spec
+
+      - name: Upload binaries to release
+        if: steps.update.outputs.update_available == 'true'
+        uses: svenstaro/upload-release-action@1.0.1
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ${{ matrix.path }}
+          overwrite: true
+          asset_name: ${{ matrix.artifact }}
+          tag: ${{ steps.update.outputs.release_tag }}
+
+
+  update-release-info:
+    name: Update Artifact Metadata
+    runs-on: ubuntu-latest
+    needs: [publish]
+    steps:
+      - name: Build Data File
+        uses: shadowmoose/Github-Release-Data-Action@2.0.1
+        id: build
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          outFile: ./_public/release.json
+
+      - name: Deploy to release-metadata branch
+        if: steps.build.outputs.is_released == 'true'
+        uses: peaceiris/actions-gh-pages@v2.1.0
+        env:
+          ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+          PUBLISH_BRANCH: release-metadata-3.x
+          PUBLISH_DIR: ./_public
+

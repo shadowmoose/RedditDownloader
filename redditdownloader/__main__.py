@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+import multiprocessing
 import sys
 import static.stringutil as su
 import static.settings as settings
@@ -29,6 +30,7 @@ parser.add_argument("--version", '-v', help="Print the current version and exit.
 parser.add_argument("--authorize", '-a', help="Authorize RMD with Reddit oAuth.", action="store_true")
 parser.add_argument("--run_tests", help="Run the given test directory, or * for all.", type=str, metavar='', default="")
 parser.add_argument("--limit", help="For direct downloading of user/subreddit, set the limit here.", type=int, default=1000)
+parser.add_argument("--skip_update", help="If set, avoid checking for updates automatically", action="store_true")
 args, unknown_args = parser.parse_known_args()
 
 
@@ -163,4 +165,5 @@ def run():
 
 
 if __name__ == '__main__':
+	multiprocessing.freeze_support()
 	run()
