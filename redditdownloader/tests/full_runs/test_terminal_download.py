@@ -5,6 +5,7 @@ from os.path import join, isfile
 import os
 import sql
 import unittest
+import importlib
 
 download_ran = False
 session = None
@@ -18,11 +19,13 @@ class TerminalDownloadTest(EnvironmentTest):
 		global download_ran, session
 		if not download_ran:
 			download_ran = True
+			importlib.reload(settings)
+			importlib.reload(sql)
 			settings.load(self.settings_file)
 			tui = TerminalUI()
 			tui.display()
-			self.db_path = join(settings.get('output.base_dir'), 'manifest.sqlite')
 			sql.init_from_settings()
+			self.db_path = sql.get_file_location()
 			session = sql.session()
 
 	def tearDown(self):

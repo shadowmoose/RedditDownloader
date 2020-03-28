@@ -216,6 +216,7 @@ add("auth", Setting("user_agent", 'RMD-Scanner-%s' % uuid.uuid4(), desc="The use
 add("auth", Setting("oauth_key", str(uuid.uuid4()), desc="Internal key.", public=False))
 
 add("output", Setting("base_dir", os.path.join(os.getcwd(), 'download'), desc="The base directory to save to. Cannot contain tags."))
+add("output", Setting("manifest", "./manifest.sqlite", desc="Path to the output manifest file, relative to the base download directory. Cannot contain tags."))
 add("output", Setting("file_name_pattern", '[subreddit]/[title] - ([author])', desc="The ouput file name/path. Supports tags."))
 
 add("processing", Setting("deduplicate_files", True, desc="Remove downloaded files if another copy already exists. Also compares images for visual similarity.", etype="bool"))
@@ -233,12 +234,12 @@ add("interface", Setting("host", 'localhost', desc="The host to bind on."))
 add("imgur", Setting("client_id", '', desc="The API client ID to use when accessing private Imgur albums."))
 add("imgur", Setting("client_secret", '', desc="The API client secret to use when accessing private Imgur albums."))
 
-add(None, Setting("meta-version", 5, etype="int", public=False))
+add(None, Setting("meta-version", 6, etype="int", public=False))
 add(None, Setting("sources", [{'alias': 'default-downloader', 'data': {}, 'filters': {}, 'type': 'personal-upvoted-saved'}], etype="list", public=False))
 # ======================================
 
 
-def _adapt(obj):  # !cover
+def _adapt(obj):
 	""" Convert old versions of the Settings files up to the newest version. """
 	version = 1
 	converted = False
@@ -313,7 +314,14 @@ def _adapt(obj):  # !cover
 		print("Adapted from Settings version 4 -> 5!")
 		obj[_default_cat]['meta-version'] = 5
 		converted = True
-		# version = 5
+		version = 5
+
+	if version == 5:  # Added setting for custom manifest file location.
+		obj['output']['manifest'] = "./manifest.sqlite"
+		print("Adapted from Settings version 5 -> 6!")
+		converted = True
+		obj[_default_cat]['meta-version'] = 6
+		# version = 6
 
 	return obj, converted
 

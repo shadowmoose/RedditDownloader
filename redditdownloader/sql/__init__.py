@@ -18,7 +18,6 @@ from sqlalchemy.orm import sessionmaker, scoped_session
 import os
 import shutil
 import sys
-from processing.wrappers import SanitizedRelFile
 from static import settings
 
 Base = declarative_base()
@@ -29,10 +28,11 @@ _engine = None
 _Session = None
 
 
-def init(db_path=":memory:"):
+def _init(db_path=":memory:"):
 	"""
 	Initialize the DB, a required function to access the database.
-	Creates the DB file if it does not already exist.
+	Creates the DB file if it does not already exist. Also auto-runs Alembic migrations.
+
 	:param db_path:
 	:return:
 	"""
@@ -55,9 +55,9 @@ def init(db_path=":memory:"):
 
 def init_from_settings():
 	""" Builds the database file using the Settings currently loaded. """
-	db_file = SanitizedRelFile(base=settings.get("output.base_dir"), file_path="manifest.sqlite")
-	db_file.mkdirs()
-	init(db_file.absolute())
+	db_file = get_file_location()
+	os.makedirs(os.path.dirname(db_file), exist_ok=True)
+	_init(db_file)
 
 
 def _create():
@@ -81,6 +81,14 @@ def session():
 
 def close():
 	_Session.close()
+
+
+def get_file_location():
+	""" Get the absolute path to the maniest SQLite DB file. """
+	db_file = settings.get("output.manifest")
+	if not os.path.isabs(db_file):
+		db_file = os.path.join(settings.get('output.base_dir'), db_file)
+	return os.path.abspath(db_file)
 
 
 class make_backup(object):
