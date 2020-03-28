@@ -37,7 +37,7 @@ class SettingsTest(EnvironmentTest):
 
 	def test_get_all(self):
 		""" All settings should be accounted for """
-		self.assertEqual(19, len(list(settings.get_all())), msg='Got invalid amount of settings!')
+		self.assertEqual(20, len(list(settings.get_all())), msg='Got invalid amount of settings!')
 
 	def test_sources(self):
 		""" Getting/Add/Remove Sources should work """
