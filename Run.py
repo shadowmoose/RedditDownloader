@@ -168,7 +168,7 @@ if __name__ == '__main__':
 		except Exception as ex:
 			print(ex)
 			traceback.print_exc()
-			print('\n\nUnable to download upate! Please manually check the project: %s' % PROJECT_URL, file=sys.stderr)
+			print('\n\nUnable to download update! Please manually check the project: %s' % PROJECT_URL, file=sys.stderr)
 
 	# noinspection PyBroadException
 	try:
