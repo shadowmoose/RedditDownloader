@@ -53,6 +53,7 @@ jobs:
           directory: ./
           badge: ./output/loc-badge.svg
           ignore: '**/js/libs/**|**/web/img/**|*.zip|**/alertify.css'
+          badge_label: 'Project Lines'
 
       - name: Print the output
         run: |
