@@ -52,7 +52,7 @@ jobs:
           debug: true
           directory: ./
           badge: ./output/loc-badge.svg
-          ignore: '**/js/libs/**|**/web/img/**|**.zip|**/alertify.css'
+          ignore: '**/js/libs/**|**/web/img/**|*.zip|**/alertify.css'
 
       - name: Print the output
         run: |
