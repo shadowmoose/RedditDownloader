@@ -36,3 +36,36 @@ jobs:
       with:
         username: "shadow-bot"
         useremail: "github_bot@github.com"
+
+
+  build_loc_badge:
+    runs-on: ubuntu-latest
+    name: Build LoC Badge
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Generate Badge
+        uses: shadowmoose/GHA-LoC-Badge@1.0.0
+        id: badge
+        with:
+          debug: true
+          directory: ./
+          badge: ./output/loc-badge.svg
+          ignore: '**/js/libs/**|**/web/img/**|*.zip|**/alertify.css'
+          badge_label: 'Lines of Code'
+
+      - name: Print the output
+        run: |
+          echo "Scanned: ${{ steps.badge.outputs.counted_files }}";
+          echo "Line Count: ${{ steps.badge.outputs.total_lines }}";
+
+      - name: Deploy Badge
+        uses: peaceiris/actions-gh-pages@v2.9.0
+        env:
+          ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+          PUBLISH_BRANCH: project-badges
+          PUBLISH_DIR: ./output
+        with:
+          username: "shadow-bot"
+          useremail: "github_bot@github.com"
