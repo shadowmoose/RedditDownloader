@@ -2,8 +2,8 @@ name: Docs
 
 on:
   push:
-#    branches:
-#      - master
+    branches:
+      - master
 
 jobs:
   build:
@@ -53,7 +53,7 @@ jobs:
           directory: ./
           badge: ./output/loc-badge.svg
           ignore: '**/js/libs/**|**/web/img/**|*.zip|**/alertify.css'
-          badge_label: 'Project Lines'
+          badge_label: 'Lines of Code'
 
       - name: Print the output
         run: |
