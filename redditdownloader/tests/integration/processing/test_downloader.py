@@ -55,5 +55,6 @@ class DownloaderTest(EnvironmentTest):
 		thread.start()
 		dl.run()
 		thread.join()
+		self.assertGreater(stats['sent'], 0, msg='Failed to send any test URLS for download!')
 		self.assertEqual(stats['sent'], stats['ack'], msg='Not all sent URLs were Acked!')
 		self.assertFalse(dl.progress.get_running(), msg='Failed to clear running status!')
