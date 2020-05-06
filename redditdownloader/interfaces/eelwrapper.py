@@ -124,7 +124,6 @@ def _downloaded_files():
 	token = eel.btl.request.query.id
 	file_obj = _session.query(sql.File).filter(sql.File.id == token).first()
 	file_path = file_obj.path
-	print('Requested RMD File: %s, %s' % (settings.get("output.base_dir"), file_path))
 	response = eel.btl.static_file(file_path, root=os.path.abspath(settings.get("output.base_dir")))
 	response.set_header("Cache-Control", "public, max-age=0")
 	return response
@@ -231,7 +230,6 @@ def api_searchable_fields():
 
 @eel.expose
 def api_search_posts(fields, term, page_size, page):
-	print('Searching posts:', fields, term, page_size, page)
 	ret = []
 	searcher = sql.PostSearcher(_session)
 	res = searcher.search_fields(fields, term.strip("%"))
@@ -262,7 +260,6 @@ def api_search_posts(fields, term, page_size, page):
 				'source_alias': p.source_alias,
 				'files': files
 			})
-	print('returned:', len(ret))
 	return {
 		'total': full_len,
 		'results': ret

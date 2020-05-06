@@ -57,6 +57,9 @@ def init_from_settings():
 	""" Builds the database file using the Settings currently loaded. """
 	db_file = get_file_location()
 	os.makedirs(os.path.dirname(db_file), exist_ok=True)
+	if not os.path.exists(db_file) or not os.access(db_file, os.W_OK) or not os.access(db_file, os.R_OK):
+		raise IOError('Unable to access the manifest file! This is probably a read/write permissions issue.')
+	os.makedirs(os.path.dirname(db_file), exist_ok=True)
 	_init(db_file)
 
 
