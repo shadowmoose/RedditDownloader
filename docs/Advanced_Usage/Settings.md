@@ -34,6 +34,14 @@ This is the pattern RMD will use, within the base directory, to name the downloa
 This is a *pattern*, which means it can inject tagged data from each Post into the filename.
 See [File Name Patterns](#file-name-patterns) for how to use this feature.
 
+### manifest
+This is the path to the database file that RMD creates to track download progress.
+If this setting is a relative path (starting with "./"), it is relative to the download directory. 
+RMD also allows this to be an absolute path (typically something like "C://", depending on your system).
+
+If you wish to download to a directory on a network/remote drive you *must* change this to a local path,
+because RMD requires the ability to exclusively access this file - which most networks will not allow.
+
 ### concurrent_downloads
 This controls how many concurrent downloads are allowed. Adjust this to control RMD's speed and resource usage.
 
