@@ -9,7 +9,7 @@
   <meta name="author" content="ShadowMoose">
   
   <link rel="shortcut icon" href="../../img/favicon.ico">
-  <title>FAQ - Reddit Media Downloader</title>
+  <title>FAQ & Common Issues - Reddit Media Downloader</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
 
   <link rel="stylesheet" href="../../css/theme.css" />
@@ -18,7 +18,7 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "FAQ";
+    var mkdocs_page_name = "FAQ & Common Issues";
     var mkdocs_page_input_path = "Getting_Started/User_FAQ.md";
     var mkdocs_page_url = null;
   </script>
@@ -72,7 +72,7 @@
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="../Sources/">Sources</a>
                     </li>
-                    <li class="toctree-l1 current"><a class="reference internal current" href="./">FAQ</a>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">FAQ & Common Issues</a>
     <ul class="current">
     </ul>
                     </li>
@@ -123,7 +123,7 @@
         
       
     
-    <li>FAQ</li>
+    <li>FAQ & Common Issues</li>
     <li class="wy-breadcrumbs-aside">
       
         <a href="https://github.com/shadowmoose/RedditDownloader/edit/master/docs/Getting_Started/User_FAQ.md"
@@ -141,6 +141,12 @@
 <p>Though RMD can theoretically support any amount of results, Reddit limits most resources to the first 1000 results.
 This means that most User/Subreddit/etc Sources will be limited to 1000 results, maximum.</p>
 <p>The <a href="../Sources/#pushshift-subreddit-submissions">PushShift Sources</a> do not have this problem, and are recommended if you need more than the 1000 post limit.</p>
+<h2 id="can-i-run-this-on-a-network-drive">Can I run this on a network drive?<a class="headerlink" href="#can-i-run-this-on-a-network-drive" title="Permanent link">&para;</a></h2>
+<p>RMD will not run well on any kind of remote file system. 
+This technical reason for this is because the manifest file it uses to track download progress 
+is an SQLite file, which requires the ability to be exclusively locked.</p>
+<p>If you wish to download to a network directory, please look at storing the manifest locally on the system
+by changing the <code>output.manifest</code> setting to a local absolute path.</p>
 <h2 id="i-have-a-bug-or-feature-request">I have a bug or feature request.<a class="headerlink" href="#i-have-a-bug-or-feature-request" title="Permanent link">&para;</a></h2>
 <ul>
 <li>I'm always open to bug reports or feature requests, so <a href="https://github.com/shadowmoose/RedditDownloader/issues/new/choose">hit me up</a>!</li>

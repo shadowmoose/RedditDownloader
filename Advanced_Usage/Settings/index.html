@@ -73,6 +73,8 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#file_name_pattern">file_name_pattern</a>
     </li>
+    <li class="toctree-l3"><a class="reference internal" href="#manifest">manifest</a>
+    </li>
     <li class="toctree-l3"><a class="reference internal" href="#concurrent_downloads">concurrent_downloads</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#deduplicate_files">deduplicate_files</a>
@@ -100,7 +102,7 @@
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="../../Getting_Started/Sources/">Sources</a>
                     </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../../Getting_Started/User_FAQ/">FAQ</a>
+                    <li class="toctree-l1"><a class="reference internal" href="../../Getting_Started/User_FAQ/">FAQ & Common Issues</a>
                     </li>
                 </ul>
                 <p class="caption"><span class="caption-text">Release Notes</span></p>
@@ -185,6 +187,12 @@ By default, RMD will use a Web-based interface. if you would prefer to use a con
 <p>This is the pattern RMD will use, within the base directory, to name the downloaded files. It supports folders, and should be relative.</p>
 <p>This is a <em>pattern</em>, which means it can inject tagged data from each Post into the filename.
 See <a href="#file-name-patterns">File Name Patterns</a> for how to use this feature.</p>
+<h3 id="manifest">manifest<a class="headerlink" href="#manifest" title="Permanent link">&para;</a></h3>
+<p>This is the path to the database file that RMD creates to track download progress.
+If this setting is a relative path (starting with "./"), it is relative to the download directory. 
+RMD also allows this to be an absolute path (typically something like "C://", depending on your system).</p>
+<p>If you wish to download to a directory on a network/remote drive you <em>must</em> change this to a local path,
+because RMD requires the ability to exclusively access this file - which most networks will not allow.</p>
 <h3 id="concurrent_downloads">concurrent_downloads<a class="headerlink" href="#concurrent_downloads" title="Permanent link">&para;</a></h3>
 <p>This controls how many concurrent downloads are allowed. Adjust this to control RMD's speed and resource usage.</p>
 <h3 id="deduplicate_files">deduplicate_files<a class="headerlink" href="#deduplicate_files" title="Permanent link">&para;</a></h3>
