@@ -248,6 +248,12 @@ def _adapt(obj):
 	elif _default_cat in obj and 'meta-version' in obj[_default_cat]:
 		version = obj[_default_cat]['meta-version']
 
+	max_version = get('meta-version')
+
+	if version > max_version:
+		raise ValueError('The loaded settings are on version %s, but this RMD build only supports up to %s!'
+						 'Please update RMD, or fix/delete your settings file.' % (version, max_version))
+
 	if version == 1:
 		# Version 1->2 saw addition of Sources & Filters.
 		obj['meta-version'] = 2
