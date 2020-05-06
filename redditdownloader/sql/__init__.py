@@ -44,6 +44,8 @@ def _init(db_path=":memory:"):
 	if db_path != ':memory:':
 		db_path = os.path.abspath(db_path)
 		create_new = not os.path.exists(db_path)
+		if not create_new and (not os.access(db_path, os.W_OK) or not os.access(db_path, os.R_OK)):
+			raise IOError('Unable to access the manifest file! This is probably a read/write permissions issue.')
 	_db_path = db_path
 	_engine = sqlalchemy.create_engine(_sqlite_uri)  # , echo=True)
 	session_factory = sessionmaker(bind=_engine)
@@ -56,9 +58,6 @@ def _init(db_path=":memory:"):
 def init_from_settings():
 	""" Builds the database file using the Settings currently loaded. """
 	db_file = get_file_location()
-	os.makedirs(os.path.dirname(db_file), exist_ok=True)
-	if not os.path.exists(db_file) or not os.access(db_file, os.W_OK) or not os.access(db_file, os.R_OK):
-		raise IOError('Unable to access the manifest file! This is probably a read/write permissions issue.')
 	os.makedirs(os.path.dirname(db_file), exist_ok=True)
 	_init(db_file)
 
