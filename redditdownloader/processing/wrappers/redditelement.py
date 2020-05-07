@@ -101,7 +101,12 @@ class RedditElement(object):
 		self.score = self._comment_field(c, 'score', 'score')
 		self.body = html.unescape(str(c.body))
 		if self.body.strip():
-			result = url_parser.parse(self.body)
+			bod = self.body
+			for u in re.findall(r'\[.+?\]\s*?\((.+?)\)', bod):
+				# The ttp plaintext parser does a bad job with [special](urls), so pre-locate & remove them.
+				self.add_url(u)
+				bod = bod.replace(u, '', 1)
+			result = url_parser.parse(bod)
 			for u in result.urls:
 				self.add_url(u)
 

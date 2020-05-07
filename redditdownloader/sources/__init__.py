@@ -8,6 +8,7 @@ from sources.user_upvoted_saved_source import UserUpvotedSaved
 from sources.pushshift_subreddit import PushShiftSubmissionSource
 from sources.pushshift_user_posts import PushShiftUserSourceSource
 from sources.direct_input_source import DirectInputSource
+from sources.direct_url_source import DirectURLSource
 from sources.pushshift_search_source import PushShiftSearchSource
 
 
@@ -27,7 +28,7 @@ def all_sources():
 
 def load_sources(source_list=None):
 	"""
-	Get a list of all availale Sources.
+	Get a list of all available Sources.
 
 	Expects that source_list is the direct array of Sources loaded from settings.
 	"""
@@ -36,7 +37,7 @@ def load_sources(source_list=None):
 		return all_sources()
 	else:
 		for s in source_list:
-			for l in all_sources() + [DirectInputSource()]:
+			for l in all_sources() + [DirectInputSource(), DirectURLSource()]:
 				if l.from_obj(s):
 					loaded.append(l)
 					break

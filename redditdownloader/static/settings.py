@@ -220,6 +220,7 @@ add("output", Setting("manifest", "./manifest.sqlite", desc="Path to the output 
 add("output", Setting("file_name_pattern", '[subreddit]/[title] - ([author])', desc="The ouput file name/path. Supports tags."))
 
 add("processing", Setting("deduplicate_files", True, desc="Remove downloaded files if another copy already exists. Also compares images for visual similarity.", etype="bool"))
+add("processing", Setting("retry_failed", True, desc="Retry downloads that have failed in previous runs.", etype="bool"))
 
 add("threading", Setting("concurrent_downloads", 5, desc="How many threads can download media at once.", etype="int"))
 add("threading", Setting("console_clear_screen", True, desc="If it's okay to clear the terminal while running.", etype="bool"))
@@ -322,12 +323,16 @@ def _adapt(obj):
 		converted = True
 		version = 5
 
-	if version == 5:  # Added setting for custom manifest file location.
+	if version == 5:
+		# RMD 3.1.0
+		# Added setting for custom manifest file location.
 		obj['output']['manifest'] = "./manifest.sqlite"
+		obj['processing']['retry_failed'] = True
 		print("Adapted from Settings version 5 -> 6!")
 		converted = True
 		obj[_default_cat]['meta-version'] = 6
 		# version = 6
+	# Adjust meta-version Setting object when you make changes.
 
 	return obj, converted
 

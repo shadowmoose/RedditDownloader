@@ -140,6 +140,12 @@ To do this, simply call RMD with the desired usernames or subreddits - including
 When you use this feature, you may also specify a limit to the amount of Posts to be loaded. 
 Do this by passing the `--limit` flag. if this is not specified, the default limit is 1000.
 
-**EG:** `python redditdownloader /u/theshadowmoose r/funny --limit=500`
+You may also pass a full, direct permalink to a reddit Comment or Submission.
+
+*Download Moose's Comments+Submissions, and Submissions from Funny, limiting both to the first 1000:*
++ `python redditdownloader /u/theshadowmoose r/funny --limit=500`
+
+*Download a single Submission:*
++ `python redditdownloader https://www.reddit.com/r/shadow_test_sub/comments/gf2n8i/` 
 
 Calling RMD like this will disable any other preconfigured Sources for this run, and RMD will use the Terminal to display progress.

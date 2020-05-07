@@ -5,7 +5,6 @@ from sources.source import Source
 class DirectInputSource(Source):
 	def __init__(self, txt=None, args=None):
 		super().__init__(source_type='direct-input-source', description="Entered on the command line, for direct downloading.")
-		self.set_alias('direct')
 		self.data['txt'] = txt if txt else ''
 		self.data['args'] = args if args else {}
 		self.src = None

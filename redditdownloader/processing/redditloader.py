@@ -39,10 +39,12 @@ class RedditLoader(multiprocessing.Process):
 
 		self.progress.set_scanning(True)
 
+		retry_failed = settings.get('processing.retry_failed')
+
 		# Query for all unhandled URLs, and submit them before scanning for new Posts.
 		unfinished = self._session\
 			.query(sql.URL)\
-			.filter((sql.URL.processed == False) | (sql.URL.failed == True))\
+			.filter((sql.URL.processed == False) | (retry_failed and sql.URL.failed == True))\
 			.all()
 		self._push_url_list(unfinished)
 

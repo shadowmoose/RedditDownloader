@@ -7,7 +7,7 @@ import static.stringutil as su
 import static.settings as settings
 import static.console as console
 import static.metadata as meta
-from sources import DirectInputSource
+from sources import DirectInputSource, DirectURLSource
 from interfaces.terminal import TerminalUI
 from interfaces.eelwrapper import WebUI
 import tests.runner
@@ -69,8 +69,11 @@ def run():
 	settings_file = args.settings or fs.find_file('settings.json')
 	_loaded = settings.load(settings_file)
 	for ua in unknown_args:
-		if '=' not in ua:
-			if 'r/' or 'u/' in ua:
+		if '=' not in ua or '/comments/' in ua:
+			if '/comments/' in ua:
+				direct_sources.append(DirectURLSource(url=ua))
+				continue
+			elif 'r/' or 'u/' in ua:
 				direct_sources.append(DirectInputSource(txt=ua, args={'limit': args.limit}))
 				continue
 			else:
@@ -147,15 +150,16 @@ def run():
 
 	# Initialize Database
 	sql.init_from_settings()
+	print('Using manifest file [%s].' % sql.get_file_location())
 
 	if direct_sources:
 		settings.disable_saving()
+		settings.put('processing.retry_failed', False)
 		for s in settings.get_sources():
 			settings.remove_source(s, save_after=False)
 		for d in direct_sources:
 			settings.add_source(d, prevent_duplicate=False, save_after=False)
 
-	ui = None
 	if settings.get('interface.start_server') and not direct_sources:
 		print("Starting WebUI...")
 		ui = WebUI()

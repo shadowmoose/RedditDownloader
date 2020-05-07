@@ -90,7 +90,6 @@ def get_file_location():
 	db_file = settings.get("output.manifest")
 	if not os.path.isabs(db_file):
 		db_file = os.path.abspath(os.path.join(settings.get('output.base_dir'), db_file))
-	print('Opening manifest file [%s].' % db_file)
 	return os.path.abspath(db_file)
 
 

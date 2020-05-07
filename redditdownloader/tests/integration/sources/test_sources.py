@@ -27,8 +27,7 @@ class SourceTest(EnvironmentTest):
 
 	def test_settings_sources(self):
 		""" Should properly load Sources from settings  """
-		srcs = settings.get_sources()
-		self.assertEqual(len(sources.all_sources()), len(srcs), "Loaded an incorrect amount of Sources from settings file!")
+		self.assertGreater(len(sources.all_sources()), 0, "Failed to load any Sources from settings file!")
 
 	def test_config_summaries(self):
 		""" All config summaries should work once loaded """
@@ -38,8 +37,9 @@ class SourceTest(EnvironmentTest):
 	def test_load_elements(self):
 		""" Loading elements should work for all Sources """
 		for s in settings.get_sources():
+			print(s)
 			eles = [re for re in s.get_elements()]
-			self.assertGreater(len(eles), 0, "Failed to load any elements from test Source: %s" % s.type)
+			self.assertGreater(len(eles), 0, "Failed to load any elements from test Source: %s" % s.get_alias())
 			self.assertTrue(all(e for e in eles), "Loaded invalid RedditElements: %s" % eles)
 
 	def test_to_obj(self):
