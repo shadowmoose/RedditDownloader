@@ -10,9 +10,9 @@ Filters are simple logic. They require 3 things:
 
 + A field to check from each post. (Upvotes, Title, Time Posted, etc)
 + A comparator value. (Minimum, Maximum, Equal to, or Regex Match)
-  + "Regex Match", while more advanced, is very powerful. It allows you to filter by text values in creative ways.
 + The value to compare against. This is whatever you want the limit to be.
 
+*"Regex Match", while more advanced, is very powerful. It allows you to filter by text values in creative ways.*
 
 ## Note: Filter Comparisons Logic
 With Filter comparisons, numeric comparison (for "min"/"max") is only done if both values can be converted to numbers.
