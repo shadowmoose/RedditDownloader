@@ -89,6 +89,8 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#direct-downloading">Direct Downloading</a>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#importing-from-reddit-csv-export">Importing from Reddit CSV Export</a>
+    </li>
     </ul>
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="../Settings_List/">Settings - Full List</a>
@@ -255,6 +257,8 @@ will be checked. This argument can be passed multiple times, to specify multiple
 <p><strong>--version, -v</strong> - Print the current RMD version, then exit.</p>
 <p><strong>--authorize, -a</strong> - Manually use the in-console authentication method to grant RMD access to Reddit.</p>
 <p><strong>--limit</strong> - See <a href="#direct-downloading">Direct Downloading</a> for this usage.</p>
+<p><strong>--import_csv</strong> - See <a href="#importing-from-reddit-csv-export">Importing from Reddit CSV Export</a> for this usage.</p>
+<p><strong>--full_csv</strong> - See <a href="#importing-from-reddit-csv-export">Importing from Reddit CSV Export</a> for this usage.</p>
 <hr />
 <h2 id="direct-downloading">Direct Downloading<a class="headerlink" href="#direct-downloading" title="Permanent link">&para;</a></h2>
 <p>If you would like to, you can directly download from Users or Subreddits using only the command line, 
@@ -272,6 +276,20 @@ Do this by passing the <code>--limit</code> flag. if this is not specified, the 
 <li><code>python redditdownloader https://www.reddit.com/r/shadow_test_sub/comments/gf2n8i/</code> </li>
 </ul>
 <p>Calling RMD like this will disable any other preconfigured Sources for this run, and RMD will use the Terminal to display progress.</p>
+<h2 id="importing-from-reddit-csv-export">Importing from Reddit CSV Export<a class="headerlink" href="#importing-from-reddit-csv-export" title="Permanent link">&para;</a></h2>
+<p>RMD allows you to input a CSV file to download the Posts inside. 
+You can request a full user file <a href="https://www.reddit.com/settings/data-request">from Reddit's data-request web page</a>.</p>
+<p>Reddit limits your Upvoted/Saved history to the most recent 1000 results. 
+However, if you request the data files for your account, they will provide you with - 
+among other data - <code>comment_votes.csv</code> &amp; <code>post_votes.csv</code> files.</p>
+<p>These two files can be fed into RMD to download your entire account's history. Simply call RMD like so:</p>
+<ul>
+<li><code>python redditdownloader --import_csv="path/to/file.csv" [--full_csv]</code></li>
+</ul>
+<p>For speed reasons, RMD attempts to use <em>only</em> PushShift to find historic post data by default. 
+Submissions and Comments that are old enough may be too old to exist in this database. 
+If you want RMD to still try to find these, include the <code>--full_csv</code> flag.
+This will be limited to Reddit's rate limiting per-lookup, and thus will be very slow whenever it has to check for a missed post.</p>
               
             </div>
           </div>
