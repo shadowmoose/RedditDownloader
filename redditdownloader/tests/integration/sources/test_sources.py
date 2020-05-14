@@ -1,3 +1,4 @@
+import os
 from tests.mock import EnvironmentTest
 import static.settings as settings
 import sources
@@ -8,6 +9,8 @@ class SourceTest(EnvironmentTest):
 
 	def setUp(self):
 		settings.load(self.settings_file)
+		dfs = sources.DirectFileSource(file=os.path.join(self.dir, 'export.csv'), slow_fallback=True)
+		settings.add_source(dfs, prevent_duplicate=True, save_after=False)
 
 	def test_unique_types(self):
 		""" Source types should be unqiue """
@@ -32,6 +35,7 @@ class SourceTest(EnvironmentTest):
 	def test_config_summaries(self):
 		""" All config summaries should work once loaded """
 		for s in settings.get_sources():
+			print(s.get_alias())
 			self.assertTrue(s.get_config_summary(), 'Source %s is missing a config summary!' % s.type)
 
 	def test_load_elements(self):

@@ -65,3 +65,9 @@ the various sources.
 + Search the [PushShift](https://pushshift.io/) database for Submissions matching the specified term.
 + Supports an (optional) list of Subreddits, which can limit the search. If not provided, searches all of Reddit.
 + This allows unlimited Posts to be found, and even (usually) includes Posts deleted from Reddit.
+
+
+#### Posts & Submissions From Reddit Data-Request Files
++ Visit https://www.reddit.com/settings/data-request to get your complete account history as CSV files.
++ [Pass these files into RMD](../Advanced_Usage/Settings.md#importing-from-reddit-csv-export) 
+    to download everything you've ever liked, fixing typical Reddit limitations.

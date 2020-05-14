@@ -129,6 +129,10 @@ will be checked. This argument can be passed multiple times, to specify multiple
 
 **--limit** - See [Direct Downloading](#direct-downloading) for this usage.
 
+**--import_csv** - See [Importing from Reddit CSV Export](#importing-from-reddit-csv-export) for this usage.
+
+**--full_csv** - See [Importing from Reddit CSV Export](#importing-from-reddit-csv-export) for this usage.
+
 ---
 
 ## Direct Downloading
@@ -151,3 +155,21 @@ You may also pass a full, direct permalink to a reddit Comment or Submission.
 + `python redditdownloader https://www.reddit.com/r/shadow_test_sub/comments/gf2n8i/` 
 
 Calling RMD like this will disable any other preconfigured Sources for this run, and RMD will use the Terminal to display progress.
+
+
+## Importing from Reddit CSV Export
+RMD allows you to input a CSV file to download the Posts inside. 
+You can request a full user file [from Reddit's data-request web page](https://www.reddit.com/settings/data-request).
+
+Reddit limits your Upvoted/Saved history to the most recent 1000 results. 
+However, if you request the data files for your account, they will provide you with - 
+among other data - `comment_votes.csv` & `post_votes.csv` files.
+
+These two files can be fed into RMD to download your entire account's history. Simply call RMD like so:
+
++ `python redditdownloader --import_csv="path/to/file.csv" [--full_csv]`
+
+For speed reasons, RMD attempts to use *only* PushShift to find historic post data by default. 
+Submissions and Comments that are old enough may be too old to exist in this database. 
+If you want RMD to still try to find these, include the `--full_csv` flag.
+This will be limited to Reddit's rate limiting per-lookup, and thus will be very slow whenever it has to check for a missed post.

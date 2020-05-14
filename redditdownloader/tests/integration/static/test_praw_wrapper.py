@@ -1,5 +1,6 @@
 import static.praw_wrapper as pw
 import static.settings as settings
+import praw.models
 from processing.wrappers.redditelement import RedditElement
 from tests.mock import EnvironmentTest
 
@@ -68,3 +69,10 @@ class PrawWrapperTest(EnvironmentTest):
 	def test_get_current_username(self):
 		""" Getting the signed-in user should work """
 		self.assertTrue(pw.get_current_username(), msg="Failed to load the active username!")
+
+	def test_get_info(self):
+		""" Getting generic ID info should work """
+		posts = list(pw.get_info(['t1_c6k3thm', 't3_79pp8r']))
+		self.assertEqual(len(posts), 2, msg='Failed to find correct amount of generic Info!')
+		self.assertIsInstance(posts[0], praw.models.Comment, msg="Didn't find a Comment!")
+		self.assertIsInstance(posts[1], praw.models.Submission, msg="Didn't find a Submission!")

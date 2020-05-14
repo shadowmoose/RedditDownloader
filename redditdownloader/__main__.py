@@ -7,7 +7,7 @@ import static.stringutil as su
 import static.settings as settings
 import static.console as console
 import static.metadata as meta
-from sources import DirectInputSource, DirectURLSource
+from sources import DirectInputSource, DirectURLSource, DirectFileSource
 from interfaces.terminal import TerminalUI
 from interfaces.eelwrapper import WebUI
 import tests.runner
@@ -31,6 +31,8 @@ parser.add_argument("--authorize", '-a', help="Authorize RMD with Reddit oAuth."
 parser.add_argument("--run_tests", help="Run the given test directory, or * for all.", type=str, metavar='', default="")
 parser.add_argument("--limit", help="For direct downloading of user/subreddit, set the limit here.", type=int, default=1000)
 parser.add_argument("--skip_update", help="If set, avoid checking for updates automatically", action="store_true")
+parser.add_argument("--import_csv", help="Import all comments/posts from an export CSV file.", type=str, metavar='', default=None)
+parser.add_argument("--full_csv", help="If set, include a slower method as a fallback when loading a CSV.", action="store_true")
 args, unknown_args = parser.parse_known_args()
 
 
@@ -94,6 +96,9 @@ def run():
 				if re.match(s, stt.get_alias()):
 					matched_sources.add(stt)
 		direct_sources.extend(matched_sources)
+
+	if args.import_csv:
+		direct_sources.append(DirectFileSource(file=args.import_csv, slow_fallback=args.full_csv))
 
 	first_time_auth = False
 

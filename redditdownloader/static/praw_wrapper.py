@@ -189,6 +189,16 @@ def get_comment(t1_id):
 
 
 @check_login
+def get_info(fullnames):
+	"""
+	A generator to get the Submission/Comment from the given array of full IDs.
+	:param fullnames: Full (prefixed) reddit IDs.
+	:return: An array of Comments+Submissions.
+	"""
+	return _reddit.info(fullnames)
+
+
+@check_login
 def _praw_apply_filter(praw_object, order_by='new', limit=None, time='all'):
 	""" Accepts a Praw object (subreddit/multireddit/user posts/etc) and applies filters to it. Returns a Generator. """
 	order = [o for o in post_orders() if o[0] == order_by]

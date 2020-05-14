@@ -10,6 +10,7 @@ from sources.pushshift_user_posts import PushShiftUserSourceSource
 from sources.direct_input_source import DirectInputSource
 from sources.direct_url_source import DirectURLSource
 from sources.pushshift_search_source import PushShiftSearchSource
+from sources.direct_file_source import DirectFileSource
 
 
 def all_sources():
@@ -37,7 +38,7 @@ def load_sources(source_list=None):
 		return all_sources()
 	else:
 		for s in source_list:
-			for l in all_sources() + [DirectInputSource(), DirectURLSource()]:
+			for l in all_sources() + [DirectInputSource(), DirectURLSource(), DirectFileSource()]:
 				if l.from_obj(s):
 					loaded.append(l)
 					break
