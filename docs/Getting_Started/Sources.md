@@ -68,6 +68,6 @@ the various sources.
 
 
 #### Posts & Submissions From Reddit Data-Request Files
-+ Visit https://www.reddit.com/settings/data-request to get your complete account history as CSV files.
++ Visit [https://www.reddit.com/settings/data-request](https://www.reddit.com/settings/data-request) to get your complete account history as CSV files.
 + [Pass these files into RMD](../Advanced_Usage/Settings.md#importing-from-reddit-csv-export) 
     to download everything you've ever liked, fixing typical Reddit limitations.
