@@ -13,6 +13,7 @@
 /dist
 /build
 bin/
+latest-rmd/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

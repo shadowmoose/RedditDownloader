@@ -157,17 +157,54 @@ class SettingsField extends React.Component {
 		console.log('Opening oauth.');
 		let win = window.open("", '_blank');
 		eel.api_get_oauth_url()(data => {
-			console.log('oAuth data', data);
 			let url = data['url'];
-			if(!url){
+			if (!url) {
 				alertify.closeLogOnClick(true).delay(10000).error(data['message']);
 			} else {
-				win.location = url;
-				win.focus();
-				alertify.confirm('Reload UI now?', (evt2)=> {
-					evt2.preventDefault();
-					location.reload();
-				});
+				try {
+					win.location = url;
+					win.focus();
+				} catch(err) {
+					alertify.closeLogOnClick(true)
+						.delay(10000)
+						.error('Cannot open reddit auth url. Manually auth on command line.');
+					return
+				}
+
+				if (window.location.host !== 'localhost:7505') {
+					alertify.prompt('If you are not on localhost, the redirect from Reddit will fail. ' +
+						'<br> This is okay. ' +
+						'<br> Please enter the url you were redirected to here:', (res) => {
+						try {
+							const params = new URL(res).searchParams;
+							const code = params.get('code');
+							const state = params.get('state');
+							const loc = `${window.origin}/authorize?state=${state}&code=${code}`;
+							try {
+								window.open(loc, '_blank')
+							} catch(err) {
+								console.error(err);
+								window.location = loc;
+							}
+							alertify.confirm(`Reload once you have authorized.<br/>`
+								+ `Click <a href="${loc}">here</a> if the auth window did not automatically open.`,
+								(evt2) => {
+								evt2.preventDefault();
+								location.reload();
+							});
+						} catch (err) {
+							console.error(err);
+							alertify.closeLogOnClick(true).delay(10000).error('Failed to parse the given URL!');
+							location.reload();
+						}
+
+					}, () => location.reload );
+				} else {
+					alertify.confirm('Reload UI now?', (evt2) => {
+						evt2.preventDefault();
+						location.reload();
+					});
+				}
 			}
 		})
 	}

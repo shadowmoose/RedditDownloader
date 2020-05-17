@@ -33,6 +33,7 @@ parser.add_argument("--limit", help="For direct downloading of user/subreddit, s
 parser.add_argument("--skip_update", help="If set, avoid checking for updates automatically", action="store_true")
 parser.add_argument("--import_csv", help="Import all comments/posts from an export CSV file.", type=str, metavar='', default=None)
 parser.add_argument("--full_csv", help="If set, include a slower method as a fallback when loading a CSV.", action="store_true")
+parser.add_argument("--docker", help="If set, activate 'Docker Mode'.", action="store_true")
 args, unknown_args = parser.parse_known_args()
 
 
@@ -102,7 +103,8 @@ def run():
 
 	first_time_auth = False
 
-	if not _loaded and not direct_sources:  # First-time configuration.
+	if not _loaded and not direct_sources and not args.docker:
+		# First-time configuration.
 		su.error('Could not find an existing settings file. A new one will be generated!')
 		if not console.confirm('Would you like to start the WebUI to help set things up?', True):
 			su.print_color('red', "If you don't open the webUI now, you'll need to edit the settings file yourself.")
@@ -118,6 +120,13 @@ def run():
 									   settings.get('interface.browser', full_obj=True).opts)
 			settings.put('interface.browser', mode, save_after=False)
 			settings.put('interface.start_server', True)
+
+	if args.docker:
+		print('Running in "Docker" mode. Assuming some default settings.')
+		settings.put('interface.host', '0.0.0.0', save_after=False)
+		settings.put('interface.browser', 'off', save_after=False)
+		settings.put('interface.keep_open', True, save_after=False)
+		settings.put('interface.start_server', True)
 
 	if args.authorize or first_time_auth:  # In-console oAuth authentication flow
 		from static import praw_wrapper

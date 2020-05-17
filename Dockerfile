@@ -1,9 +1,13 @@
 FROM python:3.7-slim
 
-ADD redditdownloader ./redditdownloader
+WORKDIR /
 
-RUN mkdir ./settings/
+RUN mkdir /storage/
 
-RUN pip install -r ./redditdownloader/requirements.txt
+ADD redditdownloader /redditdownloader
+ADD requirements.txt /requirements.txt
+ADD Run.py /Run.py
 
-ENTRYPOINT [ "python", "-u", "./redditdownloader/main.py", "--settings", "./settings/settings.json"]
+RUN pip install -r /requirements.txt
+
+ENTRYPOINT [ "python", "-u", "/redditdownloader", "--settings=/storage/config/settings.json", "--docker"]

@@ -139,6 +139,8 @@ def _authorize_rmd_token():
 		refresh = praw_wrapper.get_refresh_token(code)
 		if refresh:
 			settings.put('auth.refresh_token', refresh)
+			praw_wrapper.init()
+			praw_wrapper.login()
 			return 'Saved authorization token! Close this page to continue.'
 	return 'Cannot save the new auth key, something went wrong.<br><a href="../index.html">Back</a>'
 
@@ -151,17 +153,10 @@ def api_current_status():
 
 @eel.expose
 def api_get_oauth_url():
-	port = 7505
-	url = False
-	message = ''
-	if settings.get('interface.port') != port:
-		message = 'The UI is not using the default port (%s), and cannot use the Web App to authenticate! ' \
-				  'Run RMD with "--authorize" to manually authenticate!' % port
-	else:
-		url = praw_wrapper.get_reddit_token_url()
+	url = praw_wrapper.get_reddit_token_url()
 	return {
 		'url': url,
-		'message': message
+		'message': ''
 	}
 
 
