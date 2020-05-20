@@ -76,3 +76,9 @@ class PrawWrapperTest(EnvironmentTest):
 		self.assertEqual(len(posts), 2, msg='Failed to find correct amount of generic Info!')
 		self.assertIsInstance(posts[0], praw.models.Comment, msg="Didn't find a Comment!")
 		self.assertIsInstance(posts[1], praw.models.Submission, msg="Didn't find a Submission!")
+
+	def test_post_orders(self):
+		""" All post orders should find a result from a subreddit """
+		for order, time in pw.post_orders()+[('best', False)]:
+			post = next(pw.subreddit_posts('funny', order, 1, 'all'))
+			self.assertTrue(post, msg="Failed to find '%s' post." % order)

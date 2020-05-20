@@ -72,7 +72,6 @@ def post_orders():
 	""" Returns a list of tuples, indicating acceptable Order values and if they accept Time limits or not. """
 	return [
 		('top', True),
-		('best', False),
 		('new', False),
 		('hot', False),
 		('controversial', True),
@@ -201,6 +200,10 @@ def get_info(fullnames):
 @check_login
 def _praw_apply_filter(praw_object, order_by='new', limit=None, time='all'):
 	""" Accepts a Praw object (subreddit/multireddit/user posts/etc) and applies filters to it. Returns a Generator. """
+	if order_by == 'best':
+		print('Sorting submissions by "best" is no longer supported. Use "top" instead.')
+		order_by = 'top'
+		time = 'day'
 	order = [o for o in post_orders() if o[0] == order_by]
 	assert len(order) > 0  # The order must be a valid value.
 	assert time in time_filters()
