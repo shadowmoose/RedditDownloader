@@ -9,7 +9,7 @@
   <meta name="author" content="ShadowMoose">
   
   <link rel="shortcut icon" href="../../img/favicon.ico">
-  <title>Release 1.5 - Reddit Media Downloader</title>
+  <title>Release 3.1.0 - Reddit Media Downloader</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
 
   <link rel="stylesheet" href="../../css/theme.css" />
@@ -18,8 +18,8 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "Release 1.5";
-    var mkdocs_page_input_path = "Release_Notes/Release 1.5.md";
+    var mkdocs_page_name = "Release 3.1.0";
+    var mkdocs_page_input_path = "Release_Notes/Release 3.1.0.md";
     var mkdocs_page_url = null;
   </script>
   
@@ -81,11 +81,7 @@
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="../Release%201.4/">Release 1.4</a>
                     </li>
-                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Release 1.5</a>
-    <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#change-log-mostly-complete">Change Log (Mostly Complete)</a>
-    </li>
-    </ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../Release%201.5/">Release 1.5</a>
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="../Release%201.52/">Release 1.52</a>
                     </li>
@@ -99,7 +95,11 @@
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="../Release%203.0.1/">Release 3.0.1</a>
                     </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../Release%203.1.0/">Release 3.1.0</a>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Release 3.1.0</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#changelog">Changelog</a>
+    </li>
+    </ul>
                     </li>
                 </ul>
       </div>
@@ -127,10 +127,10 @@
         
       
     
-    <li>Release 1.5</li>
+    <li>Release 3.1.0</li>
     <li class="wy-breadcrumbs-aside">
       
-        <a href="https://github.com/shadowmoose/RedditDownloader/edit/master/docs/Release_Notes/Release 1.5.md"
+        <a href="https://github.com/shadowmoose/RedditDownloader/edit/master/docs/Release_Notes/Release 3.1.0.md"
           class="icon icon-github"> Edit on GitHub</a>
       
     </li>
@@ -141,20 +141,20 @@
           <div role="main">
             <div class="section">
               
-                <h1 id="release-15">Release 1.5<a class="headerlink" href="#release-15" title="Permanent link">&para;</a></h1>
-<p>This version sees the implementation of Sources &amp; Filters.</p>
-<p>With this release RMD's functionality has been massively expanded, going beyond pulling personal liked/saved
-posts. RMD now sports a full engine for multiple different sources of posts, as well as filters to weed out
-unwanted content.</p>
-<h3 id="change-log-mostly-complete">Change Log (Mostly Complete)<a class="headerlink" href="#change-log-mostly-complete" title="Permanent link">&para;</a></h3>
+                <h1 id="release-310">Release 3.1.0<a class="headerlink" href="#release-310" title="Permanent link">&para;</a></h1>
+<p><strong>New sources &amp; Minor Bug fixes</strong></p>
+<p>RMD Update 3.1.0 brings a few new features with it. </p>
+<h3 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h3>
 <ul>
-<li>Now supports Sources</li>
-<li>Now supports Filters</li>
-<li>Manifest now properly implemented.</li>
-<li>Wizard to handle all setup and config added.</li>
-<li>Patched potential bug in Updater (the bug may prevent automatic updates to this version).</li>
-<li>Adjusted output coloring to (hopefully) support more platforms.</li>
-<li>Added GitHub site for examples and guides.</li>
+<li>Two new Settings have been addeded:</li>
+<li><em>(output.manifest)</em> - allows you to customize the exact path to your manifest file.</li>
+<li><em>(processing.retry_failed)</em> - lets you skip retrying previously-failed downloads.</li>
+<li>Several <a href="../../Advanced_Usage/Settings/">command-line improvements</a> have been made:</li>
+<li>RMD now supports directly passing reddit Submission/Comment URLs from the command line. </li>
+<li>RMD now supports <a href="../../Advanced_Usage/Settings/#importing-from-reddit-csv-export">importing from a CSV file</a>.</li>
+<li>The oAuth flow in the UI has been improved, to support non-standard host configurations.</li>
+<li>The "best" value has been removed from submission sorting options, as it is unsupported by the Reddit API.</li>
+<li>Other minor bug fixes have been added across the program.</li>
 </ul>
               
             </div>
@@ -163,10 +163,8 @@ unwanted content.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../Release%201.52/" class="btn btn-neutral float-right" title="Release 1.52">Next <span class="icon icon-circle-arrow-right"></span></a>
       
-      
-        <a href="../Release%201.4/" class="btn btn-neutral" title="Release 1.4"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../Release%203.0.1/" class="btn btn-neutral" title="Release 3.0.1"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -194,10 +192,8 @@ unwanted content.</p>
           <a href="https://github.com/shadowmoose/RedditDownloader/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
       
       
-        <span><a href="../Release%201.4/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../Release%203.0.1/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
-      
-        <span style="margin-left: 15px"><a href="../Release%201.52/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>
