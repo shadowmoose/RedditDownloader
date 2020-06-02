@@ -1,6 +1,7 @@
 # Reddit Media Downloader 
 [![badge](https://github.com/shadowmoose/RedditDownloader/workflows/Pytest/badge.svg)](https://github.com/shadowmoose/RedditDownloader/actions) 
 [![badge](https://github.com/shadowmoose/RedditDownloader/workflows/Docs/badge.svg)](https://shadowmoose.github.io/RedditDownloader/)
+[![Docker Build](https://img.shields.io/docker/cloud/build/shadowmoose/redditdownloader)](https://hub.docker.com/r/shadowmoose/redditdownloader)
 [![codecov](https://codecov.io/gh/shadowmoose/RedditDownloader/branch/master/graph/badge.svg)](https://codecov.io/gh/shadowmoose/RedditDownloader)
 ![lines of code](https://raw.githubusercontent.com/shadowmoose/RedditDownloader/project-badges/loc-badge.svg)
 
