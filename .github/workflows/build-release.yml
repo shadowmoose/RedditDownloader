@@ -79,27 +79,27 @@ jobs:
           tag: ${{ steps.update.outputs.release_tag }}
 
 
-  update-release-info:
-    name: Update Artifact Metadata
-    runs-on: ubuntu-latest
-    needs: [publish]
-    steps:
-      - name: Build Data File
-        uses: shadowmoose/Github-Release-Data-Action@3.0.0
-        id: build
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          outFile: ./_public/release.json
-          owner: shadowmoose
-          repo: RedditDownloader
+#  update-release-info:
+#    name: Update Artifact Metadata
+#    runs-on: ubuntu-latest
+#    needs: [publish]
+#    steps:
+#      - name: Build Data File
+#        uses: shadowmoose/Github-Release-Data-Action@3.0.0
+#        id: build
+#        with:
+#          token: ${{ secrets.GITHUB_TOKEN }}
+#          outFile: ./_public/release.json
+#          owner: shadowmoose
+#          repo: RedditDownloader
 
-      - name: Deploy to release-metadata branch
-        if: steps.build.outputs.is_released == 'true'
-        uses: peaceiris/actions-gh-pages@v2.9.0
-        env:
-          ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
-          PUBLISH_BRANCH: release-metadata-3.x
-          PUBLISH_DIR: ./_public
-        with:
-          username: "shadow-bot"
-          useremail: "github_bot@github.com"
+#      - name: Deploy to release-metadata branch
+#        if: steps.build.outputs.is_released == 'true'
+#        uses: peaceiris/actions-gh-pages@v2.9.0
+#        env:
+#          ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+#          PUBLISH_BRANCH: release-metadata-3.x
+#          PUBLISH_DIR: ./_public
+#        with:
+#          username: "shadow-bot"
+#          useremail: "github_bot@github.com"
