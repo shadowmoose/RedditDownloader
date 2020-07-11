@@ -11,6 +11,7 @@ from sources import DirectInputSource, DirectURLSource, DirectFileSource
 from interfaces.terminal import TerminalUI
 from interfaces.eelwrapper import WebUI
 import tests.runner
+import tests.mock
 import sql
 from tools import ffmpeg_download
 import static.filesystem as fs

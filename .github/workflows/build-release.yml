@@ -21,12 +21,15 @@ jobs:
           - os: windows-latest
             artifact: RMD-windows.exe
             path: ./dist/RedditDownloader.exe
+            run_test: ./dist/RedditDownloader.exe --skip_update --run_tests=*
           - os: ubuntu-16.04
             artifact: RMD-ubuntu
             path: ./dist/RedditDownloader
+            run_test: chmod +x ./dist/RedditDownloader && ./dist/RedditDownloader --skip_update --run_tests=*
           - os: macOS-latest
             artifact: RMD-macOS
             path: ./dist/RedditDownloader
+            run_test: chmod +x ./dist/RedditDownloader && ./dist/RedditDownloader --skip_update --run_tests=*
 
     steps:
       - name: Check for Required Package Updates
@@ -62,11 +65,21 @@ jobs:
         run: |
           pip install -r requirements.txt
           pip install -r requirements-dev.txt
+          pip install --upgrade 'setuptools>=49.1.1'
 
       - name: Build with PyInstaller
         if: steps.update.outputs.update_available == 'true'
         run: |
           pyinstaller build-rmd.spec
+
+      - name: Run Unit Tests
+        if: steps.update.outputs.update_available == 'true'
+        run: |
+          ${{matrix.run_test}}
+        env:
+          RMD_REFRESH_TOKEN: ${{secrets.RMD_REFRESH_TOKEN}}
+          RMD_IMGUR_ID: ${{secrets.RMD_IMGUR_ID}}
+          RMD_IMGUR_SECRET: ${{secrets.RMD_IMGUR_SECRET}}
 
       - name: Upload binaries to release
         if: steps.update.outputs.update_available == 'true'
@@ -79,27 +92,27 @@ jobs:
           tag: ${{ steps.update.outputs.release_tag }}
 
 
-#  update-release-info:
-#    name: Update Artifact Metadata
-#    runs-on: ubuntu-latest
-#    needs: [publish]
-#    steps:
-#      - name: Build Data File
-#        uses: shadowmoose/Github-Release-Data-Action@3.0.0
-#        id: build
-#        with:
-#          token: ${{ secrets.GITHUB_TOKEN }}
-#          outFile: ./_public/release.json
-#          owner: shadowmoose
-#          repo: RedditDownloader
+  update-release-info:
+    name: Update Artifact Metadata
+    runs-on: ubuntu-latest
+    needs: [publish]
+    steps:
+      - name: Build Data File
+        uses: shadowmoose/Github-Release-Data-Action@3.0.0
+        id: build
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          outFile: ./_public/release.json
+          owner: shadowmoose
+          repo: RedditDownloader
 
-#      - name: Deploy to release-metadata branch
-#        if: steps.build.outputs.is_released == 'true'
-#        uses: peaceiris/actions-gh-pages@v2.9.0
-#        env:
-#          ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
-#          PUBLISH_BRANCH: release-metadata-3.x
-#          PUBLISH_DIR: ./_public
-#        with:
-#          username: "shadow-bot"
-#          useremail: "github_bot@github.com"
+      - name: Deploy to release-metadata branch
+        if: steps.build.outputs.is_released == 'true'
+        uses: peaceiris/actions-gh-pages@v2.9.0
+        env:
+          ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+          PUBLISH_BRANCH: release-metadata-3.x
+          PUBLISH_DIR: ./_public
+        with:
+          username: "shadow-bot"
+          useremail: "github_bot@github.com"
