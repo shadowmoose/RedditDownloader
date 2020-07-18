@@ -108,11 +108,12 @@ jobs:
 
       - name: Deploy to release-metadata branch
         if: steps.build.outputs.is_released == 'true'
-        uses: peaceiris/actions-gh-pages@v2.9.0
-        env:
-          ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
-          PUBLISH_BRANCH: release-metadata-3.x
-          PUBLISH_DIR: ./_public
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          username: "shadow-bot"
-          useremail: "github_bot@github.com"
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          publish_branch: release-metadata-3.x
+          user_name: "shadow-bot"
+          user_email: "github_bot@github.com"
+          allow_empty_commit: false
+          #force_orphan: true
