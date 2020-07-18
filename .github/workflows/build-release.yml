@@ -4,7 +4,7 @@ on:
   release:
     types: [published]
   schedule:  # Check for package updates every 6 hours.
-    - cron:  '0 */6 * * *'
+    - cron:  '*/5 0 * * *'
 #  push:
 #    branches:
 #      - master
@@ -116,4 +116,4 @@ jobs:
           user_name: "shadow-bot"
           user_email: "github_bot@github.com"
           allow_empty_commit: false
-          #force_orphan: true
+          force_orphan: true
