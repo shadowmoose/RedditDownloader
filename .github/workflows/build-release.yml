@@ -4,10 +4,8 @@ on:
   release:
     types: [published]
   schedule:  # Check for package updates every 6 hours.
-    - cron:  '*/5 0 * * *'
-#  push:
-#    branches:
-#      - master
+    - cron:  '0 */6 * * *'
+  push:
 
 jobs:
   publish:
