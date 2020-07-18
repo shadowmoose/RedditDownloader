@@ -4,10 +4,8 @@ on:
   release:
     types: [published]
   schedule:  # Check for package updates every 6 hours.
-    - cron:  '*/5 0 * * *'
+    - cron:  '0 */6 * * *'
 #  push:
-#    branches:
-#      - master
 
 jobs:
   publish:
@@ -111,9 +109,9 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./public
+          publish_dir: ./_public
           publish_branch: release-metadata-3.x
           user_name: "shadow-bot"
           user_email: "github_bot@github.com"
           allow_empty_commit: false
-          force_orphan: true
+          #force_orphan: true
