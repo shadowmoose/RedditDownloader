@@ -34,9 +34,9 @@
   "published_at": "2020-07-11T00:29:54Z",
   "assets": [
     {
-      "url": "https://api.github.com/repos/shadowmoose/RedditDownloader/releases/assets/23299558",
-      "id": 23299558,
-      "node_id": "MDEyOlJlbGVhc2VBc3NldDIzMjk5NTU4",
+      "url": "https://api.github.com/repos/shadowmoose/RedditDownloader/releases/assets/24027858",
+      "id": 24027858,
+      "node_id": "MDEyOlJlbGVhc2VBc3NldDI0MDI3ODU4",
       "name": "RMD-macOS",
       "label": "",
       "uploader": {
@@ -61,23 +61,23 @@
       },
       "content_type": "binary/octet-stream",
       "state": "uploaded",
-      "size": 25442229,
+      "size": 25585455,
       "download_count": "?",
-      "created_at": "2020-07-28T00:49:56Z",
-      "updated_at": "2020-07-28T00:49:57Z",
+      "created_at": "2020-08-18T00:47:52Z",
+      "updated_at": "2020-08-18T00:47:53Z",
       "browser_download_url": "https://github.com/shadowmoose/RedditDownloader/releases/download/3.1.1/RMD-macOS",
       "metadata": {
-        "updatedMS": 1595897397000,
-        "updated": 1595897397,
-        "sha1": "beb0336ea5d38171f84cfeb1e48a5724217b933a",
-        "sha256": "38236cb44e9b5f23cae652889eed1ca16a02679c0a4bf3eb15b53cd39f49abf4",
-        "md5": "e6746087e5ce4fb99bac6fac70d91d67"
+        "updatedMS": 1597711673000,
+        "updated": 1597711673,
+        "sha1": "7d3f82366c5781325c1ffcab4b9b31ba70b233c0",
+        "sha256": "e7d36d7102de491f877930e16168d5c3c10015dab3372eacfdaed969fbe0f712",
+        "md5": "4878388ebc7ef56dd1743e01a7fb0922"
       }
     },
     {
-      "url": "https://api.github.com/repos/shadowmoose/RedditDownloader/releases/assets/23299315",
-      "id": 23299315,
-      "node_id": "MDEyOlJlbGVhc2VBc3NldDIzMjk5MzE1",
+      "url": "https://api.github.com/repos/shadowmoose/RedditDownloader/releases/assets/24027829",
+      "id": 24027829,
+      "node_id": "MDEyOlJlbGVhc2VBc3NldDI0MDI3ODI5",
       "name": "RMD-ubuntu",
       "label": "",
       "uploader": {
@@ -102,23 +102,23 @@
       },
       "content_type": "binary/octet-stream",
       "state": "uploaded",
-      "size": 39159928,
+      "size": 38601880,
       "download_count": "?",
-      "created_at": "2020-07-28T00:42:41Z",
-      "updated_at": "2020-07-28T00:42:43Z",
+      "created_at": "2020-08-18T00:46:59Z",
+      "updated_at": "2020-08-18T00:47:01Z",
       "browser_download_url": "https://github.com/shadowmoose/RedditDownloader/releases/download/3.1.1/RMD-ubuntu",
       "metadata": {
-        "updatedMS": 1595896963000,
-        "updated": 1595896963,
-        "sha1": "1a2d4a039a86ab08ab9cba8150e00cbeb4236afa",
-        "sha256": "a557b915255fd87f50d3250547945aae1310b3ab707ab8e6f699cdec8d128747",
-        "md5": "8ec74ba041c787be2f891d498cedc407"
+        "updatedMS": 1597711621000,
+        "updated": 1597711621,
+        "sha1": "0c234b5ceec6bf9b917e31eba021b254e5647ff5",
+        "sha256": "5839698daa96615388b7d894f9d50cb9e2e44815f26715b8b928297b226cb419",
+        "md5": "8ad7a9e1f4ff9cdfa0c4f7ddf568e356"
       }
     },
     {
-      "url": "https://api.github.com/repos/shadowmoose/RedditDownloader/releases/assets/23299336",
-      "id": 23299336,
-      "node_id": "MDEyOlJlbGVhc2VBc3NldDIzMjk5MzM2",
+      "url": "https://api.github.com/repos/shadowmoose/RedditDownloader/releases/assets/24027861",
+      "id": 24027861,
+      "node_id": "MDEyOlJlbGVhc2VBc3NldDI0MDI3ODYx",
       "name": "RMD-windows.exe",
       "label": "",
       "uploader": {
@@ -143,17 +143,17 @@
       },
       "content_type": "binary/octet-stream",
       "state": "uploaded",
-      "size": 27313228,
+      "size": 27438837,
       "download_count": "?",
-      "created_at": "2020-07-28T00:43:41Z",
-      "updated_at": "2020-07-28T00:43:42Z",
+      "created_at": "2020-08-18T00:48:15Z",
+      "updated_at": "2020-08-18T00:48:17Z",
       "browser_download_url": "https://github.com/shadowmoose/RedditDownloader/releases/download/3.1.1/RMD-windows.exe",
       "metadata": {
-        "updatedMS": 1595897022000,
-        "updated": 1595897022,
-        "sha1": "8baa303ba98b933c9a5b3d5525ac087130c5a901",
-        "sha256": "cb3f68f8c4752e89a8c35c28f1521ecbd8b639757399afe225ad4e1d7fa3b6d3",
-        "md5": "1dfc60c5b252a6eb2e26ac8a8a748bd2"
+        "updatedMS": 1597711697000,
+        "updated": 1597711697,
+        "sha1": "5ed006a4169eae877fa19ac68382876b67b2ae03",
+        "sha256": "060fe2095f406cea64795a2fbdf38e7659f33e935807005d5b470219fb5c7185",
+        "md5": "cd5d55acc6df9a37b8f0535e3de0530a"
       }
     }
   ],
