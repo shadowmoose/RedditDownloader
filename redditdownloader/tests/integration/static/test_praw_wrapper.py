@@ -38,6 +38,14 @@ class PrawWrapperTest(EnvironmentTest):
 		self.assertEqual(re.author, 'theshadowmoose', msg='Submission has invalid Author!')
 		self.assertEqual(re.title, 'Test Direct Link', msg='Submission has invalid Title!')
 
+	def test_submission_gallery(self):
+		""" Parse all gallery links """
+		p = pw.get_submission(t3_id='t3_hrrh23')
+		re = RedditElement(p)
+		self.assertEqual(len(re.get_urls()), 3, msg='Got incorrect image count from reddit gallery submission!')
+		for url in re.get_urls():
+			self.assertIn('https', url, msg='Failed to extract valid gallery URL: %s' % url)
+
 	def test_frontpage_load(self):
 		""" Load frontpage Submissions """
 		posts = [p for p in pw.frontpage_posts(limit=3)]
