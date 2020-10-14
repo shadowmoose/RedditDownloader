@@ -13,11 +13,11 @@ jobs:
     name: ${{ matrix.os }}, ${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}-latest
     strategy:
-      max-parallel: 9
+      max-parallel: 6
       fail-fast: false
       matrix:
         os: [ubuntu, windows, macOS]
-        python-version: [3.5, 3.6, 3.7]
+        python-version: [3.6, 3.7]
 
     steps:
       - uses: actions/checkout@v1
