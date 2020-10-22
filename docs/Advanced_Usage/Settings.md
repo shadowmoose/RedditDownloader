@@ -70,7 +70,7 @@ Links to single images will not use the API.
 
 **To register an imgur Application:**
 
-+ Visit [https://api.imgur.com/oauth2/addclient](http://api.imgur.com/oauth2/addclient) while signed in to imgur.
++ Visit [https://api.imgur.com/oauth2/addclient](https://api.imgur.com/oauth2/addclient) while signed in to imgur.
 + On the registration page, the Name/Callback URL/Website/Description can be any values. 
 + Check the box for "Anonymous usage without user authorization"
 + Fill in a valid email address
@@ -92,8 +92,8 @@ To insert them, include *'[tag_name]'* in the path. EG: *'/custom/[subreddit]/[a
 + ```subreddit```
 + ```source_alias```
 + ```created_utc``` *(A numeric Unix Timestamp, eg: 1552739416)*
-+ ```[created_date]``` *(Formatted as 'YYYY-MM-DD')*
-+ ```[created_time]```*(Formatted as 'HH.MM.SS')*
++ ```created_date``` *(Formatted as 'YYYY-MM-DD')*
++ ```created_time```*(Formatted as 'HH.MM.SS')*
 
 For example, you could tell RMD to output Posts to subdirectories based off Username by setting the pattern to 
 something like `/[author]/[type]/[subreddit]/[created_date] [created_time] - [title]`.
