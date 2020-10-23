@@ -129,7 +129,10 @@ class RedditElement(object):
 			# This post probably doesn't have a URL, and has selftext instead.
 			for url in stringutil.html_elements(post.selftext_html, 'a', 'href'):
 				self.add_url(url)
-		if post.url is not None and post.url.strip() != '':
+		if getattr(post, 'is_gallery', False):
+			for k, img in post.media_metadata.items():
+				self.add_url(img['s']['u'])
+		elif post.url is not None and post.url.strip() != '':
 			self.add_url(post.url)
 
 	def _ps_submission(self, post):
@@ -140,7 +143,7 @@ class RedditElement(object):
 			self.id = 't3_%s' % self.id
 		self.title = post.title
 		self.subreddit = post.subreddit
-		if post.author is None or post.author == '[deleted]':
+		if getattr(post, 'author', None) is None or post.author == '[deleted]':
 			self.author = 'Deleted'
 		else:
 			self.author = str(post.author)
@@ -148,7 +151,10 @@ class RedditElement(object):
 		self.num_comments = post.num_comments
 		self.score = post.score
 		self.body = html.unescape(str(post.selftext)) if 'selftext' in post and post.selftext else ''
-		if post.url is not None and post.url.strip() != '' and 'reddit.com' not in post.url:
+		if getattr(post, 'is_gallery', False):
+			for k, img in post.media_metadata.items():
+				self.add_url(html.unescape(img['s']['u']))
+		elif post.url is not None and post.url.strip() != '' and 'reddit.com' not in post.url:
 			self.add_url(post.url)
 		if self.body.strip():
 			for u in re.findall(r'\[.+?\]\s*?\((.+?)\)', self.body):

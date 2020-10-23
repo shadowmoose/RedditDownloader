@@ -158,9 +158,10 @@ class FileHasher:
 		"""
 		Checks if the given Image object is an animated GIF
 		"""
+		# noinspection PyBroadException
 		try:
 			image.seek(1)
-		except EOFError:
+		except Exception:
 			return False
 		else:
 			return True
