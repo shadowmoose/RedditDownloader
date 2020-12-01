@@ -34,9 +34,9 @@
   "published_at": "2020-07-11T00:29:54Z",
   "assets": [
     {
-      "url": "https://api.github.com/repos/shadowmoose/RedditDownloader/releases/assets/28909488",
-      "id": 28909488,
-      "node_id": "MDEyOlJlbGVhc2VBc3NldDI4OTA5NDg4",
+      "url": "https://api.github.com/repos/shadowmoose/RedditDownloader/releases/assets/29000555",
+      "id": 29000555,
+      "node_id": "MDEyOlJlbGVhc2VBc3NldDI5MDAwNTU1",
       "name": "RMD-macOS",
       "label": "",
       "uploader": {
@@ -61,17 +61,17 @@
       },
       "content_type": "binary/octet-stream",
       "state": "uploaded",
-      "size": 23246356,
+      "size": 23248795,
       "download_count": "?",
-      "created_at": "2020-11-29T12:29:42Z",
-      "updated_at": "2020-11-29T12:29:43Z",
+      "created_at": "2020-12-01T19:23:46Z",
+      "updated_at": "2020-12-01T19:23:47Z",
       "browser_download_url": "https://github.com/shadowmoose/RedditDownloader/releases/download/3.1.1/RMD-macOS",
       "metadata": {
-        "updatedMS": 1606652983000,
-        "updated": 1606652983,
-        "sha1": "496eaef9b565a4041b6d5acc1a5273f47833ad99",
-        "sha256": "333cab386d372f88bcfe9c3a32bd804e5c9f46008661bebcfce4ce749804941c",
-        "md5": "88dd6791134abaa1ebf08854ecb5b628"
+        "updatedMS": 1606850627000,
+        "updated": 1606850627,
+        "sha1": "dcd55c548eaf58150ed437efdca7dc90421dbb16",
+        "sha256": "d8634c580578b4ade57d9a5b0d0c3f2f2c48b8ddeded2bcfa9bc3f76e42bfff2",
+        "md5": "7c57fb96b2a804502e8a1a25dd2c4a09"
       }
     },
     {
