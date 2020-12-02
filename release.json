@@ -75,9 +75,9 @@
       }
     },
     {
-      "url": "https://api.github.com/repos/shadowmoose/RedditDownloader/releases/assets/28909434",
-      "id": 28909434,
-      "node_id": "MDEyOlJlbGVhc2VBc3NldDI4OTA5NDM0",
+      "url": "https://api.github.com/repos/shadowmoose/RedditDownloader/releases/assets/29010326",
+      "id": 29010326,
+      "node_id": "MDEyOlJlbGVhc2VBc3NldDI5MDEwMzI2",
       "name": "RMD-ubuntu",
       "label": "",
       "uploader": {
@@ -102,23 +102,23 @@
       },
       "content_type": "binary/octet-stream",
       "state": "uploaded",
-      "size": 32775456,
+      "size": 32777904,
       "download_count": "?",
-      "created_at": "2020-11-29T12:27:10Z",
-      "updated_at": "2020-11-29T12:27:11Z",
+      "created_at": "2020-12-02T00:56:54Z",
+      "updated_at": "2020-12-02T00:56:54Z",
       "browser_download_url": "https://github.com/shadowmoose/RedditDownloader/releases/download/3.1.1/RMD-ubuntu",
       "metadata": {
-        "updatedMS": 1606652831000,
-        "updated": 1606652831,
-        "sha1": "50a046ff06f4f2be3c5b94292fe9754a1158c269",
-        "sha256": "2e550cac6391533a3531e9224b47721cb21248790273d128099e71adb636fcf4",
-        "md5": "97908fb5a30deff8ea751887c6b60447"
+        "updatedMS": 1606870614000,
+        "updated": 1606870614,
+        "sha1": "322051e2b46c258195d0b3c12a0e73cca62a713f",
+        "sha256": "5777e97f0b6216c97bc77a04b0a0ad357e6d6c421150e463bbf7a15346d69773",
+        "md5": "739206b89c323dc6667da89fc3881cfe"
       }
     },
     {
-      "url": "https://api.github.com/repos/shadowmoose/RedditDownloader/releases/assets/28909455",
-      "id": 28909455,
-      "node_id": "MDEyOlJlbGVhc2VBc3NldDI4OTA5NDU1",
+      "url": "https://api.github.com/repos/shadowmoose/RedditDownloader/releases/assets/29010401",
+      "id": 29010401,
+      "node_id": "MDEyOlJlbGVhc2VBc3NldDI5MDEwNDAx",
       "name": "RMD-windows.exe",
       "label": "",
       "uploader": {
@@ -143,17 +143,17 @@
       },
       "content_type": "binary/octet-stream",
       "state": "uploaded",
-      "size": 22571538,
+      "size": 22573970,
       "download_count": "?",
-      "created_at": "2020-11-29T12:28:08Z",
-      "updated_at": "2020-11-29T12:28:09Z",
+      "created_at": "2020-12-02T00:58:46Z",
+      "updated_at": "2020-12-02T00:58:47Z",
       "browser_download_url": "https://github.com/shadowmoose/RedditDownloader/releases/download/3.1.1/RMD-windows.exe",
       "metadata": {
-        "updatedMS": 1606652889000,
-        "updated": 1606652889,
-        "sha1": "839eb5fd54d111d362440e8511daaa4c0382d646",
-        "sha256": "88f7fd9501f25e1c1944b7eb29462bcd370f7b8b9d5dcb4f5b571344c5abfa9f",
-        "md5": "be3e9b813362393e67ef518ffb2e6c46"
+        "updatedMS": 1606870727000,
+        "updated": 1606870727,
+        "sha1": "3249d43994d4aa3b67277504c37f0cc61dbd9bb7",
+        "sha256": "9dade5d22053fe25e0758644bb4f497f28425e167ce512b737d5973e41793769",
+        "md5": "025ec7ab87cee694a01c09617aa9739b"
       }
     }
   ],
