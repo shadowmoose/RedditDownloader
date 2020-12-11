@@ -1,9 +1,0 @@
-# comment
-.git/
-.idea/
-.pytest_cache/
-
-build/
-docs/
-venv/
-latest-rmd/

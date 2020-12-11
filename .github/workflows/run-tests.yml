@@ -1,0 +1,55 @@
+name: Run tests
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ${{ matrix.os }}-latest
+
+    strategy:
+      matrix:
+        os: [windows, ubuntu, macOS]
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Setup Node.js (${{ matrix.os }})
+      uses: actions/setup-node@v1
+      with:
+        node-version: 14.x
+        registry-url: https://registry.npmjs.org
+
+    - name: Get yarn cache directory path
+      id: yarn-cache-dir-path
+      run: echo "::set-output name=dir::$(yarn cache dir)"
+
+    - name: Restore Yarn Cache
+      uses: actions/cache@v2
+      id: yarn-cache # (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+      with:
+        path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+        key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-yarn-
+
+    - name: Install dependencies
+      run: yarn install --frozen-lockfile
+
+    - name: Test
+      env:
+        RMD_REFRESH_TOKEN: ${{secrets.RMD_REFRESH_TOKEN}}
+        RMD_TEST_USERNAME: ${{secrets.RMD_TEST_USERNAME}}
+        RMD_TEST_PASSWORD: ${{secrets.RMD_TEST_PASSWORD}}
+      run: yarn test --ci
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v1
+      with:
+        # token: ${{ secrets.CODECOV_TOKEN }} # Not needed for public repos.
+        directory: ./coverage/
+        flags: unittests
+        env_vars: ${{ matrix.node-version }}
+        name: codecov-umbrella
+        fail_ci_if_error: false
+        verbose: true

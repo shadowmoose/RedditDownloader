@@ -1,0 +1,35 @@
+on:
+  push:
+    branches: [ master ]
+name: Count Lines of Code
+
+jobs:
+  count_LoC:
+    runs-on: ubuntu-latest
+    name: Count Lines of Code
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Count Lines of Code
+        uses: shadowmoose/GHA-LoC-Badge@1.0.0
+        id: badge
+        with:
+          debug: true
+          directory: ./
+          badge: ./output/loc-badge.svg
+          ignore: '*.lock'
+
+      - name: Print the output
+        run: |
+          echo "Scanned: ${{ steps.badge.outputs.counted_files }}";
+          echo "Line Count: ${{ steps.badge.outputs.total_lines }}";
+
+      - name: Deploy to image-data branch
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          publish_dir: ./output
+          publish_branch: image-data
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
