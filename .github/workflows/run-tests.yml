@@ -50,6 +50,6 @@ jobs:
         directory: ./coverage/
         flags: unittests
         env_vars: ${{ matrix.node-version }}
-        name: codecov-umbrella
+        name: test-${{ matrix.node-version }}
         fail_ci_if_error: false
         verbose: true
