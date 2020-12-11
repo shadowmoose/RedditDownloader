@@ -1723,7 +1723,7 @@ devtools-protocol@0.0.818844:
   resolved "https://registry.yarnpkg.com/devtools-protocol/-/devtools-protocol-0.0.818844.tgz#d1947278ec85b53e4c8ca598f607a28fa785ba9e"
   integrity sha512-AD1hi7iVJ8OD0aMLQU5VK0XH9LDlA1+BcPIgrAxPfaibx2DbWucuyOhc4oyQCbnvDDO68nN6/LcKfqTP343Jjg==
 
-dhash-image@^1.2.1:
+dhash-image@1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/dhash-image/-/dhash-image-1.2.1.tgz#cffcd9c93c160c31b60c48752d1fe50864c8bddd"
   integrity sha1-z/zZyTwWDDG2DEh1LR/lCGTIvd0=
