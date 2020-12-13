@@ -11,7 +11,7 @@ import {authConf} from "../terminal/authorize";
 
 
 interface Config {
-    /** If set, this is a function that the user called via command line. */
+    /** If set, this is a function that the user invoked via command line. */
     argCommand: Function|null;
 
     /** The parsed arguments that the user passed in via command line. */

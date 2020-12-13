@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import {Connection, createConnection} from "typeorm";
-import { dataPath } from "../util/paths";
+import { envDataPath } from "../util/paths";
 import DBSubmission from "./entities/db-submission";
 import DBComment from "./entities/db-comment";
 import DBDownload, {DownloadSubscriber} from "./entities/db-download";
@@ -18,7 +18,7 @@ export async function makeDB() {
 
     return createConnection({
         type: "better-sqlite3",
-        database: dataPath(`manifest.sqlite`),
+        database: envDataPath(`manifest.sqlite`),
         entities: [DBSubmission, DBComment, DBDownload, DBFile, DBFilter, DBSetting, DBSourceGroup, DBSource, DBUrl],
         logging: false,
         migrationsTransactionMode: 'all',

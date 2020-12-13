@@ -38,12 +38,12 @@ export function hammingDist(str1: string, str2: string) {
  * Uses hashing to deduplicate files. If a pre-existing match is found,
  * it deletes the worst file and returns the updated File with the new best path.
  */
-export async function buildFile(path: string) {
-    const stats = await fs.promises.stat(path);
-    if (!stats.isFile()) throw Error(`The given file output path does not exist: "${path}"`);
+export async function buildFile(fullPath: string, subpath: string) {
+    const stats = await fs.promises.stat(fullPath);
+    if (!stats.isFile()) throw Error(`The given file output path does not exist: "${fullPath}"`);
 
-    const checksum = await checksumFile(path);
-    const dh = await distHash(path);
+    const checksum = await checksumFile(fullPath);
+    const dh = await distHash(fullPath);
     const dChunks = dh?.match(/.{1,4}/g) || [];
 
     const closeMatches = await DBFile.createQueryBuilder('f')
@@ -63,9 +63,9 @@ export async function buildFile(path: string) {
         let best, worst;
         if (match.size > stats.size) {
             best = match.path;
-            worst = path;
+            worst = fullPath;
         } else {
-            best = path;
+            best = fullPath;
             worst = match.path;
         }
 
@@ -83,8 +83,8 @@ export async function buildFile(path: string) {
         hash2: dChunks[1],
         hash3: dChunks[2],
         hash4: dChunks[3],
-        mimeType: mimetype.lookup(path) || '',
-        path,
+        mimeType: mimetype.lookup(fullPath) || '',
+        path: subpath,
         size: stats.size
     });
 

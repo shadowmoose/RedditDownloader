@@ -4,10 +4,20 @@ import {DownloadProgress} from "../util/state";
 
 export default abstract class Downloader {
     public order: number = 0;
+    private initPromise: Promise<any>|null = null;
     abstract name: string;
+
+    /** Run this Downloader's init function once, and/or await for that single call to finish. */
+    public async initOnce() {
+        return this.initPromise = this.initPromise || this.init();
+    }
+
+    /** Perform any initial setup this Downloader may require. Only ever called once. */
+    protected abstract async init(): Promise<any>;
 
     /** If this Downloader thinks that it can successfully download the given URL Data. */
     abstract async canHandle(data: DownloaderData): Promise<boolean>;
+
     /** Get the user-specified order that this Downloader should run in. */
     abstract async getOrder(): Promise<number>;
 

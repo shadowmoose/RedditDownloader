@@ -35,7 +35,7 @@ export async function makeName(dl: DBDownload, template: string) {
             .where('f.path LIKE :path', {path: `${path}%`})
             .getCount();
     };
-    const baseName = makePathFit(tags, template);
+    const baseName = makePathFit(tags, template).replace(/^[./\\]/, '');
     let path = baseName;
     let idx = 1;
 

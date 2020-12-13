@@ -5,8 +5,11 @@ import {DownloadProgress} from "../../util/state";
 import * as ytdl from '../ytdl';
 
 export default class YtdlDownloader extends Downloader {
-    static hasRunUpdate = false;
     name: string = 'ytdl';
+
+    protected async init(): Promise<any> {
+        return ytdl.autoUpdate();
+    }
 
     async getOrder(): Promise<number> {
         return 0;
@@ -17,11 +20,6 @@ export default class YtdlDownloader extends Downloader {
     }
 
     async download(data: DownloaderData, actions: DownloaderFunctions, progress: DownloadProgress): Promise<string | void> {
-        if (!YtdlDownloader.hasRunUpdate) {
-            YtdlDownloader.hasRunUpdate = true;
-            await ytdl.autoUpdate();
-        }
-
         const fullPath = await ytdl.download(data.url, data.file, progress);
         return path.extname(fullPath);
     }

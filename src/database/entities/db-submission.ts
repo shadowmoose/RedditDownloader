@@ -96,8 +96,8 @@ export default class DBSubmission extends DBEntity {
             score: 0,
             selfText: "",
             shouldProcess: false,
-            subreddit: "",
-            title: "",
+            subreddit: "test_sub",
+            title: "test title",
             ...opts
         });
     }

@@ -20,22 +20,29 @@ export default class DBSetting extends DBEntity {
 
     /**
      * Retrieve the value of the given Setting key. Returns the default if none is saved.
+     * Once returned from DB, this value is cached in memory. Thus, repeated lookups will not cause slowdown.
      */
-    static async get<S extends typeof defaultSettings, K extends keyof S>(key: K): Promise<S[K]> {
-        const s = await DBSetting.findOne({ id: key as string });
+    static async get<S extends DefSettings, K extends keyof DefSettings>(key: K): Promise<S[K]> {
+        if (settingsCache[key]) {
+            return settingsCache[key];
+        }
 
-        // @ts-ignore
+        const s = await DBSetting.findOne({ id: key as string });
         const def: any = defaultSettings[key];
-        return s ? s.value : def;
+
+        return settingsCache[key] = (s ? s.value : def);
     }
 
     /**
-     * Set the value of the given Setting key. Automatically saves.
+     * Set the value of the given Setting key. Automatically saves. Also updates the in-memory settings cache.
      */
-    static async set<S extends typeof defaultSettings, K extends keyof S>(key: K, val: S[K]): Promise<DBSetting> {
+    static async set<S extends DefSettings, K extends keyof S>(key: K, val: S[K]): Promise<DBSetting> {
         const found = await DBSetting.findOne({ id: key as string });
         const s = found || await DBSetting.build({id: key as string, valueJSON: ''});
         s.value = val;
+
+        settingsCache[key] = val;
+
         return s.save();
     }
 
@@ -43,7 +50,7 @@ export default class DBSetting extends DBEntity {
      * Retrieves an object with all current setting keys and values.
      * Useful for sending to any interface that needs to know all current settings.
      */
-    static async getAll(): Promise<typeof defaultSettings> {
+    static async getAll(): Promise<DefSettings> {
         const settings = await DBSetting.find();
         const find = (id: string) => settings.find(s => s.id === id);
         const ret: Record<any, any> = {};
@@ -55,7 +62,7 @@ export default class DBSetting extends DBEntity {
     }
 }
 
-
+type DefSettings = typeof defaultSettings;
 const defaultSettings = {
     test: 1337,
     refreshToken: '',
@@ -67,3 +74,4 @@ const defaultSettings = {
     /** The output template RMD uses when generating a file name. */
     outputTemplate: '[subreddit]/[title] ([author])'
 }
+const settingsCache: Record<any, any> = {};

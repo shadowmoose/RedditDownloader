@@ -1,7 +1,4 @@
 import {buildFile} from "./dl-file-processing";
-
-process.env.UV_THREADPOOL_SIZE = '20'; // Scale up the available libuv thread pool.
-
 import DBDownload, {DownloadSubscriber} from "../database/entities/db-download";
 import promisePool, {mutex} from "../util/promise-pool";
 import DBSetting from "../database/entities/db-setting";
@@ -12,13 +9,17 @@ import Downloader, {GracefulStopError} from "./downloader";
 import {v4} from "uuid";
 import {DownloaderState, DownloadProgress} from "../util/state";
 import YtdlDownloader from "./wrappers/ytdl-downloader";
+import {getAbsoluteDL} from "../util/paths";
 
 
 export async function getDownloaders(): Promise<Downloader[]> {
     const list = [new YtdlDownloader()];
+
     for (const l of list) {
-        l.order = await l.getOrder(); // TODO: Do this statically, so it only happens once.
+        await l.initOnce();
+        l.order = await l.getOrder();
     }
+
     return list.sort((a, b) => a.order - b.order);
 }
 
@@ -71,7 +72,9 @@ export async function downloadAll(state: DownloaderState) {
 
 
 export interface DownloaderData {
-    /** The target output file path */
+    /** The relative path of this file. Not as useful for Downloaders. */
+    relativeFile: string,
+    /** The target output file's absolute path */
     file: string;
     /** The target URL, unpacked from dl.url.address for simplicity */
     url: string;
@@ -94,8 +97,10 @@ export interface DownloaderFunctions {
  * Generate the data structure and callbacks that are to be passed into the Downloader instances.
  */
 export async function buildDownloadData(dl: DBDownload) {
+    const relativeFile = await makeName(dl, await DBSetting.get('outputTemplate'));
     const data: DownloaderData = {
-        file: await makeName(dl, await DBSetting.get('outputTemplate')),
+        relativeFile,
+        file: getAbsoluteDL(relativeFile),
         url: dl.url.address,
         post: await dl.getDBParent(),
         dl
@@ -127,10 +132,9 @@ export async function buildDownloadData(dl: DBDownload) {
 export async function handleDownload(dl: DBDownload, progress: DownloadProgress) {
     const {data, callbacks} = await buildDownloadData(dl);
 
-    progress.status = `Looking for downloaders to handle this URL...`;
-
     for (const d of await getDownloaders()) {
         if (progress.shouldStop || dl.url.processed) break;
+        progress.status = `Looking for downloaders to handle this URL...`;
         if (await d.canHandle(data)) {
             progress.handler = d.name;
             progress.status = `Downloading the URL...`;
@@ -145,7 +149,7 @@ export async function handleDownload(dl: DBDownload, progress: DownloadProgress)
                 }
                 ext = ext.replace(/\./gmi, '');
                 console.log("Downloaded file:", ext);
-                return await processFinishedDownload(dl.url, `${data.file}.${ext}`, d.name);
+                return await processFinishedDownload(dl.url, `${data.relativeFile}.${ext}`, d.name);
             } catch (err) {
                 if (err instanceof GracefulStopError) {
                     // Swallow graceful errors, because the user wants to exit cleanly.
@@ -163,8 +167,8 @@ export async function handleDownload(dl: DBDownload, progress: DownloadProgress)
 /**
  * Builds and saves a new DBFile for the given DBUrl and file path.
  */
-export async function processFinishedDownload(url: DBUrl, path: string, handler: string) {
-    url.file = buildFile(path);
+export async function processFinishedDownload(url: DBUrl, subPath: string, handler: string) {
+    url.file = buildFile(getAbsoluteDL(subPath), subPath);
     url.processed = true;
     url.failed = false;
     url.failureReason = null;
