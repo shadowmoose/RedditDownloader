@@ -1,11 +1,11 @@
-import * as gen from '../src/util/name-generator'
-import {getComment, getSubmission} from "../src/reddit/snoo";
-import DBDownload from "../src/database/entities/db-download";
-import {makeDB} from "../src/database/db";
-import {getAbsoluteDL} from "../src/util/paths";
-import {MAX_NAME_LEN} from "../src/util/name-generator";
-import DBUrl from "../src/database/entities/db-url";
-import DBFile from "../src/database/entities/db-file";
+import * as gen from '../src/engine/util/name-generator'
+import {getComment, getSubmission} from "../src/engine/reddit/snoo";
+import DBDownload from "../src/engine/database/entities/db-download";
+import {makeDB} from "../src/engine/database/db";
+import {getAbsoluteDL} from "../src/engine/util/paths";
+import {MAX_NAME_LEN} from "../src/engine/util/name-generator";
+import DBUrl from "../src/engine/database/entities/db-url";
+import DBFile from "../src/engine/database/entities/db-file";
 
 describe('Name Generator Tests', () => {
     beforeEach(async () => {

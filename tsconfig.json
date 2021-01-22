@@ -1,20 +1,25 @@
 {
   "compilerOptions": {
-    "moduleResolution": "node",
     "target": "es5",
-    "module": "commonjs",
-    "lib": ["es2015", "es2016", "es2017", "dom"],
     "strict": true,
-    "sourceMap": true,
-    "declaration": true,
+    "allowJs": true,
+    "module": "commonjs",
+    "skipLibCheck": true,
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
+    "noImplicitAny": true,
+    "sourceMap": true,
+    "baseUrl": ".",
+    "outDir": "dist",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "declarationDir": "dist",
-    "outDir": "dist",
-    "typeRoots": ["node_modules/@types"],
-    "resolveJsonModule": true
+    "paths": {
+      "*": ["node_modules/*"]
+    },
+    "jsx": "react"
   },
-  "include": ["src"]
+  "include": [
+    "src/**/*"
+  ]
 }

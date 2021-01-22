@@ -1,12 +1,10 @@
 import { app, BrowserWindow } from 'electron';
 declare const MAIN_WINDOW_WEBPACK_ENTRY: any;
 
-// Handle creating/removing shortcuts on Windows when installing/uninstalling.
-if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
-    app.quit();
-}
+let setReady: any;
+export const ready = new Promise(r => {setReady = r});
 
-const createWindow = (): void => {
+export const createWindow = (): void => {
     // Create the browser window.
     const mainWindow = new BrowserWindow({
         height: 600,
@@ -28,14 +26,16 @@ const createWindow = (): void => {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createWindow);
+app.on('ready', setReady);
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
+    console.log("Closed electron.");
     if (process.platform !== 'darwin') {
         app.quit();
+        process.exit(0);
     }
 });
 
@@ -49,24 +49,3 @@ app.on('activate', () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
-
-/*
-process.env.UV_THREADPOOL_SIZE = '20'; // Scale up the available libuv thread pool.
-import {makeDB} from "./engine/database/db";
-import {config, setEnv} from './engine/util/config';
-
-
-if (config.argCommand) {
-    setEnv('./temp-test-data/manual-run/');
-    makeDB().then(async () => {
-        console.log('Database is ready! Env:', config.shared.env);
-        console.log(config.args);
-        await config.argCommand!();
-    });
-} else {
-    console.log("Launching in system tray.");
-}
-
-// TODO: Launch alternate server/UI.
-// cross-env ELECTRON_RUN_AS_NODE=true ./node_modules/.bin/electron ./node_modules/jest-cli/bin/jest.js
-*/

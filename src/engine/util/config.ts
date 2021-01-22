@@ -119,7 +119,7 @@ function loadShared() {
 
 
 /**
- * Makes sure that the, if set, the current environment exists.
+ * Makes sure that, if set, the current environment exists.
  * If it does not, removes it from the list at tries to load the next known.
  */
 function checkEnvironment() {

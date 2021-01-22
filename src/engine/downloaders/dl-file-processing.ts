@@ -2,11 +2,14 @@ import crypto from "crypto";
 import fs from "fs";
 import DBFile from "../database/entities/db-file";
 import * as mimetype from "mime-types";
-const dHash = require('dhash-image');
+import DBSetting from "../database/entities/db-setting";
+import path from "path";
+import {getAbsoluteDL} from "../util/paths";
+import {dhash} from '../util/image-dhash';
 
 
 export async function distHash(file: string): Promise<string|null> {
-    return dHash(file, 8).then(async (res: Buffer) => {
+    return dhash(file, 8).then(async (res: Buffer) => {
         return res.toString('hex');
     }).catch(() => null);
 }
@@ -61,17 +64,22 @@ export async function buildFile(fullPath: string, subpath: string) {
 
     if (match) {
         let best, worst;
-        if (match.size > stats.size) {
-            best = match.path;
-            worst = fullPath;
-        } else {
+        const fullMatchPath = getAbsoluteDL(match.path);
+        if (match.size < stats.size) {
             best = fullPath;
-            worst = match.path;
+            worst = fullMatchPath
+        } else {
+            best = fullMatchPath
+            worst = fullPath;
         }
 
         match.path = best;
         await match.save();
         await fs.promises.unlink(worst);
+
+        if (await DBSetting.get('createSymLinks')) {
+            fs.symlinkSync(path.relative(worst, best), worst);
+        }
 
         return match;
     }

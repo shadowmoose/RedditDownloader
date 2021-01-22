@@ -1,6 +1,6 @@
 import Source from "./source";
 import * as reddit from '../reddit/snoo';
-import {ListingOptionsSchema, TypeOpts} from "../shared/source-interfaces";
+import {ListingOptionsSchema, TypeOpts} from "../../shared/source-interfaces";
 import {SubredditSorts, TimeRange} from "../reddit/snoo";
 
 

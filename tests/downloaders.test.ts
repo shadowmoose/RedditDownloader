@@ -1,13 +1,13 @@
 import fs from "fs";
-import * as ytdl from "../src/downloaders/ytdl";
-import { getAbsoluteDL } from '../src/util/paths';
-import {downloadFFMPEG} from "../src/downloaders/ytdl";
-import {getNextPendingDownload, handleDownload} from "../src/downloaders";
-import {makeDB} from "../src/database/db";
-import DBSubmission from "../src/database/entities/db-submission";
-import DBDownload from "../src/database/entities/db-download";
-import {DownloadProgress} from "../src/util/state";
-import DBFile from "../src/database/entities/db-file";
+import * as ytdl from "../src/engine/downloaders/ytdl";
+import { getAbsoluteDL } from '../src/engine/util/paths';
+import {downloadFFMPEG} from "../src/engine/downloaders/ytdl";
+import {getNextPendingDownload, handleDownload} from "../src/engine/downloaders";
+import {makeDB} from "../src/engine/database/db";
+import DBSubmission from "../src/engine/database/entities/db-submission";
+import DBDownload from "../src/engine/database/entities/db-download";
+import {DownloadProgress} from "../src/engine/util/state";
+import DBFile from "../src/engine/database/entities/db-file";
 
 describe('YTDL Tests', () => {
     beforeAll( async() => {

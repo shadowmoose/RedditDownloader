@@ -1,5 +1,5 @@
-import promisePool, {mutex, sleep} from "../src/util/promise-pool";
-import {Streamer} from "../src/util/streamer";
+import promisePool, {mutex, sleep} from "../src/engine/util/promise-pool";
+import {Streamer} from "../src/engine/util/streamer";
 
 
 describe('Utility Tests', () => {

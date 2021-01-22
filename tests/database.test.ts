@@ -1,13 +1,13 @@
-import {makeDB} from "../src/database/db";
-import DBSubmission from "../src/database/entities/db-submission";
-import * as snoo from '../src/reddit/snoo';
-import {getSavedPosts, getUpvoted} from "../src/reddit/snoo";
-import DBFilter from "../src/database/entities/db-filter";
-import DBSetting from "../src/database/entities/db-setting";
-import DBSourceGroup from "../src/database/entities/db-source-group";
-import DBSource from "../src/database/entities/db-source";
-import DBDownload, {DownloadSubscriber} from "../src/database/entities/db-download";
-import DBUrl from "../src/database/entities/db-url";
+import {makeDB} from "../src/engine/database/db";
+import DBSubmission from "../src/engine/database/entities/db-submission";
+import * as snoo from '../src/engine/reddit/snoo';
+import {getSavedPosts, getUpvoted} from "../src/engine/reddit/snoo";
+import DBFilter from "../src/engine/database/entities/db-filter";
+import DBSetting from "../src/engine/database/entities/db-setting";
+import DBSourceGroup from "../src/engine/database/entities/db-source-group";
+import DBSource from "../src/engine/database/entities/db-source";
+import DBDownload, {DownloadSubscriber} from "../src/engine/database/entities/db-download";
+import DBUrl from "../src/engine/database/entities/db-url";
 
 
 describe("Database Tests", () => {

@@ -2,7 +2,7 @@ import Ajv from "ajv"
 import DBSource from "../database/entities/db-source";
 import DBSubmission from "../database/entities/db-submission";
 import DBComment from "../database/entities/db-comment";
-import {SourceSchema} from "../shared/source-interfaces";
+import {SourceSchema} from "../../shared/source-interfaces";
 
 export default abstract class Source {
     protected abstract data: any;

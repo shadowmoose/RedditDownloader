@@ -1,6 +1,6 @@
 import Source from "./source";
 import * as reddit from '../reddit/snoo';
-import {TypeOpts} from "../shared/source-interfaces";
+import {TypeOpts} from "../../shared/source-interfaces";
 import DBComment from "../database/entities/db-comment";
 import {filterMap} from "../util/generator-util";
 

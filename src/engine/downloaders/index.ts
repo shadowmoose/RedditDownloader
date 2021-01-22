@@ -72,7 +72,7 @@ export async function downloadAll(state: DownloaderState) {
 
 
 export interface DownloaderData {
-    /** The relative path of this file. Not as useful for Downloaders. */
+    /** The relative path of this file. */
     relativeFile: string,
     /** The target output file's absolute path */
     file: string;
@@ -148,7 +148,6 @@ export async function handleDownload(dl: DBDownload, progress: DownloadProgress)
                     continue;
                 }
                 ext = ext.replace(/\./gmi, '');
-                console.log("Downloaded file:", ext);
                 return await processFinishedDownload(dl.url, `${data.relativeFile}.${ext}`, d.name);
             } catch (err) {
                 if (err instanceof GracefulStopError) {

@@ -1,5 +1,7 @@
 config.json
 .idea/
+.webpack/
+out/
 data/
 dist/
 docs/

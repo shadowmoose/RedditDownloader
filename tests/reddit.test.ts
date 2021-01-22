@@ -1,10 +1,10 @@
-import * as rd from '../src/reddit/snoo'
-import * as oa from '../src/reddit/oAuth';
-import extractLinks from "../src/reddit/url-extractors";
-import {getComment, getSavedPosts, getSubmission} from "../src/reddit/snoo";
+import * as rd from '../src/engine/reddit/snoo'
+import * as oa from '../src/engine/reddit/oAuth';
+import extractLinks from "../src/engine/reddit/url-extractors";
+import {getComment, getSavedPosts, getSubmission} from "../src/engine/reddit/snoo";
 import puppeteer from 'puppeteer';
 import express from "express";
-import {makeDB} from "../src/database/db";
+import {makeDB} from "../src/engine/database/db";
 
 
 describe("Reddit Tests", () => {

@@ -1,14 +1,14 @@
-import DBSource from "../src/database/entities/db-source";
-import SavedPostSource from "../src/sources/saved-post-source";
-import {makeSource} from "../src/sources";
-import Source from "../src/sources/source";
-import DBSubmission from "../src/database/entities/db-submission";
-import DBSourceGroup from "../src/database/entities/db-source-group";
-import DBFilter from "../src/database/entities/db-filter";
-import {makeDB} from "../src/database/db";
-import {DBEntity} from "../src/database/entities/db-entity";
-import {forGen} from "../src/util/generator-util";
-import DBDownload from "../src/database/entities/db-download";
+import DBSource from "../src/engine/database/entities/db-source";
+import SavedPostSource from "../src/engine/sources/saved-post-source";
+import {makeSource} from "../src/engine/sources";
+import Source from "../src/engine/sources/source";
+import DBSubmission from "../src/engine/database/entities/db-submission";
+import DBSourceGroup from "../src/engine/database/entities/db-source-group";
+import DBFilter from "../src/engine/database/entities/db-filter";
+import {makeDB} from "../src/engine/database/db";
+import {DBEntity} from "../src/engine/database/entities/db-entity";
+import {forGen} from "../src/engine/util/generator-util";
+import DBDownload from "../src/engine/database/entities/db-download";
 
 describe("Source Tests", () => {
     beforeEach(async () => {

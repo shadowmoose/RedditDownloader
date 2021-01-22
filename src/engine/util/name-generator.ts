@@ -4,6 +4,7 @@ import DBDownload from "../database/entities/db-download";
 import {getAbsoluteDL} from "./paths";
 import DBFile from "../database/entities/db-file";
 import {forkPost} from "../database/db";
+import * as fs from "fs";
 const sanitize = require('sanitize-filename');
 
 export const MAX_NAME_LEN = 240;
@@ -39,7 +40,7 @@ export async function makeName(dl: DBDownload, template: string) {
     let path = baseName;
     let idx = 1;
 
-    while (await countMatches()) {
+    while (await countMatches() || fs.existsSync(getAbsoluteDL(path))) {
         path = `${baseName} - ${++idx}`
     }
 

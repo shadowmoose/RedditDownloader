@@ -72,6 +72,9 @@ const defaultSettings = {
     concurrentThreads: 10,
 
     /** The output template RMD uses when generating a file name. */
-    outputTemplate: '[subreddit]/[title] ([author])'
+    outputTemplate: '[subreddit]/[title] ([author])',
+
+    /** If true, create symlinks to duplicate files in place of deleted, lower-quality files. */
+    createSymLinks: true
 }
 const settingsCache: Record<any, any> = {};
