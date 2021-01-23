@@ -8,6 +8,7 @@ jobs:
     runs-on: ${{ matrix.os }}-latest
 
     strategy:
+      fail-fast: false
       matrix:
         os: [windows, ubuntu, macOS]
 
