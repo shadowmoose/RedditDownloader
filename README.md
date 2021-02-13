@@ -44,3 +44,6 @@ you can launch this program anywhere - and it's built from the ground-up to make
 
 # New Feature Requests or Issues?
 If you hit any links which RMD does not support, find anything broken, need assistance, or just want to suggest new features, please open a new request [here](https://github.com/shadowmoose/RedditDownloader/issues/new/choose).
+
+# Updates?
+RMD is currently [under a large-scale rewrite in a new language, which will greatly expand its capabilities](https://github.com/shadowmoose/RedditDownloader/discussions/180). If you don't see much recent activity in the master branch, or in the bug reports, it's probably because the rewrite already fixes the problems or adds the requested features. In the meantime, the current release of RMD is considered extremely stable, and should work exactly as expected.
