@@ -1,11 +1,19 @@
 import {Streamer} from "./streamer";
 import {DownloadSubscriber} from "../database/entities/db-download";
+import DBSourceGroup from "../database/entities/db-source-group";
 
+
+export enum DownloaderStatus {
+    IDLE = 'idle',
+    RUNNING = 'running',
+    FINISHED = 'finished'
+}
 
 export class DownloaderState {
     activeDownloads: (DownloadProgress|null)[] = [];
     shouldStop = false;
 
+    currentState: DownloaderStatus = DownloaderStatus.IDLE;
     finishedScanning = false;
     currentSource: string|null = null;
 
@@ -21,6 +29,10 @@ export class DownloaderState {
             if (a) a.shouldStop = true
         });
         DownloadSubscriber.flush();
+    }
+
+    isRunning() {
+        return this.currentState === DownloaderStatus.RUNNING
     }
 }
 

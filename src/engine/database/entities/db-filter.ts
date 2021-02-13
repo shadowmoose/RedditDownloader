@@ -1,8 +1,7 @@
 import {Entity, Column, PrimaryGeneratedColumn, Index, ManyToOne} from 'typeorm';
 import {DBEntity} from "./db-entity";
 import DBSourceGroup from "./db-source-group";
-import DBSubmission from "./db-submission";
-import DBComment from "./db-comment";
+import {DBPost} from "../db";
 
 
 @Entity({ name: 'filters' })
@@ -34,7 +33,7 @@ export default class DBFilter extends DBEntity {
         this.valueJSON =  JSON.stringify(val)
     }
 
-    validate (post: DBSubmission|DBComment, url?: string): boolean {
+    validate (post: DBPost, url?: string): boolean {
         const comp = comparators[this.comparator];
         if (!comp) throw Error(`Invalid comparator value for filter: "${this.comparator}"!`)
         // @ts-ignore

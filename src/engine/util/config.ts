@@ -141,6 +141,8 @@ function checkEnvironment() {
     if (!config.shared.env && isTest) {
         // If testing, dump everything into the same temporary test directory.
         // When run outside of tests, these directories will not be relatives.
-        setEnv(path.resolve(testDir, 'downloads')); // TODO: Prompt user on first-time setup.
+        setEnv(path.resolve(testDir, 'downloads'));
+    } else {
+        setEnv(path.resolve(process.cwd())); // TODO: Prompt user on first-time setup?
     }
 }

@@ -75,6 +75,22 @@ export default class DBSourceGroup extends DBEntity {
             }) as AsyncGenerator<DBSubmission | DBComment>
         }
     }
+
+    /**
+     * When this group needs to be sent to the client, it can be encoded suitably for serialization here.
+     */
+    async toSimpleObject() { // TODO: Unit test.
+        const r: any = {};
+
+        for (const k in this) {
+            if (!this.hasOwnProperty(k)) {
+                continue
+            }
+            r[k] = await this[k];
+        }
+
+        return r;
+    }
 }
 
 /**

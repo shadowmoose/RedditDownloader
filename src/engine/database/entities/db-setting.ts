@@ -75,6 +75,11 @@ const defaultSettings = {
     outputTemplate: '[subreddit]/[title] ([author])',
 
     /** If true, create symlinks to duplicate files in place of deleted, lower-quality files. */
-    createSymLinks: true
+    createSymLinks: true,
+
+    /** The host to launch the local webserver on. */
+    serverHost: '127.0.0.1',
+    /** The port to launch the local webserver on. */
+    serverPort: 7001,
 }
 const settingsCache: Record<any, any> = {};
