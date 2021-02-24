@@ -1,9 +1,9 @@
 {
-  "url": "https://api.github.com/repos/shadowmoose/RedditDownloader/releases/28461164",
-  "assets_url": "https://api.github.com/repos/shadowmoose/RedditDownloader/releases/28461164/assets",
-  "upload_url": "https://uploads.github.com/repos/shadowmoose/RedditDownloader/releases/28461164/assets{?name,label}",
-  "html_url": "https://github.com/shadowmoose/RedditDownloader/releases/tag/3.1.1",
-  "id": 28461164,
+  "url": "https://api.github.com/repos/shadowmoose/RedditDownloader/releases/38522092",
+  "assets_url": "https://api.github.com/repos/shadowmoose/RedditDownloader/releases/38522092/assets",
+  "upload_url": "https://uploads.github.com/repos/shadowmoose/RedditDownloader/releases/38522092/assets{?name,label}",
+  "html_url": "https://github.com/shadowmoose/RedditDownloader/releases/tag/3.1.3",
+  "id": 38522092,
   "author": {
     "login": "shadowmoose",
     "id": 774862,
@@ -24,19 +24,19 @@
     "type": "User",
     "site_admin": false
   },
-  "node_id": "MDc6UmVsZWFzZTI4NDYxMTY0",
-  "tag_name": "3.1.1",
+  "node_id": "MDc6UmVsZWFzZTM4NTIyMDky",
+  "tag_name": "3.1.3",
   "target_commitish": "master",
-  "name": "Release 3.1.1 - Windows Binary Fix",
+  "name": "Release 3.1.3 - Bug Fixes",
   "draft": false,
   "prerelease": false,
-  "created_at": "2020-07-11T00:23:49Z",
-  "published_at": "2020-07-11T00:29:54Z",
+  "created_at": "2021-02-24T01:54:27Z",
+  "published_at": "2021-02-24T01:56:44Z",
   "assets": [
     {
-      "url": "https://api.github.com/repos/shadowmoose/RedditDownloader/releases/assets/32397459",
-      "id": 32397459,
-      "node_id": "MDEyOlJlbGVhc2VBc3NldDMyMzk3NDU5",
+      "url": "https://api.github.com/repos/shadowmoose/RedditDownloader/releases/assets/32515212",
+      "id": 32515212,
+      "node_id": "MDEyOlJlbGVhc2VBc3NldDMyNTE1MjEy",
       "name": "RMD-macOS",
       "label": "",
       "uploader": {
@@ -61,23 +61,23 @@
       },
       "content_type": "binary/octet-stream",
       "state": "uploaded",
-      "size": 25341221,
+      "size": 24434904,
       "download_count": "?",
-      "created_at": "2021-02-22T00:59:24Z",
-      "updated_at": "2021-02-22T00:59:24Z",
-      "browser_download_url": "https://github.com/shadowmoose/RedditDownloader/releases/download/3.1.1/RMD-macOS",
+      "created_at": "2021-02-24T02:20:14Z",
+      "updated_at": "2021-02-24T02:20:15Z",
+      "browser_download_url": "https://github.com/shadowmoose/RedditDownloader/releases/download/3.1.3/RMD-macOS",
       "metadata": {
-        "updatedMS": 1613955564000,
-        "updated": 1613955564,
-        "sha1": "f682b49624450bacd50808e05d8d4cde71cb9d7b",
-        "sha256": "b279e60a723c84589cbd4271840431e9090b2cffeb721d62de749a1185b32475",
-        "md5": "f1f34bb1f2ee601baba89058129c3e1e"
+        "updatedMS": 1614133215000,
+        "updated": 1614133215,
+        "sha1": "035735598ea3e8493a9befd7383b0a6966b03505",
+        "sha256": "2d2550f571d7887f397b537a10fa708bdb6d6807f184f055383a2ac972f01d56",
+        "md5": "f6614a9d1d0f0ed3b84340f69d321f64"
       }
     },
     {
-      "url": "https://api.github.com/repos/shadowmoose/RedditDownloader/releases/assets/32397397",
-      "id": 32397397,
-      "node_id": "MDEyOlJlbGVhc2VBc3NldDMyMzk3Mzk3",
+      "url": "https://api.github.com/repos/shadowmoose/RedditDownloader/releases/assets/32515178",
+      "id": 32515178,
+      "node_id": "MDEyOlJlbGVhc2VBc3NldDMyNTE1MTc4",
       "name": "RMD-ubuntu",
       "label": "",
       "uploader": {
@@ -102,23 +102,23 @@
       },
       "content_type": "binary/octet-stream",
       "state": "uploaded",
-      "size": 39309088,
+      "size": 39329976,
       "download_count": "?",
-      "created_at": "2021-02-22T00:57:35Z",
-      "updated_at": "2021-02-22T00:57:36Z",
-      "browser_download_url": "https://github.com/shadowmoose/RedditDownloader/releases/download/3.1.1/RMD-ubuntu",
+      "created_at": "2021-02-24T02:18:49Z",
+      "updated_at": "2021-02-24T02:18:50Z",
+      "browser_download_url": "https://github.com/shadowmoose/RedditDownloader/releases/download/3.1.3/RMD-ubuntu",
       "metadata": {
-        "updatedMS": 1613955456000,
-        "updated": 1613955456,
-        "sha1": "670e9b495e02b0cfef6080a905b70558ea32cf66",
-        "sha256": "0068af592c97da38b3b2555d810a87291df0ad00c953b512a7fa745d93432b61",
-        "md5": "94b7faf333755e2cac448a61545f3afa"
+        "updatedMS": 1614133130000,
+        "updated": 1614133130,
+        "sha1": "26721550439a1f6c3f571906b32284e1b215e80d",
+        "sha256": "3797aa4685cd0e0c4f94eddf595c5b3b498056cc4c05e95093599f5a4ad7e1be",
+        "md5": "5ce9f48072e72944dd26e174d2ab33ea"
       }
     },
     {
-      "url": "https://api.github.com/repos/shadowmoose/RedditDownloader/releases/assets/32397427",
-      "id": 32397427,
-      "node_id": "MDEyOlJlbGVhc2VBc3NldDMyMzk3NDI3",
+      "url": "https://api.github.com/repos/shadowmoose/RedditDownloader/releases/assets/32515181",
+      "id": 32515181,
+      "node_id": "MDEyOlJlbGVhc2VBc3NldDMyNTE1MTgx",
       "name": "RMD-windows.exe",
       "label": "",
       "uploader": {
@@ -143,22 +143,22 @@
       },
       "content_type": "binary/octet-stream",
       "state": "uploaded",
-      "size": 24086776,
+      "size": 24105569,
       "download_count": "?",
-      "created_at": "2021-02-22T00:58:34Z",
-      "updated_at": "2021-02-22T00:58:36Z",
-      "browser_download_url": "https://github.com/shadowmoose/RedditDownloader/releases/download/3.1.1/RMD-windows.exe",
+      "created_at": "2021-02-24T02:19:07Z",
+      "updated_at": "2021-02-24T02:19:09Z",
+      "browser_download_url": "https://github.com/shadowmoose/RedditDownloader/releases/download/3.1.3/RMD-windows.exe",
       "metadata": {
-        "updatedMS": 1613955516000,
-        "updated": 1613955516,
-        "sha1": "b113618e65f75fe0a4637f4011021c34c1e6df4b",
-        "sha256": "7be38f8ac6507b8389183a881778b59ca55dfc94d550a164e87222bc1ba57878",
-        "md5": "9030d18a3dbe4f1af08a7d2af3bf6424"
+        "updatedMS": 1614133149000,
+        "updated": 1614133149,
+        "sha1": "9ddb98180f32fcdf2e514dfd93ed2f580b5a51ed",
+        "sha256": "df633cc9311fdfcdb229550ff20154a5ae5f68e48fbf940d9d945afd00d37e5d",
+        "md5": "1b7592b20cfcb104c51ff2d6d6b85bcd"
       }
     }
   ],
-  "tarball_url": "https://api.github.com/repos/shadowmoose/RedditDownloader/tarball/3.1.1",
-  "zipball_url": "https://api.github.com/repos/shadowmoose/RedditDownloader/zipball/3.1.1",
-  "body": "A change in a dependency of the binary build process caused an issue with the Windows binary release, so the version has been incremented to fix the issue.\r\n\r\nIf your current binary is no longer launching, replace it with this update manually. Tests have been implemented to prevent any breaking compilation issues in the future.",
-  "published_utc": 1594427394
+  "tarball_url": "https://api.github.com/repos/shadowmoose/RedditDownloader/tarball/3.1.3",
+  "zipball_url": "https://api.github.com/repos/shadowmoose/RedditDownloader/zipball/3.1.3",
+  "body": "This is a small patch to make RMD gracefully ignore users who have been banned, when searching for their posts. Additionally, this patch fixes the update message spam that was accidentally introduced in the previous patch - sorry!",
+  "published_utc": 1614131804
 }
