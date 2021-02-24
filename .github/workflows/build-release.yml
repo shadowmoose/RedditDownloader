@@ -5,6 +5,7 @@ on:
     types: [published]
   schedule:  # Check for package updates every 6 hours.
     - cron:  '0 */6 * * *'
+  workflow_dispatch:
 #  push:
 
 jobs:
@@ -31,7 +32,7 @@ jobs:
 
     steps:
       - name: Check for Required Package Updates
-        uses: shadowmoose/GHA-Compare-PyPi@1.1.1
+        uses: shadowmoose/GHA-Compare-PyPi@1.1.2
         id: update
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
