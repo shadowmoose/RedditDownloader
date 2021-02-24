@@ -148,6 +148,8 @@ def user_posts(username, find_submissions, find_comments):
 				yield RedditElement(c)
 	except prawcore.exceptions.NotFound:
 		stringutil.error('Cannot locate comments or submissions for nonexistent user: %s' % username)
+	except prawcore.exceptions.Forbidden:
+		stringutil.error('Cannot locate posts from a suspended user account: %s' % username)
 
 
 @check_login
