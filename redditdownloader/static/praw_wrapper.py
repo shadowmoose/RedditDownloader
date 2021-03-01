@@ -54,7 +54,8 @@ def init():
 		client_secret=None,
 		redirect_uri='http://%s:%s/authorize' % ('localhost', '7505'),
 		user_agent=settings.get('auth.user_agent'),
-		refresh_token=refresh
+		refresh_token=refresh,
+		check_for_updates=False
 	)
 
 
