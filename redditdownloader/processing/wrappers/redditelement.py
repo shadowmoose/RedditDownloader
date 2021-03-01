@@ -131,7 +131,10 @@ class RedditElement(object):
 				self.add_url(url)
 		if getattr(post, 'is_gallery', False):
 			for k, img in post.media_metadata.items():
-				self.add_url(img['s']['u'])
+				try:
+					self.add_url(img['s']['u'])
+				except:
+					stringutil.error('Unable to parse URL from reddit album.')
 		elif post.url is not None and post.url.strip() != '':
 			self.add_url(post.url)
 
@@ -153,7 +156,10 @@ class RedditElement(object):
 		self.body = html.unescape(str(post.selftext)) if 'selftext' in post and post.selftext else ''
 		if getattr(post, 'is_gallery', False):
 			for k, img in post.media_metadata.items():
-				self.add_url(html.unescape(img['s']['u']))
+				try:
+					self.add_url(html.unescape(img['s']['u']))
+				except:
+					stringutil.error('Unable to parse URL from praw reddit album');
 		elif post.url is not None and post.url.strip() != '' and 'reddit.com' not in post.url:
 			self.add_url(post.url)
 		if self.body.strip():
