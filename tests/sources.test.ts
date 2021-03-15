@@ -1,6 +1,6 @@
 import DBSource from "../src/engine/database/entities/db-source";
 import SavedPostSource from "../src/engine/sources/saved-post-source";
-import {makeSource} from "../src/engine/sources";
+import {availableSources, makeSource} from "../src/engine/sources";
 import Source from "../src/engine/sources/source";
 import DBSubmission from "../src/engine/database/entities/db-submission";
 import DBSourceGroup from "../src/engine/database/entities/db-source-group";
@@ -25,6 +25,11 @@ describe("Source Tests", () => {
     it("invalid source errors", async () => {
         const dbs = DBSource.build({type: 'fake-source', dataJSON: `{"getComments":true}`, id: 0, name: ""});
         expect(() => makeSource(dbs)).toThrow();
+    });
+
+    it("all source types unique", async () => {
+        const src = availableSources();
+        expect(new Set(src.map(s => s.type)).size).toEqual(src.length);
     });
 
     it("schema coercion works", async () => {
@@ -66,6 +71,20 @@ describe("Source Tests", () => {
         });
 
         expect(count).toEqual(10);
+    });
+
+    it("upvoted-posts source", async () => {
+        const dbs = DBSource.build({type: 'upvoted-posts', dataJSON: `{"limit":1}`, id: 0, name: ""});
+        const src = makeSource(dbs);
+
+        expect(src).toBeTruthy();
+
+        const gen = src!.find();
+        const count = await forGen(gen, post => {
+            expect(post instanceof DBSubmission).toBeTruthy();
+        });
+
+        expect(count).toEqual(1);
     });
 
     it("source group loading", async () => {

@@ -1,8 +1,9 @@
 import {DownloaderState, DownloaderStatus} from "./state";
 import {SendFunction, Streamer} from "./streamer";
-import {downloadAll} from "../downloaders";
+import {downloadAll} from "../downloaders/downloaders";
 import DBSourceGroup from "../database/entities/db-source-group";
 import {forGen} from "./generator-util";
+import {isTest} from "./config";
 
 let currentState: DownloaderState|null = null;
 
@@ -18,6 +19,7 @@ export function scanAndDownload(progressCallback: SendFunction) {
     if (state.isRunning()) {
         throw Error('Unable to start a second scan before the first finishes.');
     }
+    console.debug("Starting scan & download!")
     state.currentState = DownloaderStatus.RUNNING;
 
     const updater = new Streamer(state, progressCallback);
@@ -46,11 +48,16 @@ async function scanAll(state: DownloaderState) {
                 return stop();
             }
             await ele.save();
+            state.postsScanned ++;
+
+            if (isTest() && state.postsScanned % 10 === 0) {
+                console.debug(`Scanned ${state.postsScanned} posts so far...`)
+            }
         });
 
         if (state.shouldStop) break;
 
-        console.log(`Finished scanning group "${g.name}-${g.id}". Found ${found} posts.`)
+        console.log(`Finished scanning group "${g.name}-${g.id}". Found ${found} new posts.`);
     }
 
     state.finishedScanning = true;

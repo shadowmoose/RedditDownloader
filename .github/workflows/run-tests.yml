@@ -42,6 +42,7 @@ jobs:
         RMD_REFRESH_TOKEN: ${{secrets.RMD_REFRESH_TOKEN}}
         RMD_TEST_USERNAME: ${{secrets.RMD_TEST_USERNAME}}
         RMD_TEST_PASSWORD: ${{secrets.RMD_TEST_PASSWORD}}
+        RMD_IMGUR_ID: ${{secrets.RMD_IMGUR_ID}}
       run: yarn test --ci
 
     - name: Upload coverage to Codecov

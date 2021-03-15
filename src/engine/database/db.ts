@@ -10,6 +10,7 @@ import DBSetting from "./entities/db-setting";
 import DBSourceGroup from "./entities/db-source-group";
 import DBSource from "./entities/db-source";
 import DBUrl from "./entities/db-url";
+import {initial1613378705882} from "./migrations/1613378705882-initial";
 
 let _connection: Connection|null;
 
@@ -21,15 +22,18 @@ export async function makeDB() {
         database: envDataPath(`manifest.sqlite`),
         entities: [DBSubmission, DBComment, DBDownload, DBFile, DBFilter, DBSetting, DBSourceGroup, DBSource, DBUrl],
         logging: false,
+        synchronize: false,
         migrationsTransactionMode: 'all',
         migrationsRun: true,
         migrationsTableName: "migrations",
-        migrations: [],  // Add migration classes here.
+        migrations: [initial1613378705882],  // Add migration classes here.
         subscribers: [DownloadSubscriber],
     }).then(async (connection: Connection) => {
         // here you can start to work with your entities
+        await connection.runMigrations({
+            transaction: 'all'
+        });
         await connection.query('VACUUM');
-        await connection.synchronize();
         _connection = connection;
         return connection;
     });

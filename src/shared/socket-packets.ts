@@ -22,8 +22,10 @@ export enum ClientCommandTypes {
     START_DOWNLOAD = 'startDownload',
     /** Request that all downloading stop ASAP. */
     STOP_DOWNLOAD = 'stopDownload',
-    /** Update a download group with new properties. */
-    UPDATE_GROUP = 'updateGroup',
+    /** Save a setting value. */
+    SAVE_SETTING = 'saveSetting',
+    /** Update a supported database object, using its ID. */
+    UPDATE_OBJECT = 'updateObject',
     /** Delete a supported Database Object, using its ID. */
     DELETE_OBJECT = 'deleteObject',
     /** Delete all posts that have not yet been downloaded from previous runs. */

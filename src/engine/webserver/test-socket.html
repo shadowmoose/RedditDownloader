@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<style>
+	html{
+		font-family: 'Helvetica', 'Arial', sans-serif;
+	}
+
+	.event-log {
+		margin-bottom: 10px;
+		border: 1px solid gray;
+	}
+</style>
+<head>
+	<meta charset="UTF-8">
+	<title>Websocket Test Platform</title>
+</head>
+<body>
+
+<div id="log" style="width: 100%; height: 500px; overflow-y: auto;"></div>
+
+<div>
+	<button onclick="stageGroup()">SourceGroup</button>
+	<button onclick="stageSavedSource()">Source: [Saved Posts]</button>
+	<button onclick="stageSetting()">Update Setting</button>
+	<button onclick="stageDLStart()">Start Download</button>
+</div>
+<textarea id="input" style="width: 400px; height: 200px;" autofocus></textarea> <br>
+
+<button onclick="send()">Send</button>
+
+
+</body>
+<script>
+	const input = document.getElementById('input');
+	const output = document.getElementById('log');
+	const sock = new WebSocket("ws://localhost:7001");
+	let uid = 0;
+
+	sock.onopen = (_event) => {
+		console.log('Opened connection.')
+	};
+
+	sock.onclose = () => {
+		console.error('Connection closed.');
+		document.body.style.backgroundColor = '#d98585';
+		setTimeout(()=> window.location.reload(), 5000);
+	};
+
+	sock.onmessage = function(event) {
+		const data = JSON.parse(event.data);
+		const row = document.createElement('pre');
+		row.className = 'event-log';
+		row.style.color = data.error ? 'red' : 'black';
+		row.innerText = new Date().toLocaleTimeString() + ': ' + JSON.stringify(data, null, 2);
+		output.appendChild(row);
+		output.scrollTop = output.scrollHeight;
+		console.debug("Received:", JSON.parse(event.data));
+	};
+
+
+	function send() {
+		sock.send(input.value);
+		input.value = '';
+	}
+
+	function stageMsg(type, obj) {
+		const snd = {
+			type,
+			uid: ++uid,
+			data: {
+				...obj
+			}
+		}
+		input.value = JSON.stringify(snd, null, 2);
+	}
+
+	function stageGroup() {
+		stageMsg('updateObject', {
+			dbType: 'DBSourceGroup',
+			id: 1,
+			newValues: {
+				name: 'test',
+				color: '#57a481'
+			}
+		})
+	}
+
+	function stageSavedSource() {
+		stageMsg('updateObject', {
+			dbType: 'DBSource',
+			id: 1,
+			newValues: {
+				type: 'saved-posts',
+				name: 'test-saved-group',
+				dataJSON: JSON.stringify({
+					getComments: true
+				})
+			},
+			parents: [
+				{
+					dbType: 'DBSourceGroup',
+					id: 1,
+					property: 'sourceGroup'
+				}
+			]
+		})
+	}
+
+	function stageSetting() {
+		stageMsg('saveSetting', {
+			id: 1,
+			key: 'refreshToken',
+			value: ''
+		})
+	}
+
+	function stageDLStart() {
+		stageMsg('startDownload', {})
+	}
+
+</script>
+
+</html>

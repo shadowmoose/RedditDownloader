@@ -48,7 +48,7 @@ const cmds: yargs.Argv<unknown> = commands.reduce((acc: any, curr: any) => {
     });
 }, yargs);
 
-config.args = cmds.options({
+config.args = cmds.options({  // TODO: This has to be rewritten, it fights with too many tools.
     env: {
         alias: 'e',
         description: 'The directory RMD should create/load.',
@@ -69,10 +69,10 @@ config.args = cmds.options({
 // ==== LOAD SHARED CONFIG FILE: ====
 
 // If we're testing, use a local staged directory:
-export const isTest = !!process.env.JEST_WORKER_ID;
+export const isTest = () => !!process.env.JEST_WORKER_ID;
 const testDir = `./temp-test-data/${Date.now()}-${process.env.JEST_WORKER_ID}/`;
 export const CONF_FOLDER = path.resolve(
-    isTest? testDir : config.args.sharedDir || envPaths('RedditMediaDownloader', {
+    isTest()? testDir : config.args.sharedDir || envPaths('RedditMediaDownloader', {
         suffix: ''
     }).config
 );
@@ -138,11 +138,11 @@ function checkEnvironment() {
         }
     }
 
-    if (!config.shared.env && isTest) {
+    if (!config.shared.env && isTest()) {
         // If testing, dump everything into the same temporary test directory.
         // When run outside of tests, these directories will not be relatives.
         setEnv(path.resolve(testDir, 'downloads'));
     } else {
-        setEnv(path.resolve(process.cwd())); // TODO: Prompt user on first-time setup?
+        setEnv(path.resolve(process.cwd(), 'downloads')); // TODO: Prompt user on first-time setup?
     }
 }

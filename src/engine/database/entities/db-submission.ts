@@ -4,6 +4,7 @@ import {picker} from "../../reddit/snoo";
 import DBComment from "./db-comment";
 import DBDownload from "./db-download";
 import {DBEntity} from "./db-entity";
+import {PsSubmission} from "../../reddit/pushshift";
 
 
 @Entity({ name: 'submissions' })
@@ -51,13 +52,16 @@ export default class DBSubmission extends DBEntity {
     @Column({ default: true })
     shouldProcess!: boolean;
 
+    @Column({ default: false })
+    fromPushshift!: boolean;
+
     @OneToMany(() => DBComment, comm => comm.parentSubmission, {cascade: true})
     children!: Promise<DBComment[]>;
 
     @OneToMany(() => DBDownload, dl => dl.parentSubmission, {cascade: true})
     downloads!: Promise<DBDownload[]>;
 
-    loadedData?: snoowrap.Submission;
+    loadedData?: snoowrap.Submission|PsSubmission;
 
     static async fromRedditSubmission(submission: snoowrap.Submission): Promise<DBSubmission> {
         return picker(submission, ['name', 'title', 'subreddit_name_prefixed', 'selftext', 'score', 'is_self', 'created_utc', 'over_18', 'author', 'link_flair_text']).then(sub => {
@@ -75,8 +79,29 @@ export default class DBSubmission extends DBEntity {
                 score: sub.score,
                 selfText: sub.selftext || '',
                 subreddit: sub.subreddit_name_prefixed.replace(/^\/?r\//, ''),
-                loadedData: submission
+                loadedData: submission,
+                fromPushshift: false
             })
+        })
+    }
+
+    static fromPushShiftSubmission(sub: PsSubmission): DBSubmission {
+        return DBSubmission.build({
+            id: sub.id,
+            title: sub.title,
+            author: sub.author,
+            createdUTC: sub.created_utc*1000,
+            firstFoundUTC: Date.now(),
+            isSelf: sub.is_self,
+            over18: sub.over_18,
+            flairText: sub.link_flair_text ? sub.link_flair_text.trim() : null,
+            processed: false,
+            shouldProcess: true,
+            score: sub.score,
+            selfText: sub.selftext || '',
+            subreddit: sub.subreddit,
+            loadedData: sub,
+            fromPushshift: true
         })
     }
 
@@ -98,6 +123,7 @@ export default class DBSubmission extends DBEntity {
             shouldProcess: false,
             subreddit: "test_sub",
             title: "test title",
+            fromPushshift: false,
             ...opts
         });
     }

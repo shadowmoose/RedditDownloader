@@ -1,5 +1,5 @@
-import {DownloaderData, DownloaderFunctions} from "./index";
-import {DownloadProgress} from "../util/state";
+import {DownloaderData, DownloaderFunctions} from "../downloaders";
+import {DownloadProgress} from "../../util/state";
 
 
 export default abstract class Downloader {
@@ -15,7 +15,7 @@ export default abstract class Downloader {
     /** Perform any initial setup this Downloader may require. Only ever called once. */
     protected abstract async init(): Promise<any>;
 
-    /** If this Downloader thinks that it can successfully download the given URL Data. */
+    /** If this Downloader thinks that it may successfully download the given URL Data. */
     abstract async canHandle(data: DownloaderData): Promise<boolean>;
 
     /** Get the user-specified order that this Downloader should run in. */

@@ -6,8 +6,8 @@ import path from 'path';
 import crypto from 'crypto';
 import {ChildProcess} from "child_process";
 import {DownloadProgress} from "../util/state";
-import {GracefulStopError} from "./downloader";
-const ffbinaries = require('ffbinaries');
+import {GracefulStopError} from "./wrappers/download-wrapper";
+import {checkFFMPEGDownload, ffmpegPath} from "./ffmpeg";
 const YoutubeDlWrap = require("youtube-dl-wrap");
 
 const isWin = process.platform === 'win32' || process.env.NODE_PLATFORM === 'windows';
@@ -15,9 +15,7 @@ const ext = isWin ? '.exe':'';
 const updateURL = `https://yt-dl.org/downloads/latest/youtube-dl${ext}`;
 
 export const exePath = sharedPath('bin', `ytdl${ext}`);
-export const ffmpegDir = sharedPath('bin', 'ffmpeg');
 
-const ffmpegBinary = path.resolve(ffmpegDir, ffbinaries.getBinaryFilename('ffmpeg', ffbinaries.detectPlatform()));
 const ytdl = new YoutubeDlWrap(exePath);
 
 
@@ -39,24 +37,6 @@ export async function getLatestVersion() {
     return (res ? res.headers['location']||'':'').match(/\d+\.\d+\.\d+/g)[0];
 }
 
-
-/**
- * Downloads the latest ffmpeg binaries, if they are not currently on the system.
- */
-export async function downloadFFMPEG() {
-    if (!fs.existsSync(ffmpegBinary)) {
-        await new Promise(async res => {
-            await mkParents(ffmpegDir);
-            ffbinaries.downloadBinaries(['ffmpeg', 'ffprobe'], {destination: ffmpegDir}, () => {
-                res();
-            });
-        });
-        ffbinaries.locateBinariesSync(['ffmpeg', 'ffprobe'], {paths: [ffmpegDir], ensureExecutable: true})
-    }
-
-    return ffmpegBinary;
-}
-
 /**
  * Check the latest local YTDL version, if any, and update if the latest published version doesn't match.
  */
@@ -64,7 +44,7 @@ export async function autoUpdate() {
     const loc = await getLocalVersion();
     const rem = await getLatestVersion();
 
-    await downloadFFMPEG();
+    await checkFFMPEGDownload();
 
     if (!loc || rem > loc) {
         await downloadBinary(updateURL, exePath);
@@ -97,7 +77,7 @@ function makeArgs(url: string, opts: Record<string, string>) {
 const defaultYTOptions = {
     format: 'bestvideo+bestaudio/best',
     prefer_ffmpeg: '',
-    ffmpeg_location: ffmpegBinary,
+    ffmpeg_location: ffmpegPath,
     add_metadata: '',
     no_playlist: ''
 };
@@ -116,6 +96,7 @@ export async function download(url: string, filePath: string, progress?: Downloa
         // YTDL just randomly ignores extensions, so just let it choose then find it again.
         const download = await ytdl.exec(makeArgs(url,{
             output: tmpPath + '.%(ext)s',
+            no_playlist: ''
         })).on("progress", (prog: any) => {
             if (progress?.shouldStop) {
                 child.kill();

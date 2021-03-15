@@ -1,5 +1,6 @@
 import {Entity, Column, PrimaryColumn} from 'typeorm';
 import {DBEntity} from "./db-entity";
+import {isTest} from "../../util/config";
 
 
 @Entity({ name: 'settings' })
@@ -81,5 +82,15 @@ const defaultSettings = {
     serverHost: '127.0.0.1',
     /** The port to launch the local webserver on. */
     serverPort: 7001,
+
+    /** The API to authenticate with imgur. */
+    imgurClientId: ''
 }
 const settingsCache: Record<any, any> = {};
+
+if (!!process.env.JEST_WORKER_ID) {
+    // If we're testing currently, pre-seed the cache so the DB does not need to initialize for simple setting lookups.
+    settingsCache['refreshToken'] = process.env.RMD_REFRESH_TOKEN;
+    settingsCache['userAgent'] = `RMD-test-${Math.random()}`;
+    settingsCache['imgurClientId'] = process.env.RMD_IMGUR_ID;
+}

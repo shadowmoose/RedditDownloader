@@ -1,5 +1,5 @@
 /**
- * Reads through a Generator, awaiting `cb` on each element.
+ * Reads through a Generator, awaiting the given `cb` function on each element.
  * If the returned result is truthy, that result is emitted. Otherwise, nothing is emitted.
  */
 export async function* filterMap<T, TR, R>(gen: AsyncGenerator<T, TR>, cb: (ele: T) => R) {

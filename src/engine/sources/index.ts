@@ -2,11 +2,12 @@ import SavedPostSource from "./saved-post-source";
 import DBSource from "../database/entities/db-source";
 import SubredditPostSource from "./subreddit-post-source";
 import Source from "./source";
+import UpvotedPostSource from "./upvoted-post-source";
 
 /**
  * A list of all Source implementations.
  */
-export const availableSources: ()=>Source[] = () => [new SavedPostSource(), new SubredditPostSource()];
+export const availableSources: ()=>Source[] = () => [new SavedPostSource(), new SubredditPostSource(), new UpvotedPostSource()];
 
 /**
  * Convert the given DBSource into a Source instance, which can run its type-specific functionality.

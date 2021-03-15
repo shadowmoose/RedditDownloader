@@ -1,6 +1,6 @@
 import {Streamer} from "./streamer";
 import {DownloadSubscriber} from "../database/entities/db-download";
-import DBSourceGroup from "../database/entities/db-source-group";
+import {v4} from "uuid";
 
 
 export enum DownloaderStatus {
@@ -16,6 +16,9 @@ export class DownloaderState {
     currentState: DownloaderStatus = DownloaderStatus.IDLE;
     finishedScanning = false;
     currentSource: string|null = null;
+
+    @Streamer.delay(2000)
+    postsScanned = 0;
 
     /**
      * Set the "shouldStop" flag on this state and all its relevant children.
@@ -38,16 +41,24 @@ export class DownloaderState {
 
 
 export class DownloadProgress {
+    uid: string = v4();
+
     /**
      * User-friendly description of whatever is happening right now.
      */
+    @Streamer.delay(1000)
     status: string = '';
 
     /**
      * The name of the current Handler trying to download.
      */
+    @Streamer.delay(1000)
     handler: string = 'none';
 
+    /**
+     * This indicates if the current download processor can currently know its total completion percentage.
+     */
+    @Streamer.delay(500)
     knowsPercent: boolean = false;
 
     /**

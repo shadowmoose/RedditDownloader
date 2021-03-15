@@ -27,7 +27,8 @@
         "package": "electron-forge package",
         "make": "electron-forge make",
         "publish_app": "electron-forge publish",
-        "migrate": "typeorm migration:generate -p"
+        "migrate": "tsc && typeorm migration:generate -n",
+        "run-reloading-server": "nodemon --watch \"src/**\" --ext \"ts,json\" --exec \"ts-node ./dist/engine/webserver/web-server.js\""
     },
     "devDependencies": {
         "@electron-forge/cli": "^6.0.0-beta.54",
@@ -64,11 +65,13 @@
         "jest": "^26.2.2",
         "jest-config": "^26.2.2",
         "node-loader": "^1.0.1",
+        "nodemon": "^2.0.7",
         "puppeteer": "^5.5.0",
         "style-loader": "^1.2.1",
         "terser": "^5.0.0",
         "ts-jest": "^26.1.4",
         "ts-loader": "^8.0.2",
+        "ts-node": "^9.1.1",
         "typedoc": "^0.19.2",
         "typescript": "^3.9.7"
     },
@@ -81,8 +84,9 @@
         "electron-squirrel-startup": "^1.0.0",
         "env-paths": "^2.2.0",
         "express": "^4.17.1",
-        "ffbinaries": "^1.1.4",
-        "mime-types": "^2.1.27",
+        "get-urls": "^10.0.0",
+        "imgur": "^0.3.2",
+        "mime-types": "^2.1.29",
         "mobx": "^6.0.4",
         "mobx-react-lite": "^3.1.6",
         "react": "^17.0.1",
@@ -95,6 +99,7 @@
         "sharp": "^0.27.0",
         "snoowrap": "^1.21.0",
         "typeorm": "^0.2.29",
+        "unzip-stream": "^0.3.1",
         "uuid": "^8.3.1",
         "ws": "^7.4.2",
         "yaml": "^1.10.0",

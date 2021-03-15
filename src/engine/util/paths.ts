@@ -20,10 +20,6 @@ export const sharedPath = (...file: string[]) => path.resolve(CONF_FOLDER, ...fi
 
 /** Path to the shared static assets directory. Swaps automaticlly between packaged and sourcecode file locations. */
 export const assetPath = (...file: string[]) => {
-    // @ts-ignore
-    if (process.pkg) {
-        return path.resolve(__dirname, '../../assets', ...file);
-    }
     return path.resolve(__dirname, '../../assets', ...file);
 }
 

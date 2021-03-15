@@ -18,13 +18,3 @@ export interface SourceSchema {
     }
 }
 
-/**
- * Some generally-applicable schema values for Sources.
- */
-export const ListingOptionsSchema: SourceSchema = {
-    limit: {
-        description: 'Maximum amount of posts:',
-        type: TypeOpts.NUMBER,
-        default: 0
-    }
-};

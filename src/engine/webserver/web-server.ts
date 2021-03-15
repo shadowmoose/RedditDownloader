@@ -6,18 +6,21 @@ import * as dl from '../util/download-controller';
 import Command from "./commands/command";
 import {CommandStartDownload} from "./commands/cmd-start-download";
 import {CommandStopDownload} from "./commands/cmd-stop-download";
-import {CommandUpdateSourceGroup} from "./commands/cmd-update-source-group";
 import {CommandDeleteDBObject} from "./commands/cmd-delete-dbobject";
 import DBSourceGroup from "../database/entities/db-source-group";
 import {CommandCullUnprocessed} from "./commands/cmd-cull-unprocessed";
+import {makeDB} from "../database/db";
+import {CommandUpdateDBObject} from "./commands/cmd-update-dbobject";
+import {CommandSaveSetting} from "./commands/cmd-save-setting";
 
 /** All available command processors. */
 const commands: Command[] = [
     new CommandStartDownload(),
     new CommandStopDownload(),
-    new CommandUpdateSourceGroup(),
     new CommandDeleteDBObject(),
-    new CommandCullUnprocessed()
+    new CommandUpdateDBObject(),
+    new CommandCullUnprocessed(),
+    new CommandSaveSetting()
 ];
 export const clients: ws[] = [];
 export const app = express();
@@ -42,12 +45,14 @@ wsServer.on('connection', async socket => {
         }
     });
 
+    const groups = await DBSourceGroup.find();
+
     // Send some of the initial data that the client will always want:
     send(socket, {
         type: ServerPacketTypes.CURRENT_CONFIG,
         data: {
             settings: await DBSetting.getAll(),
-            sourceGroups: (await DBSourceGroup.find()).map(g => g.toSimpleObject())
+            sourceGroups: await Promise.all(groups.map(g => g.toSimpleObject()))
         }
     });
     send(socket, { type: ServerPacketTypes.FULL_STATE, data: dl.getCurrentState() });
@@ -97,6 +102,7 @@ async function handleMessage(sock: ws, pkt: ClientCommand) {
         }
         throw Error(`Unable to handle the given unknown command type: ${pkt.type}`);
     } catch (err) {
+        console.error(err);
         send(sock,{error: err.message, uid: pkt.uid});
     }
 }
@@ -117,8 +123,8 @@ export function removeClient(sock: ws) {
  */
 export function send(sock: ws, message: SocketResponse) {
     sock.send(JSON.stringify(message), err => {
-        console.error(err);
         if (err) {
+            console.error(err);
             sock.close();
         }
     });
@@ -129,4 +135,16 @@ export function send(sock: ws, message: SocketResponse) {
  */
 export function broadcast(message: SocketResponse) {
     clients.forEach(c => send(c, message))
+}
+
+
+if (require.main === module) {
+    new Promise( async () => {
+        console.debug("Starting up...");
+        await makeDB();
+        console.debug('Made DB.');
+        await launchServer();
+    }).catch(err => {
+        console.error(err)
+    })
 }

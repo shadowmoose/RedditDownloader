@@ -1,6 +1,6 @@
 import path from 'path';
-import Downloader from "../downloader";
-import {DownloaderData, DownloaderFunctions} from "../index";
+import Downloader from "./download-wrapper";
+import {DownloaderData, DownloaderFunctions} from "../downloaders";
 import {DownloadProgress} from "../../util/state";
 import * as ytdl from '../ytdl';
 
@@ -12,7 +12,7 @@ export default class YtdlDownloader extends Downloader {
     }
 
     async getOrder(): Promise<number> {
-        return 0;
+        return 100;
     }
 
     async canHandle(data: DownloaderData): Promise<boolean> {

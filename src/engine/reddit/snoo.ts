@@ -29,12 +29,11 @@ const defaultOpts = {
  */
 async function getAPI() {
     if (!_r) {
-        const token = await DBSetting.get('refreshToken');
         const config: snoowrap.SnoowrapOptions = {
             "userAgent": await DBSetting.get('userAgent'),
             "clientId": "v4XVrdEH_A-ZaA",
             "clientSecret": "",
-            "refreshToken": token || process.env.RMD_REFRESH_TOKEN
+            "refreshToken": await DBSetting.get('refreshToken')
         };
 
         if (!config.refreshToken) throw Error('You need to authorize an account before RMD can scan the API!');
@@ -68,22 +67,22 @@ export async function* readListing<T extends snoowrap.Comment|snoowrap.Submissio
 /**
  * Get all posts saved by the current user.
  */
-export async function* getSavedPosts() {
+export async function* getSavedPosts(limit: number) {
     const api = await getAPI();
     let listing = await api.getMe().getSavedContent(defaultOpts);
 
-    return yield* readListing(listing);
+    return yield* readListing(listing, limit);
 }
 
 /**
  * Get all Submissions upvoted by the current user.
  */
-export async function* getUpvoted() {
+export async function* getUpvoted(limit: number) {
     const api = await getAPI();
     // @ts-ignore
     const listing: snoowrap.Listing<snoowrap.Submission> = await api.getMe().getUpvotedContent(defaultOpts);
 
-    return yield* readListing(listing);
+    return yield* readListing(listing, limit);
 }
 
 /**

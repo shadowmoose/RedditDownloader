@@ -11,16 +11,21 @@ export default class SavedPostSource extends Source {
             description: 'Should RMD download saved comments?',
             type: TypeOpts.BOOLEAN,
             default: false
+        },
+        limit: {
+            description: 'Maximum amount of posts:',
+            type: TypeOpts.NUMBER,
+            default: 0
         }
     };
     readonly description: string = `The posts you've saved`;
     readonly type: string = 'saved-posts';
 
     async *find() {
-        const gen = reddit.getSavedPosts();
+        const gen = reddit.getSavedPosts(this.data.limit);
 
         return yield* filterMap(gen, ele => {
-            if (!(ele instanceof DBComment) || this.data.getComments) {
+            if (this.data.getComments || !(ele instanceof DBComment)) {
                 return ele
             }
         })

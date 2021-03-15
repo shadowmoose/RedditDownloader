@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import {BaseEntity, getManager} from "typeorm";
+import {BaseEntity} from "typeorm";
 
 // Hacky type templating to get a roughly-correct object, with all required properties inserted:
 type Constructor<T> = { new (): T }

@@ -4,14 +4,11 @@ import extractLinks from "../src/engine/reddit/url-extractors";
 import {getComment, getSavedPosts, getSubmission} from "../src/engine/reddit/snoo";
 import puppeteer from 'puppeteer';
 import express from "express";
-import {makeDB} from "../src/engine/database/db";
+import * as ps from '../src/engine/reddit/pushshift';
+import {forGen} from "../src/engine/util/generator-util";
 
 
 describe("Reddit Tests", () => {
-  beforeAll(async () => {
-    await makeDB();
-  });
-
   it("find all reddit gallery links", async () => {
     let sub = await rd.getSubmission('hrrh23');
     if (!sub) throw Error('Failed to locate Submission');
@@ -24,7 +21,7 @@ describe("Reddit Tests", () => {
   it('extract links from posts', async () => {
     const seen = new Set();
     let foundInAll = true;
-    const tst = getSavedPosts();
+    const tst = getSavedPosts(0);
 
     while (true) {
       const nxt = await tst.next();
@@ -52,6 +49,101 @@ describe("Reddit Tests", () => {
 
     expect(c.author).toBeTruthy();
   });
+
+  it("find selfpost urls", async () => {
+    let sub = await getSubmission('ffit3j');
+    if (!sub) throw Error('Failed to locate Submission');
+    const res = await extractLinks(sub);
+
+    expect(res.length).toEqual(39);
+  })
+});
+
+
+describe('PushShift Tests', () => {
+  it('User ps comments', async() => {
+    const seen = new Set();
+    const count = await forGen(ps.getUserComments('theshadowmoose'), p => {
+      expect(seen.has(p.id)).toBeFalsy();  // No duplicates should be yielded per-scan.
+      seen.add(p.id);
+    });
+
+    expect(count).toBeGreaterThan(190);
+  });
+
+  it('User ps submissions', async() => {
+    const seen = new Set();
+    const count = await forGen(ps.getUserSubmissions('theshadowmoose'), p => {
+      expect(seen.has(p.id)).toBeFalsy();  // No duplicates should be yielded per-scan.
+      seen.add(p.id);
+    });
+
+    expect(count).toBeGreaterThan(7);
+  })
+
+  it('Subreddit ps submissions', async() => {
+    const count = await forGen(ps.getSubredditSubmissions('pathofexile', 10), _p => {});
+
+    expect(count).toEqual(10);
+  })
+
+  it("find ps gallery links", async () => {
+    let sub = await ps.getSubmission('hrrh23');
+    if (!sub) throw Error('Failed to locate Submission');
+    const res = await extractLinks(sub);
+
+    expect(res.length).toEqual(3);
+    expect(res[0]).toContain('512');  // Found largest resolution.
+  })
+
+  it("find ps selfpost urls", async () => {
+    let sub = await ps.getSubmission('ffit3j');
+    if (!sub) throw Error('Failed to locate Submission');
+    const res = await extractLinks(sub);
+
+    expect(res.length).toEqual(30);
+  })
+
+  it("find comment link", async () => {
+    let comm = await ps.getComment('fenll1l');
+    if (!comm) throw Error('Failed to locate Comment');
+    const res = await extractLinks(comm);
+
+    expect(res.length).toEqual(1);
+    expect(res[0]).toEqual('https://github.com/shadowmoose/RedditDownloader');
+  })
+
+  it("submissions are equal", async () => {
+    let pssub: any = await ps.getSubmission('8ewkx2');
+    let rsub: any = await getSubmission('8ewkx2');
+
+    delete pssub['loadedData'];
+    delete rsub['loadedData'];
+    delete pssub['firstFoundUTC'];
+    delete rsub['firstFoundUTC'];
+    delete pssub['score'];
+    delete rsub['score'];
+    delete pssub['fromPushshift'];
+    delete rsub['fromPushshift'];
+
+    expect(JSON.stringify(pssub, null, 4)).toEqual(JSON.stringify(rsub, null, 4));
+  })
+
+  it("comments are equal", async () => {
+    let pssub: any = await ps.getComment('egna1xi');
+    let rsub: any = await getComment('egna1xi');
+
+    delete pssub['loadedData'];
+    delete rsub['loadedData'];
+    delete pssub['firstFoundUTC'];
+    delete rsub['firstFoundUTC'];
+    delete pssub['score'];
+    delete rsub['score'];
+    delete pssub['fromPushshift'];
+    delete rsub['fromPushshift'];
+
+    expect(JSON.stringify(pssub, null, 4)).toEqual(JSON.stringify(rsub, null, 4));
+  })
 });
 
 
@@ -100,5 +192,4 @@ describe("Reddit oAuth Tests", () => {
 
     expect(token).toBeTruthy();
   });
-
 })

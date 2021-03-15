@@ -1,6 +1,6 @@
 import Source from "./source";
 import * as reddit from '../reddit/snoo';
-import {ListingOptionsSchema, TypeOpts} from "../../shared/source-interfaces";
+import {TypeOpts} from "../../shared/source-interfaces";
 import {SubredditSorts, TimeRange} from "../reddit/snoo";
 
 
@@ -25,7 +25,11 @@ export default class SubredditPostSource extends Source {
             default: TimeRange[0],
             enum: TimeRange
         },
-        ...ListingOptionsSchema
+        limit: {
+            description: 'Maximum amount of posts:',
+            type: TypeOpts.NUMBER,
+            default: 0
+        }
     };
     readonly description: string = `The submissions from a subreddit`;
     readonly type: string = 'subreddit-posts';

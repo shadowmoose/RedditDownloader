@@ -5,22 +5,28 @@ import DBSetting from "../database/entities/db-setting";
 import {makeName} from "../util/name-generator";
 import {DBPost} from "../database/db";
 import DBUrl from "../database/entities/db-url";
-import Downloader, {GracefulStopError} from "./downloader";
+import Downloader, {GracefulStopError} from "./wrappers/download-wrapper";
 import {v4} from "uuid";
 import {DownloaderState, DownloadProgress} from "../util/state";
 import YtdlDownloader from "./wrappers/ytdl-downloader";
 import {getAbsoluteDL} from "../util/paths";
+import {DirectDownloader} from "./wrappers/direct-downloader";
+import {ImgurDownloader} from "./wrappers/imgur-downloader";
 
+
+let downloadList: Downloader[] = [];
 
 export async function getDownloaders(): Promise<Downloader[]> {
-    const list = [new YtdlDownloader()];
-
-    for (const l of list) {
-        await l.initOnce();
-        l.order = await l.getOrder();
+    if (!downloadList.length) {
+        downloadList = [new YtdlDownloader(), new DirectDownloader(), new ImgurDownloader()];
     }
 
-    return list.sort((a, b) => a.order - b.order);
+    for (const l of downloadList) {
+        await l.initOnce();
+        l.order = await l.getOrder();  // Buffer this before sorting.
+    }
+
+    return downloadList.sort((a, b) => a.order - b.order);
 }
 
 
@@ -35,7 +41,7 @@ export const getNextPendingDownload = mutex(async (ignoreURLs: Set<string>) => {
         .where("url.processed = :processed", {processed: false});
 
     if (ignoreURLs.size) {
-        query = query.andWhere("url.address NOT IN (:addrs)", {addrs: Array.from(ignoreURLs)});
+        query = query.andWhere("url.address NOT IN (:...addrs)", {addrs: Array.from(ignoreURLs)});
     }
 
     return query.getOne();
@@ -86,9 +92,9 @@ export interface DownloaderData {
 
 export interface DownloaderFunctions {
     /** Register a new URL, and sets the current URL as an album parent. Noop for nested albums. */
-    addAlbum: (url: string) => Promise<DBDownload|null>;
+    addAlbumURL: (url: string) => Promise<null>;
     /** Mark the current URL as failed, and add a reason. The URL will be skipped by default after this. */
-    markInvalid: (reason: string) => Promise<DBUrl>;
+    markInvalid: (reason: string) => Promise<void>;
     /** gracefully exit in a way that will be swallowed by the parent error handling. */
     userExit: (reason?: string) => void;
 }
@@ -106,19 +112,21 @@ export async function buildDownloadData(dl: DBDownload) {
         dl
     };
     const callbacks: DownloaderFunctions = {
-        addAlbum: async (url: string) => {
+        addAlbumURL: async (url: string) => {
             if (dl.albumID && !dl.isAlbumParent) return null;  // Disallow nested albums.
             dl.albumID = v4();
             dl.isAlbumParent = true;
             dl.url.processed = true;
+            dl.url.completedUTC = Date.now();
             await dl.save();
-            return (await DBDownload.getDownloader(data.post, url, dl.albumID)).save();
+            await DBDownload.getDownloader(data.post, url, dl.albumID).then(d => d.save());
+            return null;
         },
         markInvalid: async (reason: string) => {
             dl.url.processed = true;
             dl.url.failed = true;
             dl.url.failureReason = reason;
-            return dl.url.save();
+            await dl.url.save();
         },
         userExit: (reason?: string) => {throw new GracefulStopError(reason||'User exit')}
     };
@@ -135,7 +143,7 @@ export async function handleDownload(dl: DBDownload, progress: DownloadProgress)
     for (const d of await getDownloaders()) {
         if (progress.shouldStop || dl.url.processed) break;
         progress.status = `Looking for downloaders to handle this URL...`;
-        if (await d.canHandle(data)) {
+        if (await d.canHandle(data).catch(console.error)) {
             progress.handler = d.name;
             progress.status = `Downloading the URL...`;
             progress.knowsPercent = false;
@@ -143,6 +151,7 @@ export async function handleDownload(dl: DBDownload, progress: DownloadProgress)
 
             try {
                 let ext = await d.download(data, callbacks, progress);
+                if (dl.url.failed || dl.url.processed) continue;
                 if (!ext) {
                     console.warn('handler:', d.name, 'thought (incorrectly) it could handle', data.url);
                     continue;
@@ -154,12 +163,15 @@ export async function handleDownload(dl: DBDownload, progress: DownloadProgress)
                     // Swallow graceful errors, because the user wants to exit cleanly.
                     console.debug("Graceful stop encountered in downloader:", d.name, err.message);
                 } else {
-                    console.error(err);
+                    console.error('Downloader Error:', d.name, data.url, err);
                 }
             }
         }
     }
-    console.warn('Unable to find handler for:', dl.url.address);
+
+    if (!progress.shouldStop) {
+        console.warn('Unable to find handler for:', dl.url.address);
+    }
 }
 
 

@@ -39,9 +39,7 @@ export default class DBDownload extends DBEntity {
 
     @ManyToOne(() => DBUrl, comm => comm.downloads, { nullable: true, cascade: true })
     @Index()
-    url!: DBUrl;
-
-    progress?: DownloadProgress;
+    url!: DBUrl; // TODO: Why is this a one-to-many? Check all relations for sanity.
 
     async getDBParent(): Promise<DBPost> {
         const p = await this.parentSubmission;
@@ -68,7 +66,6 @@ export default class DBDownload extends DBEntity {
         const newDL = DBDownload.build({
             albumID: albumID || null,
             isAlbumParent: false,
-            progress: undefined,
             url: u
         });
         await forkPost(post,

@@ -4,6 +4,7 @@ import {getSubmission, picker} from "../../reddit/snoo";
 import DBSubmission from "./db-submission";
 import DBDownload from "./db-download";
 import {DBEntity} from "./db-entity";
+import {PsComment} from "../../reddit/pushshift";
 
 @Entity({ name: 'comments' })
 export default class DBComment extends DBEntity {
@@ -22,6 +23,7 @@ export default class DBComment extends DBEntity {
     @Column()
     score!: number;
 
+    /** Creation time, in milliseconds. */
     @Column()
     createdUTC!: number;
 
@@ -40,6 +42,9 @@ export default class DBComment extends DBEntity {
     @Column({ default: false })
     processed!: boolean;
 
+    @Column({ default: false })
+    fromPushshift!: boolean;
+
     @ManyToOne(() => DBSubmission, sub => sub.children, { nullable: true})
     @Index()
     parentSubmission!: Promise<DBSubmission>;
@@ -54,7 +59,7 @@ export default class DBComment extends DBEntity {
     @OneToMany(() => DBDownload, dl => dl.parentComment, {cascade: true})
     downloads!: Promise<DBDownload[]>;
 
-    loadedData?: snoowrap.Comment;
+    loadedData?: snoowrap.Comment|PsComment;
 
     /**
      * Find this comment's root submission.
@@ -87,8 +92,28 @@ export default class DBComment extends DBEntity {
                 selfText: c.body,
                 subreddit: c.subreddit_name_prefixed.replace(/^\/?r\//, ''),
                 loadedData: comment,
-                downloads: Promise.resolve([])
+                downloads: Promise.resolve([]),
+                fromPushshift: false
             });
         })
+    }
+
+    static fromPushShiftComment(comment: PsComment): DBComment {
+        return DBComment.build({
+            id: comment.id,
+            author: comment.author,
+            createdUTC: comment.created_utc*1000,
+            firstFoundUTC: Date.now(),
+            parentRedditID: comment.parent_id,
+            permaLink: comment.permalink,
+            processed: false,
+            rootSubmissionID: comment.link_id,
+            score: comment.score,
+            selfText: comment.body,
+            subreddit: comment.subreddit,
+            loadedData: comment,
+            downloads: Promise.resolve([]),
+            fromPushshift: true
+        });
     }
 }
