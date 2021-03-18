@@ -9,7 +9,7 @@ export interface ProxyOpts {
 export interface UpdateInfo {
     path: (string|number)[];
     value: any;
-    deleted: boolean;
+    deleted?: boolean;
     customMetadata?: any;
 }
 export type SendFunction = (upd: UpdateInfo) => void;
@@ -208,6 +208,7 @@ export class Streamer <T>{
             path: path,
             value: deleted ? undefined : this.getValue(path),
         };
+        if (!deleted) delete data.deleted;
         if (metadata.customData) data.customMetadata = metadata.customData;
         this.send(data);
     }

@@ -62,8 +62,8 @@ config.args = cmds.options({  // TODO: This has to be rewritten, it fights with 
 .epilogue('For more information, go to https://github.com/shadowmoose/RedditDownloader')
 //.strictOptions()
 .env('RMD')
-.help()
-.argv;
+.help();
+//.argv;
 
 
 // ==== LOAD SHARED CONFIG FILE: ====
@@ -136,6 +136,8 @@ function checkEnvironment() {
         if (config.shared.knownEnvironments.length) {
             setEnv(config.shared.knownEnvironments[0]);
         }
+    } else {
+        return;
     }
 
     if (!config.shared.env && isTest()) {

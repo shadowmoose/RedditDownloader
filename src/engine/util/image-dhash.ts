@@ -37,7 +37,7 @@ function binaryToHex(s: any) {
         let hex = decimal.toString(16);
         output += hex;
     }
-    return new Buffer(output, 'hex');
+    return Buffer.from(output, 'hex');
 }
 
 function px(pixels: any, width: number, x: number, y: number) {

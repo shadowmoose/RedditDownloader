@@ -45,7 +45,7 @@ export default class DBUrl extends DBEntity {
      * Find or build a DBUrl object for the given URL string.
      */
     static async dedupeURL(address: string) {
-        return (await DBUrl.findOne({address})) || DBUrl.build({
+        return (await DBUrl.findOne({where: {address}, relations: ['file']})) || DBUrl.build({
             completedUTC: 0,
             failed: false,
             failureReason: null,
@@ -53,6 +53,17 @@ export default class DBUrl extends DBEntity {
             processed: false,
             address
         });
+    }
+
+    /**
+     * Sets the failure status for this URL, and saves the URL.
+     * @param reason
+     */
+    public async setFailed(reason: string) {
+        this.processed = true;
+        this.failed = true;
+        this.failureReason = reason;
+        return this.save();
     }
 }
 

@@ -23,7 +23,7 @@ describe("Database Tests", () => {
     });
 
     it('save multiple posts', async () => {
-        const tst = getSavedPosts();
+        const tst = getSavedPosts(0);
 
         while (true) {
             const nxt = await tst.next();
@@ -35,7 +35,7 @@ describe("Database Tests", () => {
     });
 
     it('save upvoted posts', async () => {
-        const tst = getUpvoted();
+        const tst = getUpvoted(0);
 
         while (true) {
             const nxt = await tst.next();

@@ -5,8 +5,7 @@ import DBSourceGroup from "../database/entities/db-source-group";
 import {forGen} from "./generator-util";
 import {isTest} from "./config";
 
-let currentState: DownloaderState|null = null;
-
+let streamer: Streamer<DownloaderState> |null;
 
 /**
  * Start scanning for new Posts, and also downloaing them.
@@ -22,7 +21,7 @@ export function scanAndDownload(progressCallback: SendFunction) {
     console.debug("Starting scan & download!")
     state.currentState = DownloaderStatus.RUNNING;
 
-    const updater = new Streamer(state, progressCallback);
+    streamer?.setSender(progressCallback);
 
     return Promise
         .all([scanAll(state), downloadAll(state)])
@@ -32,7 +31,6 @@ export function scanAndDownload(progressCallback: SendFunction) {
             state!.currentState = DownloaderStatus.FINISHED;
             state!.shouldStop = true;
             state!.currentSource = null;
-            return updater;
         });
 }
 
@@ -64,5 +62,7 @@ async function scanAll(state: DownloaderState) {
 }
 
 export function getCurrentState() {
-    return currentState = currentState || new DownloaderState();
+    if (!streamer) streamer = new Streamer(new DownloaderState());
+
+    return streamer.state;
 }

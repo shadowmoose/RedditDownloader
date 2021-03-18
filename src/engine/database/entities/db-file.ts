@@ -12,6 +12,9 @@ export default class DBFile extends DBEntity {
     path!: string;
 
     @Column()
+    isDir: boolean = false;
+
+    @Column()
     mimeType!: string;
 
     @Column()

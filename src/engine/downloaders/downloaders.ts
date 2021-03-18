@@ -12,6 +12,8 @@ import YtdlDownloader from "./wrappers/ytdl-downloader";
 import {getAbsoluteDL} from "../util/paths";
 import {DirectDownloader} from "./wrappers/direct-downloader";
 import {ImgurDownloader} from "./wrappers/imgur-downloader";
+import {isTest} from "../util/config";
+import DBFile from "../database/entities/db-file";
 
 
 let downloadList: Downloader[] = [];
@@ -62,9 +64,8 @@ export async function downloadAll(state: DownloaderState) {
         pending.add(nxt.url.address);
 
         try {
-            const dlp = new DownloadProgress();
-            state.activeDownloads[threadNumber] = dlp;
-            await handleDownload(nxt, dlp);
+            state.activeDownloads[threadNumber] = new DownloadProgress(threadNumber);
+            await handleDownload(nxt, state.activeDownloads[threadNumber]!); // fetch the proxied object back.
             state.activeDownloads[threadNumber] = null;
         } catch (err) {
             console.error(err);
@@ -91,19 +92,25 @@ export interface DownloaderData {
 }
 
 export interface DownloaderFunctions {
-    /** Register a new URL, and sets the current URL as an album parent. Noop for nested albums. */
-    addAlbumURL: (url: string) => Promise<null>;
+    /** Register a new list of URLs, and sets the current URL as an album parent. Noop for nested albums. */
+    addAlbumUrls: (url: string[]) => Promise<null>;
     /** Mark the current URL as failed, and add a reason. The URL will be skipped by default after this. */
     markInvalid: (reason: string) => Promise<void>;
     /** gracefully exit in a way that will be swallowed by the parent error handling. */
     userExit: (reason?: string) => void;
 }
 
+const usedRelativeFileNames: string[] = [];
+
 /**
  * Generate the data structure and callbacks that are to be passed into the Downloader instances.
  */
-export async function buildDownloadData(dl: DBDownload) {
-    const relativeFile = await makeName(dl, await DBSetting.get('outputTemplate'));
+export async function buildDownloadData(dl: DBDownload, prog: DownloadProgress) {
+    const relativeFile = await makeName(dl, await DBSetting.get('outputTemplate'), usedRelativeFileNames);
+
+    usedRelativeFileNames[prog.thread] = relativeFile;  // Prevent this path from generating again until we overwrite it.
+    prog.fileName = relativeFile;
+
     const data: DownloaderData = {
         relativeFile,
         file: getAbsoluteDL(relativeFile),
@@ -111,22 +118,41 @@ export async function buildDownloadData(dl: DBDownload) {
         post: await dl.getDBParent(),
         dl
     };
+
+    let albumIDX = 1;
     const callbacks: DownloaderFunctions = {
-        addAlbumURL: async (url: string) => {
+        addAlbumUrls: async (urls: string[]) => {
             if (dl.albumID && !dl.isAlbumParent) return null;  // Disallow nested albums.
-            dl.albumID = v4();
-            dl.isAlbumParent = true;
-            dl.url.processed = true;
-            dl.url.completedUTC = Date.now();
-            await dl.save();
-            await DBDownload.getDownloader(data.post, url, dl.albumID).then(d => d.save());
+            if (!dl.albumID) {
+                const file = DBFile.build({
+                    dHash: '',
+                    hash1: '',
+                    hash2: '',
+                    hash3: '',
+                    hash4: '',
+                    isDir: true,
+                    mimeType: '',
+                    path: relativeFile + '/',  // Make this a directory for children downloads.
+                    shaHash: "",
+                    size: 0,
+                }).save();
+                dl.albumID = v4();
+                dl.isAlbumParent = true;
+                dl.url.file = file;
+                await dl.url.save();
+                await dl.save();  // Preserve ID for subsequent saved children.
+            }
+            const padLen = Math.ceil(Math.log(urls.length)/Math.log(10));
+            for (const url of urls) {
+                await DBDownload.getDownloader(data.post, url, dl.albumID).then(d => {
+                    d.albumPaddedIndex = `${(albumIDX++)}`.padStart(padLen, '0');
+                    return d.save()
+                });
+            }
             return null;
         },
         markInvalid: async (reason: string) => {
-            dl.url.processed = true;
-            dl.url.failed = true;
-            dl.url.failureReason = reason;
-            await dl.url.save();
+            await dl.url.setFailed(reason);
         },
         userExit: (reason?: string) => {throw new GracefulStopError(reason||'User exit')}
     };
@@ -138,7 +164,7 @@ export async function buildDownloadData(dl: DBDownload) {
  * Iterate through all available downloaders, attempting to handle the given DBDownload.
  */
 export async function handleDownload(dl: DBDownload, progress: DownloadProgress) {
-    const {data, callbacks} = await buildDownloadData(dl);
+    const {data, callbacks} = await buildDownloadData(dl, progress);
 
     for (const d of await getDownloaders()) {
         if (progress.shouldStop || dl.url.processed) break;
@@ -152,8 +178,17 @@ export async function handleDownload(dl: DBDownload, progress: DownloadProgress)
             try {
                 let ext = await d.download(data, callbacks, progress);
                 if (dl.url.failed || dl.url.processed) continue;
+                if (dl.isAlbumParent) {
+                    dl.url.failed = false;
+                    dl.url.failureReason = null;
+                    dl.url.processed = true;
+                    dl.url.completedUTC = Date.now();
+                    dl.url.handler = d.name;
+                    await dl.save();
+                    return;
+                }
                 if (!ext) {
-                    console.warn('handler:', d.name, 'thought (incorrectly) it could handle', data.url);
+                    if (isTest()) console.warn('handler:', d.name, 'thought (incorrectly) it could handle', data.url);
                     continue;
                 }
                 ext = ext.replace(/\./gmi, '');
@@ -171,6 +206,8 @@ export async function handleDownload(dl: DBDownload, progress: DownloadProgress)
 
     if (!progress.shouldStop) {
         console.warn('Unable to find handler for:', dl.url.address);
+        dl.url.handler = 'none';
+        await dl.url.setFailed('Unable to find handler.');
     }
 }
 

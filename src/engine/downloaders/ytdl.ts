@@ -75,9 +75,10 @@ function makeArgs(url: string, opts: Record<string, string>) {
 
 
 const defaultYTOptions = {
-    format: 'bestvideo+bestaudio/best',
+    // https://github.com/ytdl-org/youtube-dl/blob/master/README.md#format-selection
+    format: '(bestvideo+bestaudio/best)[protocol^=http]',  // combine best video and audio, and limit to protocol ID starting with "http".
     prefer_ffmpeg: '',
-    ffmpeg_location: ffmpegPath,
+    ffmpeg_location: ffmpegPath(),
     add_metadata: '',
     no_playlist: ''
 };
@@ -96,7 +97,6 @@ export async function download(url: string, filePath: string, progress?: Downloa
         // YTDL just randomly ignores extensions, so just let it choose then find it again.
         const download = await ytdl.exec(makeArgs(url,{
             output: tmpPath + '.%(ext)s',
-            no_playlist: ''
         })).on("progress", (prog: any) => {
             if (progress?.shouldStop) {
                 child.kill();

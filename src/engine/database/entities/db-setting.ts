@@ -75,8 +75,12 @@ const defaultSettings = {
     /** The output template RMD uses when generating a file name. */
     outputTemplate: '[subreddit]/[title] ([author])',
 
+    /** If RMD should de-duplicate similar files after downloading. */
+    dedupeFiles: true,
     /** If true, create symlinks to duplicate files in place of deleted, lower-quality files. */
     createSymLinks: true,
+    /** The (hamming) distance that images should be. Any less, and they get deduplicated. */
+    minimumSimiliarity: 3,
 
     /** The host to launch the local webserver on. */
     serverHost: '127.0.0.1',

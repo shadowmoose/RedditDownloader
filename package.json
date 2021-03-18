@@ -28,7 +28,7 @@
         "make": "electron-forge make",
         "publish_app": "electron-forge publish",
         "migrate": "tsc && typeorm migration:generate -n",
-        "run-reloading-server": "nodemon --watch \"src/**\" --ext \"ts,json\" --exec \"ts-node ./dist/engine/webserver/web-server.js\""
+        "run-reloading-server": "nodemon --watch \"src/**\" --ext \"ts,json\" --exec \"ts-node ./src/engine/webserver/web-server.ts\""
     },
     "devDependencies": {
         "@electron-forge/cli": "^6.0.0-beta.54",

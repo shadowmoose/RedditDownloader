@@ -7,14 +7,13 @@ import {
     getNextPendingDownload,
     handleDownload
 } from "../src/engine/downloaders/downloaders";
-import {DBPost, makeDB} from "../src/engine/database/db";
+import {makeDB} from "../src/engine/database/db";
 import DBSubmission from "../src/engine/database/entities/db-submission";
 import DBDownload from "../src/engine/database/entities/db-download";
 import {DownloadProgress} from "../src/engine/util/state";
 import DBFile from "../src/engine/database/entities/db-file";
 import {checkFFMPEGDownload, ffmpegPath, getFFMPEGVersion} from "../src/engine/downloaders/ffmpeg";
 import {DirectDownloader} from "../src/engine/downloaders/wrappers/direct-downloader";
-import {v4} from "uuid";
 import {GracefulStopError} from "../src/engine/downloaders/wrappers/download-wrapper";
 import {ImgurDownloader} from "../src/engine/downloaders/wrappers/imgur-downloader";
 
@@ -35,7 +34,7 @@ describe('YTDL Tests', () => {
 
     it('ffmpeg updates', async() => {
         await checkFFMPEGDownload();
-        expect(fs.existsSync(ffmpegPath)).toBeTruthy();
+        expect(fs.existsSync(ffmpegPath())).toBeTruthy();
         expect(await getFFMPEGVersion()).toBeTruthy();
     });
 
@@ -101,7 +100,7 @@ describe('Downloader Core Tests', () => {
     it('handleDownload works', async() => {
         const sub = DBSubmission.buildTest();
         const dl = await DBDownload.getDownloader(sub, 'https://soundcloud.com/fiberjw/sausage');  // URL should be handled last, by YTDL.
-        const prog = new DownloadProgress();
+        const prog = new DownloadProgress(0);
         (await sub.downloads).push(dl);
         await sub.save();
 
@@ -134,7 +133,7 @@ async function mockDownloadData(url: string): Promise<DownloaderData> {
 
 function mockDownloaderFunctions(): DownloaderFunctions {
     return {
-        addAlbumURL: jest.fn(),
+        addAlbumUrls: jest.fn((...p: any)=>Promise.resolve(null)),
         markInvalid: jest.fn(),
         userExit: (reason?: string) => {throw new GracefulStopError(reason||'User exit')}
     };
@@ -153,12 +152,12 @@ describe('Direct Download Tests', () => {
 
     it('canHandle can error', async () => {
         const dl = new DirectDownloader();
-        await expect(dl.canHandle(await mockDownloadData('http://127.0.0.1:49586'))).rejects.toThrow();
+        await expect(await dl.canHandle(await mockDownloadData('http://127.0.0.1:49586'))).toBeFalsy();
     })
 
     it('downloading works', async () => {
         const dat = await mockDownloadData('https://i.imgur.com/gYih4vd.jpg');
-        const prog = new DownloadProgress();
+        const prog = new DownloadProgress(0);
         const dl = new DirectDownloader();
 
         const res = await dl.download(dat, mockDownloaderFunctions(), prog);
@@ -169,10 +168,10 @@ describe('Direct Download Tests', () => {
 
     it('downloading catches bad media url', async () => {
         const dat = await mockDownloadData('https://google.com');
-        const prog = new DownloadProgress();
+        const prog = new DownloadProgress(0);
         const dl = new DirectDownloader();
 
-        await expect(dl.download(dat, mockDownloaderFunctions(), prog)).rejects.toThrow();
+        await expect(await dl.download(dat, mockDownloaderFunctions(), prog)).toBeFalsy();
     })
 });
 
@@ -216,19 +215,19 @@ describe('Imgur Download Tests', () => {
 
     it('download gallery', async () => {
         const dat = await mockDownloadData('https://imgur.com/gallery/plN58');
-        const prog = new DownloadProgress();
+        const prog = new DownloadProgress(0);
         const funcs: any = mockDownloaderFunctions();
         const dl = new ImgurDownloader();
         const res = await dl.download(dat, funcs, prog);
 
-        expect(funcs.addAlbumURL.mock.calls.length).toEqual(134);
+        expect(funcs.addAlbumUrls.mock.calls.length).toEqual(1);
         expect(res).toBeFalsy();
         expect(prog.percent).toEqual(0);
     })
 
     it('download direct image', async () => {
         const dat = await mockDownloadData('https://i.imgur.com/gYih4vd.jpg');
-        const prog = new DownloadProgress();
+        const prog = new DownloadProgress(0);
         const dl = new ImgurDownloader();
 
         const res = await dl.download(dat, mockDownloaderFunctions(), prog);
@@ -239,7 +238,7 @@ describe('Imgur Download Tests', () => {
 
     it('download gif as mp4', async () => {
         const dat = await mockDownloadData('imgur.com/r/gifs/jIuIbIu');  // Leave off ext to test full flow.
-        const prog = new DownloadProgress();
+        const prog = new DownloadProgress(0);
         const dl = new ImgurDownloader();
 
         const res = await dl.download(dat, mockDownloaderFunctions(), prog);

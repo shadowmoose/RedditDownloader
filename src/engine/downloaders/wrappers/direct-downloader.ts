@@ -8,9 +8,9 @@ export class DirectDownloader extends Downloader {
     name: string = 'direct';
 
     async canHandle(data: DownloaderData): Promise<boolean> {
-        const head = await axios.head(data.url);
+        const head = await axios.head(data.url).catch(_err=>{});
 
-        if (head.status !== 200) return false;
+        if (!head || head.status !== 200) return false;
 
         return !!getMediaMimeExtension(head.headers['content-type']);
     }
@@ -21,7 +21,7 @@ export class DirectDownloader extends Downloader {
 
     protected async init(): Promise<any> {}
 
-    async download(data: DownloaderData, actions: DownloaderFunctions, progress: DownloadProgress): Promise<string | void> {
-        return downloadMedia(data.url, data.file, progress);
+    async download(data: DownloaderData, actions: DownloaderFunctions, progress: DownloadProgress) {
+        return downloadMedia(data.url, data.file, progress).catch(_err=>{});
     }
 }

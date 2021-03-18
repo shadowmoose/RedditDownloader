@@ -5,14 +5,14 @@ import {
     Index,
     PrimaryGeneratedColumn,
     EventSubscriber,
-    EntitySubscriberInterface, InsertEvent
+    EntitySubscriberInterface, InsertEvent, JoinColumn
 } from 'typeorm';
 import DBSubmission from "./db-submission";
 import DBComment from "./db-comment";
 import {DBEntity} from "./db-entity";
 import {DBPost, forkPost} from "../db";
 import DBUrl from "./db-url";
-import {DownloadProgress} from "../../util/state";
+
 
 @Entity({ name: 'downloads' })
 export default class DBDownload extends DBEntity {
@@ -29,6 +29,9 @@ export default class DBDownload extends DBEntity {
     @Column({default: false})
     isAlbumParent!: boolean;
 
+    @Column({type: 'varchar', default: null})
+    albumPaddedIndex!: string|null;
+
     @ManyToOne(() => DBSubmission, sub => sub.downloads, { nullable: true })
     @Index()
     parentSubmission!: Promise<DBSubmission>;
@@ -39,7 +42,7 @@ export default class DBDownload extends DBEntity {
 
     @ManyToOne(() => DBUrl, comm => comm.downloads, { nullable: true, cascade: true })
     @Index()
-    url!: DBUrl; // TODO: Why is this a one-to-many? Check all relations for sanity.
+    url!: DBUrl;
 
     async getDBParent(): Promise<DBPost> {
         const p = await this.parentSubmission;
@@ -54,19 +57,24 @@ export default class DBDownload extends DBEntity {
      *
      * Does not save automatically.
      */
-    static async getDownloader(post: DBPost, url: string, albumID?: string) {
+    static async getDownloader(post: DBPost, url: string, albumID?: string, albumIndex: string|null = null) {
         for (const dl of await post.downloads) {
-            if (albumID && dl.albumID !== albumID) continue;
+            if (albumID && dl.albumID !== albumID || dl.isAlbumParent) continue;
+            if (!dl.url) {
+                console.warn('Gonna be an error! url:', url, 'album:', albumID, '->', post, dl, await post.downloads);
+            }
             if (dl.url.address === url) {
                 return dl;
             }
         }
+
         // No matching Downloader. Add new one:
         const u = await DBUrl.dedupeURL(url);
         const newDL = DBDownload.build({
             albumID: albumID || null,
             isAlbumParent: false,
-            url: u
+            url: u,
+            albumPaddedIndex: albumIndex
         });
         await forkPost(post,
             c => newDL.parentComment = Promise.resolve(c),

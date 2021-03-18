@@ -11,6 +11,12 @@ import DBSourceGroup from "./entities/db-source-group";
 import DBSource from "./entities/db-source";
 import DBUrl from "./entities/db-url";
 import {initial1613378705882} from "./migrations/1613378705882-initial";
+import {psTagCol1615799411768} from "./migrations/1615799411768-ps-tag-col";
+import {dlAlbumIndex1615805733346} from "./migrations/1615805733346-dl-album-index";
+import {stringPaddedIndex1615868441239} from "./migrations/1615868441239-string-padded-index";
+import DBSymLink from "./entities/db-symlink";
+import {addSymlinks1615947913892} from "./migrations/1615947913892-add-symlinks";
+import {addDirFlag1616042478022} from "./migrations/1616042478022-add-dir-flag";
 
 let _connection: Connection|null;
 
@@ -20,13 +26,20 @@ export async function makeDB() {
     return createConnection({
         type: "better-sqlite3",
         database: envDataPath(`manifest.sqlite`),
-        entities: [DBSubmission, DBComment, DBDownload, DBFile, DBFilter, DBSetting, DBSourceGroup, DBSource, DBUrl],
+        entities: [DBSubmission, DBComment, DBDownload, DBFile, DBFilter, DBSetting, DBSourceGroup, DBSource, DBUrl, DBSymLink],
         logging: false,
         synchronize: false,
         migrationsTransactionMode: 'all',
         migrationsRun: true,
         migrationsTableName: "migrations",
-        migrations: [initial1613378705882],  // Add migration classes here.
+        migrations: [
+            initial1613378705882,
+            psTagCol1615799411768,
+            dlAlbumIndex1615805733346,
+            stringPaddedIndex1615868441239,
+            addSymlinks1615947913892,
+            addDirFlag1616042478022
+        ],  // Add migration classes here.
         subscribers: [DownloadSubscriber],
     }).then(async (connection: Connection) => {
         // here you can start to work with your entities

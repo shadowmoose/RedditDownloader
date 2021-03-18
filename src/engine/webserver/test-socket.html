@@ -13,10 +13,19 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Websocket Test Platform</title>
+	<script src="commands/cmd-delete-dbobject.ts"></script>
 </head>
 <body>
 
-<div id="log" style="width: 100%; height: 500px; overflow-y: auto;"></div>
+<div style="height: 800px;">
+	<div class="container" style="display: flex; height: 100px;">
+		<div id="log" style="width: 50%; background: #80d080; height: 750px; overflow: auto;">
+		</div>
+		<div style="flex-grow: 1; background: #8686e9; height: 750px; overflow: auto;">
+			<pre id="state"></pre>
+		</div>
+	</div>
+</div>
 
 <div>
 	<button onclick="stageGroup()">SourceGroup</button>
@@ -33,8 +42,11 @@
 <script>
 	const input = document.getElementById('input');
 	const output = document.getElementById('log');
+	const stateLog = document.getElementById('state');
 	const sock = new WebSocket("ws://localhost:7001");
 	let uid = 0;
+	let state = {};
+	let logRows = [];
 
 	sock.onopen = (_event) => {
 		console.log('Opened connection.')
@@ -47,15 +59,51 @@
 	};
 
 	sock.onmessage = function(event) {
-		const data = JSON.parse(event.data);
-		const row = document.createElement('pre');
-		row.className = 'event-log';
-		row.style.color = data.error ? 'red' : 'black';
-		row.innerText = new Date().toLocaleTimeString() + ': ' + JSON.stringify(data, null, 2);
-		output.appendChild(row);
-		output.scrollTop = output.scrollHeight;
-		console.debug("Received:", JSON.parse(event.data));
+		const packet = JSON.parse(event.data);
+		const data = packet.data;
+
+		window.debugPacketCount = (window.debugPacketCount || 0) + 1;
+
+		if (packet.type === 'fullState') {
+			state = data;
+			stateLog.innerText = JSON.stringify(state, null, 4);
+		} else if (packet.type === 'stateChange') {
+			updateState(packet, data);
+			stateLog.innerText = JSON.stringify(state, null, 4);
+		} else {
+			const row = document.createElement('pre');
+			row.className = 'event-log';
+			row.style.color = packet.error ? 'red' : 'black';
+			row.innerText = new Date().toLocaleTimeString() + ': ' + JSON.stringify(packet, null, 2);
+			output.appendChild(row);
+			output.scrollTop = output.scrollHeight;
+			console.debug("Received:", packet);
+			logRows.push(row);
+
+			while (logRows.length > 20) {
+				logRows.splice(0, 1).forEach(r => output.removeChild(r));
+			}
+		}
 	};
+
+	function updateState(packet, data) {
+		let cs = state;
+		const path = data.path;
+		const endKey = path.pop();
+
+		path.forEach((p) => {
+			if (!cs[p]) {
+				if (data.deleted) return;
+				cs[p] = {};
+			}
+			cs = cs[p];
+		});
+
+		if (data.deleted) {
+			return delete cs[endKey];
+		}
+		cs[endKey] = data.value;
+	}
 
 
 	function send() {

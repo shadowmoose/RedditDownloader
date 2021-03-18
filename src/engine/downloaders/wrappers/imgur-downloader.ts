@@ -97,7 +97,10 @@ export class ImgurDownloader extends Downloader {
             }
 
             if (urls.length) {
-                await Promise.all(urls.map(u => actions.addAlbumURL(u)));
+                await actions.addAlbumUrls(urls).catch(err => {
+                    console.log('Imgur album error...');
+                    console.error(err);
+                });
                 return;
             }
         }

@@ -53,11 +53,11 @@ describe('Utility Tests', () => {
 
         expect(spy).toBeCalledTimes(5);  // Ensure that all updates have gone through.
         expect(spy.mock.calls).toEqual([
-            [{"deleted": false, "path": ["other"], "value": true}],
-            [{"deleted": false, "path": ["nested", "test"], "value": 100}],
+            [{"path": ["other"], "value": true}],
+            [{"path": ["nested", "test"], "value": 100}],
             [{"deleted": true, "path": ["nested", "b"]}],
-            [{"deleted": false, "path": ["items"], "value": ["ok"]}],
-            [{"deleted": false, "path": ["delayedItems", 0], "value": "delay me"}]
+            [{"path": ["items"], "value": ["ok"]}],
+            [{"path": ["delayedItems", 0], "value": "delay me"}]
         ]);
         // @ts-ignore
         expect(streamer.pending).toEqual({ delayedItems: {}, nested: {} });

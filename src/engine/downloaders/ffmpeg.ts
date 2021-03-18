@@ -12,12 +12,12 @@ const platform = isWin ? 'windows' : process.platform === 'darwin' ? 'osx' : 'li
 const arch = os.arch().replace('x', '');
 const ext = isWin ? '.exe':'';
 export const ffmpegDir = sharedPath('bin', 'ffmpeg');
-export const ffmpegPath = path.resolve(ffmpegDir, `ffmpeg${ext}`);
+export const ffmpegPath = () =>  path.resolve(ffmpegDir, `ffmpeg${ext}`);
 
 
 export async function getFFMPEGVersion(): Promise<string> {
     return new Promise((res, rej) => {
-        child_process.execFile(ffmpegPath, ['-version'], (error, stdout, stderr) => {
+        child_process.execFile(ffmpegPath(), ['-version'], (error, stdout, stderr) => {
             if (error) {
                 return rej(error)
             }
@@ -50,7 +50,7 @@ export async function downloadFFMPEG() {
         pipe.on('error', rej)
     });
 
-    fs.chmodSync(ffmpegPath, '755');
+    fs.chmodSync(ffmpegPath(), '755');
 
     return getFFMPEGVersion();
 }

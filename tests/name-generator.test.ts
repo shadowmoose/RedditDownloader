@@ -58,7 +58,7 @@ describe('Name Generator Tests', () => {
             subreddit: "test_sub",
             title: "This is a test [title].".repeat(100),
             type: 'comment',
-            url: ""
+            url: "",
         }, template)
 
         expect(getAbsoluteDL(output).length).toBeLessThan(MAX_NAME_LEN+1);
@@ -69,7 +69,8 @@ describe('Name Generator Tests', () => {
         const dl = DBDownload.build({
             albumID: "test",
             isAlbumParent: false,
-            url: await DBUrl.dedupeURL('test.com')
+            url: await DBUrl.dedupeURL('test.com'),
+            albumPaddedIndex: null
         });
         (await c.downloads).push(dl);
         await c.save();
@@ -82,7 +83,8 @@ describe('Name Generator Tests', () => {
         const dl = DBDownload.build({
             albumID: "test",
             isAlbumParent: false,
-            url: await DBUrl.dedupeURL('test.com')
+            url: await DBUrl.dedupeURL('test.com'),
+            albumPaddedIndex: null
         });
         (await c.downloads).push(dl);
         await c.save();
@@ -95,7 +97,8 @@ describe('Name Generator Tests', () => {
         const dl = DBDownload.build({
             albumID: "test",
             isAlbumParent: false,
-            url: await DBUrl.dedupeURL('test.com')
+            url: await DBUrl.dedupeURL('test.com'),
+            albumPaddedIndex: null
         });
         (await c.downloads).push(dl);
         await c.save();
@@ -109,6 +112,7 @@ describe('Name Generator Tests', () => {
             path,
             shaHash: "",
             size: 0,
+            isDir: false
         }).save();
 
         const p2 = await gen.makeName(dl, '[subreddit]/[author]/[type]s/[title]')

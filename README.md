@@ -1,5 +1,7 @@
 _This is the WIP branch for converting RMD into TypeScript. At any given moment, the code within may or may not be operational._
 
+It is certain that anything you run here will not work properly with the final release of the next RMD. Please avoid using this branch for anything unrelated to development.
+
 # Reddit Media Downloader 
 [![badge](https://github.com/shadowmoose/RedditDownloader/workflows/Pytest/badge.svg)](https://github.com/shadowmoose/RedditDownloader/actions) 
 [![badge](https://github.com/shadowmoose/RedditDownloader/workflows/Docs/badge.svg)](https://shadowmoose.github.io/RedditDownloader/)

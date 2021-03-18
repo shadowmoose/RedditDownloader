@@ -1,6 +1,5 @@
 import {Streamer} from "./streamer";
 import {DownloadSubscriber} from "../database/entities/db-download";
-import {v4} from "uuid";
 
 
 export enum DownloaderStatus {
@@ -10,6 +9,7 @@ export enum DownloaderStatus {
 }
 
 export class DownloaderState {
+    @Streamer.delay(500)
     activeDownloads: (DownloadProgress|null)[] = [];
     shouldStop = false;
 
@@ -41,13 +41,20 @@ export class DownloaderState {
 
 
 export class DownloadProgress {
-    uid: string = v4();
+    constructor(thread: number) {
+        this.thread = thread;
+    }
+
+    thread: number;
 
     /**
      * User-friendly description of whatever is happening right now.
      */
     @Streamer.delay(1000)
     status: string = '';
+
+    @Streamer.delay(1000)
+    fileName: string = '';
 
     /**
      * The name of the current Handler trying to download.

@@ -122,12 +122,18 @@ export function removeClient(sock: ws) {
  * Send a message to a connected client socket.
  */
 export function send(sock: ws, message: SocketResponse) {
-    sock.send(JSON.stringify(message), err => {
-        if (err) {
-            console.error(err);
-            sock.close();
-        }
-    });
+    try {
+        sock.send(JSON.stringify(message), err => {
+            if (err) {
+                console.error(err);
+                sock.close();
+            }
+        });
+    } catch (err) {
+        console.error('Failed to send to client.')
+        sock.close();
+    }
+
 }
 
 /**

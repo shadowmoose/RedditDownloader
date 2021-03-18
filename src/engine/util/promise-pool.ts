@@ -42,15 +42,17 @@ export default function promisePool(feeder: (stop: ()=>void, threadNumber: numbe
 /**
  * Returns the given function, but wrapped so that only one call may run concurrently.
  */
-export function mutex<T,A extends any[]>(fn: (...args: A)=>T): (...args: A)=>Promise<T> {
+export function mutex<T,A extends any[]>(fn: (...args: A)=>T): (...args: A)=>Promise<Await<T>> {
     let p: Promise<any> = Promise.resolve();
 
     return (...args: A) => {
-        p = p.then(() => fn(...args) );
-        return p
+        p = p.then(() => fn(...args) ).catch(console.error);
+        return p;
     }
 }
 
+
+type Await<T> = T extends PromiseLike<infer U> ? U : T
 
 /**
  * Simple sleep function, just to save the trouble of retyping it.
