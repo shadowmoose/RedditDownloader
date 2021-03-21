@@ -95,11 +95,11 @@ export const buildFile = mutex(async (fullPath: string, subpath: string) => {
 
     return DBFile.build({
         shaHash: checksum,
-        dHash: dh,
-        hash1: dChunks[0],
-        hash2: dChunks[1],
-        hash3: dChunks[2],
-        hash4: dChunks[3],
+        dHash: dh || null,
+        hash1: dChunks[0] || null,
+        hash2: dChunks[1] || null,
+        hash3: dChunks[2] || null,
+        hash4: dChunks[3] || null,
         mimeType: mimetype.lookup(fullPath) || '',
         path: subpath,
         size: stats.size,

@@ -14,8 +14,8 @@ export default class DBFile extends DBEntity {
     @Column()
     isDir: boolean = false;
 
-    @Column()
-    mimeType!: string;
+    @Column({type: 'varchar', nullable: true})
+    mimeType!: string|null;
 
     @Column()
     size!: number;
@@ -23,8 +23,8 @@ export default class DBFile extends DBEntity {
     @OneToMany(() => DBUrl, dl => dl.file)
     urls!: Promise<DBUrl[]>;
 
-    @Column({type: 'varchar', length: 64})
-    shaHash!: string;
+    @Column({type: 'varchar', length: 64, nullable: true})
+    shaHash!: string|null;
 
     @Column({type: 'varchar', nullable: true})
     dHash: string|null = null;

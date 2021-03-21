@@ -92,7 +92,7 @@ export default class DBDownload extends DBEntity {
 @EventSubscriber()
 export class DownloadSubscriber implements EntitySubscriberInterface<DBDownload> {
     private static waiting: ((url: DBDownload|undefined)=>void)[] = [];
-    private static enabled = false;
+    private static enabled = true;
 
     listenTo() {
         return DBDownload;

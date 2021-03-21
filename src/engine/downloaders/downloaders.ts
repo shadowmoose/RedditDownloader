@@ -126,15 +126,15 @@ export async function buildDownloadData(dl: DBDownload, prog: DownloadProgress) 
             if (dl.albumID && !dl.isAlbumParent) return null;  // Disallow nested albums.
             if (!dl.albumID) {
                 const file = DBFile.build({
-                    dHash: '',
-                    hash1: '',
-                    hash2: '',
-                    hash3: '',
-                    hash4: '',
+                    dHash: null,
+                    hash1: null,
+                    hash2: null,
+                    hash3: null,
+                    hash4: null,
                     isDir: true,
-                    mimeType: '',
+                    mimeType: null,
                     path: relativeFile + '/',  // Make this a directory for children downloads.
-                    shaHash: "",
+                    shaHash: null,
                     size: 0,
                 }).save();
                 dl.albumID = v4();
