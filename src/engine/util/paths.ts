@@ -34,3 +34,8 @@ export const mkParents = (file: string) => {
         })
     });
 }
+
+export async function baseDownloadDir() {
+    if (!config.shared.env) throw Error('Cannot get base DL Location - current working environment is not set!');
+    return path.resolve(config.shared.env);
+}

@@ -1,6 +1,5 @@
 import {Entity, Column, PrimaryColumn} from 'typeorm';
 import {DBEntity} from "./db-entity";
-import {isTest} from "../../util/config";
 
 
 @Entity({ name: 'settings' })
@@ -81,6 +80,8 @@ const defaultSettings = {
     createSymLinks: true,
     /** The (hamming) distance that images should be. Any less, and they get deduplicated. */
     minimumSimiliarity: 3,
+    /** If true, skip deduplication for all files that are within an album. */
+    skipAlbumFiles: true,
 
     /** The host to launch the local webserver on. */
     serverHost: '127.0.0.1',

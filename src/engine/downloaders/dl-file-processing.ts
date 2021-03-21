@@ -8,6 +8,7 @@ import {getAbsoluteDL} from "../util/paths";
 import {dhash} from '../util/image-dhash';
 import {mutex} from "../util/promise-pool";
 import DBSymLink from "../database/entities/db-symlink";
+import {Brackets} from "typeorm";
 
 
 export async function distHash(file: string): Promise<string|null> {
@@ -43,22 +44,26 @@ export function hammingDist(str1: string, str2: string) {
  * Uses hashing to deduplicate files. If a pre-existing match is found,
  * it deletes the worst file and returns the updated File with the new best path.
  */
-export const buildFile = mutex(async (fullPath: string, subpath: string) => {
+export const buildFile = mutex(async (fullPath: string, subpath: string, isAlbumFile: boolean) => {
     const stats = await fs.promises.stat(fullPath);
     if (!stats.isFile()) throw Error(`The given file output path does not exist: "${fullPath}"`);
 
     const checksum = await checksumFile(fullPath);
     const dh = await distHash(fullPath);
     const dChunks = dh?.match(/.{1,4}/g) || [];
+    const skipAlbums = await DBSetting.get('skipAlbumFiles');
 
-    if (await DBSetting.get('dedupeFiles')) {
+    if (await DBSetting.get('dedupeFiles') && !(isAlbumFile && skipAlbums)) {
         let closeMatches = await DBFile.createQueryBuilder('f')
             .select()
-            .where({shaHash: checksum})
-            .orWhere('f.hash1 = :hash1', {hash1: dChunks[0]})
-            .orWhere('f.hash2 = :hash2', {hash2: dChunks[1]})
-            .orWhere('f.hash3 = :hash3', {hash3: dChunks[2]})
-            .orWhere('f.hash4 = :hash4', {hash4: dChunks[3]})
+            .where(new Brackets(qb => {
+                qb.where({shaHash: checksum})
+                .orWhere('(:hash1 is not null and f.hash1 = :hash1)', {hash1: dChunks[0]})
+                .orWhere('(:hash2 is not null and f.hash2 = :hash2)', {hash2: dChunks[1]})
+                .orWhere('(:hash3 is not null and f.hash3 = :hash3)', {hash3: dChunks[2]})
+                .orWhere('(:hash4 is not null and f.hash4 = :hash4)', {hash4: dChunks[3]})
+            }))
+            .andWhere('(not :skip or not f.isAlbumFile )', {skip: skipAlbums ? 1 : 0})
             .getMany();
         const similarity = await DBSetting.get('minimumSimiliarity');
         const match = closeMatches.find(m =>
@@ -103,7 +108,8 @@ export const buildFile = mutex(async (fullPath: string, subpath: string) => {
         mimeType: mimetype.lookup(fullPath) || '',
         path: subpath,
         size: stats.size,
-        isDir: false
+        isDir: false,
+        isAlbumFile
     }).save();
 });
 

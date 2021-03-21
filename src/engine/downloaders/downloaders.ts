@@ -136,6 +136,7 @@ export async function buildDownloadData(dl: DBDownload, prog: DownloadProgress) 
                     path: relativeFile + '/',  // Make this a directory for children downloads.
                     shaHash: null,
                     size: 0,
+                    isAlbumFile: true
                 }).save();
                 dl.albumID = v4();
                 dl.isAlbumParent = true;
@@ -188,12 +189,11 @@ export async function handleDownload(dl: DBDownload, progress: DownloadProgress)
                     await dl.save();
                     return;
                 }
-                if (!ext) {
+                if (!ext || !(ext = ext.trim().replace(/\./gmi, ''))) {
                     if (isTest()) console.warn('handler:', d.name, 'thought (incorrectly) it could handle', data.url);
                     continue;
                 }
-                ext = ext.replace(/\./gmi, '');
-                return await processFinishedDownload(dl.url, `${data.relativeFile}.${ext}`, d.name);
+                return await processFinishedDownload(dl.url, `${data.relativeFile}.${ext}`, d.name, !!dl.albumPaddedIndex);
             } catch (err) {
                 if (err instanceof GracefulStopError) {
                     // Swallow graceful errors, because the user wants to exit cleanly.
@@ -216,8 +216,8 @@ export async function handleDownload(dl: DBDownload, progress: DownloadProgress)
 /**
  * Builds and saves a new DBFile for the given DBUrl and file path.
  */
-export async function processFinishedDownload(url: DBUrl, subPath: string, handler: string) {
-    url.file = buildFile(getAbsoluteDL(subPath), subPath);
+export async function processFinishedDownload(url: DBUrl, subPath: string, handler: string, isAlbumFile: boolean) {
+    url.file = buildFile(getAbsoluteDL(subPath), subPath, isAlbumFile);
     url.processed = true;
     url.failed = false;
     url.failureReason = null;

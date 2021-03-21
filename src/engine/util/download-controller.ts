@@ -1,3 +1,5 @@
+import {promises as fsPromises} from 'fs';
+import path from 'path';
 import {DownloaderState, DownloaderStatus} from "./state";
 import {SendFunction, Streamer} from "./streamer";
 import {downloadAll} from "../downloaders/downloaders";
@@ -5,6 +7,7 @@ import DBSourceGroup from "../database/entities/db-source-group";
 import {forGen} from "./generator-util";
 import {isTest} from "./config";
 import {DownloadSubscriber} from "../database/entities/db-download";
+import {baseDownloadDir} from "./paths";
 
 let streamer: Streamer<DownloaderState> |null;
 
@@ -28,7 +31,11 @@ export function scanAndDownload(progressCallback: SendFunction) {
     DownloadSubscriber.toggle(true);
 
     return Promise
-        .all([scanAll(state).then(() => DownloadSubscriber.toggle(false)), downloadAll(state)])
+        .all([
+            scanAll(state).then(() => DownloadSubscriber.toggle(false)), // Scan all, then turn off the (blocking) subscriber.
+            downloadAll(state)  // Concurrently download existing posts, and new posts from the Subscriber.
+        ])
+        .then(async () => removeEmptyDirectories(await baseDownloadDir()))
         .catch(err => {
             console.error(err);
         }).finally(() => {
@@ -74,4 +81,38 @@ export function getCurrentState() {
     if (!streamer) streamer = new Streamer(new DownloaderState());
 
     return streamer.state;
+}
+
+
+/**
+ * Recursively removes empty directories from the given directory.
+ *
+ * If the directory itself is empty, it is also removed.
+ *
+ * Code taken from: https://gist.github.com/jakub-g/5903dc7e4028133704a4
+ *
+ * @param {string} directory Path to the directory to clean up
+ */
+async function removeEmptyDirectories(directory: string) {
+    // lstat does not follow symlinks (in contrast to stat)
+    const fileStats = await fsPromises.lstat(directory);
+    if (!fileStats.isDirectory()) {
+        return;
+    }
+    let fileNames = await fsPromises.readdir(directory);
+    if (fileNames.length > 0) {
+        const recursiveRemovalPromises = fileNames.map(
+            (fileName) => removeEmptyDirectories(path.join(directory, fileName)),
+        );
+        await Promise.all(recursiveRemovalPromises);
+
+        // re-evaluate fileNames; after deleting subdirectory
+        // we may have parent directory empty now
+        fileNames = await fsPromises.readdir(directory);
+    }
+
+    if (fileNames.length === 0) {
+        if (isTest()) console.log('Removing empty directory: ', directory);
+        await fsPromises.rmdir(directory);
+    }
 }

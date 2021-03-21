@@ -12,7 +12,10 @@ export default class DBFile extends DBEntity {
     path!: string;
 
     @Column()
-    isDir: boolean = false;
+    isDir!: boolean;
+
+    @Column()
+    isAlbumFile!: boolean;
 
     @Column({type: 'varchar', nullable: true})
     mimeType!: string|null;
