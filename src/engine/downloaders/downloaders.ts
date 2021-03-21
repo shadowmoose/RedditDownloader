@@ -14,13 +14,14 @@ import {DirectDownloader} from "./wrappers/direct-downloader";
 import {ImgurDownloader} from "./wrappers/imgur-downloader";
 import {isTest} from "../util/config";
 import DBFile from "../database/entities/db-file";
+import {GfycatDownloader} from "./wrappers/gfycat-downloader";
 
 
 let downloadList: Downloader[] = [];
 
 export async function getDownloaders(): Promise<Downloader[]> {
     if (!downloadList.length) {
-        downloadList = [new YtdlDownloader(), new DirectDownloader(), new ImgurDownloader()];
+        downloadList = [new YtdlDownloader(), new DirectDownloader(), new ImgurDownloader(), new GfycatDownloader()];
     }
 
     for (const l of downloadList) {
@@ -198,7 +199,7 @@ export async function handleDownload(dl: DBDownload, progress: DownloadProgress)
                     // Swallow graceful errors, because the user wants to exit cleanly.
                     console.debug("Graceful stop encountered in downloader:", d.name, err.message);
                 } else {
-                    console.error('Downloader Error:', d.name, data.url, err);
+                    console.error('Downloader Error:', d.name, data.url, isTest() ? err : '<snipped error trace>');
                 }
             }
         }

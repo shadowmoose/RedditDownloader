@@ -104,7 +104,7 @@ export async function download(url: string, filePath: string, progress?: Downloa
             }
             if (progress) {
                 progress.status = 'Downloading with YTDL...';
-                progress.percent = prog.percent
+                progress.percent = prog.percent/100;
                 progress.knowsPercent = !!prog.percent;
             }
         }).on("error", rej);

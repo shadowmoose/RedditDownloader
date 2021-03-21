@@ -3,7 +3,7 @@ import Downloader from "./download-wrapper";
 import {DownloaderData, DownloaderFunctions} from "../downloaders";
 import {DownloadProgress} from "../../util/state";
 import * as ytdl from '../ytdl';
-import {isTest} from "../../util/config";
+
 
 export default class YtdlDownloader extends Downloader {
     name: string = 'ytdl';
@@ -21,11 +21,7 @@ export default class YtdlDownloader extends Downloader {
     }
 
     async download(data: DownloaderData, actions: DownloaderFunctions, progress: DownloadProgress): Promise<string | void> {
-        try {
-            const fullPath = await ytdl.download(data.url, data.file, progress);
-            return path.extname(fullPath);
-        } catch (err) {
-            if (isTest()) console.warn(err);
-        }
+        const fullPath = await ytdl.download(data.url, data.file, progress);
+        return path.extname(fullPath).replace(/^\./, '');
     }
 }

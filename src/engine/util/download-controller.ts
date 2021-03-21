@@ -4,6 +4,7 @@ import {downloadAll} from "../downloaders/downloaders";
 import DBSourceGroup from "../database/entities/db-source-group";
 import {forGen} from "./generator-util";
 import {isTest} from "./config";
+import {DownloadSubscriber} from "../database/entities/db-download";
 
 let streamer: Streamer<DownloaderState> |null;
 
@@ -20,17 +21,21 @@ export function scanAndDownload(progressCallback: SendFunction) {
     }
     console.debug("Starting scan & download!")
     state.currentState = DownloaderStatus.RUNNING;
+    state.shouldStop = false;
 
     streamer?.setSender(progressCallback);
 
+    DownloadSubscriber.toggle(true);
+
     return Promise
-        .all([scanAll(state), downloadAll(state)])
+        .all([scanAll(state).then(() => DownloadSubscriber.toggle(false)), downloadAll(state)])
         .catch(err => {
             console.error(err);
         }).finally(() => {
             state!.currentState = DownloaderStatus.FINISHED;
             state!.shouldStop = true;
             state!.currentSource = null;
+            state!.stop()
         });
 }
 
@@ -40,16 +45,19 @@ export function scanAndDownload(progressCallback: SendFunction) {
 async function scanAll(state: DownloaderState) {
     const groups = await DBSourceGroup.find();  // TODO: Potentially allow 'specific source groups only'.
 
+    state.finishedScanning = false;
+    state.newPostsScanned = 0;
+
     for (const g of groups) {
         let found = await forGen(g.getPostGenerator(), async (ele, idx, stop) => {
             if (state.shouldStop) {
                 return stop();
             }
             await ele.save();
-            state.postsScanned ++;
+            state.newPostsScanned ++;
 
-            if (isTest() && state.postsScanned % 10 === 0) {
-                console.debug(`Scanned ${state.postsScanned} posts so far...`)
+            if (isTest() && state.newPostsScanned % 10 === 0) {
+                console.debug(`Scanned ${state.newPostsScanned} posts so far...`)
             }
         });
 
@@ -59,6 +67,7 @@ async function scanAll(state: DownloaderState) {
     }
 
     state.finishedScanning = true;
+    state.currentSource = null;
 }
 
 export function getCurrentState() {

@@ -92,6 +92,7 @@ export default class DBDownload extends DBEntity {
 @EventSubscriber()
 export class DownloadSubscriber implements EntitySubscriberInterface<DBDownload> {
     private static waiting: ((url: DBDownload|undefined)=>void)[] = [];
+    private static enabled = false;
 
     listenTo() {
         return DBDownload;
@@ -106,9 +107,10 @@ export class DownloadSubscriber implements EntitySubscriberInterface<DBDownload>
     /**
      * Wait for a new *unprocessed* DBUrl to be saved. Hands out new entities in the order that they were requested.
      *
-     * Will only return `undefined` when {@link flush} is called.
+     * Will only return `undefined` when {@link flush} is called, or after being disabled.
      */
     public static awaitNew() {
+        if (!DownloadSubscriber.enabled) return;
         let r: any, err: any;
         const prom = new Promise<DBDownload|undefined>((res, rej) => {
             r = res;
@@ -124,5 +126,10 @@ export class DownloadSubscriber implements EntitySubscriberInterface<DBDownload>
     public static flush() {
         let cb;
         while (cb = this.waiting.shift()) cb(undefined);
+    }
+
+    public static toggle(enabled: boolean) {
+        DownloadSubscriber.enabled = enabled;
+        if (!enabled) DownloadSubscriber.flush();
     }
 }

@@ -18,7 +18,7 @@ export class DownloaderState {
     currentSource: string|null = null;
 
     @Streamer.delay(2000)
-    postsScanned = 0;
+    newPostsScanned = 0;
 
     /**
      * Set the "shouldStop" flag on this state and all its relevant children.

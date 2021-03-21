@@ -67,7 +67,6 @@ export const buildFile = mutex(async (fullPath: string, subpath: string) => {
         );
 
         if (match) {
-            console.log('\tMatched files:', fullPath, match.path);
             let best, worst;
             if (match.size < stats.size) {
                 best = subpath;
