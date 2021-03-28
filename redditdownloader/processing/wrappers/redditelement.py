@@ -129,7 +129,7 @@ class RedditElement(object):
 			# This post probably doesn't have a URL, and has selftext instead.
 			for url in stringutil.html_elements(post.selftext_html, 'a', 'href'):
 				self.add_url(url)
-		if getattr(post, 'is_gallery', False):
+		if getattr(post, 'is_gallery', False) and getattr(post, 'media_metadata', False):
 			for k, img in post.media_metadata.items():
 				try:
 					self.add_url(img['s']['u'])
@@ -154,7 +154,7 @@ class RedditElement(object):
 		self.num_comments = post.num_comments
 		self.score = post.score
 		self.body = html.unescape(str(post.selftext)) if 'selftext' in post and post.selftext else ''
-		if getattr(post, 'is_gallery', False):
+		if getattr(post, 'is_gallery', False) and getattr(post, 'media_metadata', False):
 			for k, img in post.media_metadata.items():
 				try:
 					self.add_url(html.unescape(img['s']['u']))
