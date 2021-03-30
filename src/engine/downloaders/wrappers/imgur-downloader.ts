@@ -62,7 +62,7 @@ export class ImgurDownloader extends Downloader {
     }
 
     /** use the imgur API to extract album URLs. May be throttled. */
-    async extractAlbumAPI(albumKey: string): Promise<string[]> {
+    async extractAlbumUsingAPI(albumKey: string): Promise<string[]> {
         const id = await DBSetting.get('imgurClientId');
         imgur.setClientId(id);
 
@@ -93,7 +93,7 @@ export class ImgurDownloader extends Downloader {
             if (found && found.length) {
                 urls = urls.concat(found);
             } else {
-                urls = urls.concat(await this.extractAlbumAPI(albumKey));
+                urls = urls.concat(await this.extractAlbumUsingAPI(albumKey));
             }
 
             if (urls.length) {

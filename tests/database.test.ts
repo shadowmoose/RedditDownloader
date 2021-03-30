@@ -54,7 +54,8 @@ describe("Database Tests", () => {
                 comparator: ">",
                 field: "title",
                 forSubmissions: false,
-                valueJSON: JSON.stringify(1000)
+                valueJSON: JSON.stringify(1000),
+                negativeMatch: false
             });
             if (i === 1) f.value = 2000;
             (await sg.filters).push(f);
@@ -86,7 +87,8 @@ describe("Database Tests", () => {
             comparator: ">",
             field: "title",
             forSubmissions: false,
-            valueJSON: JSON.stringify(1000)
+            valueJSON: JSON.stringify(1000),
+            negativeMatch: false
         });
         (await sg.sources).push(src);
         (await sg.filters).push(fi);
@@ -114,7 +116,7 @@ describe("Database Tests", () => {
         const dl3 = await DBDownload.getDownloader(sub, 'https://shadowmoo.se', 'test-album-id');
         expect(dl3.id).not.toEqual(dl.id);  // Mismatching album should create a new DL in that album.
         expect(dl3.albumID).toEqual('test-album-id');
-        expect(dl3.url.id).toEqual(dl.url.id);
+        expect((await dl3.url).id).toEqual((await dl.url).id);
         await dl3.save();
         
         expect(await DBDownload.count()).toEqual(2);

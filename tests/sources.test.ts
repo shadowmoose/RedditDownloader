@@ -94,7 +94,8 @@ describe("Source Tests", () => {
             comparator: "re",
             field: "title",
             forSubmissions: true,
-            valueJSON: JSON.stringify('test')
+            valueJSON: JSON.stringify('test'),
+            negativeMatch: false
         });
         (await sg.sources).push(src);
         (await sg.filters).push(fi);

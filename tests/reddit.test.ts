@@ -9,13 +9,13 @@ import {forGen} from "../src/engine/util/generator-util";
 
 
 describe("Reddit Tests", () => {
-  it("find all reddit gallery links", async () => {
+  it("builds reddit gallery link", async () => {
     let sub = await rd.getSubmission('hrrh23');
     if (!sub) throw Error('Failed to locate Submission');
     const res = await extractLinks(sub);
 
-    expect(res.length).toEqual(3);
-    expect(res[0]).toContain('512');  // Found largest resolution.
+    expect(res.length).toEqual(1);
+    expect(res[0]).toEqual('https://www.reddit.com/gallery/hrrh23');  // Found largest resolution.
   });
 
   it('extract links from posts', async () => {
@@ -71,6 +71,15 @@ describe('PushShift Tests', () => {
     expect(count).toBeGreaterThan(190);
   });
 
+  it("builds ps reddit gallery link", async () => {
+    let sub = await ps.getSubmission('hrrh23');
+    if (!sub) throw Error('Failed to locate Submission');
+    const res = await extractLinks(sub);
+
+    expect(res.length).toEqual(1);
+    expect(res[0]).toEqual('https://www.reddit.com/gallery/hrrh23');  // Found largest resolution.
+  });
+
   it('User ps submissions', async() => {
     const seen = new Set();
     const count = await forGen(ps.getUserSubmissions('theshadowmoose'), p => {
@@ -85,15 +94,6 @@ describe('PushShift Tests', () => {
     const count = await forGen(ps.getSubredditSubmissions('pathofexile', 10), _p => {});
 
     expect(count).toEqual(10);
-  })
-
-  it("find ps gallery links", async () => {
-    let sub = await ps.getSubmission('hrrh23');
-    if (!sub) throw Error('Failed to locate Submission');
-    const res = await extractLinks(sub);
-
-    expect(res.length).toEqual(3);
-    expect(res[0]).toContain('512');  // Found largest resolution.
   })
 
   it("find ps selfpost urls", async () => {

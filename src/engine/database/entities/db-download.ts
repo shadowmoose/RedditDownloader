@@ -5,7 +5,7 @@ import {
     Index,
     PrimaryGeneratedColumn,
     EventSubscriber,
-    EntitySubscriberInterface, InsertEvent, JoinColumn
+    EntitySubscriberInterface, InsertEvent
 } from 'typeorm';
 import DBSubmission from "./db-submission";
 import DBComment from "./db-comment";
@@ -42,7 +42,7 @@ export default class DBDownload extends DBEntity {
 
     @ManyToOne(() => DBUrl, comm => comm.downloads, { nullable: true, cascade: true })
     @Index()
-    url!: DBUrl;
+    url!: Promise<DBUrl>;
 
     async getDBParent(): Promise<DBPost> {
         const p = await this.parentSubmission;
@@ -60,10 +60,10 @@ export default class DBDownload extends DBEntity {
     static async getDownloader(post: DBPost, url: string, albumID?: string, albumIndex: string|null = null) {
         for (const dl of await post.downloads) {
             if (albumID && dl.albumID !== albumID || dl.isAlbumParent) continue;
-            if (!dl.url) {
+            if (!await dl.url) {
                 console.warn('Gonna be an error! url:', url, 'album:', albumID, '->', post, dl, await post.downloads);
             }
-            if (dl.url.address === url) {
+            if ((await dl.url).address === url) {
                 return dl;
             }
         }
@@ -73,7 +73,7 @@ export default class DBDownload extends DBEntity {
         const newDL = DBDownload.build({
             albumID: albumID || null,
             isAlbumParent: false,
-            url: u,
+            url: Promise.resolve(u),
             albumPaddedIndex: albumIndex
         });
         await forkPost(post,
@@ -99,9 +99,11 @@ export class DownloadSubscriber implements EntitySubscriberInterface<DBDownload>
     }
 
     afterInsert(event: InsertEvent<DBDownload>) {
-        if (event.entity.url.processed) return;
-        let cb = DownloadSubscriber.waiting.shift();
-        if (cb) cb(event.entity);
+        event.entity.url.then(url => {
+            if (url.processed) return;
+            let cb = DownloadSubscriber.waiting.shift();
+            if (cb) cb(event.entity);
+        })
     }
 
     /**

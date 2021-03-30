@@ -57,10 +57,10 @@ async function scanAll(state: DownloaderState) {
 
     for (const g of groups) {
         let found = await forGen(g.getPostGenerator(), async (ele, idx, stop) => {
+            await ele.save();
             if (state.shouldStop) {
                 return stop();
             }
-            await ele.save();
             state.newPostsScanned ++;
 
             if (isTest() && state.newPostsScanned % 10 === 0) {

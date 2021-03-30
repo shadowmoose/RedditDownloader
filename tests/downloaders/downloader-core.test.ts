@@ -27,7 +27,7 @@ describe('Downloader Core Tests', () => {
 
         const pending = await getNextPendingDownload(running);
         expect(pending).toBeTruthy();
-        expect(pending!.url.address).toEqual(url);
+        expect((await pending!.url).address).toEqual(url);
 
         running.add(url);
         expect(await getNextPendingDownload(running)).toBeFalsy();

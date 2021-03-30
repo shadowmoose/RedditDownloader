@@ -128,8 +128,6 @@ export async function redirectSymLinks(originalDest: string, newDest: string) {
 
         if (exists) await fs.promises.unlink(abs);
 
-        console.debug('Updating symlink:', l.id, l.location, l.target, '-->', newDest);
-
         await fs.promises.symlink(target, abs);
         l.target = newDest;
         await l.save();

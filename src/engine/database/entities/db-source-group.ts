@@ -43,7 +43,9 @@ export default class DBSourceGroup extends DBEntity {
             const gen = s!.find();
 
             yield* filterMap(gen, async post => {
-                post = await checkExisting(post);
+                const liveData: any = post.loadedData;
+                post = await dedupeExisting(post);
+                post.loadedData = liveData;
 
                 if (post.processed) {
                     return;
@@ -96,7 +98,7 @@ export default class DBSourceGroup extends DBEntity {
 /**
  * Returns either the preexisting Post within the DB, or the same object it was passed.
  */
-async function checkExisting(post: DBPost) {
+async function dedupeExisting(post: DBPost) {
     return (await forkPost(post,
         c => DBComment.findOne({id: c.id}),
         s => DBSubmission.findOne({ id: s.id})

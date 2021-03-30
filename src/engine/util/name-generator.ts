@@ -28,7 +28,7 @@ export const makeName = mutex(async (dl: DBDownload, template: string, usedFileN
     const tags = await forkPost(parent,
             c => getCommentValues(c),
             s => getSubmissionValues(s));
-    tags.url = dl.url.address;
+    tags.url = (await dl.url).address;
 
     const countMatches = async() => {
         return DBFile
@@ -39,7 +39,7 @@ export const makeName = mutex(async (dl: DBDownload, template: string, usedFileN
     };
 
     const alParent = (dl.albumID && !dl.isAlbumParent) ? await DBDownload.findOne({where: {isAlbumParent: true, albumID: dl.albumID}, relations: ['url']}): null;
-    const parentDir = (await alParent?.url?.file)?.path;
+    const parentDir = (await (await alParent?.url)?.file)?.path;
     let base = parentDir ? parentDir+dl.albumPaddedIndex : makePathFit(tags, template, dl.albumPaddedIndex).replace(/^[./\\]/, '');
     let path = base;
     let idx = 1;

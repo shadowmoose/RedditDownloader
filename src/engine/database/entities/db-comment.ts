@@ -1,10 +1,12 @@
 import snoowrap from 'snoowrap';
 import {Entity, Column, PrimaryColumn, ManyToOne, OneToMany, Index} from 'typeorm';
-import {getSubmission, picker} from "../../reddit/snoo";
+import {picker} from "../../reddit/snoo";
+import * as ps from '../../reddit/pushshift';
 import DBSubmission from "./db-submission";
 import DBDownload from "./db-download";
 import {DBEntity} from "./db-entity";
 import {PsComment} from "../../reddit/pushshift";
+import * as snoo from "../../reddit/snoo";
 
 @Entity({ name: 'comments' })
 export default class DBComment extends DBEntity {
@@ -66,15 +68,16 @@ export default class DBComment extends DBEntity {
      * If the submission is not stored locally, loads the submission from Reddit and saves it in the DB.
      */
     async getRootSubmission(): Promise<DBSubmission|null> {
-        let loc = await DBSubmission.findOne({id: this.rootSubmissionID});
+        let loc: DBSubmission|void = await DBSubmission.findOne({id: this.rootSubmissionID});
         if (!loc) {
-            loc = await getSubmission(this.rootSubmissionID); // TODO: PushShift as a backup.
+            loc = await snoo.getSubmission(this.rootSubmissionID).catch(()=>{}) || await ps.getSubmission(this.rootSubmissionID);
             if (loc) {
                 loc.shouldProcess = false;
                 await loc.save()
             }
         }
-        return loc ;
+        if (!loc) throw Error('Unable to look up parent ID: ' + this.rootSubmissionID);
+        return loc;
     }
 
     static async fromRedditComment(comment: snoowrap.Comment): Promise<DBComment> {

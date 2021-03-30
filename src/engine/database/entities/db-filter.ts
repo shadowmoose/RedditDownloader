@@ -16,6 +16,10 @@ export default class DBFilter extends DBEntity {
     @Column()
     forSubmissions!: boolean;
 
+    /** If true, Posts only pass validation when it does not match the filter criteria. */
+    @Column({default: false})
+    negativeMatch!: boolean;
+
     @Column({ length: 20 })
     field!: string;
 
@@ -38,7 +42,8 @@ export default class DBFilter extends DBEntity {
         if (!comp) throw Error(`Invalid comparator value for filter: "${this.comparator}"!`)
         // @ts-ignore
         const val = this.field === 'url' ? url : post[this.field];
-        return comp(val, this.value);
+        const valid = comp(val, this.value)
+        return (!this.negativeMatch && valid) || (this.negativeMatch && !valid);
     }
 }
 

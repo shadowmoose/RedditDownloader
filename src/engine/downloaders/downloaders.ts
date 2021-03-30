@@ -15,13 +15,14 @@ import {ImgurDownloader} from "./wrappers/imgur-downloader";
 import {isTest} from "../util/config";
 import DBFile from "../database/entities/db-file";
 import {GfycatDownloader} from "./wrappers/gfycat-downloader";
+import {RedditGalleryDownloader} from "./wrappers/reddit-gallery";
 
 
 let downloadList: Downloader[] = [];
 
 export async function getDownloaders(): Promise<Downloader[]> {
     if (!downloadList.length) {
-        downloadList = [new YtdlDownloader(), new DirectDownloader(), new ImgurDownloader(), new GfycatDownloader()];
+        downloadList = [new YtdlDownloader(), new DirectDownloader(), new ImgurDownloader(), new GfycatDownloader(), new RedditGalleryDownloader()];
     }
 
     for (const l of downloadList) {
@@ -61,8 +62,8 @@ export async function downloadAll(state: DownloaderState) {
     return promisePool(async (stop, threadNumber) => {
         const nxt = await getNext();
         if (!nxt || state.shouldStop) return stop();
-        if (pending.has(nxt.url.address)) return;  // Prevent duplicate URLs from downloading concurrently.
-        pending.add(nxt.url.address);
+        if (pending.has((await nxt.url).address)) return;  // Prevent duplicate URLs from downloading concurrently.
+        pending.add((await nxt.url).address);
 
         try {
             state.activeDownloads[threadNumber] = new DownloadProgress(threadNumber);
@@ -72,7 +73,7 @@ export async function downloadAll(state: DownloaderState) {
             console.error(err);
         }
 
-        pending.delete(nxt.url.address);
+        pending.delete((await nxt.url).address);
     }, await DBSetting.get('concurrentThreads'), err => {
         console.error(err);
     });
@@ -106,7 +107,7 @@ const usedRelativeFileNames: string[] = [];
 /**
  * Generate the data structure and callbacks that are to be passed into the Downloader instances.
  */
-export async function buildDownloadData(dl: DBDownload, prog: DownloadProgress) {
+export const buildDownloadData = mutex(async (dl: DBDownload, prog: DownloadProgress) => {
     const relativeFile = await makeName(dl, await DBSetting.get('outputTemplate'), usedRelativeFileNames);
 
     usedRelativeFileNames[prog.thread] = relativeFile;  // Prevent this path from generating again until we overwrite it.
@@ -115,7 +116,7 @@ export async function buildDownloadData(dl: DBDownload, prog: DownloadProgress) 
     const data: DownloaderData = {
         relativeFile,
         file: getAbsoluteDL(relativeFile),
-        url: dl.url.address,
+        url: (await dl.url).address,
         post: await dl.getDBParent(),
         dl
     };
@@ -140,8 +141,8 @@ export async function buildDownloadData(dl: DBDownload, prog: DownloadProgress) 
                 }).save();
                 dl.albumID = v4();
                 dl.isAlbumParent = true;
-                dl.url.file = file;
-                await dl.url.save();
+                (await dl.url).file = file;
+                await (await dl.url).save();
                 await dl.save();  // Preserve ID for subsequent saved children.
             }
             const padLen = Math.ceil(Math.log(urls.length)/Math.log(10));
@@ -154,13 +155,13 @@ export async function buildDownloadData(dl: DBDownload, prog: DownloadProgress) 
             return null;
         },
         markInvalid: async (reason: string) => {
-            await dl.url.setFailed(reason);
+            await (await dl.url).setFailed(reason);
         },
         userExit: (reason?: string) => {throw new GracefulStopError(reason||'User exit')}
     };
 
     return {data, callbacks};
-}
+});
 
 /**
  * Iterate through all available downloaders, attempting to handle the given DBDownload.
@@ -169,7 +170,7 @@ export async function handleDownload(dl: DBDownload, progress: DownloadProgress)
     const {data, callbacks} = await buildDownloadData(dl, progress);
 
     for (const d of await getDownloaders()) {
-        if (progress.shouldStop || dl.url.processed) break;
+        if (progress.shouldStop || (await dl.url).processed) break;
         progress.status = `Looking for downloaders to handle this URL...`;
         if (await d.canHandle(data).catch(console.error)) {
             progress.handler = d.name;
@@ -179,13 +180,14 @@ export async function handleDownload(dl: DBDownload, progress: DownloadProgress)
 
             try {
                 let ext = await d.download(data, callbacks, progress);
-                if (dl.url.failed || dl.url.processed) continue;
+                const url = (await dl.url);
+                if (url.failed || url.processed) continue;
                 if (dl.isAlbumParent) {
-                    dl.url.failed = false;
-                    dl.url.failureReason = null;
-                    dl.url.processed = true;
-                    dl.url.completedUTC = Date.now();
-                    dl.url.handler = d.name;
+                    url.failed = false;
+                    url.failureReason = null;
+                    url.processed = true;
+                    url.completedUTC = Date.now();
+                    url.handler = d.name;
                     await dl.save();
                     return;
                 }
@@ -193,7 +195,7 @@ export async function handleDownload(dl: DBDownload, progress: DownloadProgress)
                     if (isTest()) console.warn('handler:', d.name, 'thought (incorrectly) it could handle', data.url);
                     continue;
                 }
-                return await processFinishedDownload(dl.url, `${data.relativeFile}.${ext}`, d.name, !!dl.albumPaddedIndex);
+                return await processFinishedDownload(url, `${data.relativeFile}.${ext}`, d.name, !!dl.albumPaddedIndex);
             } catch (err) {
                 if (err instanceof GracefulStopError) {
                     // Swallow graceful errors, because the user wants to exit cleanly.
@@ -206,9 +208,10 @@ export async function handleDownload(dl: DBDownload, progress: DownloadProgress)
     }
 
     if (!progress.shouldStop) {
-        console.warn('Unable to find handler for:', dl.url.address);
-        dl.url.handler = 'none';
-        await dl.url.setFailed('Unable to find handler.');
+        const url = await dl.url;
+        console.warn('Unable to find handler for:', url.address);
+        url.handler = 'none';
+        await url.setFailed('Unable to find handler.');
     }
 }
 

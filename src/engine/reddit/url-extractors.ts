@@ -20,34 +20,17 @@ function getHrefs(str: string|null): string[] {
 const submissionExtractors: Record<string, (post: snoo.Submission, pushshift: boolean)=>Promise<string[]>> = {
     'url': async (post: snoo.Submission | PsSubmission, _ps: boolean) => {
         // @ts-ignore
-        if (await post.is_gallery) return [];
+        if (await post.is_gallery) {
+            // Force the album URL into a valid pattern that the reddit-album handler can pick up.
+            // @ts-ignore
+            return [`https://www.reddit.com/gallery/${(post.name || await post.id).replace('t3_', '')}`];
+        }
         return [await post.url]
     },
     'bodyHTML': async (post: snoo.Submission | PsSubmission, ps: boolean) => {
         if (ps) return Array.from(getUrls(post.selftext));
         // @ts-ignore
         return getHrefs(await post.selftext_html);
-    },
-    'redditGallery': async (post: snoo.Submission | PsSubmission, _ps: boolean) => {
-        // @ts-ignore
-        const meta: Record<any, any> = await post.media_metadata;
-        // @ts-ignore
-        const galleryData: any = await post.gallery_data;
-        const ret: string[] = [];
-
-        if (!meta || !galleryData.items) return [];
-
-        const gKeys: string[] = galleryData.items.map((gd: any) => gd.media_id);
-
-        for (const k of gKeys) {
-            const m = meta[k];
-            Object.values(m).forEach((s: any) => {
-                if (!s.x || !s.y) return;
-                const url: any = Object.values(s).find(v => `${v}`.startsWith('http'));
-                if (url) ret.push(url);
-            });
-        }
-        return ret;
     }
 };
 
@@ -58,7 +41,6 @@ const commentExtractors: Record<string, (post: snoo.Comment, isPs: boolean)=>Pro
         return getHrefs(await post.body_html);
     },
 };
-
 
 /**
  * Extract the URLs from the given Post, checking both direct links and body text.

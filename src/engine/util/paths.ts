@@ -18,7 +18,7 @@ export const getAbsoluteDL = (subPath: string) => {
 /** Convert a relative path into an absolute path within the globally-shared config/data directory. */
 export const sharedPath = (...file: string[]) => path.resolve(CONF_FOLDER, ...file);
 
-/** Path to the shared static assets directory. Swaps automaticlly between packaged and sourcecode file locations. */
+/** Path to the shared static assets directory. Swaps automatically between packaged and sourcecode file locations. */
 export const assetPath = (...file: string[]) => {
     return path.resolve(__dirname, '../../assets', ...file);
 }

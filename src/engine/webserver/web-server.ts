@@ -12,6 +12,10 @@ import {CommandCullUnprocessed} from "./commands/cmd-cull-unprocessed";
 import {makeDB} from "../database/db";
 import {CommandUpdateDBObject} from "./commands/cmd-update-dbobject";
 import {CommandSaveSetting} from "./commands/cmd-save-setting";
+import DBFile from "../database/entities/db-file";
+import {getAbsoluteDL} from "../util/paths";
+import path from "path";
+
 
 /** All available command processors. */
 const commands: Command[] = [
@@ -25,6 +29,26 @@ const commands: Command[] = [
 export const clients: ws[] = [];
 export const app = express();
 const wsServer = new ws.Server({ noServer: true });
+
+/* Serve an index file. */
+app.get('/', function(req, res){
+    res.sendFile(path.resolve(path.dirname(__filename), './test-socket.html'));  // TODO: Replace with a real index.
+});
+
+/* Serve downloaded files, using their ID. */
+app.get('/file/:id', async (req, res) => {
+    const f = await DBFile.findOne({id: parseInt(req.params.id)});
+    if (!f) {
+        return res.status(404).send('Unknown file ID.');
+    }
+
+    console.log('Serving file:', req.params.id, '->', path.basename(f.path));
+    return res.sendFile(getAbsoluteDL(f.path), {
+        headers: {
+            'Content-Disposition': 'inline; filename=' + encodeURIComponent(path.basename(f.path))
+        }
+    });
+});
 
 
 wsServer.on('connection', async socket => {

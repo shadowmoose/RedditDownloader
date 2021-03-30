@@ -13,7 +13,6 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Websocket Test Platform</title>
-	<script src="commands/cmd-delete-dbobject.ts"></script>
 </head>
 <body>
 
@@ -30,6 +29,7 @@
 <div>
 	<button onclick="stageGroup()">SourceGroup</button>
 	<button onclick="stageSavedSource()">Source: [Saved Posts]</button>
+	<button onclick="stageUpvotedSource()">Source: [Upvoted Posts]</button>
 	<button onclick="stageSetting()">Update Setting</button>
 	<button onclick="stageDLStart()">Start Download</button>
 </div>
@@ -154,6 +154,27 @@
 		})
 	}
 
+	function stageUpvotedSource() {
+		stageMsg('updateObject', {
+			dbType: 'DBSource',
+			id: 2,
+			newValues: {
+				type: 'upvoted-posts',
+				name: 'test-upvoted-group',
+				dataJSON: JSON.stringify({
+					limit: 0
+				})
+			},
+			parents: [
+				{
+					dbType: 'DBSourceGroup',
+					id: 1,
+					property: 'sourceGroup'
+				}
+			]
+		})
+	}
+
 	function stageSetting() {
 		stageMsg('saveSetting', {
 			id: 1,
@@ -166,6 +187,7 @@
 		stageMsg('startDownload', {})
 	}
 
+	setInterval(() => console.log('Messages:', window.debugPacketCount), 10000)
 </script>
 
 </html>

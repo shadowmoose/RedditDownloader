@@ -34,7 +34,7 @@ describe('Imgur Download Tests', () => {
 
     it('API gallery', async () => {
         const dl = new ImgurDownloader();
-        const urls = await dl.extractAlbumAPI('plN58');
+        const urls = await dl.extractAlbumUsingAPI('plN58');
 
         expect(urls.length).toEqual(134);
         expect(urls[0]).toBeTruthy();

@@ -18,6 +18,7 @@ import DBSymLink from "./entities/db-symlink";
 import {addSymlinks1615947913892} from "./migrations/1615947913892-add-symlinks";
 import {addDirFlag1616042478022} from "./migrations/1616042478022-add-dir-flag";
 import {fileIsAlbum1616318709797} from "./migrations/1616318709797-file-is-album";
+import {addInvertedFilter1617069277622} from "./migrations/1617069277622-add-inverted-filter";
 
 let _connection: Connection|null;
 
@@ -40,7 +41,8 @@ export async function makeDB() {
             stringPaddedIndex1615868441239,
             addSymlinks1615947913892,
             addDirFlag1616042478022,
-            fileIsAlbum1616318709797
+            fileIsAlbum1616318709797,
+            addInvertedFilter1617069277622
         ],  // Add migration classes here.
         subscribers: [DownloadSubscriber],
     }).then(async (connection: Connection) => {

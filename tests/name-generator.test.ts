@@ -69,7 +69,7 @@ describe('Name Generator Tests', () => {
         const dl = DBDownload.build({
             albumID: "test",
             isAlbumParent: false,
-            url: await DBUrl.dedupeURL('test.com'),
+            url: DBUrl.dedupeURL('test.com'),
             albumPaddedIndex: null
         });
         (await c.downloads).push(dl);
@@ -83,7 +83,7 @@ describe('Name Generator Tests', () => {
         const dl = DBDownload.build({
             albumID: "test",
             isAlbumParent: false,
-            url: await DBUrl.dedupeURL('test.com'),
+            url: DBUrl.dedupeURL('test.com'),
             albumPaddedIndex: null
         });
         (await c.downloads).push(dl);
@@ -97,7 +97,7 @@ describe('Name Generator Tests', () => {
         const dl = DBDownload.build({
             albumID: "test",
             isAlbumParent: false,
-            url: await DBUrl.dedupeURL('test.com'),
+            url: DBUrl.dedupeURL('test.com'),
             albumPaddedIndex: null
         });
         (await c.downloads).push(dl);
@@ -112,7 +112,8 @@ describe('Name Generator Tests', () => {
             path,
             shaHash: "",
             size: 0,
-            isDir: false
+            isDir: false,
+            isAlbumFile: false
         }).save();
 
         const p2 = await gen.makeName(dl, '[subreddit]/[author]/[type]s/[title]')
