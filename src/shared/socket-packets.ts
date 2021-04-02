@@ -38,5 +38,7 @@ export enum ServerPacketTypes {
     /** Set a whole new state for the current download progress. */
     FULL_STATE = 'fullState',
     /** Signifies an incremental update to the current download state. */
-    STATE_CHANGE = 'stateChange',
+    STATE_CHANGE = 'sc',
+    /** The server is requesting a "pong" response, in a timely manner. */
+    PING = 'ping'
 }

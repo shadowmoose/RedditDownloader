@@ -54,18 +54,28 @@ app.get('/file/:id', async (req, res) => {
 wsServer.on('connection', async socket => {
     console.debug('Client connected via WebSocket.');
 
+    resetPing(socket, true);
+
     socket.on("error", () => socket.close(500, 'Encountered critical internal error.'));
     socket.on('close', () => {
-        removeClient(socket)
+        removeClient(socket);
+        resetPing(socket);
     });
     socket.on('message', async message => {
+        resetPing(socket, true);
+        if (message === 'pong') {
+            // Handle pings "out of band" since they may be required before any validation handlers.
+            return;
+        }
+
         console.log('Incoming message:', message);
+
         try {
             await handleMessage(socket, JSON.parse(`${message}`));
         } catch (err) {
             // Packet is malformed.
             console.error(err);
-            socket.close(400, 'Malformed packet.');
+            socket.close(4000, 'Malformed packet.');
         }
     });
 
@@ -85,7 +95,21 @@ wsServer.on('connection', async socket => {
 });
 
 
-// TODO: Add an express route for locally-built website, for when not running through Electron.
+/**
+ * Clears any currently scheduled disconnect timer from the client, and optionally schedules a new one.
+ * @param client
+ * @param reCheck
+ */
+function resetPing(client: any, reCheck: boolean = false) {
+    clearTimeout(client.pingCheck);
+    client.pingCheck = reCheck ? setTimeout(() => {
+        client.pingCheck = setTimeout(() => {
+            console.error('Missing Ping: Websocket Client timed out.');
+            client.close(4001, 'Client timed out.');
+        }, 10000)
+        send(client, {type: ServerPacketTypes.PING, data: Date.now()});
+    }, 25000) : null;
+}
 
 
 /**
@@ -124,11 +148,11 @@ async function handleMessage(sock: ws, pkt: ClientCommand) {
                 })
             }
         }
-        throw Error(`Unable to handle the given unknown command type: ${pkt.type}`);
     } catch (err) {
         console.error(err);
         send(sock,{error: err.message, uid: pkt.uid});
     }
+    throw Error(`Unable to handle the given unknown command type: ${pkt.type}`);
 }
 
 /**
@@ -154,10 +178,9 @@ export function send(sock: ws, message: SocketResponse) {
             }
         });
     } catch (err) {
-        console.error('Failed to send to client.')
+        console.error('Failed to send to ws client.')
         sock.close();
     }
-
 }
 
 /**

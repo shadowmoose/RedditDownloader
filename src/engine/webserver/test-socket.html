@@ -48,8 +48,11 @@
 	let state = {};
 	let logRows = [];
 
+	document.body.style.backgroundColor = '#d98585';
+
 	sock.onopen = (_event) => {
-		console.log('Opened connection.')
+		console.log('Opened connection.');
+		document.body.style.backgroundColor = '#FFFFFF';
 	};
 
 	sock.onclose = () => {
@@ -64,10 +67,12 @@
 
 		window.debugPacketCount = (window.debugPacketCount || 0) + 1;
 
-		if (packet.type === 'fullState') {
+		if (packet.type === 'ping') {
+			sock.send('pong');
+		} else if (packet.type === 'fullState') {
 			state = data;
 			stateLog.innerText = JSON.stringify(state, null, 4);
-		} else if (packet.type === 'stateChange') {
+		} else if (packet.type === 'sc') {
 			updateState(packet, data);
 			stateLog.innerText = JSON.stringify(state, null, 4);
 		} else {

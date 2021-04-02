@@ -1,14 +1,9 @@
-import * as ytdl from "../../src/engine/downloaders/ytdl";
 import {GfycatDownloader} from "../../src/engine/downloaders/wrappers/gfycat-downloader";
 import {DownloadProgress} from "../../src/engine/util/state";
 import {mockDownloadData, mockDownloaderFunctions} from "./test-util";
 
 
 describe('Gfycat Download Tests', () => {
-    beforeAll( async() => {
-        await ytdl.autoUpdate();
-    });
-
     it('canHandle works', async () => {
         const dl = new GfycatDownloader();
         expect(await dl.canHandle(await mockDownloadData('https://gfycat.com/kaleidoscopicnauticalbordercollie'))).toBeTruthy();

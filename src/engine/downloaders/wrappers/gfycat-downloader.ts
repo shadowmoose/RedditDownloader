@@ -13,7 +13,7 @@ export class GfycatDownloader extends Downloader {
     name: string = 'gfycat';
 
     async canHandle(data: DownloaderData): Promise<boolean> {
-        return !!urlp.parse(data.url).hostname?.match(/^gfycat\.com$|.*\.gfycat\.com$/)
+        return !!urlp.parse(data.url).hostname?.match(/^gfycat\.com$|.*\.gfycat\.com$|^redgifs\.com$|.*\.redgifs\.com$/)
     }
 
     async getOrder(): Promise<number> {
@@ -25,14 +25,16 @@ export class GfycatDownloader extends Downloader {
     }
 
     async download(data: DownloaderData, actions: DownloaderFunctions, progress: DownloadProgress) {
-        const match = data.url.match(/com\/([a-zA-Z]+)/);
+        const match = data.url.match(/\.com\/([a-zA-Z]+)/);
         const code = match ? match[1] : null;
-        const api = await getJSON(`https://api.gfycat.com/v1/gfycats/${code}`).catch(err=>{});
-
+        let api = await getJSON(`https://api.gfycat.com/v1/gfycats/${code}`).catch(err=>{});
 
         if (!api?.gfyItem?.content_urls) {
-            const fullPath = await ytdl.download(`https://www.redgifs.com/watch/${code}`, data.file, progress);
-            return path.extname(fullPath).replace(/^\./, '');
+            api = await getJSON(`https://api.redgifs.com/v1/gfycats/${code}`)
+        }
+
+        if (!api?.gfyItem) {
+            throw new Error('Could not find gfycat or redirected link.')
         }
 
         for (const f of formatOpts) {

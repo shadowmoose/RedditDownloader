@@ -71,6 +71,7 @@ export async function downloadMedia(url: string, filePath: string, prog: Downloa
     data.on('data', (chunk: any) => {
         if (totalLength) {
             downloaded += chunk.length;
+            prog.knowsPercent = true;
             prog.percent = parseFloat((downloaded/totalLength).toFixed(2));
         } else {
             prog.knowsPercent = false;
