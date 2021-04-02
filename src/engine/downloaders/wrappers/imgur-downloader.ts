@@ -79,13 +79,18 @@ export class ImgurDownloader extends Downloader {
 
     async download(data: DownloaderData, actions: DownloaderFunctions, progress: DownloadProgress): Promise<string | void> {
         if (!this.isAlbum(data.url)) {
-            return http.downloadMedia(await this.buildDirectURL(data.url), data.file, progress)
+            try {
+                return await http.downloadMedia(await this.buildDirectURL(data.url), data.file, progress);
+            } catch (err) {
+                if (isTest()) console.error(err);
+                return actions.markInvalid('Failed to download non-album image.')
+            }
         } else {
             // Album download:
             const match = data.url.match(/(https?):\/\/(www\.)?(?:m\.)?imgur\.com\/(a|gallery)\/([a-zA-Z0-9]+)(#[0-9]+)?/);
             const albumKey = match ? match[4] : null;
 
-            if (!albumKey) return;
+            if (!albumKey) return actions.markInvalid('Failed to extract album key from URL.');
 
             let urls: string[] = [];
             const found = await this.extractAlbumLinks(albumKey);
@@ -102,6 +107,8 @@ export class ImgurDownloader extends Downloader {
                     console.error(err);
                 });
                 return;
+            } else {
+                return actions.markInvalid('Failed to extract valid URLS from album.');
             }
         }
     }

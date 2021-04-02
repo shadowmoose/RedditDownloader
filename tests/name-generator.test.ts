@@ -66,10 +66,11 @@ describe('Name Generator Tests', () => {
 
     it('generate for real comment', async () => {
         const c = await getComment('c0b7g40');
+        const url = await DBUrl.dedupeURL('test.com');
         const dl = DBDownload.build({
             albumID: "test",
             isAlbumParent: false,
-            url: DBUrl.dedupeURL('test.com'),
+            url: Promise.resolve(url),
             albumPaddedIndex: null
         });
         (await c.downloads).push(dl);
@@ -80,13 +81,15 @@ describe('Name Generator Tests', () => {
 
     it('generate for real submission', async () => {
         const c = await getSubmission('hrrh23');
+        const url = await DBUrl.dedupeURL('test.com');
         const dl = DBDownload.build({
             albumID: "test",
             isAlbumParent: false,
-            url: DBUrl.dedupeURL('test.com'),
+            url: Promise.resolve(url),
             albumPaddedIndex: null
         });
         (await c.downloads).push(dl);
+        await dl.url;
         await c.save();
         const path = await gen.makeName(dl, '[subreddit]/[author]/[type]s/[title]')
         expect(path).toBe('announcements/LanterneRougeOG/submissions/Now you can make posts with multiple images_');
@@ -94,10 +97,11 @@ describe('Name Generator Tests', () => {
 
     it('generate incremented filenames', async () => {
         const c = await getSubmission('hrrh23');
+        const url = await DBUrl.dedupeURL('test.com');
         const dl = DBDownload.build({
             albumID: "test",
             isAlbumParent: false,
-            url: DBUrl.dedupeURL('test.com'),
+            url: Promise.resolve(url),
             albumPaddedIndex: null
         });
         (await c.downloads).push(dl);
@@ -118,5 +122,50 @@ describe('Name Generator Tests', () => {
 
         const p2 = await gen.makeName(dl, '[subreddit]/[author]/[type]s/[title]')
         expect(p2).toBe('announcements/LanterneRougeOG/submissions/Now you can make posts with multiple images_ - 2');
+    });
+
+    it('generate for album files', async () => {
+        // Create a DBDownload, and a parent DBDownload with a sub path file, then generate a name that *should* be within that dir.
+        const c = await getSubmission('hrrh23');
+        const url = await DBUrl.dedupeURL('test.com');
+        const url2 = DBUrl.build({
+            completedUTC: 0,
+            failed: false,
+            failureReason: null,
+            handler: "",
+            processed: false,
+            address: 'fake.address',
+            file: Promise.resolve(DBFile.build({
+                dHash: null, hash1: null, hash2: null, hash3: null, hash4: null,
+                isAlbumFile: true,
+                isDir: true,
+                mimeType: null,
+                path: "album-dir/",
+                shaHash: null,
+                size: 0,
+                urls: Promise.resolve([])
+            }))
+        });
+
+        const dl = DBDownload.build({
+            albumID: "album",
+            isAlbumParent: false,
+            url: Promise.resolve(url),
+            albumPaddedIndex: '002'
+        });
+        const parent = DBDownload.build({
+            albumID: "album",
+            isAlbumParent: true,
+            url: Promise.resolve(url2),
+            albumPaddedIndex: null
+        });
+        await url2.save();
+        (await c.downloads).push(parent);
+        (await c.downloads).push(dl);
+        await parent.save();
+        await c.save();
+
+        const path = await gen.makeName(dl, '[subreddit]/[author]/[type]s/[title]')
+        expect(path).toBe('album-dir/002');
     });
 });

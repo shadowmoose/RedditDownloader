@@ -39,7 +39,9 @@ export class RedditGalleryDownloader extends Downloader {
             const galleryData: any = await post.gallery_data;
             const ret: string[] = [];
 
-            if (!meta || !galleryData.items) return;
+            if (!meta || !galleryData.items) {
+                return actions.markInvalid('Failed to locate the expected gallery property in Submission.');
+            }
 
             const gKeys: string[] = galleryData.items.map((gd: any) => gd.media_id);
 
@@ -52,8 +54,14 @@ export class RedditGalleryDownloader extends Downloader {
                 });
             }
 
+            if (!ret.length) {
+                return actions.markInvalid('Failed to extract any URLS from Submission Album.');
+            }
+
             await actions.addAlbumUrls(ret);
             return;
+        } else {
+            return actions.markInvalid('Failed to locate album Submission.');
         }
     }
 }

@@ -38,9 +38,9 @@ export const makeName = mutex(async (dl: DBDownload, template: string, usedFileN
             .getCount();
     };
 
-    const alParent = (dl.albumID && !dl.isAlbumParent) ? await DBDownload.findOne({where: {isAlbumParent: true, albumID: dl.albumID}, relations: ['url']}): null;
+    const alParent = (dl.albumID && !dl.isAlbumParent) ? await DBDownload.findOne({isAlbumParent: true, albumID: dl.albumID}): null;
     const parentDir = (await (await alParent?.url)?.file)?.path;
-    let base = parentDir ? parentDir+dl.albumPaddedIndex : makePathFit(tags, template, dl.albumPaddedIndex).replace(/^[./\\]/, '');
+    let base = parentDir ? parentDir+dl.albumPaddedIndex : makePathFit(tags, template).replace(/^[./\\]/, '');
     let path = base;
     let idx = 1;
 
@@ -55,14 +55,10 @@ export const makeName = mutex(async (dl: DBDownload, template: string, usedFileN
  * Generates a file subpath which, when in absolute form, fits within the filename limit for the OS.
  * @param tags
  * @param template
- * @param albumIDX If non-null, the template is used as a subdirectory, and the file name within is this index.
  */
-export function makePathFit(tags: TemplateTags, template: string, albumIDX: string|null = null) {
+export function makePathFit(tags: TemplateTags, template: string) {
     let res = '';
-    let len = 245;
-    if (albumIDX) {
-        template = template + '/' + albumIDX; // TODO: Test this to be sure it always works.
-    }
+    let len = MAX_NAME_LEN - 5;  // leave space for Jesus.
     do {
         res = insert(tags, template, len);
     } while (getAbsoluteDL(res).length > MAX_NAME_LEN && --len)

@@ -48,7 +48,7 @@ describe('Downloader Core Tests', () => {
         expect(res.completedUTC).toBeTruthy();
         expect(file).toBeTruthy();
         expect(fs.existsSync(getAbsoluteDL(file!.path))).toBeTruthy();
-        expect(prog.handler).toEqual('ytdl');
+        expect(prog.downloader).toEqual('ytdl');
         expect(prog.percent).toEqual(1);
         expect((await DBFile.findOne())?.path.endsWith('.mp3')).toBeTruthy(); // File is saved, with ext.
     });

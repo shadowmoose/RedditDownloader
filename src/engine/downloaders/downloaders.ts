@@ -5,7 +5,7 @@ import DBSetting from "../database/entities/db-setting";
 import {makeName} from "../util/name-generator";
 import {DBPost} from "../database/db";
 import DBUrl from "../database/entities/db-url";
-import Downloader, {GracefulStopError} from "./wrappers/download-wrapper";
+import Downloader, {GracefulStopError, InvalidDownloaderError} from "./wrappers/download-wrapper";
 import {v4} from "uuid";
 import {DownloaderState, DownloadProgress} from "../util/state";
 import YtdlDownloader from "./wrappers/ytdl-downloader";
@@ -96,9 +96,9 @@ export interface DownloaderData {
 export interface DownloaderFunctions {
     /** Register a new list of URLs, and sets the current URL as an album parent. Noop for nested albums. */
     addAlbumUrls: (url: string[]) => Promise<null>;
-    /** Mark the current URL as failed, and add a reason. The URL will be skipped by default after this. */
+    /** Mark the current URL as failed, sets a reason, and raise a InvalidDownloadError to exit. The URL will be skipped by default after this. */
     markInvalid: (reason: string) => Promise<void>;
-    /** gracefully exit in a way that will be swallowed by the parent error handling. */
+    /** Gracefully exit in a way that will be swallowed by the parent error handling. */
     userExit: (reason?: string) => void;
 }
 
@@ -155,7 +155,8 @@ export const buildDownloadData = mutex(async (dl: DBDownload, prog: DownloadProg
             return null;
         },
         markInvalid: async (reason: string) => {
-            await (await dl.url).setFailed(reason);
+            await (await dl.url).setFailed(reason, prog.downloader);
+            throw new InvalidDownloaderError(reason);
         },
         userExit: (reason?: string) => {throw new GracefulStopError(reason||'User exit')}
     };
@@ -166,14 +167,14 @@ export const buildDownloadData = mutex(async (dl: DBDownload, prog: DownloadProg
 /**
  * Iterate through all available downloaders, attempting to handle the given DBDownload.
  */
-export async function handleDownload(dl: DBDownload, progress: DownloadProgress) {
+export async function handleDownload(dl: DBDownload, progress: DownloadProgress): Promise<any> {
     const {data, callbacks} = await buildDownloadData(dl, progress);
 
     for (const d of await getDownloaders()) {
         if (progress.shouldStop || (await dl.url).processed) break;
         progress.status = `Looking for downloaders to handle this URL...`;
         if (await d.canHandle(data).catch(console.error)) {
-            progress.handler = d.name;
+            progress.downloader = d.name;
             progress.status = `Downloading the URL...`;
             progress.knowsPercent = false;
             progress.percent = 0;
@@ -200,6 +201,9 @@ export async function handleDownload(dl: DBDownload, progress: DownloadProgress)
                 if (err instanceof GracefulStopError) {
                     // Swallow graceful errors, because the user wants to exit cleanly.
                     console.debug("Graceful stop encountered in downloader:", d.name, err.message);
+                } else if (err.isDownloaderError) {
+                    console.error('Invalid Downloader Error:', err.reason);
+                    return;
                 } else {
                     console.error('Downloader Error:', d.name, data.url, isTest() ? err : '<snipped error trace>');
                 }

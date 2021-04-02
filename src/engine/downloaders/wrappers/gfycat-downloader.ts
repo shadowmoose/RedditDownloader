@@ -5,9 +5,10 @@ import {downloadMedia, getJSON} from "../../util/http";
 import {DownloadProgress} from "../../util/state";
 import * as ytdl from "../ytdl";
 import path from "path";
+import {isTest} from "../../util/config";
 
 
-const formatOpts = ["mp4", "webm", "webp", "largeGif"];
+const formatOpts = ["mp4Url", "mp4", "webm", "webp", "largeGif"];
 
 export class GfycatDownloader extends Downloader {
     name: string = 'gfycat';
@@ -25,22 +26,28 @@ export class GfycatDownloader extends Downloader {
     }
 
     async download(data: DownloaderData, actions: DownloaderFunctions, progress: DownloadProgress) {
-        const match = data.url.match(/\.com\/([a-zA-Z]+)/);
-        const code = match ? match[1] : null;
-        let api = await getJSON(`https://api.gfycat.com/v1/gfycats/${code}`).catch(err=>{});
+        const match = urlp.parse(data.url).path;
+        const code = match ? path.basename(match).split('.')[0].split('-')[0] : null;
+        let api = await getJSON(`https://api.gfycat.com/v1/gfycats/${code}`).catch(_err=>{});
 
-        if (!api?.gfyItem?.content_urls) {
-            api = await getJSON(`https://api.redgifs.com/v1/gfycats/${code}`)
+        if (!(api?.gfyItem?.content_urls)) {
+            api = await getJSON(`https://api.redgifs.com/v1/gfycats/${code?.toLowerCase()}`).catch(_err=>{})
         }
 
-        if (!api?.gfyItem) {
-            throw new Error('Could not find gfycat or redirected link.')
+        if (!(api?.gfyItem)) {
+            return actions.markInvalid('Could not find gfycat or redirected link: ' + code);
         }
 
         for (const f of formatOpts) {
-            if (f in api.gfyItem.content_urls) {
-                return downloadMedia(api.gfyItem.content_urls[f].url, data.file, progress);
+            // Some fields are within the direct obj, but the backups are within the "content_urls" section.
+            const val = api.gfyItem.content_urls[f] ? api.gfyItem.content_urls[f].url : (f in api.gfyItem) ? api.gfyItem[f] : null;
+            if (val) {
+                return downloadMedia(val, data.file, progress).catch(err => {
+                    if (isTest()) console.error(err);
+                    return actions.markInvalid('Failed to download valid media file: ' + f);
+                });
             }
         }
+        return actions.markInvalid('Failed to locate a valid file type.')
     }
 }

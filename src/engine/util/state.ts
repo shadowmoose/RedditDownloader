@@ -60,7 +60,7 @@ export class DownloadProgress {
      * The name of the current Handler trying to download.
      */
     @Streamer.delay(1000)
-    handler: string = 'none';
+    downloader: string = 'none';
 
     /**
      * This indicates if the current download processor can currently know its total completion percentage.

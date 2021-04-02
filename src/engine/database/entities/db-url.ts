@@ -58,11 +58,13 @@ export default class DBUrl extends DBEntity {
     /**
      * Sets the failure status for this URL, and saves the URL.
      * @param reason
+     * @param handler
      */
-    public async setFailed(reason: string) {
+    public async setFailed(reason: string, handler?: string) {
         this.processed = true;
         this.failed = true;
         this.failureReason = reason;
+        this.handler = handler || 'none';
         return this.save();
     }
 }

@@ -39,3 +39,25 @@ export class GracefulStopError extends Error {
         }
     }
 }
+
+
+/**
+ * An error raised by downloaders,
+ * which indicates the download has failed in such a way that it should not be retried by other downloaders.
+ */
+export class InvalidDownloaderError extends Error {
+    public reason: string;
+    public isDownloaderError = true;
+
+    constructor(reason: string) {
+        // Pass remaining arguments (including vendor specific ones) to parent constructor
+        super(reason);
+
+        this.reason = reason;
+
+        // Maintains proper stack trace for where our error was thrown (only available on V8)
+        if (Error.captureStackTrace) {
+            Error.captureStackTrace(this, GracefulStopError)
+        }
+    }
+}

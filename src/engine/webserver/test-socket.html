@@ -47,6 +47,7 @@
 	let uid = 0;
 	let state = {};
 	let logRows = [];
+	let totalBytesRec = 0;
 
 	document.body.style.backgroundColor = '#d98585';
 
@@ -64,6 +65,8 @@
 	sock.onmessage = function(event) {
 		const packet = JSON.parse(event.data);
 		const data = packet.data;
+
+		totalBytesRec += event.data.length + 2;
 
 		window.debugPacketCount = (window.debugPacketCount || 0) + 1;
 
@@ -192,7 +195,21 @@
 		stageMsg('startDownload', {})
 	}
 
-	setInterval(() => console.log('Messages:', window.debugPacketCount), 10000)
+	function formatBytes(bytes, decimals = 2) {
+		if (bytes === 0) return '0 Bytes';
+
+		const k = 1024;
+		const dm = decimals < 0 ? 0 : decimals;
+		const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
+		const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+		return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+	}
+
+	setInterval(() => {
+		console.log('Messages:', window.debugPacketCount, ' -> Size:', formatBytes(totalBytesRec));
+	}, 10000)
 </script>
 
 </html>

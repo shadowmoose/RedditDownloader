@@ -15,7 +15,7 @@ describe('Gfycat Download Tests', () => {
     })
 
     it('download with CDN redirect', async () => {
-        const dat = await mockDownloadData('https://gfycat.com/kaleidoscopicnauticalbordercollie');
+        const dat = await mockDownloadData('https://gfycat.com/kaleidoscopicnauticalbordercollie?with=true');
         const prog = new DownloadProgress(0);
         const dl = new GfycatDownloader();
 
