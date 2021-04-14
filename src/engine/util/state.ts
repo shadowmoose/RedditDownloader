@@ -1,19 +1,14 @@
 import {Streamer} from "./streamer";
 import {DownloadSubscriber} from "../database/entities/db-download";
+import {DownloaderProgressInterface, DownloaderStateInterface, RMDStatus} from "../../shared/state-interfaces";
 
 
-export enum DownloaderStatus {
-    IDLE = 'idle',
-    RUNNING = 'running',
-    FINISHED = 'finished'
-}
-
-export class DownloaderState {
+export class DownloaderState implements DownloaderStateInterface{
     @Streamer.delay(500)
     activeDownloads: (DownloadProgress|null)[] = [];
     shouldStop = false;
 
-    currentState: DownloaderStatus = DownloaderStatus.IDLE;
+    currentState: RMDStatus = RMDStatus.IDLE;
     finishedScanning = false;
     currentSource: string|null = null;
 
@@ -35,47 +30,32 @@ export class DownloaderState {
     }
 
     isRunning() {
-        return this.currentState === DownloaderStatus.RUNNING
+        return this.currentState === RMDStatus.RUNNING
     }
 }
 
 
-export class DownloadProgress {
+export class DownloadProgress implements DownloaderProgressInterface {
     constructor(thread: number) {
         this.thread = thread;
     }
 
     thread: number;
 
-    /**
-     * User-friendly description of whatever is happening right now.
-     */
     @Streamer.delay(1000)
     status: string = '';
 
     @Streamer.delay(1000)
     fileName: string = '';
 
-    /**
-     * The name of the current Handler trying to download.
-     */
     @Streamer.delay(1000)
     downloader: string = 'none';
 
-    /**
-     * This indicates if the current download processor can currently know its total completion percentage.
-     */
     @Streamer.delay(500)
     knowsPercent: boolean = false;
 
-    /**
-     * Set internally as a signal to any supported running downloaders, that they should terminate.
-     */
     shouldStop = false;
 
-    /**
-     * A float, representing the percentage complete this download is.
-     */
     @Streamer.delay(1000)
     percent: number = 0;
 }

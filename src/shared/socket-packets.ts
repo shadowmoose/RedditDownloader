@@ -1,14 +1,14 @@
 /**
- * An incoming WS request, sent by the client to the server.
+ * A WS-based request, sent by the client (browser) to the server.
  */
 export interface ClientCommand {
-    uid: number;
+    uid?: number;
     type: ClientCommandTypes;
     data?: any;
 }
 
 /**
- * A response object, send from the server to the client.
+ * A response object, send from the server to the client (browser).
  */
 export interface SocketResponse {
     uid?: number;
@@ -40,5 +40,7 @@ export enum ServerPacketTypes {
     /** Signifies an incremental update to the current download state. */
     STATE_CHANGE = 'sc',
     /** The server is requesting a "pong" response, in a timely manner. */
-    PING = 'ping'
+    PING = 'ping',
+    /** A response from the server, for a specific client command. */
+    ACK = 'ack'
 }

@@ -1,0 +1,9 @@
+{
+  "watch": [
+    "./src/engine/main.ts",
+    "./src/engine/*",
+    "./src/shared/*"
+  ],
+  "exec": "webpack --config ./webpack.electron.js && electron ./dist/main.js",
+  "ext": "ts"
+}

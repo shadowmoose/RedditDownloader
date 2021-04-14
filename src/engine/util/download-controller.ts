@@ -1,6 +1,6 @@
 import {promises as fsPromises} from 'fs';
 import path from 'path';
-import {DownloaderState, DownloaderStatus} from "./state";
+import {DownloaderState} from "./state";
 import {SendFunction, Streamer} from "./streamer";
 import {downloadAll} from "../downloaders/downloaders";
 import DBSourceGroup from "../database/entities/db-source-group";
@@ -8,6 +8,7 @@ import {forGen} from "./generator-util";
 import {isTest} from "./config";
 import {DownloadSubscriber} from "../database/entities/db-download";
 import {baseDownloadDir} from "./paths";
+import {RMDStatus} from "../../shared/state-interfaces";
 
 let streamer: Streamer<DownloaderState> |null;
 
@@ -23,7 +24,7 @@ export function scanAndDownload(progressCallback: SendFunction) {
         throw Error('Unable to start a second scan before the first finishes.');
     }
     console.debug("Starting scan & download!")
-    state.currentState = DownloaderStatus.RUNNING;
+    state.currentState = RMDStatus.RUNNING;
     state.shouldStop = false;
 
     streamer?.setSender(progressCallback);
@@ -39,7 +40,7 @@ export function scanAndDownload(progressCallback: SendFunction) {
         .catch(err => {
             console.error(err);
         }).finally(() => {
-            state!.currentState = DownloaderStatus.FINISHED;
+            state!.currentState = RMDStatus.FINISHED;
             state!.shouldStop = true;
             state!.currentSource = null;
             state!.stop()

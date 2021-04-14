@@ -1,5 +1,6 @@
 import {Entity, Column, PrimaryColumn} from 'typeorm';
 import {DBEntity} from "./db-entity";
+import {defaultSettings, SettingsInterface} from "../../../shared/state-interfaces";
 
 
 @Entity({ name: 'settings' })
@@ -22,7 +23,7 @@ export default class DBSetting extends DBEntity {
      * Retrieve the value of the given Setting key. Returns the default if none is saved.
      * Once returned from DB, this value is cached in memory. Thus, repeated lookups will not cause slowdown.
      */
-    static async get<S extends DefSettings, K extends keyof DefSettings>(key: K): Promise<S[K]> {
+    static async get<S extends SettingsInterface, K extends keyof SettingsInterface>(key: K): Promise<S[K]> {
         if (settingsCache[key]) {
             return settingsCache[key];
         }
@@ -36,7 +37,7 @@ export default class DBSetting extends DBEntity {
     /**
      * Set the value of the given Setting key. Automatically saves. Also updates the in-memory settings cache.
      */
-    static async set<S extends DefSettings, K extends keyof S>(key: K, val: S[K]): Promise<DBSetting> {
+    static async set<S extends SettingsInterface, K extends keyof S>(key: K, val: S[K]): Promise<DBSetting> {
         const found = await DBSetting.findOne({ id: key as string });
         const s = found || await DBSetting.build({id: key as string, valueJSON: ''});
         s.value = val;
@@ -50,7 +51,7 @@ export default class DBSetting extends DBEntity {
      * Retrieves an object with all current setting keys and values.
      * Useful for sending to any interface that needs to know all current settings.
      */
-    static async getAll(): Promise<DefSettings> {
+    static async getAll(): Promise<SettingsInterface> {
         const settings = await DBSetting.find();
         const find = (id: string) => settings.find(s => s.id === id);
         const ret: Record<any, any> = {};
@@ -62,35 +63,6 @@ export default class DBSetting extends DBEntity {
     }
 }
 
-type DefSettings = typeof defaultSettings;
-const defaultSettings = {
-    test: 1337,
-    refreshToken: '',
-    userAgent: `RMD-${Math.random()}`,
-
-    /** The maximum number of concurrent downloads. */
-    concurrentThreads: 10,
-
-    /** The output template RMD uses when generating a file name. */
-    outputTemplate: '[subreddit]/[title] ([author])',
-
-    /** If RMD should de-duplicate similar files after downloading. */
-    dedupeFiles: true,
-    /** If true, create symlinks to duplicate files in place of deleted, lower-quality files. */
-    createSymLinks: true,
-    /** The (hamming) distance that images should be. Any less, and they get deduplicated. */
-    minimumSimiliarity: 3,
-    /** If true, skip deduplication for all files that are within an album. */
-    skipAlbumFiles: true,
-
-    /** The host to launch the local webserver on. */
-    serverHost: '127.0.0.1',
-    /** The port to launch the local webserver on. */
-    serverPort: 7001,
-
-    /** The API to authenticate with imgur. */
-    imgurClientId: ''
-}
 const settingsCache: Record<any, any> = {};
 
 if (!!process.env.JEST_WORKER_ID) {

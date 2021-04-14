@@ -15,6 +15,7 @@ import {CommandSaveSetting} from "./commands/cmd-save-setting";
 import DBFile from "../database/entities/db-file";
 import {getAbsoluteDL} from "../util/paths";
 import path from "path";
+import {Server} from "http";
 
 
 /** All available command processors. */
@@ -31,9 +32,9 @@ export const app = express();
 const wsServer = new ws.Server({ noServer: true });
 
 /* Serve an index file. */
-app.get('/', function(req, res){
-    res.sendFile(path.resolve(path.dirname(__filename), './test-socket.html'));  // TODO: Replace with a real index.
-});
+app.use(express.static(path.resolve(path.dirname(__filename), '../../../dist/')));
+
+console.log(path.resolve(path.dirname(__filename), '../../../dist/'));
 
 /* Serve downloaded files, using their ID. */
 app.get('/file/:id', async (req, res) => {
@@ -115,21 +116,22 @@ function resetPing(client: any, reCheck: boolean = false) {
 /**
  * Start the local HTTP & WebSockeet server.
  */
-export async function launchServer() {
+export async function launchServer(): Promise<Server> {
     console.log("Launching server...");
-    const host = await DBSetting.get('serverHost');
-    const port = await DBSetting.get('serverPort');
-    const server = app.listen(port, host, () => {
-        console.debug(`Server listening on http://${host}:${port}`);
-    });
-
-    server.on('upgrade', (request, socket, head) => {
-        wsServer.handleUpgrade(request, socket, head, socket => {
-            wsServer.emit('connection', socket, request);
+    return new Promise(async (res) => {
+        const host = await DBSetting.get('serverHost');
+        const port = await DBSetting.get('serverPort');
+        const server = app.listen(port, host, () => {
+            console.debug(`Server listening on http://${host}:${port}`);
+            res(server);
         });
-    });
 
-    return server;
+        server.on('upgrade', (request, socket, head) => {
+            wsServer.handleUpgrade(request, socket, head, socket => {
+                wsServer.emit('connection', socket, request);
+            });
+        });
+    })
 }
 
 
@@ -142,10 +144,13 @@ async function handleMessage(sock: ws, pkt: ClientCommand) {
             if (c.type === pkt.type) {
                 const resp = await c.handle(pkt, broadcast);
 
-                return send(sock, {
-                    uid: pkt.uid,
-                    data: resp
-                })
+                if (pkt.uid !== null && pkt.uid !== undefined) {
+                    return send(sock, {
+                        type: ServerPacketTypes.ACK,
+                        uid: pkt.uid,
+                        data: resp
+                    })
+                }
             }
         }
     } catch (err) {
@@ -191,13 +196,13 @@ export function broadcast(message: SocketResponse) {
 }
 
 
+export async function startServer() {
+    console.debug("Starting up...");
+    await makeDB();
+    console.debug('Made DB.');
+    return launchServer();
+}
+
 if (require.main === module) {
-    new Promise( async () => {
-        console.debug("Starting up...");
-        await makeDB();
-        console.debug('Made DB.');
-        await launchServer();
-    }).catch(err => {
-        console.error(err)
-    })
+    startServer()
 }
