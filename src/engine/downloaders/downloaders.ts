@@ -224,7 +224,8 @@ export async function handleDownload(dl: DBDownload, progress: DownloadProgress)
  * Builds and saves a new DBFile for the given DBUrl and file path.
  */
 export async function processFinishedDownload(url: DBUrl, subPath: string, handler: string, isAlbumFile: boolean) {
-    url.file = buildFile(getAbsoluteDL(subPath), subPath, isAlbumFile);
+    const file = await buildFile(getAbsoluteDL(subPath), subPath, isAlbumFile);
+    url.file = Promise.resolve(file);
     url.processed = true;
     url.failed = false;
     url.failureReason = null;

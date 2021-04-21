@@ -37,6 +37,7 @@ export const SETTINGS: SettingsInterface = {
 
 /** Connect to the server's WebSocket, so that we can send or receive data. */
 export function connectWS() {
+    disconnectWS();
     ws = new WebSocket(location.origin.replace(/^http/, 'ws'));
     ws.onmessage = (event) => {
         const packet = JSON.parse(event.data);
@@ -48,6 +49,7 @@ export function connectWS() {
         for (const k of Object.keys(pendingCommands) as any) {
             failAck(k, 'Disconnected from RMD!');
         }
+        ws = null;
     }
 }
 
@@ -128,8 +130,6 @@ function clearState(newState?: any) {
 }
 
 function onAck(packet: SocketResponse) {
-    console.log('Got Ack:', packet.uid) // TODO: Actually handle acks.
-
     const idx = packet.uid || -1;
     const prom = pendingCommands[idx];
     if (prom) {
@@ -147,6 +147,8 @@ function failAck(uid: number, error: string) {
     const prom = pendingCommands[uid];
 
     delete pendingCommands[uid];
+
+    console.error('Failed ACK:', uid, error);
 
     if (prom) {
         prom[1](error);

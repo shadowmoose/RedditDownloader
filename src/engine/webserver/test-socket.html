@@ -32,6 +32,7 @@
 	<button onclick="stageUpvotedSource()">Source: [Upvoted Posts]</button>
 	<button onclick="stageSetting()">Update Setting</button>
 	<button onclick="stageDLStart()">Start Download</button>
+	<button onclick="stageDlSearch()">Search</button>
 </div>
 <textarea id="input" style="width: 400px; height: 200px;" autofocus></textarea> <br>
 
@@ -193,6 +194,19 @@
 
 	function stageDLStart() {
 		stageMsg('startDownload', {})
+	}
+
+	function stageDlSearch() {
+		stageMsg('listDownloads', {
+			offset: 0,
+			limit: 10,
+			where: [
+				{
+					column: 'title',
+					value: '%som%'
+				}
+			]
+		})
 	}
 
 	function formatBytes(bytes, decimals = 2) {

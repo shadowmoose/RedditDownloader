@@ -29,7 +29,9 @@ export enum ClientCommandTypes {
     /** Delete a supported Database Object, using its ID. */
     DELETE_OBJECT = 'deleteObject',
     /** Delete all posts that have not yet been downloaded from previous runs. */
-    CULL_UNPROCESSED = 'cullUnprocessed'
+    CULL_UNPROCESSED = 'cullUnprocessed',
+    /** Return a paginated section of the available downloads matching the given query. */
+    LIST_DOWNLOADS = 'listDownloads'
 }
 
 export enum ServerPacketTypes {

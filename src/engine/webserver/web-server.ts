@@ -16,6 +16,7 @@ import DBFile from "../database/entities/db-file";
 import {getAbsoluteDL} from "../util/paths";
 import path from "path";
 import {Server} from "http";
+import {CommandListDownloads} from "./commands/cmd-list-downloads";
 
 
 /** All available command processors. */
@@ -25,7 +26,8 @@ const commands: Command[] = [
     new CommandDeleteDBObject(),
     new CommandUpdateDBObject(),
     new CommandCullUnprocessed(),
-    new CommandSaveSetting()
+    new CommandSaveSetting(),
+    new CommandListDownloads()
 ];
 export const clients: ws[] = [];
 export const app = express();
@@ -156,6 +158,7 @@ async function handleMessage(sock: ws, pkt: ClientCommand) {
     } catch (err) {
         console.error(err);
         send(sock,{error: err.message, uid: pkt.uid});
+        return;
     }
     throw Error(`Unable to handle the given unknown command type: ${pkt.type}`);
 }
