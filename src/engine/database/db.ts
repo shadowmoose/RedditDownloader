@@ -19,6 +19,7 @@ import {addSymlinks1615947913892} from "./migrations/1615947913892-add-symlinks"
 import {addDirFlag1616042478022} from "./migrations/1616042478022-add-dir-flag";
 import {fileIsAlbum1616318709797} from "./migrations/1616318709797-file-is-album";
 import {addInvertedFilter1617069277622} from "./migrations/1617069277622-add-inverted-filter";
+import {fixCommentParent1618973367109} from "./migrations/1618973367109-fix-comment-parent";
 
 let _connection: Connection|null;
 
@@ -32,7 +33,7 @@ export async function makeDB() {
         logging: false,
         synchronize: false,
         migrationsTransactionMode: 'all',
-        migrationsRun: true,
+        migrationsRun: false,
         migrationsTableName: "migrations",
         migrations: [
             initial1613378705882,
@@ -42,14 +43,17 @@ export async function makeDB() {
             addSymlinks1615947913892,
             addDirFlag1616042478022,
             fileIsAlbum1616318709797,
-            addInvertedFilter1617069277622
+            addInvertedFilter1617069277622,
+            fixCommentParent1618973367109
         ],  // Add migration classes here.
         subscribers: [DownloadSubscriber],
     }).then(async (connection: Connection) => {
+        await connection.query('PRAGMA foreign_keys=OFF');  // TypeORM sucks at migrations, so disable key checks until after.
         // here you can start to work with your entities
         await connection.runMigrations({
             transaction: 'all'
         });
+        await connection.query('PRAGMA foreign_keys=ON');
         await connection.query('VACUUM');
         _connection = connection;
         return connection;

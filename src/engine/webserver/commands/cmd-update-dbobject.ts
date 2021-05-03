@@ -4,6 +4,7 @@ import {getClass} from "./cmd-delete-dbobject";
 
 /**
  * Update/create a supported object type in the database.
+ * Only the properties that need to change must be included.
  */
 export class CommandUpdateDBObject extends Command {
     type = ClientCommandTypes.UPDATE_OBJECT;

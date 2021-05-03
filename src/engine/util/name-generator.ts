@@ -68,7 +68,7 @@ export function makePathFit(tags: TemplateTags, template: string) {
 }
 
 export async function getCommentValues(c: DBComment): Promise<TemplateTags> {
-    const root = await c.getRootSubmission();
+    const root = await c.parentSubmission;
 
     return {
         author: c.author,

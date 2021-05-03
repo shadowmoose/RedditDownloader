@@ -33,13 +33,7 @@ export default class DBComment extends DBEntity {
     firstFoundUTC!: number;
 
     @Column()
-    parentRedditID!: string;
-
-    @Column()
     permaLink!: string;
-
-    @Column()
-    rootSubmissionID!: string;
 
     @Column({ default: false })
     processed!: boolean;
@@ -64,59 +58,60 @@ export default class DBComment extends DBEntity {
     loadedData?: snoowrap.Comment|PsComment;
 
     /**
-     * Find this comment's root submission.
+     * Find a DBSubmission using the given ID.
      * If the submission is not stored locally, loads the submission from Reddit and saves it in the DB.
      */
-    async getRootSubmission(): Promise<DBSubmission|null> {
-        let loc: DBSubmission|void = await DBSubmission.findOne({id: this.rootSubmissionID});
+    static async getRootSubmission(id: string) {
+        let loc: DBSubmission|void = await DBSubmission.findOne({id});
         if (!loc) {
-            loc = await snoo.getSubmission(this.rootSubmissionID).catch(()=>{}) || await ps.getSubmission(this.rootSubmissionID);
-            if (loc) {
-                loc.shouldProcess = false;
-                await loc.save()
-            }
+            loc = await snoo.getSubmission(id).catch(() => {}) || await ps.getSubmission(id).catch(() => {});
+            if (loc) loc.shouldProcess = false;
         }
-        if (!loc) throw Error('Unable to look up parent ID: ' + this.rootSubmissionID);
-        return loc;
+
+        if (!loc) throw Error(`Unable to load a comment's root submission: ${id}`);
+
+        return loc.save();
     }
 
     static async fromRedditComment(comment: snoowrap.Comment): Promise<DBComment> {
-        return picker(comment, ['name', 'subreddit_name_prefixed', 'body', 'score', 'created_utc', 'author', 'permalink', 'parent_id', 'link_id']).then(c => {
+        return picker(comment, ['name', 'subreddit_name_prefixed', 'body', 'score', 'created_utc', 'author', 'permalink', 'parent_id', 'link_id']).then(async c => {
+            const parSub = await this.getRootSubmission(c.link_id);
+
             return DBComment.build({
                 id: c.name,
                 author: c.author.name,
                 createdUTC: c.created_utc*1000,
                 firstFoundUTC: Date.now(),
-                parentRedditID: c.parent_id,
                 permaLink: c.permalink,
                 processed: false,
-                rootSubmissionID: c.link_id,
                 score: c.score,
                 selfText: c.body,
                 subreddit: c.subreddit_name_prefixed.replace(/^\/?r\//, ''),
                 loadedData: comment,
                 downloads: Promise.resolve([]),
-                fromPushshift: false
+                fromPushshift: false,
+                parentSubmission: Promise.resolve(parSub)
             });
         })
     }
 
-    static fromPushShiftComment(comment: PsComment): DBComment {
+    static async fromPushShiftComment(comment: PsComment): Promise<DBComment> {
+        const parSub = await this.getRootSubmission(comment.link_id);
+
         return DBComment.build({
             id: comment.id,
             author: comment.author,
             createdUTC: comment.created_utc*1000,
             firstFoundUTC: Date.now(),
-            parentRedditID: comment.parent_id,
             permaLink: comment.permalink,
             processed: false,
-            rootSubmissionID: comment.link_id,
             score: comment.score,
             selfText: comment.body,
             subreddit: comment.subreddit,
             loadedData: comment,
             downloads: Promise.resolve([]),
-            fromPushshift: true
+            fromPushshift: true,
+            parentSubmission: Promise.resolve(parSub)
         });
     }
 }

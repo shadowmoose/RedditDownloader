@@ -18,6 +18,7 @@ export class CommandListDownloads extends Command {
         const count = (await this.select(where, true))[0];
         const downloads = await this.select(where, false, limit, offset);
 
+        console.log('[server] responding to search...');
         return {
             downloads,
             count: count?.count
@@ -56,6 +57,7 @@ export class CommandListDownloads extends Command {
         const select = `
             file.path as path, 
             file.id as id, 
+            file.mimeType as type,
             submission.title as title,
             comment.author as commentAuthor,
             submission.author as submissionAuthor`;
@@ -83,7 +85,7 @@ export class CommandListDownloads extends Command {
             from downloads dl
             left join comments comment on comment.id = dl.parentCommentId
             left join submissions submission
-                on submission.id == dl.parentSubmissionId or submission.id = comment.rootSubmissionID
+                on submission.id == dl.parentSubmissionId or submission.id = comment.parentSubmissionId
             left join urls url on url.id = dl.urlId
             left join files file on file.id = url.fileId
             where

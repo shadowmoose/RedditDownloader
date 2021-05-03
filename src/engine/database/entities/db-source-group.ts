@@ -73,6 +73,8 @@ export default class DBSourceGroup extends DBEntity {
 
                 post.processed = true;
 
+                await post.save();
+
                 return post;
             }) as AsyncGenerator<DBSubmission | DBComment>
         }
@@ -90,6 +92,9 @@ export default class DBSourceGroup extends DBEntity {
             }
             r[k] = await this[k];
         }
+
+        r.sources = await this.sources;
+        r.filters = await this.filters;
 
         return r;
     }

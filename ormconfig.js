@@ -14,6 +14,6 @@ module.exports = {
 	migrations: [`${outDir}/migrations/*.js`],
 	synchronize: false,
 	cli: {
-		migrationsDir: `${outDir}/migrations/`
+		migrationsDir: `./src/engine/database/migrations/`
 	}
 }

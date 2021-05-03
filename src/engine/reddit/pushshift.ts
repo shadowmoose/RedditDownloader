@@ -129,9 +129,9 @@ export async function getComment(...ids: string[]): Promise<DBComment|void> {
 }
 
 
-export function convertToDB<T extends PsType>(type: T, data: PsPost): PsDBConversion<T> {
+export async function convertToDB<T extends PsType>(type: T, data: PsPost): Promise<PsDBConversion<T>> {
     if (type === 'comment') {
-        return DBComment.fromPushShiftComment(data as PsComment) as any;
+        return await DBComment.fromPushShiftComment(data as PsComment) as any;
     } else {
         return DBSubmission.fromPushShiftSubmission(data as PsSubmission) as any;
     }

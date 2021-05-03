@@ -45,7 +45,8 @@ app.get('/file/:id', async (req, res) => {
         return res.status(404).send('Unknown file ID.');
     }
 
-    console.log('Serving file:', req.params.id, '->', path.basename(f.path));
+    if (!req.headers.range) console.log('Serving file:', req.params.id, '->', path.basename(f.path));
+
     return res.sendFile(getAbsoluteDL(f.path), {
         headers: {
             'Content-Disposition': 'inline; filename=' + encodeURIComponent(path.basename(f.path))
@@ -71,7 +72,7 @@ wsServer.on('connection', async socket => {
             return;
         }
 
-        console.log('Incoming message:', message);
+        console.log('[server] Incoming message:', message);
 
         try {
             await handleMessage(socket, JSON.parse(`${message}`));

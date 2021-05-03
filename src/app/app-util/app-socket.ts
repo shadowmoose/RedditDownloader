@@ -1,9 +1,13 @@
-import {ClientCommand, ServerPacketTypes, SocketResponse} from "../../shared/socket-packets";
+import {ClientCommand, ClientCommandTypes, ServerPacketTypes, SocketResponse} from "../../shared/socket-packets";
 import {SettingsInterface, DownloaderStateInterface, RMDStatus} from "../../shared/state-interfaces";
 import { observable } from "mobx"
 
 let ws: WebSocket|null = null;
 let uid = 0;
+let setConnected: any;
+const awaitConnection = new Promise((res) => {
+    setConnected = res;
+});
 const pendingCommands: Record<number, Function[]> = {};
 
 /**
@@ -34,6 +38,8 @@ export const SETTINGS: SettingsInterface = {
     userAgent: ""
 };
 
+export const SOURCE_GROUPS: any[] = observable([]);  // TODO: Shared base interface.
+
 
 /** Connect to the server's WebSocket, so that we can send or receive data. */
 export function connectWS() {
@@ -43,6 +49,8 @@ export function connectWS() {
         const packet = JSON.parse(event.data);
         handleMessage(packet);
     };
+
+    ws.onopen = setConnected;
 
     ws.onclose = () => {
         console.warn('Disconnected from RMD websocket!');
@@ -59,21 +67,28 @@ export function disconnectWS() {
 }
 
 function sendRaw(data: string) {
-    if (!ws) throw Error('No valid websocket connection - cannot send.')
-    ws.send(data);
+    awaitConnection.then(() => {
+        if (!ws) throw Error('No valid websocket connection - cannot send.');
+        ws.send(data);
+    })
 }
 
-export function sendCommand(packet: ClientCommand, timeout: number = 10000): Promise<any> {
-    packet.uid = uid++;
+export function sendCommand(type: ClientCommandTypes, data: any, timeout: number = 10000): Promise<any> {
+    const packet: ClientCommand = {
+        type,
+        uid: ++uid,
+        data
+    }
     sendRaw(JSON.stringify(packet));
 
     return new Promise ((res, rej) => {
-        pendingCommands[uid] = [res, rej];
+        let timer: any;
         if (timeout) {
-            setTimeout(() => {
+            timer = setTimeout(() => {
                 failAck(uid, `Command timed out! ${packet}`);
             }, timeout)
         }
+        pendingCommands[uid] = [res, rej, ()=>clearTimeout(timer)];
     })
 }
 
@@ -89,7 +104,9 @@ function handleMessage(packet: SocketResponse) {
             return updateState(packet.data);
 
         case ServerPacketTypes.CURRENT_CONFIG:
-            return Object.assign(SETTINGS, packet.data);
+            SOURCE_GROUPS.splice(0, SOURCE_GROUPS.length);
+            SOURCE_GROUPS.push(...packet.data.sourceGroups);
+            return Object.assign(SETTINGS, packet.data.settings);
 
         case ServerPacketTypes.ACK:
             return onAck(packet);
@@ -132,7 +149,10 @@ function clearState(newState?: any) {
 function onAck(packet: SocketResponse) {
     const idx = packet.uid || -1;
     const prom = pendingCommands[idx];
+
+    console.log('Got ack', packet, pendingCommands);
     if (prom) {
+        prom[2](); // Clear timer.
         delete pendingCommands[idx];
         if (packet.error) {
             failAck(idx, packet.error);
@@ -157,6 +177,7 @@ function failAck(uid: number, error: string) {
 
 
 Object.assign(window, {
-    debugState: () => console.log(JSON.parse(JSON.stringify(STATE))),
-    debugSettings: () => console.log(SETTINGS)
+    debugState: () => JSON.parse(JSON.stringify(STATE)),
+    debugSettings: () => SETTINGS,
+    debugSourceGroups: () => JSON.parse(JSON.stringify(SOURCE_GROUPS)),
 })
