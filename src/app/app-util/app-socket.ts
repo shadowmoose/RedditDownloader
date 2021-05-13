@@ -1,6 +1,7 @@
 import {ClientCommand, ClientCommandTypes, ServerPacketTypes, SocketResponse} from "../../shared/socket-packets";
 import {SettingsInterface, DownloaderStateInterface, RMDStatus} from "../../shared/state-interfaces";
 import { observable } from "mobx"
+import {SourceGroupInterface} from "../../shared/source-interfaces";
 
 let ws: WebSocket|null = null;
 let uid = 0;
@@ -38,7 +39,7 @@ export const SETTINGS: SettingsInterface = {
     userAgent: ""
 };
 
-export const SOURCE_GROUPS: any[] = observable([]);  // TODO: Shared base interface.
+export const SOURCE_GROUPS: SourceGroupInterface[] = observable([]);
 
 
 /** Connect to the server's WebSocket, so that we can send or receive data. */

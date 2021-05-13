@@ -1,18 +1,11 @@
 import Source from "./source";
 import * as reddit from '../reddit/snoo';
-import {TypeOpts} from "../../shared/source-interfaces";
+import {SourceTypes} from "../../shared/source-interfaces";
+import UpvotedPostsSchema from "../../shared/source-schemas/upvoted-posts-schema";
 
 export default class UpvotedPostSource extends Source {
-    protected data: any;
-    readonly schema = {
-        limit: {
-            description: 'Maximum amount of posts:',
-            type: TypeOpts.NUMBER,
-            default: 0
-        }
-    };
-    readonly description: string = `The submissions you've upvoted`;
-    readonly type: string = 'upvoted-posts';
+    protected data!: UpvotedPostsSchema;
+    readonly type = SourceTypes.UPVOTED_POSTS;
 
     async *find() {
         const gen = reddit.getUpvoted(this.data.limit);

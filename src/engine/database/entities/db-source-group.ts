@@ -9,6 +9,7 @@ import {filterMap} from "../../util/generator-util";
 import {DBPost, forkPost} from "../db";
 import extractLinks from "../../reddit/url-extractors";
 import DBDownload from "./db-download";
+import {SourceGroupInterface} from "../../../shared/source-interfaces";
 
 
 @Entity({ name: 'source_groups' })
@@ -83,7 +84,7 @@ export default class DBSourceGroup extends DBEntity {
     /**
      * When this group needs to be sent to the client, it can be encoded suitably for serialization here.
      */
-    async toSimpleObject() { // TODO: Unit test.
+    async toSimpleObject(): Promise<SourceGroupInterface> { // TODO: Unit test.
         const r: any = {};
 
         for (const k in this) {

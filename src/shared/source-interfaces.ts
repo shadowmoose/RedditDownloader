@@ -1,20 +1,28 @@
-export enum TypeOpts {
-    STRING = "string",
-    NUMBER = "number",
-    BOOLEAN = 'boolean',
+
+export enum SourceTypes {
+    SAVED_POSTS = 'saved-posts',
+    UPVOTED_POSTS = 'upvoted-posts',
+    SUBREDDIT_POSTS = 'subreddit-posts',
 }
 
-/**
- * The schema used by each Source to control/coerce what types it accepts.
- */
-export interface SourceSchema {
-    [key: string]: {
-        /** A user-friendly prompt for this input. */
-        description: string;
-        /** The data type that should be accepted. */
-        type: TypeOpts;
-        /** The default value this should return */
-        default: any;
-    }
+
+export interface SourceInterface {
+    dataJSON: string
+    id: number
+    name: string
+    type: SourceTypes
 }
 
+
+export interface SourceGroupInterface {
+    name: string;
+    id: number;
+    color: string;
+    filters: any[]; // TODO: Add filter interface.
+    sources: SourceInterface[];
+}
+
+export const TimeRange = ['hour', 'day', 'week', 'month', 'year', 'all'];
+export type TimeRange = 'hour' | 'day' | 'week' | 'month' | 'year' | 'all';
+export const SubredditSorts = ['hot', 'new', 'top', 'rising'];
+export type SubredditSorts = 'hot' | 'new' | 'top' | 'rising';

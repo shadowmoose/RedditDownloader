@@ -1,41 +1,15 @@
 import Source from "./source";
 import * as reddit from '../reddit/snoo';
-import {TypeOpts} from "../../shared/source-interfaces";
-import {SubredditSorts, TimeRange} from "../reddit/snoo";
+import {SourceTypes} from "../../shared/source-interfaces";
+import SubredditPostsSchema from "../../shared/source-schemas/subreddit-posts-schema";
 
 
 export default class SubredditPostSource extends Source {
-    protected data: any;
-    readonly schema = {
-        subreddit: {
-            description: 'Subreddit to download:',
-            type: TypeOpts.STRING,
-            default: '',
-            minLength: 1
-        },
-        type: {
-            description: 'Sort submissions by:',
-            type: TypeOpts.STRING,
-            default: SubredditSorts[0],
-            enum: SubredditSorts
-        },
-        time: {
-            description: 'Time range:',
-            type: TypeOpts.STRING,
-            default: TimeRange[0],
-            enum: TimeRange
-        },
-        limit: {
-            description: 'Maximum amount of posts:',
-            type: TypeOpts.NUMBER,
-            default: 0
-        }
-    };
-    readonly description: string = `The submissions from a subreddit`;
-    readonly type: string = 'subreddit-posts';
+    protected data!: SubredditPostsSchema;
+    readonly type = SourceTypes.SUBREDDIT_POSTS;
 
     async *find() {
-        const gen = reddit.getSubreddit(this.data.subreddit, this.data.type, this.data.time, this.data.limit);
+        const gen = reddit.getSubreddit(this.data.subreddit, this.data.sort, this.data.time, this.data.limit);
 
         return yield* gen;
     }

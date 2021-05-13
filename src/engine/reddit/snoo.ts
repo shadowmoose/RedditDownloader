@@ -2,18 +2,13 @@ import snoowrap from 'snoowrap';
 import DBSubmission from "../database/entities/db-submission";
 import DBComment from "../database/entities/db-comment";
 import DBSetting from "../database/entities/db-setting";
-import { ListingOptions } from 'snoowrap/dist/objects';
-
+import {SubredditSorts, TimeRange} from "../../shared/source-interfaces";
 
 
 type DBTypeConversion<T> = T extends snoowrap.Submission
     ? DBSubmission
     : DBComment;
 type Post = snoowrap.Submission|snoowrap.Comment;
-export const TimeRange = ['hour', 'day', 'week', 'month', 'year', 'all'];
-export type TimeRange = 'hour'|'day'|'week'|'month'|'year'|'all';
-export const SubredditSorts = ['hot', 'new', 'top', 'rising'];
-export type SubredditSorts = 'hot'|'new'|'top'|'rising';
 
 let _r: snoowrap|null = null;
 /** Default Listing opts for Snoowrap. */
@@ -88,13 +83,13 @@ export async function* getUpvoted(limit: number) {
 /**
  * Get all Submissions upvoted by the current user.
  */
-export async function* getSubreddit(subreddit: string, type: SubredditSorts, time: TimeRange, limit: number) {
+export async function* getSubreddit(subreddit: string, sort: SubredditSorts, time: TimeRange, limit: number) {
     const api = await getAPI();
     const sub = api.getSubreddit(subreddit);
     const opts = { time };
 
     let listing;
-    switch (type) {
+    switch (sort) {
         case 'hot':
             listing = await sub.getHot();
             break;
