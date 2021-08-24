@@ -34,7 +34,7 @@ export default class DBUrl extends DBEntity {
     @Column({ default: 0 })
     completedUTC!: number;
 
-    @ManyToOne(() => DBFile, comm => comm.urls, { nullable: true, cascade: true })
+    @ManyToOne(() => DBFile, comm => comm.urls, { nullable: true, cascade: true, onDelete: 'CASCADE'})
     @Index()
     file!: Promise<DBFile|null>;
 

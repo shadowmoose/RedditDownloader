@@ -42,11 +42,11 @@ export default class DBComment extends DBEntity implements CommentInterface{
     @Column({ default: false })
     fromPushshift!: boolean;
 
-    @ManyToOne(() => DBSubmission, sub => sub.children, { nullable: true})
+    @ManyToOne(() => DBSubmission, sub => sub.children, { nullable: true, onDelete: 'CASCADE'})
     @Index()
     parentSubmission!: Promise<DBSubmission>;
 
-    @ManyToOne(() => DBComment, sub => sub.children, { nullable: true})
+    @ManyToOne(() => DBComment, sub => sub.children, { nullable: true, onDelete: 'CASCADE'})
     @Index()
     parentComment!: Promise<DBComment>;
 

@@ -151,7 +151,7 @@ export const SourceConfigModal = observer((props: {open: boolean, onClose: (save
                     color="secondary"
                     onClick = {deleteSource}
                 >
-                    Delete
+                    Delete Source
                 </Button>
             </Grid>
         </div>

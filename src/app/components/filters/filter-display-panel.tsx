@@ -202,13 +202,11 @@ const ActiveFilterListPane = observer((props: {sg: SourceGroupInterface, filters
     const submissions = buildDisplayFilterList(props.sg, props.filters.filter(f => f.forSubmissions), SubmissionFilters);
     const comments = buildDisplayFilterList(props.sg, props.filters.filter(f => !f.forSubmissions), CommentFilters);
 
-    return <div style={{maxHeight: '300px', overflowY: 'auto'}}>
+    return <div style={{maxHeight: '310px', overflowY: 'auto'}}>
         <Typography variant="h6">Submissions</Typography>
-        {submissions}
-        {submissions.length ? '':'No limits on Submissions.'}
+        {submissions.length ? submissions : 'No limits on Submissions.'}
         <Typography variant="h6">Comments</Typography>
-        {comments}
-        {comments.length ? '':'No limits on Comments.'}
+        {comments.length ? comments : 'No limits on Comments.'}
     </div>;
 });
 

@@ -10,7 +10,7 @@ export default class DBFilter extends DBEntity implements FilterInterface {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @ManyToOne(() => DBSourceGroup, src => src.filters, { nullable: true})
+    @ManyToOne(() => DBSourceGroup, src => src.filters, { nullable: true, onDelete: 'CASCADE'})
     @Index()
     sourceGroup!: Promise<DBSourceGroup>;
 

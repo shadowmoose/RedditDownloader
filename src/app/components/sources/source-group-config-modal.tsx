@@ -1,13 +1,12 @@
 import {observer} from "mobx-react-lite";
 import {SourceGroupInterface} from "../../../shared/source-interfaces";
 import React, {useMemo, useState} from "react";
-import {sendCommand} from "../../app-util/app-socket";
+import {sendCommand, SOURCE_GROUPS} from "../../app-util/app-socket";
 import {ClientCommandTypes} from "../../../shared/socket-packets";
 import {Button, Grid, makeStyles, Modal, TextField} from "@material-ui/core";
 import {createStyles, Theme} from "@material-ui/core/styles";
 import ColorPicker from "material-ui-color-picker";
 import {FilterDisplayPanel} from "../filters/filter-display-panel";
-import FilterInterface from "../../../shared/filter-interface";
 
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -96,6 +95,10 @@ export const SourceGroupConfigModal = observer((props: {open: boolean, onClose: 
             dbType: 'DBSourceGroup',
             id: sg.id,
         }).then(() => {
+            const idx = SOURCE_GROUPS.findIndex(s => s.id === sg.id);
+            if (idx >= 0) {
+                SOURCE_GROUPS.splice(idx, 1);
+            }
             onClose()
         })
     }

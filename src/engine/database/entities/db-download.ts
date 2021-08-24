@@ -32,15 +32,15 @@ export default class DBDownload extends DBEntity {
     @Column({type: 'varchar', default: null})
     albumPaddedIndex!: string|null;
 
-    @ManyToOne(() => DBSubmission, sub => sub.downloads, { nullable: true })
+    @ManyToOne(() => DBSubmission, sub => sub.downloads, { nullable: true, onDelete: 'CASCADE'})
     @Index()
     parentSubmission!: Promise<DBSubmission>;
 
-    @ManyToOne(() => DBComment, comm => comm.downloads, { nullable: true })
+    @ManyToOne(() => DBComment, comm => comm.downloads, { nullable: true, onDelete: 'CASCADE'})
     @Index()
     parentComment!: Promise<DBComment>;
 
-    @ManyToOne(() => DBUrl, comm => comm.downloads, { nullable: true, cascade: true })
+    @ManyToOne(() => DBUrl, comm => comm.downloads, { nullable: true, cascade: true, onDelete: 'CASCADE' })
     @Index()
     url!: Promise<DBUrl>;
 

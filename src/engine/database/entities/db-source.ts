@@ -10,7 +10,7 @@ export default class DBSource extends DBEntity {
     @Column({length: 15, nullable: false})
     type!: string;
 
-    @ManyToOne(() => DBSourceGroup, src => src.sources, { nullable: false})
+    @ManyToOne(() => DBSourceGroup, src => src.sources, { nullable: false, onDelete: 'CASCADE'})
     @Index()
     sourceGroup!: Promise<DBSourceGroup>;
 

@@ -20,6 +20,8 @@ import {addDirFlag1616042478022} from "./migrations/1616042478022-add-dir-flag";
 import {fileIsAlbum1616318709797} from "./migrations/1616318709797-file-is-album";
 import {addInvertedFilter1617069277622} from "./migrations/1617069277622-add-inverted-filter";
 import {fixCommentParent1618973367109} from "./migrations/1618973367109-fix-comment-parent";
+import {addSourceCascade1629767914963} from "./migrations/1629767914963-add-source-cascade";
+import {addAllDeleteCascades1629768495254} from "./migrations/1629768495254-add-all-delete-cascades";
 
 let _connection: Connection|null;
 
@@ -44,7 +46,9 @@ export async function makeDB() {
             addDirFlag1616042478022,
             fileIsAlbum1616318709797,
             addInvertedFilter1617069277622,
-            fixCommentParent1618973367109
+            fixCommentParent1618973367109,
+            addSourceCascade1629767914963,
+            addAllDeleteCascades1629768495254,
         ],  // Add migration classes here.
         subscribers: [DownloadSubscriber],
     }).then(async (connection: Connection) => {

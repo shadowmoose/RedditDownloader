@@ -23,10 +23,10 @@ export default class DBSourceGroup extends DBEntity {
     @Column({ length: 36, nullable: false })
     color!: string;
 
-    @OneToMany(() => DBFilter, f => f.sourceGroup, {cascade: true})
+    @OneToMany(() => DBFilter, f => f.sourceGroup, {cascade: true, onDelete: 'CASCADE'})
     filters!: Promise<DBFilter[]>;
 
-    @OneToMany(() => DBSource, f => f.sourceGroup, {cascade: true})
+    @OneToMany(() => DBSource, f => f.sourceGroup, {cascade: true, onDelete: 'CASCADE'})
     sources!: Promise<DBSource[]>;
 
     /**

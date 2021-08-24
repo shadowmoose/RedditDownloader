@@ -11,16 +11,46 @@ import {
     DropResult
 } from "react-beautiful-dnd";
 import {ClientCommandTypes} from "../../../shared/socket-packets";
-import {Accordion, AccordionDetails, AccordionSummary, Button, Fade, IconButton, Tooltip} from "@material-ui/core";
+import {
+    Accordion,
+    AccordionDetails,
+    AccordionSummary,
+    Button,
+    Fade,
+    Grid,
+    IconButton, makeStyles, Modal, TextField,
+    Tooltip
+} from "@material-ui/core";
 import SettingsIcon from '@material-ui/icons/Settings';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import DragIndicatorIcon from '@material-ui/icons/DragIndicator';
 import {SourceGroupInterface, SourceInterface, SourceTypes} from "../../../shared/source-interfaces";
 import {SourceConfigModal} from "./source-config-modal";
 import {SourceGroupConfigModal} from "./source-group-config-modal";
+import {createStyles, Theme} from "@material-ui/core/styles";
+import ColorPicker from "material-ui-color-picker";
+
+
+
+const useStyles = makeStyles((theme: Theme) =>
+    createStyles({
+        modalBody: {
+            position: 'absolute',
+            width: 750,
+            backgroundColor: theme.palette.background.paper,
+            border: '2px solid #000',
+            boxShadow: theme.shadows[5],
+            padding: theme.spacing(2, 4, 3),
+            top: `50%`,
+            left: `50%`,
+            transform: `translate(-50%, -50%)`,
+        }
+    }),
+);
 
 
 export const SourceGroupDrawer = observer(() => {
+    const [creatingNew, setCreating] = useState(false);
     const eles = SOURCE_GROUPS.map(sg => {
         return <SourceGroupEle key={sg.id} sourceGroup={sg} />
     });
@@ -55,8 +85,105 @@ export const SourceGroupDrawer = observer(() => {
 
     return <DragDropContext onDragEnd={onDragEnd}>
         {eles}
+
+        <Grid container justify="center">
+            <Button
+                variant="outlined"
+                color={"primary"}
+                style={{marginTop: '10px', marginBottom: '4px'}}
+                onClick={()=>setCreating(true)}
+            >
+                Add new Source Group.
+            </Button>
+        </Grid>
+
+        <CreateSourceGroupModal open={creatingNew} onClose={()=>setCreating(false)}/>
     </DragDropContext>
 });
+
+
+/**
+ * Modal for creating a new Source Group.
+ */
+export const CreateSourceGroupModal = (props: {open: boolean, onClose: any}) => {
+    const pastelHex = () => {
+        let R = Math.floor((Math.random() * 127) + 127);
+        let G = Math.floor((Math.random() * 127) + 127);
+        let B = Math.floor((Math.random() * 127) + 127);
+
+        let rgb = (R << 16) + (G << 8) + B;
+        return `#${rgb.toString(16)}`;
+    }
+    const classes = useStyles();
+    const [name, setName] = useState('');
+    const [color, setColor] = useState(pastelHex);
+    const nameError = !name.trim().length;
+
+    function createSourceGroup() {
+        const sg: Partial<SourceGroupInterface> = {
+            color,
+            name,
+            filters: [],
+            sources: []
+        };
+
+        sendCommand(ClientCommandTypes.UPDATE_OBJECT, {
+            dbType: 'DBSourceGroup',
+            newValues: sg
+        }).then(res => {
+            props.onClose();
+            sg.id = res.id;
+            SOURCE_GROUPS.push(sg as SourceGroupInterface);
+            setName('');
+            setColor(pastelHex());
+        });
+    }
+
+    return <Modal
+        open={props.open}
+        onClose={props.onClose}
+        aria-labelledby="source-group-creator"
+        aria-describedby="Create a new source group."
+    >
+        <div className={classes.modalBody}>
+            <Typography variant="h5" noWrap>
+                Create a Group for Sources
+            </Typography>
+
+            <TextField
+                label="Group Name" value={name}
+                onChange={(ev) => {setName(ev.target.value)}}
+                style={{width: '100%'}}
+                variant="outlined"
+                error={nameError}
+            />
+
+            <Grid>
+                <Typography variant="h6" noWrap style={{display: 'inline'}}>
+                    Color:
+                </Typography>
+                <ColorPicker
+                    name='color'
+                    defaultValue={color}
+                    value={color}
+                    onChange={setColor}
+                    style={{width: '100px', marginLeft: '20px'}}
+                />
+            </Grid>
+
+            <Button
+                disabled={nameError}
+                variant="contained"
+                color="primary"
+                onClick = {createSourceGroup}
+                style={{marginTop: '20px'}}
+            >
+                Save
+            </Button>
+        </div>
+    </Modal>
+}
+
 
 
 export const SourceGroupEle = observer((props: {sourceGroup: SourceGroupInterface}) => {
