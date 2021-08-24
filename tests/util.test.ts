@@ -103,6 +103,18 @@ describe('Utility Tests', () => {
         expect(data).toEqual(['test']);
     });
 
+    it('streamer transformer', async() => {
+        class Test {
+            @Streamer.transformer(num => `string-${num}`)
+            num: number = 0;
+        }
+        const streamer = new Streamer(new Test());
+        const s = streamer.state;
+        s.num = 1337;
+
+        expect(s.num).toEqual('string-1337');
+    });
+
     it('mutex should work', async() => {
         let running = false;
         const fn = async (val: number) => {

@@ -57,5 +57,6 @@ export class DownloadProgress implements DownloaderProgressInterface {
     shouldStop = false;
 
     @Streamer.delay(1000)
+    @Streamer.transformer(number => (Math.round(number * 100) / 100))
     percent: number = 0;
 }

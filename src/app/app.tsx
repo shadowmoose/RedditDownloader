@@ -1,9 +1,9 @@
 import React, {useEffect} from 'react';
-import {connectWS, disconnectWS, STATE} from "./app-util/app-socket";
+import {connectWS, disconnectWS, sendCommand, STATE, useRmdState} from "./app-util/app-socket";
 import {observer} from "mobx-react-lite";
 import {configure} from "mobx";
 import clsx from 'clsx';
-import { makeStyles, useTheme, Theme, createStyles } from '@material-ui/core/styles';
+import {createStyles, makeStyles, Theme, useTheme} from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import AppBar from '@material-ui/core/AppBar';
@@ -21,6 +21,10 @@ import ListItemText from '@material-ui/core/ListItemText';
 import InboxIcon from '@material-ui/icons/MoveToInbox';
 import MailIcon from '@material-ui/icons/Mail';
 import {SourceGroupDrawer} from "./components/sources/source-group-drawer";
+import {Fab, Grid} from "@material-ui/core";
+import GetAppIcon from '@material-ui/icons/GetApp';
+import CancelIcon from '@material-ui/icons/Cancel';
+import {ClientCommandTypes} from "../shared/socket-packets";
 
 
 configure({
@@ -41,8 +45,8 @@ const useStyles = makeStyles((theme: Theme) =>
             }),
         },
         appBarShift: {
-            width: `calc(100% - ${drawerWidth}px)`,
-            marginLeft: drawerWidth,
+            width: `calc(100% - ${drawerWidth*2}px)`,
+            marginRight: drawerWidth,
             transition: theme.transitions.create(['margin', 'width'], {
                 easing: theme.transitions.easing.easeOut,
                 duration: theme.transitions.duration.enteringScreen,
@@ -99,6 +103,7 @@ const StateDebug = observer(() => {
 })
 
 const App = () => {
+    const {rmdReady, rmdConnected} = useRmdState();
     useEffect(() => {
         connectWS();
 
@@ -127,18 +132,33 @@ const App = () => {
                 })}
             >
                 <Toolbar>
-                    <IconButton
-                        color="inherit"
-                        aria-label="open drawer"
-                        onClick={handleDrawerOpen}
-                        edge="start"
-                        className={clsx(classes.menuButton, open && classes.hide)}
-                    >
-                        <MenuIcon />
-                    </IconButton>
-                    <Typography variant="h4" noWrap>
-                        Reddit Media Downloader
-                    </Typography>
+                    <Grid container justify="space-between" >
+                        <IconButton
+                            color="inherit"
+                            aria-label="open drawer"
+                            onClick={handleDrawerOpen}
+                            edge="start"
+                            className={clsx(classes.menuButton, open && classes.hide)}
+                        >
+                            <MenuIcon />
+                        </IconButton>
+
+                        <Typography variant="h4" noWrap>
+                            Reddit Media Downloader
+                        </Typography>
+
+                        <Fab
+                            variant="extended"
+                            disabled={!rmdConnected}
+                            color={rmdReady ? 'default' : 'secondary'}
+                            onClick={() => {
+                                sendCommand(rmdReady ? ClientCommandTypes.START_DOWNLOAD : ClientCommandTypes.STOP_DOWNLOAD, {})
+                            }}
+                        >
+                            {rmdReady ? <GetAppIcon /> : <CancelIcon />}
+                            {rmdReady ? 'Start Download' : 'Stop Downloading'}
+                        </Fab>
+                    </Grid>
                 </Toolbar>
             </AppBar>
 

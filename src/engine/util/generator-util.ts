@@ -2,18 +2,24 @@
  * Reads through a Generator, awaiting the given `cb` function on each element.
  * If the returned result is truthy, that result is emitted. Otherwise, nothing is emitted.
  */
-export async function* filterMap<T, TR, R>(gen: AsyncGenerator<T, TR>, cb: (ele: T) => R) {
+export async function* filterMap<T, TR, R>(gen: AsyncGenerator<T, TR>, cb: (ele: T, stop: ()=>void) => R) {
     let count = 0;
-    while (true) {
+    let stop = false;
+    while (!stop) {
         const nxt = await gen.next();
-        if (nxt.done) return count;
+        if (nxt.done) break;
 
-        const res = await cb(nxt.value);
+        const res = await cb(nxt.value, ()=>stop = true);
+
+        if (stop) break;
+
         if (res) {
             count++;
             yield res as NonNullable<R>;
         }
     }
+
+    return count;
 }
 
 /**

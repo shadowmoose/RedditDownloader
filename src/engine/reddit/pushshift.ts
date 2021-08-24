@@ -75,6 +75,7 @@ export async function* scan<T extends PsType>(type: T, params: any, limit=0, old
 
     while (!oldestUTC || lastTime >= oldestUTC) {
         const res = await axios.get(url, {
+            timeout: 15000,
             params: {
                 ...params,
                 before: lastTime,

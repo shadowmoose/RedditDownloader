@@ -10,6 +10,7 @@ import {DBPost, forkPost} from "../db";
 import extractLinks from "../../reddit/url-extractors";
 import DBDownload from "./db-download";
 import {SourceGroupInterface} from "../../../shared/source-interfaces";
+import {DownloaderState} from "../../util/state";
 
 
 @Entity({ name: 'source_groups' })
@@ -23,10 +24,10 @@ export default class DBSourceGroup extends DBEntity {
     @Column({ length: 36, nullable: false })
     color!: string;
 
-    @OneToMany(() => DBFilter, f => f.sourceGroup, {cascade: true, onDelete: 'CASCADE'})
+    @OneToMany(() => DBFilter, f => f.sourceGroup, {cascade: true})
     filters!: Promise<DBFilter[]>;
 
-    @OneToMany(() => DBSource, f => f.sourceGroup, {cascade: true, onDelete: 'CASCADE'})
+    @OneToMany(() => DBSource, f => f.sourceGroup, {cascade: true})
     sources!: Promise<DBSource[]>;
 
     /**
@@ -36,14 +37,16 @@ export default class DBSourceGroup extends DBEntity {
      *
      * The generator is an async function that will return the next Post from the each Source, if one is available.
      */
-    public async *getPostGenerator() {
+    public async *getPostGenerator(state: DownloaderState|null = null) {
         const filters = await this.filters;
         const sources = (await this.sources).map(s => makeSource(s)).filter(t=>!!t);
 
         for (const s of sources) {
+            if (state && state.shouldStop) return stop();
             const gen = s!.find();
 
-            yield* filterMap(gen, async post => {
+            yield* filterMap(gen, async (post, stop) => {
+                if (state && state.shouldStop) return stop();
                 const liveData: any = post.loadedData;
                 post = await dedupeExisting(post);
                 post.loadedData = liveData;

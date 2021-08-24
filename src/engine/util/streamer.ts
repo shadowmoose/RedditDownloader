@@ -3,8 +3,8 @@ const TIMEOUT = Symbol('timeout');
 const metaMap = new WeakMap<object, Record<string, DecoratorMetadata>>();
 
 export interface ProxyOpts {
-    onChange: (path: (string|number)[], target: any, newValue: any, metadata: DecoratorMetadata)=>void;
-    onDelete: (path: (string|number)[], metadata: DecoratorMetadata)=>void;
+    onChange: (path: (string|number)[], target: any, newValue: any, metadata: DecoratorMetadata|null)=>void;
+    onDelete: (path: (string|number)[], metadata: DecoratorMetadata|null)=>void;
 }
 export interface UpdateInfo {
     path: (string|number)[];
@@ -18,6 +18,7 @@ interface DecoratorMetadata {
     before?: boolean;
     after?: boolean;
     customData?: any;
+    transformer?: (arg: any)=>any;
 }
 interface TrackerData {
     timer: any;
@@ -58,11 +59,15 @@ export function proxify<T>(target: T, opts: ProxyOpts, tracker: (string|number)[
         },
         set(target: any, property, newValue) {
             if (target[property] === newValue) return true;
+            const currentMetadata: DecoratorMetadata|null = metadata || getMeta(property) || null;
+            if (currentMetadata?.transformer) {
+                newValue = currentMetadata.transformer(newValue);
+            }
             target[property] = newValue;
             if (!(Array.isArray(target) && property === 'length')) {
                 const prop = Number(property) in target ? Number(property) : property;
                 // Pass either the current metadata value, or attempt to look one up (if we're the root object)
-                opts.onChange(path(prop), target, newValue, metadata || getMeta(property));
+                opts.onChange(path(prop), target, newValue, currentMetadata);
             }
             return true;
         },
@@ -194,11 +199,11 @@ export class Streamer <T>{
         curr[TIMEOUT] = data;
     }
 
-    private onChange(path: (string | number)[], _target: any, _newValue: any, metadata: DecoratorMetadata) {
+    private onChange(path: (string | number)[], _target: any, _newValue: any, metadata: DecoratorMetadata|null) {
         this.setPending(path, false, metadata || {});
     }
 
-    private onDelete(path: (string | number)[], metadata: DecoratorMetadata) {
+    private onDelete(path: (string | number)[], metadata: DecoratorMetadata|null) {
         this.setPending(path, true, metadata || {});
     }
 
@@ -234,7 +239,7 @@ export class Streamer <T>{
      * A decorator, used to tag any properties in a Class that should be throttled.
      *
      * While awaiting this delay, subsequent updates to this property will not be scheduled.
-     * At the end of the delay, the latest value will be send.
+     * At the end of the delay, the latest value will be sent.
      */
     static delay(durationMS: number = 0) {
         return (targetClass: any, propertyKey: string) => {
@@ -275,6 +280,20 @@ export class Streamer <T>{
         return (targetClass: any, propertyKey: string) => {
             Streamer.setMetadata(targetClass, propertyKey, {
                 customData
+            });
+        }
+    }
+
+    /**
+     * A decorator, which wraps the given value.
+     *
+     * Whenever the value is reassigned, the given transformer function will first be run,
+     * and the value of the wrapped property will be set to the transformer function's output.
+     */
+    static transformer(syncFunction: (val: any) => any) {
+        return (targetClass: any, propertyKey: string) => {
+            Streamer.setMetadata(targetClass, propertyKey, {
+                transformer: syncFunction
             });
         }
     }

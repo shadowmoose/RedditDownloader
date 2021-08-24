@@ -6,9 +6,15 @@ import puppeteer from 'puppeteer';
 import express from "express";
 import * as ps from '../src/engine/reddit/pushshift';
 import {forGen} from "../src/engine/util/generator-util";
+import {makeDB} from "../src/engine/database/db";
 
 
 describe("Reddit Tests", () => {
+  beforeEach(async () => {
+    const conn = await makeDB();
+    await conn.synchronize(true);  // Rerun sync to drop & recreate existing tables.
+  });
+
   it("builds reddit gallery link", async () => {
     let sub = await rd.getSubmission('hrrh23');
     if (!sub) throw Error('Failed to locate Submission');

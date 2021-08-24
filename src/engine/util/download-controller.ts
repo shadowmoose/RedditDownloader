@@ -57,9 +57,10 @@ async function scanAll(state: DownloaderState) {
     state.newPostsScanned = 0;
 
     for (const g of groups) {
-        let found = await forGen(g.getPostGenerator(), async (ele, idx, stop) => {
+        let found = await forGen(g.getPostGenerator(state), async (ele, idx, stop) => {
             await ele.save();
             if (state.shouldStop) {
+                console.debug('Early exit from scan, due to state flag.')
                 return stop();
             }
             state.newPostsScanned ++;

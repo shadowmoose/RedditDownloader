@@ -1,13 +1,16 @@
 import {ClientCommand, ClientCommandTypes, ServerPacketTypes, SocketResponse} from "../../shared/socket-packets";
-import {SettingsInterface, DownloaderStateInterface, RMDStatus} from "../../shared/state-interfaces";
-import { observable } from "mobx"
+import {DownloaderStateInterface, RMDStatus, SettingsInterface} from "../../shared/state-interfaces";
+import {observable, reaction} from "mobx"
 import {SourceGroupInterface} from "../../shared/source-interfaces";
+import {useEffect, useState} from "react";
 
 let ws: WebSocket|null = null;
 let uid = 0;
 let setConnected: any;
-const awaitConnection = new Promise((res) => {
+let setFailed: any;
+let awaitConnection = new Promise((res, rej) => {
     setConnected = res;
+    setFailed = rej;
 });
 const pendingCommands: Record<number, Function[]> = {};
 
@@ -42,6 +45,30 @@ export const SETTINGS: SettingsInterface = {
 export const SOURCE_GROUPS: SourceGroupInterface[] = observable([]);
 
 
+/**
+ * A custom React Hook, which automatically tracks if RMD is ready to begin downloading.
+ */
+export function useRmdState() {
+    const [rmdState, setState] = useState(STATE.currentState);
+
+    useEffect(() => {
+        // Sets up the autorun and prints 0.
+        return reaction(
+            () => STATE.currentState,
+            status => {
+                setState(status);
+            }
+        );
+    });
+
+    return {
+        /** If RMD is in a state that is ready to begin downloading. */
+        rmdReady: [RMDStatus.FINISHED, RMDStatus.IDLE].includes(rmdState),
+        state: rmdState,
+        rmdConnected: rmdState !== RMDStatus.CLIENT_NOT_CONNECTED
+    };
+}
+
 /** Connect to the server's WebSocket, so that we can send or receive data. */
 export function connectWS() {
     disconnectWS();
@@ -51,14 +78,28 @@ export function connectWS() {
         handleMessage(packet);
     };
 
-    ws.onopen = setConnected;
+    ws.onopen = () => {
+        console.info('Connected to the RMD WebSocket!');
+        setConnected();
+    }
 
     ws.onclose = () => {
         console.warn('Disconnected from RMD websocket!');
+
+        STATE.currentState = RMDStatus.CLIENT_NOT_CONNECTED;
+        setFailed();
+
         for (const k of Object.keys(pendingCommands) as any) {
             failAck(k, 'Disconnected from RMD!');
         }
         ws = null;
+
+        awaitConnection = new Promise((res, rej) => {
+            setConnected = res;
+            setFailed = rej;
+        });
+
+        setTimeout(connectWS, 5000);
     }
 }
 
@@ -151,7 +192,7 @@ function onAck(packet: SocketResponse) {
     const idx = packet.uid || -1;
     const prom = pendingCommands[idx];
 
-    console.log('Got ack', packet, pendingCommands);
+    console.debug('Got ack', packet, pendingCommands);
     if (prom) {
         prom[2](); // Clear timer.
         delete pendingCommands[idx];

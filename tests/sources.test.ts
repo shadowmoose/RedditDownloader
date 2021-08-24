@@ -38,12 +38,6 @@ describe("Source Tests", () => {
         expect(src instanceof Source).toBeTruthy();
     });
 
-    it("coercion raises errors", async () => {
-        const dbs = DBSource.build({type: 'saved-posts', dataJSON: `{"getComments":"blargh"}`, id: 0, name: ""});
-
-        expect(() => new SavedPostSource().createFromDB(dbs)).toThrow();
-    });
-
     it("saved-posts source", async () => {
         const dbs = DBSource.build({type: 'saved-posts', dataJSON: `{"getComments":false}`, id: 0, name: ""});
         const src = makeSource(dbs);
@@ -59,7 +53,7 @@ describe("Source Tests", () => {
     });
 
     it("subreddit-posts source", async () => {
-        const dataJSON = JSON.stringify({ subreddit: 'news', type: 'top', time: 'all', limit: 10 });
+        const dataJSON = JSON.stringify({ subreddit: 'news', sort: 'top', time: 'all', limit: 10 });
         const dbs = DBSource.build({type: 'subreddit-posts', dataJSON, id: 0, name: ""});
         const src = makeSource(dbs);
 
