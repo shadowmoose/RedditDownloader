@@ -177,6 +177,23 @@ function failAck(uid: number, error: string) {
 }
 
 
+/**
+ * Remove the given Source from the Group. Client-side modification only.
+ * @param sourceGroupID
+ * @param sourceID
+ */
+export function removeSource(sourceGroupID: number, sourceID: number) {
+    const sg = SOURCE_GROUPS.find(sg => sg.id === sourceGroupID);
+    if (!sg) throw Error('Invalid source group ID for Source deletion!');
+    const idx = sg.sources.findIndex(s => s.id === sourceID);
+
+    if (idx >= 0) {
+        sg.sources.splice(idx);
+        console.log('Deleted source from group:', sourceID, JSON.stringify(sg, null, 2));
+    }
+}
+
+
 Object.assign(window, {
     debugState: () => JSON.parse(JSON.stringify(STATE)),
     debugSettings: () => SETTINGS,

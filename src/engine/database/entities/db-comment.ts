@@ -7,9 +7,10 @@ import DBDownload from "./db-download";
 import {DBEntity} from "./db-entity";
 import {PsComment} from "../../reddit/pushshift";
 import * as snoo from "../../reddit/snoo";
+import {CommentInterface} from "../../../shared/comment-interface";
 
 @Entity({ name: 'comments' })
-export default class DBComment extends DBEntity {
+export default class DBComment extends DBEntity implements CommentInterface{
     @PrimaryColumn()
     id!: string;
 

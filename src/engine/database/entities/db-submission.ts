@@ -5,10 +5,11 @@ import DBComment from "./db-comment";
 import DBDownload from "./db-download";
 import {DBEntity} from "./db-entity";
 import {PsSubmission} from "../../reddit/pushshift";
+import {SubmissionInterface} from "../../../shared/submission-interface";
 
 
 @Entity({ name: 'submissions' })
-export default class DBSubmission extends DBEntity {
+export default class DBSubmission extends DBEntity implements SubmissionInterface {
     @PrimaryColumn()
     id!: string;
 

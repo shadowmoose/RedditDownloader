@@ -36,7 +36,7 @@ const wsServer = new ws.Server({ noServer: true });
 /* Serve an index file. */
 app.use(express.static(path.resolve(path.dirname(__filename), '../../../dist/')));
 
-console.log(path.resolve(path.dirname(__filename), '../../../dist/'));
+console.log('Serving static files from:', path.resolve(path.dirname(__filename), '../../../dist/'));
 
 /* Serve downloaded files, using their ID. */
 app.get('/file/:id', async (req, res) => {
@@ -125,7 +125,7 @@ export async function launchServer(): Promise<Server> {
         const host = await DBSetting.get('serverHost');
         const port = await DBSetting.get('serverPort');
         const server = app.listen(port, host, () => {
-            console.debug(`Server listening on http://${host}:${port}`);
+            console.debug(`[ENTRYPOINT] Server listening on http://${host}:${port}`);
             res(server);
         });
 

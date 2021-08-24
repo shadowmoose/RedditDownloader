@@ -97,6 +97,7 @@
         "express": "^4.17.1",
         "get-urls": "^10.0.0",
         "imgur": "^0.3.2",
+        "material-ui-color-picker": "^3.5.1",
         "mime-types": "^2.1.29",
         "mobx": "^6.0.4",
         "mobx-react-lite": "^3.1.6",

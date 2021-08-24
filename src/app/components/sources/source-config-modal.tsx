@@ -1,9 +1,9 @@
 import {observer} from "mobx-react-lite";
 import React, {useMemo, useState} from "react";
 import {SourceInterface, SourceTypes} from "../../../shared/source-interfaces";
-import {Button, FormControl, InputLabel, makeStyles, Modal, Select, TextField} from "@material-ui/core";
+import {Button, FormControl, Grid, InputLabel, makeStyles, Modal, Select, TextField} from "@material-ui/core";
 import {createStyles, Theme} from "@material-ui/core/styles";
-import {sendCommand} from "../../app-util/app-socket";
+import {removeSource, sendCommand} from "../../app-util/app-socket";
 import {ClientCommandTypes} from "../../../shared/socket-packets";
 import {observable} from "mobx";
 import {SavedPostDataForm} from "./source-data-forms/saved-post-data-form";
@@ -36,7 +36,7 @@ function snapshot(obj: any) {
     return JSON.parse(JSON.stringify(obj));
 }
 
-export const SourceEditorModal = observer((props: {open: boolean, onClose: (saved: boolean)=>void, source: SourceInterface, sourceGroupID: number}) => {
+export const SourceConfigModal = observer((props: {open: boolean, onClose: (saved: boolean)=>void, source: SourceInterface, sourceGroupID: number}) => {
     const [saveIDX, setSaveIDX] = useState(0); // Exists simply to track when changes are committed.
     const ogConfigString = useMemo(() => {
         return JSON.stringify(props.source);
@@ -85,6 +85,16 @@ export const SourceEditorModal = observer((props: {open: boolean, onClose: (save
         });
     }
 
+    function deleteSource() {
+        removeSource(props.sourceGroupID, source.id);
+        sendCommand(ClientCommandTypes.DELETE_OBJECT, {
+            dbType: 'DBSource',
+            id: source.id
+        }).then(() => {
+            onClose();
+        });
+    }
+
     return <Modal
         open={props.open}
         onClose={onClose}
@@ -125,14 +135,25 @@ export const SourceEditorModal = observer((props: {open: boolean, onClose: (save
             {getSourceConfigPage(source.type, sourceData)}
             <Divider style={{marginBottom: '10px', marginTop: '10px'}}/>
 
-            <Button
-                disabled={!needsSave || !hasValidName}
-                variant="contained"
-                color="primary"
-                onClick = {saveSource}
-            >
-                Save
-            </Button>
+            <Grid container justify="space-between" >
+                <Button
+                    disabled={!needsSave || !hasValidName}
+                    variant="contained"
+                    color="primary"
+                    onClick = {saveSource}
+                >
+                    Save
+                </Button>
+
+                <Button
+                    disabled={source.id === undefined || source.id === null}
+                    variant="contained"
+                    color="secondary"
+                    onClick = {deleteSource}
+                >
+                    Delete
+                </Button>
+            </Grid>
         </div>
     </Modal>
 });

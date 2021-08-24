@@ -1,11 +1,12 @@
-import {Entity, Column, PrimaryGeneratedColumn, Index, ManyToOne} from 'typeorm';
+import {Column, Entity, Index, ManyToOne, PrimaryGeneratedColumn} from 'typeorm';
 import {DBEntity} from "./db-entity";
 import DBSourceGroup from "./db-source-group";
 import {DBPost} from "../db";
+import FilterInterface, {ComparatorKeyTypes, FilterComparatorFunctions} from "../../../shared/filter-interface";
 
 
 @Entity({ name: 'filters' })
-export default class DBFilter extends DBEntity {
+export default class DBFilter extends DBEntity implements FilterInterface {
     @PrimaryGeneratedColumn()
     id!: number;
 
@@ -24,7 +25,7 @@ export default class DBFilter extends DBEntity {
     field!: string;
 
     @Column({ type: 'varchar', length: 2 })
-    comparator!: ComparatorKeys;
+    comparator!: ComparatorKeyTypes;
 
     @Column({ type: 'text' })
     valueJSON!: string;
@@ -38,7 +39,7 @@ export default class DBFilter extends DBEntity {
     }
 
     validate (post: DBPost, url?: string): boolean {
-        const comp = comparators[this.comparator];
+        const comp = FilterComparatorFunctions[this.comparator];
         if (!comp) throw Error(`Invalid comparator value for filter: "${this.comparator}"!`)
         // @ts-ignore
         const val = this.field === 'url' ? url : post[this.field];
@@ -47,12 +48,3 @@ export default class DBFilter extends DBEntity {
     }
 }
 
-type ComparatorKeys = '>'|'<'|'='|'re';
-type Comparator = (val1: any, val2: any) => boolean;
-
-export const comparators: Record<ComparatorKeys, Comparator> = {
-    '>': (val1, val2) => {return val1 > val2},
-    '<': (val1, val2) => {return val1 < val2},
-    '=': (val1, val2) => {return val1 == val2},
-    're': (val1, val2) => {return Boolean(`${val1}`.match(new RegExp(val2, 'gmi')))},
-}

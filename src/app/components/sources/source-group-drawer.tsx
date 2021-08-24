@@ -16,8 +16,8 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import DragIndicatorIcon from '@material-ui/icons/DragIndicator';
 import {SourceGroupInterface, SourceInterface, SourceTypes} from "../../../shared/source-interfaces";
-import {SourceEditorModal} from "./source-editor-modal";
-import {observable} from "mobx";
+import {SourceConfigModal} from "./source-config-modal";
+import {SourceGroupConfigModal} from "./source-group-config-modal";
 
 
 export const SourceGroupDrawer = observer(() => {
@@ -62,6 +62,7 @@ export const SourceGroupDrawer = observer(() => {
 export const SourceGroupEle = observer((props: {sourceGroup: SourceGroupInterface}) => {
     const sg = props.sourceGroup;
     const [newSource, setNewSource] = useState<SourceInterface|null>(null);
+    const [edit, setEdit] = useState(false);
 
     const sources = sg.sources.map((s: any, idx: number) => {
         return <SourceDraggableEle source={s} key={s.id} idx={idx} sourceGroupID={sg.id} />
@@ -80,68 +81,79 @@ export const SourceGroupEle = observer((props: {sourceGroup: SourceGroupInterfac
 
     function onEditorClose(saved: boolean) {
         if (newSource && !saved) {
-            console.log('Cancelled new source!')
-            sg.sources.splice(sg.sources.findIndex(s=>s.id === newSource.id), 1);
+            console.log('Cancelled new source!');
+            const idx = sg.sources.findIndex(s=>s.id === newSource.id);
+            if (idx >= 0) {
+                sg.sources.splice(sg.sources.findIndex(s=>s.id === newSource.id), 1);
+            }
         }
         setNewSource(null);
     }
 
-    return <Accordion
-        className={'SourceGroupEle'}
-        TransitionProps={{ unmountOnExit: true }}
-        defaultExpanded={true}
-        style={{background: sg.color}}
-    >
-        {newSource && <SourceEditorModal open={!!newSource} onClose={onEditorClose} source={newSource} sourceGroupID={sg.id} />}
-        <AccordionSummary expandIcon={<ExpandMoreIcon />} >
-            <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexDirection: "row",
-                width: '100%'
-            }}>
-                <Typography variant="h5" noWrap>
-                    {sg.name}
-                </Typography>
+    return <>
+        <Accordion
+            className={'SourceGroupEle'}
+            TransitionProps={{ unmountOnExit: true }}
+            defaultExpanded={true}
+            style={{background: sg.color}}
+        >
+            {newSource && <SourceConfigModal open={!!newSource} onClose={onEditorClose} source={newSource} sourceGroupID={sg.id} />}
+            <AccordionSummary expandIcon={<ExpandMoreIcon />} >
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexDirection: "row",
+                    width: '100%'
+                }}>
+                    <Typography variant="h5" noWrap>
+                        {sg.name}
+                    </Typography>
 
-                <div
-                    className={'sourceGroupControls'}
-                    style={{
-                        marginLeft: 'auto'
-                    }}
-                >
-                    <Tooltip title="Configure Source Group">
-                        <SettingsIcon
-                            fontSize={'large'}
-                        />
-                    </Tooltip>
-                </div>
-            </div>
-        </AccordionSummary>
-
-        <AccordionDetails>
-            <Droppable key={sg.id} droppableId={`${sg.id}`}>
-                {(provided, snapshot) => (
                     <div
-                        ref={provided.innerRef}
-                        style={{...getListStyle(snapshot.isDraggingOver), width: '100%' }}
-                        {...provided.droppableProps}
+                        className={'sourceGroupControls'}
+                        style={{
+                            marginLeft: 'auto'
+                        }}
                     >
-                        {sources}
-                        {provided.placeholder}
-                        <Button
-                            variant="outlined"
-                            style={{marginTop: '10px', marginBottom: '4px'}}
-                            onClick={addNewSource}
-                        >
-                            Add Source
-                        </Button>
+                        <Tooltip title="Configure Source Group">
+                            <IconButton color="primary" aria-label="source group settings" component="span" onClick={(e: any)=>{
+                                e.stopPropagation();
+                                setEdit(true);
+                            }}>
+                                <SettingsIcon
+                                    fontSize={'large'}
+                                />
+                            </IconButton>
+                        </Tooltip>
                     </div>
-                )}
-            </Droppable>
-        </AccordionDetails>
-    </Accordion>
+                </div>
+            </AccordionSummary>
+
+            <AccordionDetails>
+                <Droppable key={sg.id} droppableId={`${sg.id}`}>
+                    {(provided, snapshot) => (
+                        <div
+                            ref={provided.innerRef}
+                            style={{...getListStyle(snapshot.isDraggingOver), width: '100%' }}
+                            {...provided.droppableProps}
+                        >
+                            {sources}
+                            {provided.placeholder}
+                            <Button
+                                variant="outlined"
+                                style={{marginTop: '10px', marginBottom: '4px'}}
+                                onClick={addNewSource}
+                            >
+                                Add Source
+                            </Button>
+                        </div>
+                    )}
+                </Droppable>
+            </AccordionDetails>
+        </Accordion>
+        <SourceGroupConfigModal open={edit} onClose={()=>setEdit(false)} sourceGroup={sg} />
+    </>
 })
 
 
@@ -219,7 +231,7 @@ export const SourceControlButtons = (props: {source: SourceInterface, visible: b
             }}
         >
             <Tooltip title="Configure Source" TransitionComponent={Fade} TransitionProps={{ timeout: 0 }}>
-                <IconButton color="primary" aria-label="upload picture" component="span" onClick={()=>setEdit(true)}>
+                <IconButton color="primary" aria-label="source settings" component="span" onClick={()=>setEdit(true)}>
                     <SettingsIcon
                         fontSize={'small'}
                     />
@@ -231,7 +243,7 @@ export const SourceControlButtons = (props: {source: SourceInterface, visible: b
                 />
             </Tooltip>
         </div>
-        {edit && <SourceEditorModal open={edit} onClose={() => setEdit(false)} source={props.source} sourceGroupID={props.sourceGroupID}/>}
+        {edit && <SourceConfigModal open={edit} onClose={() => setEdit(false)} source={props.source} sourceGroupID={props.sourceGroupID}/>}
     </>
 }
 

@@ -1,3 +1,4 @@
+import FilterInterface from "./filter-interface";
 
 export enum SourceTypes {
     SAVED_POSTS = 'saved-posts',
@@ -18,7 +19,7 @@ export interface SourceGroupInterface {
     name: string;
     id: number;
     color: string;
-    filters: any[]; // TODO: Add filter interface.
+    filters: FilterInterface[];
     sources: SourceInterface[];
 }
 

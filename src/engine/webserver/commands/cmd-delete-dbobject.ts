@@ -12,7 +12,7 @@ export class CommandDeleteDBObject extends Command {
     type = ClientCommandTypes.DELETE_OBJECT;
 
     async handle(pkt: ClientCommand, broadcast: (message: SocketResponse)=>void): Promise<any> {
-        const {id, dbType} = pkt.data.dbType;
+        const {id, dbType} = pkt.data;
         const dbClass = getClass(dbType);
 
         return dbClass.delete({ id });

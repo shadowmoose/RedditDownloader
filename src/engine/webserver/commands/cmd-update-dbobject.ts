@@ -33,7 +33,7 @@ export class CommandUpdateDBObject extends Command {
 
         await dbInstance.save();
 
-        return `${existing ? 'Updated' : 'Created'} ${dbInstance.id}`;
+        return {status: existing ? 'Updated' : 'Created', id: dbInstance.id };
     }
 }
 
