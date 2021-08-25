@@ -83,6 +83,7 @@ export async function* scan<T extends PsType>(type: T, params: any, limit=0, old
                 sort: 'desc'
             }
         }).then(res => res.data);
+
         const posts: PsTypeConversion<T>[] = res.data.filter((p: PsPost) => {
             p.id = type === 'submission' ? `t3_${p.id}` : `t1_${p.id}`;
             return !ignore.has(p.id)

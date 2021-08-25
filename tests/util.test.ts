@@ -110,6 +110,8 @@ describe('Utility Tests', () => {
         }
         const streamer = new Streamer(new Test());
         const s = streamer.state;
+
+        streamer.setSender(()=>{});
         s.num = 1337;
 
         expect(s.num).toEqual('string-1337');

@@ -67,14 +67,19 @@ describe("Reddit Tests", () => {
 
 
 describe('PushShift Tests', () => {
+  beforeEach(async () => {
+    const conn = await makeDB();
+    await conn.synchronize(true);  // Rerun sync to drop & recreate existing tables.
+  });
+
   it('User ps comments', async() => {
     const seen = new Set();
-    const count = await forGen(ps.getUserComments('theshadowmoose'), p => {
+    const count = await forGen(ps.getUserComments('spez', 5), p => {
       expect(seen.has(p.id)).toBeFalsy();  // No duplicates should be yielded per-scan.
       seen.add(p.id);
     });
 
-    expect(count).toBeGreaterThan(190);
+    expect(count).toBeGreaterThan(4);
   });
 
   it("builds ps reddit gallery link", async () => {
@@ -88,12 +93,12 @@ describe('PushShift Tests', () => {
 
   it('User ps submissions', async() => {
     const seen = new Set();
-    const count = await forGen(ps.getUserSubmissions('theshadowmoose'), p => {
+    const count = await forGen(ps.getUserSubmissions('spez', 5), p => {
       expect(seen.has(p.id)).toBeFalsy();  // No duplicates should be yielded per-scan.
       seen.add(p.id);
     });
 
-    expect(count).toBeGreaterThan(7);
+    expect(count).toBeGreaterThan(4);
   })
 
   it('Subreddit ps submissions', async() => {
@@ -136,9 +141,11 @@ describe('PushShift Tests', () => {
   })
 
   it("comments are equal", async () => {
-    let pssub: any = await ps.getComment('egna1xi');
-    let rsub: any = await getComment('egna1xi');
+    let pssub: any = JSON.parse(JSON.stringify(await ps.getComment('egna1xi')));
+    let rsub: any = JSON.parse(JSON.stringify(await getComment('egna1xi')));
 
+    delete pssub['__parentSubmission__']['loadedData'];
+    delete rsub['__parentSubmission__']['loadedData'];
     delete pssub['loadedData'];
     delete rsub['loadedData'];
     delete pssub['firstFoundUTC'];
@@ -148,7 +155,8 @@ describe('PushShift Tests', () => {
     delete pssub['fromPushshift'];
     delete rsub['fromPushshift'];
 
-    expect(JSON.stringify(pssub, null, 4)).toEqual(JSON.stringify(rsub, null, 4));
+    expect(pssub).toEqual(rsub);
+    expect(pssub.parentSubmission).toBe(rsub.parentSubmission); // The same comments should have the same parent.
   })
 });
 
