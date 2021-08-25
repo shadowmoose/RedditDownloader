@@ -2,10 +2,10 @@ import * as urlp from 'url';
 import Downloader from "./download-wrapper";
 import {DownloaderData, DownloaderFunctions} from "../downloaders";
 import {downloadMedia, getJSON} from "../../util/http";
-import {DownloadProgress} from "../../util/state";
+import {DownloadProgress} from "../../core/state";
 import * as ytdl from "../ytdl";
 import path from "path";
-import {isTest} from "../../util/config";
+import {isTest} from "../../core/config";
 
 
 const formatOpts = ["mp4Url", "mp4", "webm", "webp", "largeGif"];

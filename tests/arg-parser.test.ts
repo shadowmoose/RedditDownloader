@@ -1,5 +1,5 @@
-import * as args from '../src/engine/util/arg-parser';
-import {ARG_TYPES, ArgCommand, ArgOption, Parser} from '../src/engine/util/arg-parser';
+import * as args from '../src/engine/terminal/arg-parser';
+import {ARG_TYPES, ArgCommand, ArgOption, Parser} from '../src/engine/terminal/arg-parser';
 
 
 describe('Argument Parser Tests', () => {

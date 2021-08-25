@@ -1,11 +1,11 @@
 import fs from "fs";
-import * as ytdl from "../../src/engine/downloaders/ytdl";
-import {getAbsoluteDL} from '../../src/engine/util/paths';
-import {getNextPendingDownload, handleDownload} from "../../src/engine/downloaders/downloaders";
+import * as ytdl from "../../src/engine/downloading/ytdl";
+import {getAbsoluteDL} from '../../src/engine/core/paths';
+import {getNextPendingDownload, handleDownload} from "../../src/engine/downloading/downloaders";
 import {makeDB} from "../../src/engine/database/db";
 import DBSubmission from "../../src/engine/database/entities/db-submission";
 import DBDownload from "../../src/engine/database/entities/db-download";
-import {DownloadProgress} from "../../src/engine/util/state";
+import {DownloadProgress} from "../../src/engine/core/state";
 import DBFile from "../../src/engine/database/entities/db-file";
 
 

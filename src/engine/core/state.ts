@@ -1,4 +1,4 @@
-import {Streamer} from "./streamer";
+import {Streamer} from "../util/streamer";
 import {DownloadSubscriber} from "../database/entities/db-download";
 import {DownloaderProgressInterface, DownloaderStateInterface, RMDStatus} from "../../shared/state-interfaces";
 
@@ -26,7 +26,7 @@ export class DownloaderState implements DownloaderStateInterface{
         this.activeDownloads.forEach(a => {
             if (a) a.shouldStop = true
         });
-        DownloadSubscriber.flush();
+        DownloadSubscriber.toggle(false);
     }
 
     isRunning() {

@@ -1,7 +1,7 @@
-import {DownloaderData, DownloaderFunctions} from "../../src/engine/downloaders/downloaders";
+import {DownloaderData, DownloaderFunctions} from "../../src/engine/downloading/downloaders";
 import DBSubmission from "../../src/engine/database/entities/db-submission";
-import {getAbsoluteDL} from "../../src/engine/util/paths";
-import {GracefulStopError, InvalidDownloaderError} from "../../src/engine/downloaders/wrappers/download-wrapper";
+import {getAbsoluteDL} from "../../src/engine/core/paths";
+import {GracefulStopError, InvalidDownloaderError} from "../../src/engine/downloading/downloader-wrappers/download-wrapper";
 
 /** Generate a mock DownloaderData object for testing. */
 export async function mockDownloadData(url: string): Promise<DownloaderData> {

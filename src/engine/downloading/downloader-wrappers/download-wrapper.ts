@@ -1,5 +1,5 @@
 import {DownloaderData, DownloaderFunctions} from "../downloaders";
-import {DownloadProgress} from "../../util/state";
+import {DownloadProgress} from "../../core/state";
 
 
 export default abstract class Downloader {

@@ -1,6 +1,6 @@
 import {getJSON} from "../util/http";
 import * as child_process from 'child_process';
-import {sharedPath} from "../util/paths";
+import {sharedPath} from "../core/paths";
 import path from 'path';
 import * as os from "os";
 import axios from "axios";

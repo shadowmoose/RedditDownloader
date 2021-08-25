@@ -1,21 +1,21 @@
-import {buildFile} from "./dl-file-processing";
+import {buildFile} from "../file-processing/dl-file-processing";
 import DBDownload, {DownloadSubscriber} from "../database/entities/db-download";
 import promisePool, {mutex} from "../util/promise-pool";
 import DBSetting from "../database/entities/db-setting";
-import {makeName} from "../util/name-generator";
+import {makeName} from "../file-processing/name-generator";
 import {DBPost} from "../database/db";
 import DBUrl from "../database/entities/db-url";
-import Downloader, {GracefulStopError, InvalidDownloaderError} from "./wrappers/download-wrapper";
+import Downloader, {GracefulStopError, InvalidDownloaderError} from "./downloader-wrappers/download-wrapper";
 import {v4} from "uuid";
-import {DownloaderState, DownloadProgress} from "../util/state";
-import YtdlDownloader from "./wrappers/ytdl-downloader";
-import {getAbsoluteDL} from "../util/paths";
-import {DirectDownloader} from "./wrappers/direct-downloader";
-import {ImgurDownloader} from "./wrappers/imgur-downloader";
-import {isTest} from "../util/config";
+import {DownloaderState, DownloadProgress} from "../core/state";
+import YtdlDownloader from "./downloader-wrappers/ytdl-downloader";
+import {getAbsoluteDL} from "../core/paths";
+import {DirectDownloader} from "./downloader-wrappers/direct-downloader";
+import {ImgurDownloader} from "./downloader-wrappers/imgur-downloader";
+import {isTest} from "../core/config";
 import DBFile from "../database/entities/db-file";
-import {GfycatDownloader} from "./wrappers/gfycat-downloader";
-import {RedditGalleryDownloader} from "./wrappers/reddit-gallery";
+import {GfycatDownloader} from "./downloader-wrappers/gfycat-downloader";
+import {RedditGalleryDownloader} from "./downloader-wrappers/reddit-gallery";
 
 
 let downloadList: Downloader[] = [];

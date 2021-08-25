@@ -1,7 +1,7 @@
 import * as urlp from 'url';
 import Downloader from "./download-wrapper";
 import {DownloaderData, DownloaderFunctions} from "../downloaders";
-import {DownloadProgress} from "../../util/state";
+import {DownloadProgress} from "../../core/state";
 import * as http from "../../util/http";
 import * as snoo from "../../reddit/snoo";
 import * as ps from '../../reddit/pushshift';

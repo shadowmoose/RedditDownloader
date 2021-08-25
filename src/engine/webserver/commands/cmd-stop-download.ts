@@ -1,6 +1,6 @@
 import Command from "./command";
 import {ClientCommand, ClientCommandTypes, SocketResponse} from "../../../shared/socket-packets";
-import * as dl from "../../util/download-controller";
+import * as dl from "../../core/download-controller";
 
 /**
  * Signals to all running downloads that they should resolve ASAP, by toggling the "shouldStop" state value.

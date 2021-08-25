@@ -1,10 +1,10 @@
 import {promises as fsPromises} from 'fs';
 import path from 'path';
 import {DownloaderState} from "./state";
-import {SendFunction, Streamer} from "./streamer";
-import {downloadAll} from "../downloaders/downloaders";
+import {SendFunction, Streamer} from "../util/streamer";
+import {downloadAll} from "../downloading/downloaders";
 import DBSourceGroup from "../database/entities/db-source-group";
-import {forGen} from "./generator-util";
+import {forGen} from "../util/generator-util";
 import {isTest} from "./config";
 import {DownloadSubscriber} from "../database/entities/db-download";
 import {baseDownloadDir} from "./paths";

@@ -1,10 +1,10 @@
-import * as ytdl from "../../src/engine/downloaders/ytdl";
+import * as ytdl from "../../src/engine/downloading/ytdl";
 import fs from "fs";
-import {checkFFMPEGDownload, ffmpegPath, getFFMPEGVersion} from "../../src/engine/downloaders/ffmpeg";
-import {getAbsoluteDL} from "../../src/engine/util/paths";
+import {checkFFMPEGDownload, ffmpegPath, getFFMPEGVersion} from "../../src/engine/file-processing/ffmpeg";
+import {getAbsoluteDL} from "../../src/engine/core/paths";
 import {mockDownloadData, mockDownloaderFunctions} from "./test-util";
-import {DownloadProgress} from "../../src/engine/util/state";
-import YtdlDownloader from "../../src/engine/downloaders/wrappers/ytdl-downloader";
+import {DownloadProgress} from "../../src/engine/core/state";
+import YtdlDownloader from "../../src/engine/downloading/downloader-wrappers/ytdl-downloader";
 
 
 describe('YTDL Library Tests', () => {

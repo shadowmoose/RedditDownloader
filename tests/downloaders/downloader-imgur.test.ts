@@ -1,5 +1,5 @@
-import {ImgurDownloader} from "../../src/engine/downloaders/wrappers/imgur-downloader";
-import {DownloadProgress} from "../../src/engine/util/state";
+import {ImgurDownloader} from "../../src/engine/downloading/downloader-wrappers/imgur-downloader";
+import {DownloadProgress} from "../../src/engine/core/state";
 import {mockDownloadData, mockDownloaderFunctions} from "./test-util";
 
 

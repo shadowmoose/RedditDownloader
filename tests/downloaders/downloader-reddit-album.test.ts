@@ -1,6 +1,6 @@
 import {mockDownloadData, mockDownloaderFunctions} from "./test-util";
-import {DownloadProgress} from "../../src/engine/util/state";
-import {RedditGalleryDownloader} from "../../src/engine/downloaders/wrappers/reddit-gallery";
+import {DownloadProgress} from "../../src/engine/core/state";
+import {RedditGalleryDownloader} from "../../src/engine/downloading/downloader-wrappers/reddit-gallery";
 
 
 describe('Reddit Album Download Tests', () => {

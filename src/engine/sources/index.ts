@@ -21,5 +21,5 @@ export function makeSource(dbo: DBSource) {
             return s.createFromDB(dbo);
         }
     }
-    throw Error(`Unknown SB Source type: "${dbo.type}"!`);
+    throw Error(`Unknown Source type: "${dbo.type}"!`);
 }

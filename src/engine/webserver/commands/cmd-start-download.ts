@@ -1,7 +1,7 @@
 import Command from "./command";
 import {ClientCommand, ClientCommandTypes, ServerPacketTypes, SocketResponse} from "../../../shared/socket-packets";
-import * as dl from "../../util/download-controller";
-import {scanAndDownload} from "../../util/download-controller";
+import * as dl from "../../core/download-controller";
+import {scanAndDownload} from "../../core/download-controller";
 
 /**
  * Starts a new download if not already running, and attaches it to the broadcast functionality the webserver is using.

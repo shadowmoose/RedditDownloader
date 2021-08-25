@@ -1,5 +1,5 @@
-import {GfycatDownloader} from "../../src/engine/downloaders/wrappers/gfycat-downloader";
-import {DownloadProgress} from "../../src/engine/util/state";
+import {GfycatDownloader} from "../../src/engine/downloading/downloader-wrappers/gfycat-downloader";
+import {DownloadProgress} from "../../src/engine/core/state";
 import {mockDownloadData, mockDownloaderFunctions} from "./test-util";
 
 

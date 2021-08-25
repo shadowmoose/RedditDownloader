@@ -10,7 +10,7 @@ import {DBPost, forkPost} from "../db";
 import extractLinks from "../../reddit/url-extractors";
 import DBDownload from "./db-download";
 import {SourceGroupInterface} from "../../../shared/source-interfaces";
-import {DownloaderState} from "../../util/state";
+import {DownloaderState} from "../../core/state";
 
 
 @Entity({ name: 'source_groups' })

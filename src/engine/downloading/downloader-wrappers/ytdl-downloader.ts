@@ -1,7 +1,7 @@
 import path from 'path';
 import Downloader from "./download-wrapper";
 import {DownloaderData, DownloaderFunctions} from "../downloaders";
-import {DownloadProgress} from "../../util/state";
+import {DownloadProgress} from "../../core/state";
 import * as ytdl from '../ytdl';
 
 

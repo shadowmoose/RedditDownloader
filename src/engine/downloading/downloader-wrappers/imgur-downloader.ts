@@ -1,11 +1,11 @@
 import * as urlp from 'url';
 import Downloader from "./download-wrapper";
 import {DownloaderData, DownloaderFunctions} from "../downloaders";
-import {DownloadProgress} from "../../util/state";
+import {DownloadProgress} from "../../core/state";
 import * as http from "../../util/http";
 import path from 'path';
 import DBSetting from "../../database/entities/db-setting";
-import {isTest} from "../../util/config";
+import {isTest} from "../../core/config";
 const imgur = require('imgur');
 
 export class ImgurDownloader extends Downloader {

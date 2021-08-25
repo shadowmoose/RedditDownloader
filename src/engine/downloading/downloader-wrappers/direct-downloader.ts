@@ -1,6 +1,6 @@
 import Downloader from "./download-wrapper";
 import {DownloaderData, DownloaderFunctions} from "../downloaders";
-import {DownloadProgress} from "../../util/state";
+import {DownloadProgress} from "../../core/state";
 import axios from "axios";
 import {getMediaMimeExtension, downloadMedia} from "../../util/http";
 

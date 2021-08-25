@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import {Connection, createConnection} from "typeorm";
-import { envDataPath } from "../util/paths";
+import { envDataPath } from "../core/paths";
 import DBSubmission from "./entities/db-submission";
 import DBComment from "./entities/db-comment";
 import DBDownload, {DownloadSubscriber} from "./entities/db-download";

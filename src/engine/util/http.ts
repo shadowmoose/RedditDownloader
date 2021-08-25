@@ -1,9 +1,9 @@
 import fs from "fs";
 import axios, {AxiosRequestConfig} from "axios";
-import {mkParents} from "./paths";
+import {mkParents} from "../core/paths";
 import * as mime from 'mime-types';
-import {DownloadProgress} from "./state";
-import {GracefulStopError} from "../downloaders/wrappers/download-wrapper";
+import {DownloadProgress} from "../core/state";
+import {GracefulStopError} from "../downloading/downloader-wrappers/download-wrapper";
 
 
 export async function downloadBinary (url: string, filePath: string): Promise<string> {

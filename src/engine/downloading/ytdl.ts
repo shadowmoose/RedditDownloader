@@ -1,13 +1,13 @@
 import axios from 'axios';
-import {sharedPath, mkParents} from "../util/paths";
+import {sharedPath, mkParents} from "../core/paths";
 import {downloadBinary} from "../util/http";
 import * as fs from "fs";
 import path from 'path';
 import crypto from 'crypto';
 import {ChildProcess} from "child_process";
-import {DownloadProgress} from "../util/state";
-import {GracefulStopError} from "./wrappers/download-wrapper";
-import {checkFFMPEGDownload, ffmpegPath} from "./ffmpeg";
+import {DownloadProgress} from "../core/state";
+import {GracefulStopError} from "./downloader-wrappers/download-wrapper";
+import {checkFFMPEGDownload, ffmpegPath} from "../file-processing/ffmpeg";
 const YoutubeDlWrap = require("youtube-dl-wrap");
 
 const isWin = process.platform === 'win32' || process.env.NODE_PLATFORM === 'windows';

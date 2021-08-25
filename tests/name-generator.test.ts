@@ -1,9 +1,9 @@
-import * as gen from '../src/engine/util/name-generator'
+import * as gen from '../src/engine/file-processing/name-generator'
 import {getComment, getSubmission} from "../src/engine/reddit/snoo";
 import DBDownload from "../src/engine/database/entities/db-download";
 import {makeDB} from "../src/engine/database/db";
-import {getAbsoluteDL} from "../src/engine/util/paths";
-import {MAX_NAME_LEN} from "../src/engine/util/name-generator";
+import {getAbsoluteDL} from "../src/engine/core/paths";
+import {MAX_NAME_LEN} from "../src/engine/file-processing/name-generator";
 import DBUrl from "../src/engine/database/entities/db-url";
 import DBFile from "../src/engine/database/entities/db-file";
 

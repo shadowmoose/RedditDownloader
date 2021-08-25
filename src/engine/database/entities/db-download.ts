@@ -125,7 +125,7 @@ export class DownloadSubscriber implements EntitySubscriberInterface<DBDownload>
     /**
      * Return `undefined` to all pending listeners.
      */
-    public static flush() {
+    private static flush() {
         let cb;
         while (cb = this.waiting.shift()) cb(undefined);
     }

@@ -1,5 +1,5 @@
-import {DirectDownloader} from "../../src/engine/downloaders/wrappers/direct-downloader";
-import {DownloadProgress} from "../../src/engine/util/state";
+import {DirectDownloader} from "../../src/engine/downloading/downloader-wrappers/direct-downloader";
+import {DownloadProgress} from "../../src/engine/core/state";
 import {mockDownloadData, mockDownloaderFunctions} from "./test-util";
 
 

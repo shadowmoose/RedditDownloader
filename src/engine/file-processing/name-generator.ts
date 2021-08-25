@@ -1,10 +1,10 @@
 import DBSubmission from "../database/entities/db-submission";
 import DBComment from "../database/entities/db-comment";
 import DBDownload from "../database/entities/db-download";
-import {getAbsoluteDL} from "./paths";
+import {getAbsoluteDL} from "../core/paths";
 import DBFile from "../database/entities/db-file";
 import {forkPost} from "../database/db";
-import {mutex} from "./promise-pool";
+import {mutex} from "../util/promise-pool";
 const sanitize = require('sanitize-filename');
 
 export const MAX_NAME_LEN = 240;
