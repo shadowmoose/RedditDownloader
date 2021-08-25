@@ -43,7 +43,8 @@ export default class DBSourceGroup extends DBEntity {
 
         for (const s of sources) {
             if (state && state.shouldStop) return stop();
-            const gen = s!.find();
+            if (state) state.currentSource = s.alias;
+            const gen = s.find();
 
             yield* filterMap(gen, async (post, stop) => {
                 if (state && state.shouldStop) return stop();

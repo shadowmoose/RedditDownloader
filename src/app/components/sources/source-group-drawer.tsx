@@ -279,7 +279,7 @@ export const SourceGroupEle = observer((props: {sourceGroup: SourceGroupInterfac
                 </Droppable>
             </AccordionDetails>
         </Accordion>
-        <SourceGroupConfigModal open={edit} onClose={()=>setEdit(false)} sourceGroup={sg} />
+        {edit && <SourceGroupConfigModal open={edit} onClose={()=>setEdit(false)} sourceGroup={sg} />}
     </>
 })
 
@@ -344,7 +344,7 @@ const SourceEle = observer((props: {source: SourceInterface, provided: Draggable
     </div>
 })
 
-export const SourceControlButtons = (props: {source: SourceInterface, visible: boolean, sourceGroupID: number}) => {
+export const SourceControlButtons = observer((props: {source: SourceInterface, visible: boolean, sourceGroupID: number}) => {
     const [edit, setEdit] = useState(false);
 
     return <>
@@ -372,7 +372,7 @@ export const SourceControlButtons = (props: {source: SourceInterface, visible: b
         </div>
         {edit && <SourceConfigModal open={edit} onClose={() => setEdit(false)} source={props.source} sourceGroupID={props.sourceGroupID}/>}
     </>
-}
+});
 
 /**
  * Create a blank Source with a new unique ID, which should be configured by the user.

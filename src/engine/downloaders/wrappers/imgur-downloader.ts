@@ -79,6 +79,7 @@ export class ImgurDownloader extends Downloader {
 
     async download(data: DownloaderData, actions: DownloaderFunctions, progress: DownloadProgress): Promise<string | void> {
         if (!this.isAlbum(data.url)) {
+            progress.status = 'Downloading from imgur.';
             try {
                 return await http.downloadMedia(await this.buildDirectURL(data.url), data.file, progress);
             } catch (err) {
@@ -91,6 +92,8 @@ export class ImgurDownloader extends Downloader {
             const albumKey = match ? match[4] : null;
 
             if (!albumKey) return actions.markInvalid('Failed to extract album key from URL.');
+
+            progress.status = 'Extracting imgur album URLs...';
 
             let urls: string[] = [];
             const found = await this.extractAlbumLinks(albumKey);

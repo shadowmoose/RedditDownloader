@@ -6,6 +6,7 @@ import {SourceTypes} from "../../shared/source-interfaces";
 export default abstract class Source {
     protected abstract data: any;
     public readonly abstract type: SourceTypes;
+    public alias: string = '';
 
     /**
      * Find the next post that this Source has available.
@@ -19,6 +20,7 @@ export default abstract class Source {
     public createFromDB(src: DBSource): this {
         const rt = Object.create(Object.getPrototypeOf(this));
         rt.data = src.data;
+        rt.alias = src.name;
         return rt;
     }
 }

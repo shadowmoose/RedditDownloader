@@ -8,23 +8,19 @@ import Drawer from '@material-ui/core/Drawer';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
-import List from '@material-ui/core/List';
 import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import InboxIcon from '@material-ui/icons/MoveToInbox';
-import MailIcon from '@material-ui/icons/Mail';
+import ViewListIcon from '@material-ui/icons/ViewList';
 import {SourceGroupDrawer} from "./components/sources/source-group-drawer";
-import {Fab, Grid} from "@material-ui/core";
+import {CircularProgress, Fab, Grid, Popper, Tooltip} from "@material-ui/core";
 import GetAppIcon from '@material-ui/icons/GetApp';
 import CancelIcon from '@material-ui/icons/Cancel';
 import {ClientCommandTypes} from "../shared/socket-packets";
+import {RMDStatus} from "../shared/state-interfaces";
+import {StateDropdown} from "./components/state-display/state-dropdown";
 
 
 configure({
@@ -45,8 +41,8 @@ const useStyles = makeStyles((theme: Theme) =>
             }),
         },
         appBarShift: {
-            width: `calc(100% - ${drawerWidth*2}px)`,
-            marginRight: drawerWidth,
+            width: `calc(100% - ${drawerWidth}px)`,
+            marginLeft: drawerWidth,
             transition: theme.transitions.create(['margin', 'width'], {
                 easing: theme.transitions.easing.easeOut,
                 duration: theme.transitions.duration.enteringScreen,
@@ -91,6 +87,43 @@ const useStyles = makeStyles((theme: Theme) =>
             }),
             marginLeft: 0,
         },
+        progressPopover: {
+            display: 'flex',
+            alignItems: 'center',
+            padding: theme.spacing(0, 1),
+            // necessary for content to be below app bar
+            ...theme.mixins.toolbar,
+            justifyContent: 'flex-end',
+        },
+        progressButtonWrapper: {
+            marginLeft: theme.spacing(1),
+            position: 'relative',
+            display: 'inline-block'
+        },
+        progressButtonClosed: {
+            width: 48,
+            height: 48,
+            backgroundColor: '#5fa9dc',
+            '&:hover': {
+                backgroundColor: '#4e84ac',
+            },
+        },
+        progressButtonOpen: {
+            width: 48,
+            height: 48,
+            backgroundColor: '#4e84ac',
+            '&:hover': {
+                backgroundColor: '#5fa9dc',
+            },
+        },
+        fabProgress: {
+            color: 'rgb(68,236,61)',
+            position: 'absolute',
+            top: -6,
+            left: -6,
+            zIndex: 1,
+            pointerEvents: 'none'
+        },
     }),
 );
 
@@ -103,7 +136,7 @@ const StateDebug = observer(() => {
 })
 
 const App = () => {
-    const {rmdReady, rmdConnected} = useRmdState();
+    const {rmdReady, rmdConnected, rmdState} = useRmdState();
     useEffect(() => {
         connectWS();
 
@@ -113,6 +146,8 @@ const App = () => {
     const classes = useStyles();
     const theme = useTheme();
     const [open, setOpen] = React.useState(true);
+    const progBtnRef: any = React.useRef();
+    const [progressAnchorEl, setProgAnchorEl] = React.useState<null | HTMLElement>(null);
 
     const handleDrawerOpen = () => {
         setOpen(true);
@@ -121,6 +156,15 @@ const App = () => {
     const handleDrawerClose = () => {
         setOpen(false);
     };
+
+    const toggleProgress = () => {
+        setProgAnchorEl(progressAnchorEl ? null : progBtnRef.current);
+    };
+
+    const progButtonClass = clsx({
+        [classes.progressButtonClosed]: !progressAnchorEl,
+        [classes.progressButtonOpen]: !!progressAnchorEl,
+    });
 
     return (
         <div className={classes.root}>
@@ -147,17 +191,36 @@ const App = () => {
                             Reddit Media Downloader
                         </Typography>
 
-                        <Fab
-                            variant="extended"
-                            disabled={!rmdConnected}
-                            color={rmdReady ? 'default' : 'secondary'}
-                            onClick={() => {
-                                sendCommand(rmdReady ? ClientCommandTypes.START_DOWNLOAD : ClientCommandTypes.STOP_DOWNLOAD, {})
-                            }}
-                        >
-                            {rmdReady ? <GetAppIcon /> : <CancelIcon />}
-                            {rmdReady ? 'Start Download' : 'Stop Downloading'}
-                        </Fab>
+                        <Grid>
+                            <Fab
+                                variant="extended"
+                                disabled={!rmdConnected}
+                                color={rmdReady ? 'default' : 'secondary'}
+                                onClick={() => {
+                                    sendCommand(rmdReady ? ClientCommandTypes.START_DOWNLOAD : ClientCommandTypes.STOP_DOWNLOAD, {})
+                                }}
+                            >
+                                {rmdReady ? <GetAppIcon /> : <CancelIcon />}
+                                <span style={{marginLeft: '5px'}}>
+                                    {rmdReady ? 'Start Download' : 'Stop Downloading'}
+                                </span>
+                            </Fab>
+
+                            <div className={classes.progressButtonWrapper}>
+                                <Tooltip title="Toggle Details">
+                                    <Fab
+                                        aria-label="save"
+                                        color="primary"
+                                        onClick={toggleProgress}
+                                        className={progButtonClass}
+                                        ref={progBtnRef}
+                                    >
+                                        <ViewListIcon />
+                                    </Fab>
+                                </Tooltip>
+                                {rmdState === RMDStatus.RUNNING && <CircularProgress size={60} className={classes.fabProgress} /> }
+                            </div>
+                        </Grid>
                     </Grid>
                 </Toolbar>
             </AppBar>
@@ -188,66 +251,19 @@ const App = () => {
                 })}
             >
                 <div className={classes.drawerHeader} />
+                <Popper
+                    id="progress-popper"
+                    anchorEl={progressAnchorEl}
+                    open={!!progressAnchorEl}
+                    className={classes.progressPopover}
+                >
+                    <StateDropdown />
+                </Popper>
                 <Typography paragraph>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
-                    ut labore et dolore magna aliqua. Rhoncus dolor purus non enim praesent elementum
-                    facilisis leo vel. Risus at ultrices mi tempus imperdiet. Semper risus in hendrerit
-                    gravida rutrum quisque non tellus. Convallis convallis tellus id interdum velit laoreet id
-                    donec ultrices. Odio morbi quis commodo odio aenean sed adipiscing. Amet nisl suscipit
-                    adipiscing bibendum est ultricies integer quis. Cursus euismod quis viverra nibh cras.
-                    Metus vulputate eu scelerisque felis imperdiet proin fermentum leo. Mauris commodo quis
-                    imperdiet massa tincidunt. Cras tincidunt lobortis feugiat vivamus at augue. At augue eget
-                    arcu dictum varius duis at consectetur lorem. Velit sed ullamcorper morbi tincidunt. Lorem
-                    donec massa sapien faucibus et molestie ac.
-                </Typography>
-                <Typography paragraph>
-                    Consequat mauris nunc congue nisi vitae suscipit. Fringilla est ullamcorper eget nulla
-                    facilisi etiam dignissim diam. Pulvinar elementum integer enim neque volutpat ac
-                    tincidunt. Ornare suspendisse sed nisi lacus sed viverra tellus. Purus sit amet volutpat
-                    consequat mauris. Elementum eu facilisis sed odio morbi. Euismod lacinia at quis risus sed
-                    vulputate odio. Morbi tincidunt ornare massa eget egestas purus viverra accumsan in. In
-                    hendrerit gravida rutrum quisque non tellus orci ac. Pellentesque nec nam aliquam sem et
-                    tortor. Habitant morbi tristique senectus et. Adipiscing elit duis tristique sollicitudin
-                    nibh sit. Ornare aenean euismod elementum nisi quis eleifend. Commodo viverra maecenas
-                    accumsan lacus vel facilisis. Nulla posuere sollicitudin aliquam ultrices sagittis orci a.
+
                 </Typography>
                 <StateDebug />
             </main>
-
-
-            <Drawer
-                className={classes.drawer}
-                variant="persistent"
-                anchor="right"
-                open={open}
-                classes={{
-                    paper: classes.drawerPaper,
-                }}
-            >
-                <div className={classes.drawerHeader}>
-                    <IconButton onClick={handleDrawerClose}>
-                        <ChevronRightIcon />
-                    </IconButton>
-                </div>
-                <Divider />
-                <List>
-                    {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-                        <ListItem button key={text}>
-                            <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-                            <ListItemText primary={text} />
-                        </ListItem>
-                    ))}
-                </List>
-                <Divider />
-                <List>
-                    {['All mail', 'Trash', 'Spam'].map((text, index) => (
-                        <ListItem button key={text}>
-                            <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-                            <ListItemText primary={text} />
-                        </ListItem>
-                    ))}
-                </List>
-            </Drawer>
         </div>
     );
 }

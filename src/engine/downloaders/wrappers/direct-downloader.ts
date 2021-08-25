@@ -22,6 +22,7 @@ export class DirectDownloader extends Downloader {
     protected async init(): Promise<any> {}
 
     async download(data: DownloaderData, actions: DownloaderFunctions, progress: DownloadProgress) {
+        progress.status = 'Downloading directly from webpage.';
         return downloadMedia(data.url, data.file, progress).catch(_err=>{});
     }
 }

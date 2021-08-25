@@ -52,7 +52,6 @@ export function useRmdState() {
     const [rmdState, setState] = useState(STATE.currentState);
 
     useEffect(() => {
-        // Sets up the autorun and prints 0.
         return reaction(
             () => STATE.currentState,
             status => {
@@ -64,7 +63,7 @@ export function useRmdState() {
     return {
         /** If RMD is in a state that is ready to begin downloading. */
         rmdReady: [RMDStatus.FINISHED, RMDStatus.IDLE].includes(rmdState),
-        state: rmdState,
+        rmdState: rmdState,
         rmdConnected: rmdState !== RMDStatus.CLIENT_NOT_CONNECTED
     };
 }
@@ -76,6 +75,26 @@ export function connectWS() {
     ws.onmessage = (event) => {
         const packet = JSON.parse(event.data);
         handleMessage(packet);
+/*        STATE.activeDownloads = [
+            {
+                thread: 0,
+                status: 'Testing fake status...',
+                fileName: 'Fake Filename Being Downloaded.jpg',
+                knowsPercent: true,
+                percent: .5,
+                downloader: 'YTDL',
+                shouldStop: false
+            },
+            {
+                thread: 1,
+                status: 'Second status.',
+                fileName: 'Unknown <b>length file being downloaded, but is really really long.mpeg',
+                knowsPercent: false,
+                percent: .5,
+                downloader: 'Imgur',
+                shouldStop: false
+            }];
+ */
     };
 
     ws.onopen = () => {
@@ -180,6 +199,7 @@ function updateState(data: any) {
 function clearState(newState?: any) {
     for (const key in STATE){
         if (STATE.hasOwnProperty(key)){
+            if (newState && key in newState) continue;
             // @ts-ignore
             delete STATE[key];
         }

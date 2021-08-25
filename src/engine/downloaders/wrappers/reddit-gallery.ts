@@ -43,6 +43,8 @@ export class RedditGalleryDownloader extends Downloader {
                 return actions.markInvalid('Failed to locate the expected gallery property in Submission.');
             }
 
+            progress.status = 'Extracting reddit album URLs...';
+
             const gKeys: string[] = galleryData.items.map((gd: any) => gd.media_id);
 
             for (const k of gKeys) {

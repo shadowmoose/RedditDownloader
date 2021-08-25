@@ -30,6 +30,8 @@ export class GfycatDownloader extends Downloader {
         const code = match ? path.basename(match).split('.')[0].split('-')[0] : null;
         let api = await getJSON(`https://api.gfycat.com/v1/gfycats/${code}`).catch(_err=>{});
 
+        progress.status = 'Searching gfycat for media...';
+
         if (!(api?.gfyItem?.content_urls)) {
             api = await getJSON(`https://api.redgifs.com/v1/gfycats/${code?.toLowerCase()}`).catch(_err=>{})
         }
@@ -42,6 +44,8 @@ export class GfycatDownloader extends Downloader {
             // Some fields are within the direct obj, but the backups are within the "content_urls" section.
             const val = api.gfyItem.content_urls[f] ? api.gfyItem.content_urls[f].url : (f in api.gfyItem) ? api.gfyItem[f] : null;
             if (val) {
+                progress.status = 'Downloading from gfycat.';
+
                 return downloadMedia(val, data.file, progress).catch(err => {
                     if (isTest()) console.error(err);
                     return actions.markInvalid('Failed to download valid media file: ' + f);
