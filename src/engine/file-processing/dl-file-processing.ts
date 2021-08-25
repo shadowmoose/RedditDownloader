@@ -41,10 +41,12 @@ export function hammingDist(str1: string, str2: string) {
 /**
  * Creates & Saves a DBFile for the given path.
  *
- * Uses hashing to deduplicate files. If a pre-existing match is found,
- * it deletes the worst file and returns the updated File with the new best path.
+ * Uses hashing to deduplicate files.
+ * If a pre-existing match is found, deletes the worst file and returns the updated File with the new best path.
+ *
+ * This function is fully async, but is wrapped in a mutex so no more than one file may be deduplicated at a time.
  */
-export const buildFile = mutex(async (fullPath: string, subpath: string, isAlbumFile: boolean) => {
+export const buildDedupedFile = mutex(async (fullPath: string, subpath: string, isAlbumFile: boolean) => {
     const stats = await fs.promises.stat(fullPath);
     if (!stats.isFile()) throw Error(`The given file output path does not exist: "${fullPath}"`);
 

@@ -1,4 +1,4 @@
-import {buildFile} from "../file-processing/dl-file-processing";
+import {buildDedupedFile} from "../file-processing/dl-file-processing";
 import DBDownload, {DownloadSubscriber} from "../database/entities/db-download";
 import promisePool, {mutex} from "../util/promise-pool";
 import DBSetting from "../database/entities/db-setting";
@@ -202,7 +202,7 @@ export async function handleDownload(dl: DBDownload, progress: DownloadProgress)
                     // Swallow graceful errors, because the user wants to exit cleanly.
                     console.debug("Graceful stop encountered in downloader:", d.name, err.message);
                 } else if (err.isDownloaderError) {
-                    console.error('Invalid Downloader Error:', err.reason);
+                    console.error('Error - Marked invalid by Downloader:', err.reason);
                     return;
                 } else {
                     console.error('Downloader Error:', d.name, data.url, isTest() ? err : '<snipped error trace>');
@@ -224,7 +224,7 @@ export async function handleDownload(dl: DBDownload, progress: DownloadProgress)
  * Builds and saves a new DBFile for the given DBUrl and file path.
  */
 export async function processFinishedDownload(url: DBUrl, subPath: string, handler: string, isAlbumFile: boolean) {
-    const file = await buildFile(getAbsoluteDL(subPath), subPath, isAlbumFile);
+    const file = await buildDedupedFile(getAbsoluteDL(subPath), subPath, isAlbumFile);
     url.file = Promise.resolve(file);
     url.processed = true;
     url.failed = false;

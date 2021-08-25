@@ -4,7 +4,7 @@ const logErr = (err: Error) => console.error(err);
  * Repeatedly calls the given callback for a new Promise, until the provided `stop()` callback is called.
  * Waits to generate each Promise so that only a specified amount run concurrently.
  *
- * The entire Pool can be awaited, and will resolve once the feeder function calls `stop()`, and all pending promises finish.
+ * The entire Pool can be awaited, and will resolve once the feeder function calls `stop()` and all pending promises finish.
  *
  * Note that if the feeder function is itself async, it may be called more than once after `stop` is triggered.
  *
