@@ -7,7 +7,7 @@ export const ExampleTagObject = {
     subreddit: 'test_sub',
     score: 1337,
     createdDate: '2021-01-22',
-    over18: true,
+    nsfw: 'sfw',
 
     type: 'submission'
 };

@@ -38,7 +38,7 @@ export default class DBSubmission extends DBEntity implements SubmissionInterfac
     firstFoundUTC!: number;
 
     @Column()
-    over18!: boolean;
+    nsfw!: boolean;
 
     @Column({ type: "text", nullable: true })
     flairText!: string|null;
@@ -73,7 +73,7 @@ export default class DBSubmission extends DBEntity implements SubmissionInterfac
                 createdUTC: sub.created_utc*1000,
                 firstFoundUTC: Date.now(),
                 isSelf: sub.is_self,
-                over18: sub.over_18,
+                nsfw: sub.over_18,
                 flairText: sub.link_flair_text,
                 processed: false,
                 shouldProcess: true,
@@ -94,7 +94,7 @@ export default class DBSubmission extends DBEntity implements SubmissionInterfac
             createdUTC: sub.created_utc*1000,
             firstFoundUTC: Date.now(),
             isSelf: sub.is_self,
-            over18: sub.over_18,
+            nsfw: sub.over_18,
             flairText: sub.link_flair_text ? sub.link_flair_text.trim() : null,
             processed: false,
             shouldProcess: true,
@@ -117,7 +117,7 @@ export default class DBSubmission extends DBEntity implements SubmissionInterfac
             flairText: '',
             id: `t3_${Math.round(Math.random()*1000000)}`,
             isSelf: false,
-            over18: false,
+            nsfw: false,
             processed: false,
             score: 0,
             selfText: "",

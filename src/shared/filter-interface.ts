@@ -46,7 +46,7 @@ export const SubmissionFilters: Record<keyof SubmissionInterface, FilterPropInfo
     author: {displayName: 'Author', type: 'string'},
     createdUTC: {displayName: 'Created Date', type: 'datetime'},
     isSelf: {displayName: 'Self Post', type: 'boolean'},
-    over18: {displayName: 'Over 18', type: 'boolean'},
+    nsfw: {displayName: 'Over 18', type: 'boolean'},
     score: {displayName: 'Score', type: 'number'},
     selfText: {displayName: 'Self Text', type: 'string'},
     subreddit: {displayName: 'Subreddit', type: 'string'},

@@ -7,5 +7,5 @@ export interface SubmissionInterface {
     score: number;
     isSelf: boolean;
     createdUTC: number;
-    over18: boolean;
+    nsfw: boolean;
 }
