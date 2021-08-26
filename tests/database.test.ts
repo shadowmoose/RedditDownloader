@@ -71,13 +71,13 @@ describe("Database Tests", () => {
     });
 
     it('save settings', async() => {
-        expect(await DBSetting.get('test')).toBe(1337);  // Default value
+        expect(await DBSetting.get('serverPort')).toBe(7001);  // Default value
 
-        await DBSetting.set('test', 100);
-        expect(await DBSetting.get('test')).toBe(100);  // Custom value
+        await DBSetting.set('serverPort', 100);
+        expect(await DBSetting.get('serverPort')).toBe(100);  // Custom value
 
         const all = await DBSetting.getAll();
-        expect(all.test).toBe(100);  // Full settings reload
+        expect(all.serverPort).toBe(100);  // Full settings reload
     });
 
     it('save source group', async () => {

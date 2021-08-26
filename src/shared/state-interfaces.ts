@@ -56,12 +56,8 @@ export interface DownloaderProgressInterface {
 
 export type SettingsInterface = typeof defaultSettings;
 export const defaultSettings = {
-    test: 1337,
-    refreshToken: '',
+    /** Reddit wants a unique user-agent, so we're nice and generate one per-user. */
     userAgent: `RMD-${Math.random()}`,
-
-    /** The maximum number of concurrent downloads. */
-    concurrentThreads: 10,
 
     /** The output template RMD uses when generating a file name. */
     outputTemplate: '[subreddit]/[title] ([author])',
@@ -79,7 +75,11 @@ export const defaultSettings = {
     serverHost: '127.0.0.1',
     /** The port to launch the local webserver on. */
     serverPort: 7001,
+    /** The maximum number of concurrent downloads. */
+    concurrentThreads: 10,
 
-    /** The API to authenticate with imgur. */
+    /*** The refresh token provided by Reddit via oAuth. */
+    refreshToken: '',
+    /** The API token to authenticate with imgur. */
     imgurClientId: ''
 }
