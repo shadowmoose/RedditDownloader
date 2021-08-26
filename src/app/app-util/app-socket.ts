@@ -27,7 +27,7 @@ export const STATE: DownloaderStateInterface = observable({
     shouldStop: false
 });
 
-export const SETTINGS: SettingsInterface = {
+export const SETTINGS: SettingsInterface = observable({
     concurrentThreads: 0,
     createSymLinks: false,
     dedupeFiles: false,
@@ -40,7 +40,7 @@ export const SETTINGS: SettingsInterface = {
     skipAlbumFiles: false,
     test: 0,
     userAgent: ""
-};
+});
 
 export const SOURCE_GROUPS: SourceGroupInterface[] = observable([]);
 
@@ -257,6 +257,6 @@ export function removeSource(sourceGroupID: number, sourceID: number) {
 
 Object.assign(window, {
     debugState: () => JSON.parse(JSON.stringify(STATE)),
-    debugSettings: () => SETTINGS,
+    debugSettings: () => JSON.parse(JSON.stringify(SETTINGS)),
     debugSourceGroups: () => JSON.parse(JSON.stringify(SOURCE_GROUPS)),
 })

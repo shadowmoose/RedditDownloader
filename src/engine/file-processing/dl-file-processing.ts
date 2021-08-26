@@ -70,7 +70,7 @@ export const buildDedupedFile = mutex(async (fullPath: string, subpath: string, 
         const similarity = await DBSetting.get('minimumSimiliarity');
         const match = closeMatches.find(m =>
             checksum === m.shaHash ||
-            (m.dHash && dh && hammingDist(m.dHash || '', dh || '') < similarity)
+            (similarity && m.dHash && dh && hammingDist(m.dHash || '', dh || '') < similarity)
         );
 
         if (match) {

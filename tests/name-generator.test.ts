@@ -17,14 +17,13 @@ describe('Name Generator Tests', () => {
         const template = '[subreddit]/[author]/[type]s/[title]';
         const output = gen.makePathFit({
             author: "ShadowMoose",
-            createdUTC: 0,
+            createdDate: '2021-01-22',
             id: "t3_test",
             over18: false,
             score: 1337,
             subreddit: "test_sub",
             title: "This is a test title.",
             type: 'submission',
-            url: ""
         }, template)
 
         expect(output).toEqual('test_sub/ShadowMoose/submissions/This is a test title_');
@@ -34,14 +33,13 @@ describe('Name Generator Tests', () => {
         const template = '[subreddit]/[author]/[type]s/[title]';
         const output = gen.makePathFit({
             author: "[ShadowMoose]",
-            createdUTC: 0,
+            createdDate: '2021-01-22',
             id: "t3_test",
             over18: false,
             score: 1337,
             subreddit: "test_sub",
             title: "This is a test [title].",
             type: 'comment',
-            url: ""
         }, template)
 
         expect(output).toEqual('test_sub/[ShadowMoose]/comments/This is a test [title]_');
@@ -51,14 +49,13 @@ describe('Name Generator Tests', () => {
         const template = '[subreddit]/[author]/[type]s/[title]';
         const output = gen.makePathFit({
             author: "[ShadowMoose]",
-            createdUTC: 0,
+            createdDate: '2021-01-22',
             id: "t3_test",
             over18: false,
             score: 1337,
             subreddit: "test_sub",
             title: "This is a test [title].".repeat(100),
             type: 'comment',
-            url: "",
         }, template)
 
         expect(getAbsoluteDL(output).length).toBeLessThan(MAX_NAME_LEN+1);

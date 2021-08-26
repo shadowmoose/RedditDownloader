@@ -87,7 +87,7 @@ wsServer.on('connection', async socket => {
 
     // Send some of the initial data that the client will always want:
     send(socket, {
-        type: ServerPacketTypes.CURRENT_CONFIG,
+        type: ServerPacketTypes.CURRENT_CONFIG,  // Send config first to avoid any possible client-side race conditions.
         data: {
             settings: await DBSetting.getAll(),
             sourceGroups: await Promise.all(groups.map(g => g.toSimpleObject()))

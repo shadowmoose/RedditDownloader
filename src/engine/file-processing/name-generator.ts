@@ -5,22 +5,11 @@ import {getAbsoluteDL} from "../core/paths";
 import DBFile from "../database/entities/db-file";
 import {forkPost} from "../database/db";
 import {mutex} from "../util/promise-pool";
+import {TemplateTags} from "../../shared/name-template";
+
 const sanitize = require('sanitize-filename');
 
 export const MAX_NAME_LEN = 240;
-
-export interface TemplateTags {
-    id: string;
-    title: string;
-    author: string;
-    subreddit: string;
-    score: number;
-    createdUTC: number;
-    over18: boolean;
-
-    url: string;
-    type: 'comment'|'submission';
-}
 
 
 export const makeName = mutex(async (dl: DBDownload, template: string, usedFileNames: string[] = []) => {
@@ -28,7 +17,6 @@ export const makeName = mutex(async (dl: DBDownload, template: string, usedFileN
     const tags = await forkPost(parent,
             c => getCommentValues(c),
             s => getSubmissionValues(s));
-    tags.url = (await dl.url).address;
 
     const countMatches = async() => {
         return DBFile
@@ -72,13 +60,12 @@ export async function getCommentValues(c: DBComment): Promise<TemplateTags> {
 
     return {
         author: c.author,
-        createdUTC: c.createdUTC,
+        createdDate: yyyymmss(c.createdUTC),
         id: c.id,
         over18: root?.over18||true,
         score: c.score,
         subreddit: c.subreddit,
         title: root?.title||'[unknown title]',
-        url: "",
         type: 'comment'
     }
 }
@@ -86,13 +73,12 @@ export async function getCommentValues(c: DBComment): Promise<TemplateTags> {
 export async function getSubmissionValues(s: DBSubmission): Promise<TemplateTags> {
     return {
         author: s.author,
-        createdUTC: s.createdUTC,
+        createdDate: yyyymmss(s.createdUTC),
         id: s.id,
         over18: s.over18,
         score: s.score,
         subreddit: s.subreddit,
         title: s.title,
-        url: "",
         type: 'submission'
     }
 }
@@ -121,4 +107,11 @@ function clean(str: string): string {
     return sanitize(str, {
         replacement: '_'
     });
+}
+
+
+function yyyymmss(utc: number) {
+    const date = new Date(utc*1000);
+    const padded = (val: any, len=2) => `${val}`.padStart(len, '0');
+    return padded(date.getFullYear(), 4) + "-" + padded(date.getMonth()+1) + "-" + padded(date.getDate())
 }

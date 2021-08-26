@@ -3,7 +3,7 @@ import {connectWS, disconnectWS, sendCommand, STATE, useRmdState} from "./app-ut
 import {observer} from "mobx-react-lite";
 import {configure} from "mobx";
 import clsx from 'clsx';
-import {createStyles, makeStyles, Theme, useTheme} from '@material-ui/core/styles';
+import {createStyles, makeStyles, Theme} from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import AppBar from '@material-ui/core/AppBar';
@@ -14,13 +14,14 @@ import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ViewListIcon from '@material-ui/icons/ViewList';
-import {SourceGroupDrawer} from "./components/sources/source-group-drawer";
-import {CircularProgress, Fab, Grid, Popper, Tooltip} from "@material-ui/core";
 import GetAppIcon from '@material-ui/icons/GetApp';
 import CancelIcon from '@material-ui/icons/Cancel';
+import {CircularProgress, Fab, Grid, Popper, Tooltip} from "@material-ui/core";
+import {SourceGroupDrawer} from "./components/sources/source-group-drawer";
 import {ClientCommandTypes} from "../shared/socket-packets";
 import {RMDStatus} from "../shared/state-interfaces";
 import {StateDropdown} from "./components/state-display/state-dropdown";
+import {SettingsModal} from "./components/settings-modal/settings-modal";
 
 
 configure({
@@ -144,7 +145,6 @@ const App = () => {
     }, []);
 
     const classes = useStyles();
-    const theme = useTheme();
     const [open, setOpen] = React.useState(true);
     const progBtnRef: any = React.useRef();
     const [progressAnchorEl, setProgAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -177,15 +177,18 @@ const App = () => {
             >
                 <Toolbar>
                     <Grid container justify="space-between" >
-                        <IconButton
-                            color="inherit"
-                            aria-label="open drawer"
-                            onClick={handleDrawerOpen}
-                            edge="start"
-                            className={clsx(classes.menuButton, open && classes.hide)}
-                        >
-                            <MenuIcon />
-                        </IconButton>
+                        <Grid>
+                            <IconButton
+                                color="inherit"
+                                aria-label="open drawer"
+                                onClick={handleDrawerOpen}
+                                edge="start"
+                                className={clsx(classes.menuButton, open && classes.hide)}
+                            >
+                                <MenuIcon />
+                            </IconButton>
+                            <SettingsModal />
+                        </Grid>
 
                         <Typography variant="h4" noWrap>
                             Reddit Media Downloader
