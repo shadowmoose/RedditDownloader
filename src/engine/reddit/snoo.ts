@@ -40,6 +40,27 @@ async function getAPI() {
 }
 
 /**
+ * Remove the current Reddit API wrapper. Useful for when the access token is reset, or when users may be switched.
+ */
+export function disposeRedditAPI() {
+    _r = null;
+}
+
+/**
+ * Get the username of the currently authenticated account, or return null on any error.
+ */
+export async function getRedditUsername() {
+    try {
+        const api = await getAPI();
+        return await api.getMe().fetch().then(userInfo => {
+            return userInfo.name;
+        });
+    } catch (e) {
+        return null;
+    }
+}
+
+/**
  * Creates a generator which reads every post from the given Listing, requesting more from Reddit until it runs out.
  */
 export async function* readListing<T extends snoowrap.Comment|snoowrap.Submission>(listing: snoowrap.Listing<T>, limit = 0) {

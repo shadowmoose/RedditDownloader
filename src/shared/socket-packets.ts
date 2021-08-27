@@ -31,7 +31,13 @@ export enum ClientCommandTypes {
     /** Delete all posts that have not yet been downloaded from previous runs. */
     CULL_UNPROCESSED = 'cullUnprocessed',
     /** Return a paginated section of the available downloads matching the given query. */
-    LIST_DOWNLOADS = 'listDownloads'
+    LIST_DOWNLOADS = 'listDownloads',
+    /** Return a valid Reddit URL for authentication flow. */
+    GET_OAUTH_URL = 'getOAuth',
+    /** Set the oAuth code for RMD to use in retrieving a refresh token. */
+    SET_OAUTH_CODE = 'setOAuth',
+    /** Set the oAuth code for RMD to use in retrieving a refresh token. */
+    GET_AUTHED_USERNAME = 'getUsername',
 }
 
 export enum ServerPacketTypes {

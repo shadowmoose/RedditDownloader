@@ -8,13 +8,15 @@ export enum RMDStatus {
 }
 
 export interface DownloaderStateInterface {
+    /** All download progress objects that are currently running. */
     activeDownloads: (DownloaderProgressInterface|null)[];
+
+    /** A flag set, which indicates if RMD should be making a best effort to stop downloading/scanning. */
     shouldStop: boolean;
 
     currentState: RMDStatus;
     finishedScanning: boolean;
     currentSource: string|null;
-
     newPostsScanned: number;
 }
 
@@ -74,7 +76,7 @@ export const defaultSettings = {
     /** The host to launch the local webserver on. */
     serverHost: '127.0.0.1',
     /** The port to launch the local webserver on. */
-    serverPort: 7001,
+    serverPort: 7505,
     /** The maximum number of concurrent downloads. */
     concurrentThreads: 10,
 

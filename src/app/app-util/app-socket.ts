@@ -45,6 +45,9 @@ export const SETTINGS: SettingsInterface = observable({
 export const SOURCE_GROUPS: SourceGroupInterface[] = observable([]);
 
 
+export const AUTHED_USERNAME = observable.box<string|null>(null);
+
+
 /**
  * A custom React Hook, which automatically tracks if RMD is ready to begin downloading.
  */
@@ -75,30 +78,13 @@ export function connectWS() {
     ws.onmessage = (event) => {
         const packet = JSON.parse(event.data);
         handleMessage(packet);
-/*        STATE.activeDownloads = [
-            {
-                thread: 0,
-                status: 'Testing fake status...',
-                fileName: 'Fake Filename Being Downloaded.jpg',
-                knowsPercent: true,
-                percent: .5,
-                downloader: 'YTDL',
-                shouldStop: false
-            },
-            {
-                thread: 1,
-                status: 'Second status.',
-                fileName: 'Unknown <b>length file being downloaded, but is really really long.mpeg',
-                knowsPercent: false,
-                percent: .5,
-                downloader: 'Imgur',
-                shouldStop: false
-            }];
- */
     };
 
     ws.onopen = () => {
         console.info('Connected to the RMD WebSocket!');
+        sendCommand(ClientCommandTypes.GET_AUTHED_USERNAME).then(user => {
+            AUTHED_USERNAME.set(user)
+        });
         setConnected();
     }
 
@@ -134,11 +120,11 @@ function sendRaw(data: string) {
     })
 }
 
-export function sendCommand(type: ClientCommandTypes, data: any, timeout: number = 10000): Promise<any> {
+export function sendCommand(type: ClientCommandTypes, data?: any, timeout: number = 10000): Promise<any> {
     const packet: ClientCommand = {
         type,
         uid: ++uid,
-        data
+        data: data || {}
     }
     sendRaw(JSON.stringify(packet));
 
@@ -259,4 +245,5 @@ Object.assign(window, {
     debugState: () => JSON.parse(JSON.stringify(STATE)),
     debugSettings: () => JSON.parse(JSON.stringify(SETTINGS)),
     debugSourceGroups: () => JSON.parse(JSON.stringify(SOURCE_GROUPS)),
+    sendCommand
 })

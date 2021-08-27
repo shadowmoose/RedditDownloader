@@ -7,6 +7,7 @@ import {createStyles, Theme} from "@material-ui/core/styles";
 import {sendCommand, SETTINGS, useRmdState} from "../../app-util/app-socket";
 import {FileHandlingSettingsPanel} from "./file-handling-settings-panel";
 import {ClientCommandTypes} from "../../../shared/socket-packets";
+import AccountsSettingsPanel from "./accounts-settings-panel";
 
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -33,7 +34,7 @@ const useStyles = makeStyles((theme: Theme) =>
 export const SettingsModal = observer(()=> {
     const [settingsOpen, setSettingsOpen] = useState(true);
     const [oldSettings, setOldSettings] = useState(JSON.stringify(SETTINGS));
-    const [currentTab, setCurrentTab] = useState(1);
+    const [currentTab, setCurrentTab] = useState(0);
     const {rmdConnected} = useRmdState();
     const styles = useStyles();
     const canSave = JSON.stringify(SETTINGS) !== oldSettings;
@@ -100,7 +101,7 @@ export const SettingsModal = observer(()=> {
                     </Tabs>
 
                     <SettingsTabPanel value={currentTab} index={0}>
-                        Accounts
+                        <AccountsSettingsPanel />
                     </SettingsTabPanel>
 
                     <SettingsTabPanel value={currentTab} index={1}>

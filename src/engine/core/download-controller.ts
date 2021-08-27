@@ -9,6 +9,7 @@ import {isTest} from "./config";
 import {DownloadSubscriber} from "../database/entities/db-download";
 import {baseDownloadDir} from "./paths";
 import {RMDStatus} from "../../shared/state-interfaces";
+import {disposeRedditAPI} from "../reddit/snoo";
 
 let streamer: Streamer<DownloaderState> |null;
 
@@ -30,6 +31,7 @@ export function scanAndDownload(progressCallback: SendFunction) {
     streamer?.setSender(progressCallback);
 
     DownloadSubscriber.toggle(true);
+    disposeRedditAPI();
 
     return Promise
         .all([

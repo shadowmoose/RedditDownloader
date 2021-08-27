@@ -3,7 +3,7 @@ import {DownloadSubscriber} from "../database/entities/db-download";
 import {DownloaderProgressInterface, DownloaderStateInterface, RMDStatus} from "../../shared/state-interfaces";
 
 
-export class DownloaderState implements DownloaderStateInterface{
+export class DownloaderState implements DownloaderStateInterface {
     @Streamer.delay(500)
     activeDownloads: (DownloadProgress|null)[] = [];
     shouldStop = false;

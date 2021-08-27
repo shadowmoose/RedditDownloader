@@ -17,6 +17,9 @@ import {getAbsoluteDL} from "../core/paths";
 import path from "path";
 import {Server} from "http";
 import {CommandListDownloads} from "./commands/cmd-list-downloads";
+import {CommandSetOAuthCode} from "./commands/cmd-set-oauth";
+import {CommandGetOAuthUrl} from "./commands/cmd-get-oauth-url";
+import {CommandGetAuthedUsername} from "./commands/cmd-get-authed-username";
 
 
 /** All available command processors. */
@@ -27,8 +30,12 @@ const commands: Command[] = [
     new CommandUpdateDBObject(),
     new CommandCullUnprocessed(),
     new CommandSaveSetting(),
-    new CommandListDownloads()
+    new CommandListDownloads(),
+    new CommandGetOAuthUrl(),
+    new CommandSetOAuthCode(),
+    new CommandGetAuthedUsername(),
 ];
+const commandMap: Record<string, Command> = commands.reduce((p: any, c) => {p[c.type] = c; return p}, {});
 export const clients: ws[] = [];
 export const app = express();
 const wsServer = new ws.Server({ noServer: true });
@@ -54,6 +61,10 @@ app.get('/file/:id', async (req, res) => {
     });
 });
 
+app.get('/authorize', async (req, res) => {
+    // Serve a basic landing page prompt for users working through the oAuth flow, rather than a confusing error.
+    res.send(`If this window doesn't auto-close soon, copy <a href=''>the URL</a> and paste it into RMD's settings.`);
+});
 
 wsServer.on('connection', async socket => {
     console.debug('Client connected via WebSocket.');
@@ -143,17 +154,17 @@ export async function launchServer(): Promise<Server> {
  */
 async function handleMessage(sock: ws, pkt: ClientCommand) {
     try {
-        for (const c of commands) {
-            if (c.type === pkt.type) {
-                const resp = await c.handle(pkt, broadcast);
+        const cmd = commandMap[pkt.type];
 
-                if (pkt.uid !== null && pkt.uid !== undefined) {
-                    return send(sock, {
-                        type: ServerPacketTypes.ACK,
-                        uid: pkt.uid,
-                        data: resp
-                    })
-                }
+        if (cmd) {
+            const resp = await cmd.handle(pkt, broadcast);
+
+            if (pkt.uid !== null && pkt.uid !== undefined) {
+                return send(sock, {
+                    type: ServerPacketTypes.ACK,
+                    uid: pkt.uid,
+                    data: resp
+                })
             }
         }
     } catch (err) {

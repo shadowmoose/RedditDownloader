@@ -51,7 +51,6 @@ export const OutputTemplateSetting = observer(() => {
     return <div>
         <Tooltip title={`The relative output file path for everything RMD downloads. Supported tags are: ${AvailableTemplateTags.map(t=>`[${t}]`).join(', ')}`}>
             <TextField
-                id="outlined-basic"
                 label="Output Template"
                 variant="outlined"
                 style={{width: '100%'}}
