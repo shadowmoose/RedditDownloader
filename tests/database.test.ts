@@ -8,6 +8,7 @@ import DBSourceGroup from "../src/engine/database/entities/db-source-group";
 import DBSource from "../src/engine/database/entities/db-source";
 import DBDownload, {DownloadSubscriber} from "../src/engine/database/entities/db-download";
 import DBUrl from "../src/engine/database/entities/db-url";
+import {defaultSettings} from "../src/shared/state-interfaces";
 
 
 describe("Database Tests", () => {
@@ -71,7 +72,7 @@ describe("Database Tests", () => {
     });
 
     it('save settings', async() => {
-        expect(await DBSetting.get('serverPort')).toBe(7001);  // Default value
+        expect(await DBSetting.get('serverPort')).toBe(defaultSettings.serverPort);  // Default value
 
         await DBSetting.set('serverPort', 100);
         expect(await DBSetting.get('serverPort')).toBe(100);  // Custom value
