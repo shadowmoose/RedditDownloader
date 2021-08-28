@@ -1,5 +1,12 @@
 import React, {useEffect} from 'react';
-import {connectWS, disconnectWS, sendCommand, STATE, useRmdState} from "./app-util/app-socket";
+import {
+    connectWS,
+    disconnectWS,
+    GLOBAL_SERVER_ERROR,
+    sendCommand,
+    STATE,
+    useRmdState
+} from "./app-util/app-socket";
 import {observer} from "mobx-react-lite";
 import {configure} from "mobx";
 import clsx from 'clsx';
@@ -22,6 +29,7 @@ import {ClientCommandTypes} from "../shared/socket-packets";
 import {RMDStatus} from "../shared/state-interfaces";
 import {StateDropdown} from "./components/state-display/state-dropdown";
 import {SettingsModal} from "./components/settings-modal/settings-modal";
+import {SnackbarProvider, useSnackbar} from "notistack";
 
 
 configure({
@@ -128,13 +136,6 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
-const StateDebug = observer(() => {
-    return <div>
-        <pre>
-            {JSON.stringify(STATE, null, 4)}
-        </pre>
-    </div>
-})
 
 const App = () => {
     const {rmdReady, rmdConnected, rmdState} = useRmdState();
@@ -167,109 +168,134 @@ const App = () => {
     });
 
     return (
-        <div className={classes.root}>
-            <CssBaseline />
-            <AppBar
-                position="fixed"
-                className={clsx(classes.appBar, {
-                    [classes.appBarShift]: open,
-                })}
-            >
-                <Toolbar>
-                    <Grid container justify="space-between" >
-                        <Grid>
-                            <IconButton
-                                color="inherit"
-                                aria-label="open drawer"
-                                onClick={handleDrawerOpen}
-                                edge="start"
-                                className={clsx(classes.menuButton, open && classes.hide)}
-                            >
-                                <MenuIcon />
-                            </IconButton>
-                            <SettingsModal />
-                        </Grid>
+        <SnackbarProvider maxSnack={5}>
+            <div className={classes.root}>
+                <CssBaseline />
+                <AppBar
+                    position="fixed"
+                    className={clsx(classes.appBar, {
+                        [classes.appBarShift]: open,
+                    })}
+                >
+                    <Toolbar>
+                        <Grid container justify="space-between" >
+                            <Grid>
+                                <IconButton
+                                    color="inherit"
+                                    aria-label="open drawer"
+                                    onClick={handleDrawerOpen}
+                                    edge="start"
+                                    className={clsx(classes.menuButton, open && classes.hide)}
+                                >
+                                    <MenuIcon />
+                                </IconButton>
+                                <SettingsModal />
+                            </Grid>
 
-                        <Typography variant="h4" noWrap>
-                            Reddit Media Downloader
-                        </Typography>
+                            <Typography variant="h4" noWrap>
+                                Reddit Media Downloader
+                            </Typography>
 
-                        <Grid>
-                            <Fab
-                                variant="extended"
-                                disabled={!rmdConnected}
-                                color={rmdReady ? 'default' : 'secondary'}
-                                onClick={() => {
-                                    sendCommand(rmdReady ? ClientCommandTypes.START_DOWNLOAD : ClientCommandTypes.STOP_DOWNLOAD, {})
-                                }}
-                            >
-                                {rmdReady ? <GetAppIcon /> : <CancelIcon />}
-                                <span style={{marginLeft: '5px'}}>
+                            <Grid>
+                                <Fab
+                                    variant="extended"
+                                    disabled={!rmdConnected}
+                                    color={rmdReady ? 'default' : 'secondary'}
+                                    onClick={() => {
+                                        sendCommand(rmdReady ? ClientCommandTypes.START_DOWNLOAD : ClientCommandTypes.STOP_DOWNLOAD, {})
+                                    }}
+                                >
+                                    {rmdReady ? <GetAppIcon /> : <CancelIcon />}
+                                    <span style={{marginLeft: '5px'}}>
                                     {rmdReady ? 'Start Download' : 'Stop Downloading'}
                                 </span>
-                            </Fab>
+                                </Fab>
 
-                            <div className={classes.progressButtonWrapper}>
-                                <Tooltip title="Toggle Details">
-                                    <Fab
-                                        aria-label="save"
-                                        color="primary"
-                                        onClick={toggleProgress}
-                                        className={progButtonClass}
-                                        ref={progBtnRef}
-                                    >
-                                        <ViewListIcon />
-                                    </Fab>
-                                </Tooltip>
-                                {rmdState === RMDStatus.RUNNING && <CircularProgress size={60} className={classes.fabProgress} /> }
-                            </div>
+                                <div className={classes.progressButtonWrapper}>
+                                    <Tooltip title="Toggle Details">
+                                        <Fab
+                                            aria-label="save"
+                                            color="primary"
+                                            onClick={toggleProgress}
+                                            className={progButtonClass}
+                                            ref={progBtnRef}
+                                        >
+                                            <ViewListIcon />
+                                        </Fab>
+                                    </Tooltip>
+                                    {rmdState === RMDStatus.RUNNING && <CircularProgress size={60} className={classes.fabProgress} /> }
+                                </div>
+                            </Grid>
                         </Grid>
-                    </Grid>
-                </Toolbar>
-            </AppBar>
+                    </Toolbar>
+                </AppBar>
 
 
-            <Drawer
-                className={classes.drawer}
-                variant="persistent"
-                anchor="left"
-                open={open}
-                classes={{
-                    paper: classes.drawerPaper,
-                }}
-            >
-                <div className={classes.drawerHeader}>
-                    <IconButton onClick={handleDrawerClose}>
-                        <ChevronLeftIcon />
-                    </IconButton>
-                </div>
-                <Divider />
-                <SourceGroupDrawer />
-            </Drawer>
-
-
-            <main
-                className={clsx(classes.content, {
-                    [classes.contentShift]: open,
-                })}
-            >
-                <div className={classes.drawerHeader} />
-                <Popper
-                    id="progress-popper"
-                    anchorEl={progressAnchorEl}
-                    open={!!progressAnchorEl}
-                    className={classes.progressPopover}
+                <Drawer
+                    className={classes.drawer}
+                    variant="persistent"
+                    anchor="left"
+                    open={open}
+                    classes={{
+                        paper: classes.drawerPaper,
+                    }}
                 >
-                    <StateDropdown />
-                </Popper>
-                <Typography paragraph>
+                    <div className={classes.drawerHeader}>
+                        <IconButton onClick={handleDrawerClose}>
+                            <ChevronLeftIcon />
+                        </IconButton>
+                    </div>
+                    <Divider />
+                    <SourceGroupDrawer />
+                </Drawer>
 
-                </Typography>
-                <StateDebug />
-            </main>
-        </div>
+
+                <main
+                    className={clsx(classes.content, {
+                        [classes.contentShift]: open,
+                    })}
+                >
+                    <div className={classes.drawerHeader} />
+                    <Popper
+                        id="progress-popper"
+                        anchorEl={progressAnchorEl}
+                        open={!!progressAnchorEl}
+                        className={classes.progressPopover}
+                    >
+                        <StateDropdown />
+                    </Popper>
+                    <StateDebug />
+                </main>
+            </div>
+            <NotifyComponent />
+        </SnackbarProvider>
     );
-}
+};
 
+
+const StateDebug = observer(() => {
+    return <div>
+        <pre>
+            {JSON.stringify(STATE, null, 4)}
+        </pre>
+    </div>
+});
+
+
+/**
+ * Handles listening for notifications, while existing within the DOM for access to the Snackbar component.
+ */
+const NotifyComponent = observer(() => {
+    const { enqueueSnackbar } = useSnackbar();
+    const alert = GLOBAL_SERVER_ERROR.get();
+
+    useEffect(() => {
+        if (!alert) return;
+        const {message, options} = JSON.parse(alert);
+        enqueueSnackbar(message, options);
+    }, [alert]);
+
+    return <></>
+});
 
 export default App;

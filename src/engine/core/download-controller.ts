@@ -10,6 +10,8 @@ import {DownloadSubscriber} from "../database/entities/db-download";
 import {baseDownloadDir} from "./paths";
 import {RMDStatus} from "../../shared/state-interfaces";
 import {disposeRedditAPI} from "../reddit/snoo";
+import {broadcast} from "../webserver/web-server";
+import {ServerPacketTypes} from "../../shared/socket-packets";
 
 let streamer: Streamer<DownloaderState> |null;
 
@@ -41,9 +43,12 @@ export function scanAndDownload(progressCallback: SendFunction) {
         .then(async () => removeEmptyDirectories(await baseDownloadDir()))
         .catch(err => {
             console.error(err);
+            return broadcast({  // TODO: Possibly swap this out for static notification service once Terminal UI is built.
+                type: ServerPacketTypes.GLOBAL_ERROR,
+                data: err.message
+            })
         }).finally(() => {
             state!.currentState = RMDStatus.FINISHED;
-            state!.shouldStop = true;
             state!.currentSource = null;
             state!.stop()
         });

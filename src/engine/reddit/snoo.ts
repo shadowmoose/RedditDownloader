@@ -31,7 +31,7 @@ async function getAPI() {
             "refreshToken": await DBSetting.get('refreshToken')
         };
 
-        if (!config.refreshToken) throw Error('You need to authorize an account before RMD can scan the API!');
+        if (!config.refreshToken) throw Error('You need to authorize an account in the settings before RMD can scan the API!');
 
         _r = new snoowrap(config);
     }

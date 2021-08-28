@@ -174,7 +174,7 @@ const TypedFilterValueInput = (props: {type: FilterPropTypes, value: any, onChan
                 label={`${props.value}`}
             />
         case "number":
-            return <BoundNumberInput label={""} value={props.value} onUpdate={v => props.onChange(v)} />;
+            return <BoundNumberInput label={""} value={props.value} onUpdate={v => props.onChange(v)} style={{width: 100}}/>;
         case "string":
             return <TextField style={{marginTop: '5px'}} onChange={e => props.onChange(e.target.value)} value={props.value} />
         case "datetime":

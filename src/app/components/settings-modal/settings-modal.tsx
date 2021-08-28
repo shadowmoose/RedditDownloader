@@ -8,6 +8,7 @@ import {sendCommand, SETTINGS, useRmdState} from "../../app-util/app-socket";
 import {FileHandlingSettingsPanel} from "./file-handling-settings-panel";
 import {ClientCommandTypes} from "../../../shared/socket-packets";
 import AccountsSettingsPanel from "./accounts-settings-panel";
+import {AdvancedConfigPanel} from "./advanced-config-panel";
 
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -109,7 +110,7 @@ export const SettingsModal = observer(()=> {
                     </SettingsTabPanel>
 
                     <SettingsTabPanel value={currentTab} index={2}>
-                        Advanced
+                        <AdvancedConfigPanel />
                     </SettingsTabPanel>
                 </div>
 

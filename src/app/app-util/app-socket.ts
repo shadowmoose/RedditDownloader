@@ -3,6 +3,7 @@ import {DownloaderStateInterface, RMDStatus, SettingsInterface} from "../../shar
 import {observable, reaction} from "mobx"
 import {SourceGroupInterface} from "../../shared/source-interfaces";
 import {useEffect, useState} from "react";
+import {OptionsObject} from "notistack";
 
 let ws: WebSocket|null = null;
 let uid = 0;
@@ -46,6 +47,8 @@ export const SOURCE_GROUPS: SourceGroupInterface[] = observable([]);
 
 
 export const AUTHED_USERNAME = observable.box<string|null>(null);
+
+export const GLOBAL_SERVER_ERROR = observable.box<any>(null);
 
 
 /**
@@ -139,6 +142,7 @@ export function sendCommand(type: ClientCommandTypes, data?: any, timeout: numbe
     })
 }
 
+
 function handleMessage(packet: SocketResponse) {
     switch (packet.type) {
         case ServerPacketTypes.PING:
@@ -157,6 +161,10 @@ function handleMessage(packet: SocketResponse) {
 
         case ServerPacketTypes.ACK:
             return onAck(packet);
+
+        case ServerPacketTypes.GLOBAL_ERROR:
+            notify(packet.data, {variant: 'error'});
+            return console.error('[Global Server Error]', packet.data);
 
         default:
             console.error('Unknown packet:', packet);
@@ -201,10 +209,11 @@ function onAck(packet: SocketResponse) {
     console.debug('Got ack', packet, pendingCommands);
     if (prom) {
         prom[2](); // Clear timer.
-        delete pendingCommands[idx];
+
         if (packet.error) {
             failAck(idx, packet.error);
         } else {
+            delete pendingCommands[idx];
             prom[0](packet.data);
         }
     }
@@ -217,10 +226,26 @@ function failAck(uid: number, error: string) {
     delete pendingCommands[uid];
 
     console.error('Failed ACK:', uid, error);
+    notify(error, {variant: 'error'});
 
     if (prom) {
         prom[1](error);
     }
+}
+
+
+/**
+ * Submit a toast message to display via Snackbar, from outside the React Virtual DOM.
+ * The message is serialized and passed to an embedded component, which manages the display.
+ * For use inside a component it is likely better to use the intended display methods.
+ * @param message
+ * @param options
+ * @see https://iamhosseindhv.com/notistack/demos
+ * @see NotifyComponent
+ */
+export function notify(message: string, options: OptionsObject = {}) {
+    // Pretty janky method of managing this, but it works well enough.
+    GLOBAL_SERVER_ERROR.set(JSON.stringify({message, options, rnd: Date.now()+''+Math.random()}));
 }
 
 

@@ -16,6 +16,6 @@ export const UpvotedPostDataForm = observer((props: {data: UpvotedPostsSchema}) 
             Downloads any Submissions you have personally upvoted.
         </Typography>
 
-        <BoundNumberInput label="Limit number of submissions (0 for unlimited)" value={data.limit} onUpdate={val => data.limit = val} limit={1000} />
+        <BoundNumberInput label="Limit number of submissions (0 for unlimited)" value={data.limit} onUpdate={val => data.limit = val} maximum={1000} minimum={0}/>
     </div>
 })

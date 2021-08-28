@@ -50,5 +50,7 @@ export enum ServerPacketTypes {
     /** The server is requesting a "pong" response, in a timely manner. */
     PING = 'ping',
     /** A response from the server, for a specific client command. */
-    ACK = 'ack'
+    ACK = 'ack',
+    /** An error that all clients should be aware of, and display. */
+    GLOBAL_ERROR = 'globalError'
 }
