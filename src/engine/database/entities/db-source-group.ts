@@ -11,6 +11,7 @@ import extractLinks from "../../reddit/url-extractors";
 import DBDownload from "./db-download";
 import {SourceGroupInterface} from "../../../shared/source-interfaces";
 import {DownloaderState} from "../../core/state";
+import {sendError} from "../../core/notifications";
 
 
 @Entity({ name: 'source_groups' })
@@ -42,46 +43,51 @@ export default class DBSourceGroup extends DBEntity {
         const sources = (await this.sources).map(s => makeSource(s)).filter(t=>!!t);
 
         for (const s of sources) {
-            if (state && state.shouldStop) return stop();
-            if (state) state.currentSource = s.alias;
-            const gen = s.find();
-
-            yield* filterMap(gen, async (post, stop) => {
+            try {
                 if (state && state.shouldStop) return stop();
-                const liveData: any = post.loadedData;
-                post = await dedupeExisting(post);
-                post.loadedData = liveData;
+                if (state) state.currentSource = s.alias;
+                const gen = s.find();
 
-                if (post.processed) {
-                    return;
-                }
-                if (post instanceof DBSubmission) {
-                    // In case we found a Submission already loaded as a comment's parent:
-                    post.shouldProcess = true;
-                }
+                yield* filterMap(gen, async (post, stop) => {
+                    if (state && state.shouldStop) return stop();
+                    const liveData: any = post.loadedData;
+                    post = await dedupeExisting(post);
+                    post.loadedData = liveData;
 
-                const links = await extractLinks(post);
-
-                for (const link of links) {
-                    const dl = await DBDownload.getDownloader(post, link);
-
-                    if (!filters.every(f => {
-                        if (f.forSubmissions && post instanceof DBComment) return true;
-                        if (!f.forSubmissions && post instanceof DBSubmission) return true;
-                        return f.validate(post, link)
-                    })) {
-                        continue;
+                    if (post.processed) {
+                        return;
+                    }
+                    if (post instanceof DBSubmission) {
+                        // In case we found a Submission already loaded as a comment's parent:
+                        post.shouldProcess = true;
                     }
 
-                    (await post.downloads).push(dl);
-                }
+                    const links = await extractLinks(post);
 
-                post.processed = true;
+                    for (const link of links) {
+                        const dl = await DBDownload.getDownloader(post, link);
 
-                await post.save();
+                        if (!filters.every(f => {
+                            if (f.forSubmissions && post instanceof DBComment) return true;
+                            if (!f.forSubmissions && post instanceof DBSubmission) return true;
+                            return f.validate(post, link)
+                        })) {
+                            continue;
+                        }
 
-                return post;
-            }) as AsyncGenerator<DBSubmission | DBComment>
+                        (await post.downloads).push(dl);
+                    }
+
+                    post.processed = true;
+
+                    await post.save();
+
+                    return post;
+                }) as AsyncGenerator<DBSubmission | DBComment>
+            } catch (err) {
+                console.error(`Failed to scan Source: [${s.alias}]`, err);
+                sendError(`Failed to scan Source: [${s.alias}] ${err.message}`);
+            }
         }
     }
 

@@ -9,9 +9,10 @@ import {isTest} from "./config";
 import {DownloadSubscriber} from "../database/entities/db-download";
 import {baseDownloadDir} from "./paths";
 import {RMDStatus} from "../../shared/state-interfaces";
-import {disposeRedditAPI} from "../reddit/snoo";
+import {disposeRedditAPI, getRedditUsername} from "../reddit/snoo";
 import {broadcast} from "../webserver/web-server";
 import {ServerPacketTypes} from "../../shared/socket-packets";
+import {sendError} from "./notifications";
 
 let streamer: Streamer<DownloaderState> |null;
 
@@ -43,14 +44,11 @@ export function scanAndDownload(progressCallback: SendFunction) {
         .then(async () => removeEmptyDirectories(await baseDownloadDir()))
         .catch(err => {
             console.error(err);
-            return broadcast({  // TODO: Possibly swap this out for static notification service once Terminal UI is built.
-                type: ServerPacketTypes.GLOBAL_ERROR,
-                data: err.message
-            })
+            sendError(err);
         }).finally(() => {
             state!.currentState = RMDStatus.FINISHED;
             state!.currentSource = null;
-            state!.stop()
+            state!.stop();
         });
 }
 
@@ -59,23 +57,29 @@ export function scanAndDownload(progressCallback: SendFunction) {
  */
 async function scanAll(state: DownloaderState) {
     const groups = await DBSourceGroup.find();  // TODO: Potentially allow 'specific source groups only'.
+    let found = 0;
 
     state.finishedScanning = false;
     state.newPostsScanned = 0;
 
     for (const g of groups) {
-        let found = await forGen(g.getPostGenerator(state), async (ele, idx, stop) => {
-            await ele.save();
-            if (state.shouldStop) {
-                console.debug('Early exit from scan, due to state flag.')
-                return stop();
-            }
-            state.newPostsScanned ++;
+        try {
+            found = await forGen(g.getPostGenerator(state), async (ele, idx, stop) => {
+                await ele.save();
+                if (state.shouldStop) {
+                    console.debug('Early exit from scan, due to state flag.')
+                    return stop();
+                }
+                state.newPostsScanned++;
 
-            if (isTest() && state.newPostsScanned % 10 === 0) {
-                console.debug(`Scanned ${state.newPostsScanned} posts so far...`)
-            }
-        });
+                if (isTest() && state.newPostsScanned % 10 === 0) {
+                    console.debug(`Scanned ${state.newPostsScanned} posts so far...`)
+                }
+            });
+        } catch (err) {
+            console.error('Error scanning group:', err);
+            sendError(err);
+        }
 
         if (state.shouldStop) break;
 

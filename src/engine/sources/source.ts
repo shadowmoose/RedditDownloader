@@ -9,7 +9,7 @@ export default abstract class Source {
     public alias: string = '';
 
     /**
-     * Find the next post that this Source has available.
+     * Returns a generator, which contains the posts that this Source has available.
      */
     public abstract find(): AsyncGenerator<DBSubmission | DBComment>;
 

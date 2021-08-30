@@ -16,6 +16,7 @@ import {isTest} from "../core/config";
 import DBFile from "../database/entities/db-file";
 import {GfycatDownloader} from "./downloader-wrappers/gfycat-downloader";
 import {RedditGalleryDownloader} from "./downloader-wrappers/reddit-gallery";
+import {sendError} from "../core/notifications";
 
 
 let downloadList: Downloader[] = [];
@@ -76,6 +77,7 @@ export async function downloadAll(state: DownloaderState) {
         pending.delete((await nxt.url).address);
     }, await DBSetting.get('concurrentThreads'), err => {
         console.error(err);
+        sendError(err);
     });
 }
 
