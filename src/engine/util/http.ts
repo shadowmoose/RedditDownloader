@@ -100,14 +100,14 @@ export async function downloadMedia(url: string, filePath: string, prog: Downloa
     })
 }
 
-export async function getJSON (url: string|URL, headers: Record<string, string> = {}, ext: Partial<AxiosRequestConfig> = {}) {
+export async function getJSON (url: string|URL, params: Record<string, string> = {}, ext: Partial<AxiosRequestConfig> = {}) {
     if (url instanceof URL) url = url.toString();
 
     const response = await axios({
         url,
         method: 'GET',
         timeout: 10000,
-        headers,
+        params,
         ...ext
     });
 

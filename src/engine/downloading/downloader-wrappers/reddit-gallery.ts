@@ -60,8 +60,7 @@ export class RedditGalleryDownloader extends Downloader {
                 return actions.markInvalid('Failed to extract any URLS from Submission Album.');
             }
 
-            await actions.addAlbumUrls(ret);
-            return;
+            return await actions.addAlbumUrls(ret);
         } else {
             return actions.markInvalid('Failed to locate album Submission.');
         }

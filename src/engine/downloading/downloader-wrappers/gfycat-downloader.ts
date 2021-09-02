@@ -8,7 +8,7 @@ import path from "path";
 import {isTest} from "../../core/config";
 
 
-const formatOpts = ["mp4Url", "mp4", "webm", "webp", "largeGif"];
+const formatOpts = ["mp4Url", "mp4", "webm", "webp", "largeGif", "mobile"];
 
 export class GfycatDownloader extends Downloader {
     name: string = 'gfycat';
@@ -25,8 +25,59 @@ export class GfycatDownloader extends Downloader {
         return ytdl.autoUpdate();
     }
 
+    async handleUser(progress: DownloadProgress, actions: DownloaderFunctions, username: string, ogHost: string) {
+        const possibleUrls = [
+            `https://api.gfycat.com/v1/users/${username}/gfycats`,
+            `https://api.redgifs.com/v1/users/${username}/gfycats`
+        ].sort((a, b) => {
+            // Prioritize URLs which match the original link. The user may have migrated, so still try them all.
+            let aa = a.includes(ogHost.replace('www.', '')) ? 1 : 0;
+            let bb = b.includes(ogHost.replace('www.', '')) ? 1 : 0;
+            return bb - aa;
+        });
+
+        progress.status = `Searching for user's ${username} content.`;
+
+        for (const u of possibleUrls) {
+            const allFound: string[] = [];
+            let api: any;
+
+            do {
+                api = await getJSON(u, {
+                    count: '100',
+                    cursor: api?.cursor || undefined
+                }).catch(_err=>{});
+                if (!api) break;
+
+                const found: string[] = api.gfycats.map((gfy: any) => {
+                    for (const f of formatOpts) {
+                        const link = gfy.content_urls[f];
+
+                        if (link) return link.url;
+                    }
+                }).filter((f: string)=>!!f);
+
+                allFound.push(...found);
+            } while (api?.cursor);
+
+            if (allFound.length) {
+                return await actions.addAlbumUrls(allFound);
+            }
+        }
+
+        return await actions.markInvalid(`Unable to locate user profile data: ${username}`);
+    }
+
     async download(data: DownloaderData, actions: DownloaderFunctions, progress: DownloadProgress) {
-        const match = urlp.parse(data.url).path;
+        const parsedUrl = urlp.parse(data.url)
+        const match = parsedUrl.path;
+
+        if (match && (match?.includes('/users/') || match.includes('@'))) {
+            const username = match.includes('@') ?
+                match.split('@')[1].split('/')[0] : match.split('/users/')[1].split('/')[0];
+            return this.handleUser(progress, actions, username, `${parsedUrl.hostname}`);
+        }
+
         const code = match ? path.basename(match).split('.')[0].split('-')[0] : null;
         let api = await getJSON(`https://api.gfycat.com/v1/gfycats/${code}`).catch(_err=>{});
 

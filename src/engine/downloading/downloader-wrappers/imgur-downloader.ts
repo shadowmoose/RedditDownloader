@@ -106,11 +106,10 @@ export class ImgurDownloader extends Downloader {
             }
 
             if (urls.length) {
-                await actions.addAlbumUrls(urls).catch(err => {
+                return await actions.addAlbumUrls(urls).catch(err => {
                     console.log('Imgur album error...');
                     console.error(err);
                 });
-                return;
             } else {
                 return actions.markInvalid('Failed to extract valid URLS from album.');
             }

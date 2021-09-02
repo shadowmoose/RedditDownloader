@@ -19,7 +19,7 @@ export async function mockDownloadData(url: string): Promise<DownloaderData> {
 
 export function mockDownloaderFunctions(): DownloaderFunctions {
     return {
-        addAlbumUrls: jest.fn((...p: any) => Promise.resolve(null)),
+        addAlbumUrls: jest.fn((..._p: any) => Promise.resolve()),
         markInvalid: (reason: string) => {
             throw new InvalidDownloaderError(reason);
         },

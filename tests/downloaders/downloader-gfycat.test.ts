@@ -36,6 +36,40 @@ describe('Gfycat Download Tests', () => {
         expect(prog.percent).toEqual(1);  // Download completes in progress tracker.
     })
 
+    it('load red user album', async () => {
+        const dat = await mockDownloadData('https://www.redgifs.com/users/shadowmoose');
+        const prog = new DownloadProgress(0);
+        const dl = new GfycatDownloader();
+
+        const mocked = mockDownloaderFunctions();
+        const res = await dl.download(dat, mocked, prog);
+        expect(res).toBeFalsy();
+        expect(mocked.addAlbumUrls).toBeCalled();
+        // @ts-ignore
+        expect(mocked.addAlbumUrls.mock.calls[0][0].length).toBeGreaterThan(1);
+    });
+
+    it('load gfy user album', async () => {
+        const dat = await mockDownloadData('https://gfycat.com/@theshadowmoose/');
+        const prog = new DownloadProgress(0);
+        const dl = new GfycatDownloader();
+
+        const mocked = mockDownloaderFunctions();
+        const res = await dl.download(dat, mocked, prog);
+        expect(res).toBeFalsy();
+        expect(mocked.addAlbumUrls).toBeCalled();
+        // @ts-ignore
+        expect(mocked.addAlbumUrls.mock.calls[0][0].length).toEqual(1);
+    });
+
+    it('load gfy user can fail', async () => {
+        const dat = await mockDownloadData('https://gfycat.com/@asfd-0!asdf');
+        const prog = new DownloadProgress(0);
+        const dl = new GfycatDownloader();
+
+        await expect(dl.download(dat, mockDownloaderFunctions(), prog)).rejects.toThrow();
+    });
+
     it('download can fail', async () => {
         const dat = await mockDownloadData('https://gfycat.com/thisIsAFakeId');
         const prog = new DownloadProgress(0);

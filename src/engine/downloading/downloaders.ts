@@ -103,7 +103,7 @@ export interface DownloaderData {
 
 export interface DownloaderFunctions {
     /** Register a new list of URLs, and sets the current URL as an album parent. Noop for nested albums. */
-    addAlbumUrls: (url: string[]) => Promise<null>;
+    addAlbumUrls: (url: string[]) => Promise<void>;
     /** Mark the current URL as failed, sets a reason, and raise a InvalidDownloadError to exit. The URL will be skipped by default after this. */
     markInvalid: (reason: string) => Promise<void>;
     /** Gracefully exit in a way that will be swallowed by the parent error handling. */
@@ -132,7 +132,7 @@ export const buildDownloadData = mutex(async (dl: DBDownload, prog: DownloadProg
     let albumIDX = 1;
     const callbacks: DownloaderFunctions = {
         addAlbumUrls: async (urls: string[]) => {
-            if (dl.albumID && !dl.isAlbumParent) return null;  // Disallow nested albums.
+            if (dl.albumID && !dl.isAlbumParent) return;  // Disallow nested albums.
             if (!dl.albumID) {
                 const file = DBFile.build({
                     dHash: null,
@@ -160,7 +160,6 @@ export const buildDownloadData = mutex(async (dl: DBDownload, prog: DownloadProg
                     return d.save()
                 });
             }
-            return null;
         },
         markInvalid: async (reason: string) => {
             if (!prog.shouldStop) {
