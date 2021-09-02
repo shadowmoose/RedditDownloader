@@ -65,7 +65,7 @@ const RedditOAuthInput = observer(() => {
 
     async function addAccount() {
         if (username) return;
-        const win = window.open('');
+        const win = SETTINGS.serverPort === 7505 && window.open('');
         const url = await sendCommand(ClientCommandTypes.GET_OAUTH_URL);
 
         setOAuth(url);

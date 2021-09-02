@@ -135,7 +135,7 @@ export const SourceConfigModal = observer((props: {open: boolean, onClose: (save
             {getSourceConfigPage(source.type, sourceData)}
             <Divider style={{marginBottom: '10px', marginTop: '10px'}}/>
 
-            <Grid container justify="space-between" >
+            <Grid container justifyContent="space-between" >
                 <Button
                     disabled={!needsSave || !hasValidName}
                     variant="contained"

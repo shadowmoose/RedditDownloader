@@ -34,14 +34,16 @@ export const ThreadProgressItem = observer((props: {prog: DownloaderProgressInte
 
     return <ListItem>
         <ListItemAvatar>
-            <Avatar>
-                {prog.knowsPercent ? <CircularProgressWithLabel value={prog.percent*100} /> : <CircularProgress style={{backgroundColor: '#f1b57d'}}/>}
-            </Avatar>
+            <a href={prog.url} target={"_blank"} style={{pointerEvents: prog.url? 'all':'none'}} title={prog.url?'Open URL.':''}>
+                <Avatar>
+                    {prog.knowsPercent ? <CircularProgressWithLabel value={prog.percent*100} /> : <CircularProgress style={{backgroundColor: '#f1b57d'}}/>}
+                </Avatar>
+            </a>
         </ListItemAvatar>
         <Tooltip title={prog.fileName}>
             <ListItemText
                 primary={prog.fileName}
-                secondary={`[${prog.downloader}] ${prog.status}`}
+                secondary={`${prog.downloader && `[${prog.downloader}]`} ${prog.status}`}
                 style={{
                     whiteSpace: "nowrap",
                 }}

@@ -33,7 +33,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 
 export const SettingsModal = observer(()=> {
-    const [settingsOpen, setSettingsOpen] = useState(true);
+    const [settingsOpen, setSettingsOpen] = useState(false);
     const [oldSettings, setOldSettings] = useState(JSON.stringify(SETTINGS));
     const [currentTab, setCurrentTab] = useState(0);
     const {rmdConnected} = useRmdState();

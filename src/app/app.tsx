@@ -4,7 +4,6 @@ import {
     disconnectWS,
     GLOBAL_SERVER_ERROR,
     sendCommand,
-    STATE,
     useRmdState
 } from "./app-util/app-socket";
 import {observer} from "mobx-react-lite";
@@ -30,6 +29,7 @@ import {RMDStatus} from "../shared/state-interfaces";
 import {StateDropdown} from "./components/state-display/state-dropdown";
 import {SettingsModal} from "./components/settings-modal/settings-modal";
 import {SnackbarProvider, useSnackbar} from "notistack";
+import BasicGallery from "./components/gallery/basic-gallery/basic-gallery";
 
 
 configure({
@@ -42,6 +42,8 @@ const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
             display: 'flex',
+            backgroundColor: theme.palette.background.paper,
+            height: '100%'
         },
         appBar: {
             transition: theme.transitions.create(['margin', 'width'], {
@@ -82,7 +84,7 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         content: {
             flexGrow: 1,
-            padding: theme.spacing(3),
+            padding: 10,
             transition: theme.transitions.create('margin', {
                 easing: theme.transitions.easing.sharp,
                 duration: theme.transitions.duration.leavingScreen,
@@ -178,7 +180,7 @@ const App = () => {
                     })}
                 >
                     <Toolbar>
-                        <Grid container justify="space-between" >
+                        <Grid container justifyContent="space-between" >
                             <Grid>
                                 <IconButton
                                     color="inherit"
@@ -207,8 +209,8 @@ const App = () => {
                                 >
                                     {rmdReady ? <GetAppIcon /> : <CancelIcon />}
                                     <span style={{marginLeft: '5px'}}>
-                                    {rmdReady ? 'Start Download' : 'Stop Downloading'}
-                                </span>
+                                        {rmdReady ? 'Start Download' : 'Stop Downloading'}
+                                    </span>
                                 </Fab>
 
                                 <div className={classes.progressButtonWrapper}>
@@ -255,7 +257,7 @@ const App = () => {
                         [classes.contentShift]: open,
                     })}
                 >
-                    <div className={classes.drawerHeader} />
+                    <div className={classes.drawerHeader} id={'spacerHeader'}/>
                     <Popper
                         id="progress-popper"
                         anchorEl={progressAnchorEl}
@@ -264,22 +266,13 @@ const App = () => {
                     >
                         <StateDropdown />
                     </Popper>
-                    <StateDebug />
+                    <BasicGallery />
                 </main>
             </div>
             <NotifyComponent />
         </SnackbarProvider>
     );
 };
-
-
-const StateDebug = observer(() => {
-    return <div>
-        <pre>
-            {JSON.stringify(STATE, null, 4)}
-        </pre>
-    </div>
-});
 
 
 /**

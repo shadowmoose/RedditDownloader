@@ -24,7 +24,8 @@ export const STATE: DownloaderStateInterface = observable({
     currentSource: null,
     currentState: RMDStatus.CLIENT_NOT_CONNECTED,
     finishedScanning: false,
-    newPostsScanned: 1000,
+    newPostsScanned: 0,
+    downloadsInQueue: 0,
     shouldStop: false
 });
 
@@ -74,11 +75,14 @@ export function useRmdState() {
     };
 }
 
+let totalRecBytes = 0;
+
 /** Connect to the server's WebSocket, so that we can send or receive data. */
 export function connectWS() {
     disconnectWS();
     ws = new WebSocket(location.origin.replace(/^http/, 'ws'));
     ws.onmessage = (event) => {
+        totalRecBytes += (new TextEncoder().encode(event.data.length)).length;
         const packet = JSON.parse(event.data);
         handleMessage(packet);
     };
@@ -175,19 +179,23 @@ function updateState(data: any) {
     let cs: any = STATE;
     const path = data.path;
     const endKey = path.pop();
+    try {
+        path.forEach((p: any) => {
+            if (!cs[p]) {
+                if (data.deleted) return;
+                cs[p] = {};
+            }
+            cs = cs[p];
+        });
 
-    path.forEach((p: any) => {
-        if (!cs[p]) {
-            if (data.deleted) return;
-            cs[p] = {};
+        if (data.deleted) {
+            return delete cs[endKey];
         }
-        cs = cs[p];
-    });
-
-    if (data.deleted) {
-        return delete cs[endKey];
+        cs[endKey] = data.value;
+    } catch(err) {
+        data.path.push(endKey)
+        console.error(data, err);
     }
-    cs[endKey] = data.value;
 }
 
 function clearState(newState?: any) {
@@ -206,7 +214,7 @@ function onAck(packet: SocketResponse) {
     const idx = packet.uid || -1;
     const prom = pendingCommands[idx];
 
-    console.debug('Got ack', packet, pendingCommands);
+    console.debug('Got ack', packet);
     if (prom) {
         prom[2](); // Clear timer.
 
@@ -270,5 +278,12 @@ Object.assign(window, {
     debugState: () => JSON.parse(JSON.stringify(STATE)),
     debugSettings: () => JSON.parse(JSON.stringify(SETTINGS)),
     debugSourceGroups: () => JSON.parse(JSON.stringify(SOURCE_GROUPS)),
-    sendCommand
+    sendCommand,
+    debugRecBytes: () => {return setInterval(() => {
+        function humanFileSize(size: number) {
+            let i = Math.floor( Math.log(size) / Math.log(1024) );
+            return parseFloat((size / Math.pow(1024, i)).toFixed(2)).toLocaleString() + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
+        }
+        console.log('[REC BYTES]', humanFileSize(totalRecBytes))
+    }, 10000)}
 })

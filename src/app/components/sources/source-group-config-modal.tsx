@@ -128,7 +128,7 @@ export const SourceGroupConfigModal = observer((props: {open: boolean, onClose: 
 
             <FilterDisplayPanel sourceGroup={sg} />
 
-            <Grid container justify="space-between" >
+            <Grid container justifyContent="space-between" >
                 <Button
                     disabled={!needsSave || !hasValidName}
                     variant="contained"

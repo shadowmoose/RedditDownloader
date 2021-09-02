@@ -18,6 +18,7 @@ export interface DownloaderStateInterface {
     finishedScanning: boolean;
     currentSource: string|null;
     newPostsScanned: number;
+    downloadsInQueue: number;
 }
 
 
@@ -53,6 +54,11 @@ export interface DownloaderProgressInterface {
      * A float, representing the percentage complete this download is.
      */
     percent: number;
+
+    /**
+     * The URL that is currently being downloaded.
+     */
+    url: string;
 }
 
 

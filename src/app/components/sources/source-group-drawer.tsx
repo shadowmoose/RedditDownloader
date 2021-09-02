@@ -86,7 +86,7 @@ export const SourceGroupDrawer = observer(() => {
     return <DragDropContext onDragEnd={onDragEnd}>
         {eles}
 
-        <Grid container justify="center">
+        <Grid container justifyContent="center">
             <Button
                 variant="outlined"
                 color={"primary"}
