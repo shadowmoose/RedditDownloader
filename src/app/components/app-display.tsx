@@ -21,6 +21,9 @@ import {StateDropdown} from "./state-display/state-dropdown";
 import BasicGallery from "./gallery/basic-gallery/basic-gallery";
 import React, {useEffect} from "react";
 import {createStyles, makeStyles, Theme} from "@material-ui/core/styles";
+import BrowserSettings from "../app-util/local-config";
+import {observer} from "mobx-react-lite";
+import SettingsBrightnessIcon from '@material-ui/icons/SettingsBrightness';
 
 
 
@@ -68,7 +71,7 @@ const useStyles = makeStyles((theme: Theme) =>
             padding: theme.spacing(0, 1),
             // necessary for content to be below app bar
             ...theme.mixins.toolbar,
-            justifyContent: 'flex-end',
+            justifyContent: 'space-between',
         },
         content: {
             flexGrow: 1,
@@ -127,7 +130,7 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 
-export default function AppDisplay() {
+const AppDisplay = observer(() => {
     const {rmdReady, rmdConnected, rmdState} = useRmdState();
     useEffect(() => {
         connectWS();
@@ -137,8 +140,9 @@ export default function AppDisplay() {
 
     const classes = useStyles();
     const [open, setOpen] = React.useState(true);
-    const progBtnRef: any = React.useRef();
     const [progressAnchorEl, setProgAnchorEl] = React.useState<null | HTMLElement>(null);
+    const progBtnRef: any = React.useRef();
+    const shouldOpenProgress = !!progressAnchorEl && BrowserSettings.openDownloadProgress;
 
     const handleDrawerOpen = () => {
         setOpen(true);
@@ -149,13 +153,17 @@ export default function AppDisplay() {
     };
 
     const toggleProgress = () => {
-        setProgAnchorEl(progressAnchorEl ? null : progBtnRef.current);
+        BrowserSettings.openDownloadProgress = !BrowserSettings.openDownloadProgress;
     };
 
     const progButtonClass = clsx({
-        [classes.progressButtonClosed]: !progressAnchorEl,
-        [classes.progressButtonOpen]: !!progressAnchorEl,
+        [classes.progressButtonClosed]: !BrowserSettings.openDownloadProgress,
+        [classes.progressButtonOpen]: BrowserSettings.openDownloadProgress,
     });
+
+    useEffect(() => {
+        setProgAnchorEl(progBtnRef.current);
+    }, [progBtnRef.current]);
 
 
     return <Box className={classes.root}>
@@ -196,8 +204,8 @@ export default function AppDisplay() {
                         >
                             {rmdReady ? <GetAppIcon /> : <CancelIcon />}
                             <span style={{marginLeft: '5px'}}>
-                                        {rmdReady ? 'Start Download' : 'Stop Downloading'}
-                                    </span>
+                                {rmdReady ? 'Start Download' : 'Stop Downloading'}
+                            </span>
                         </Fab>
 
                         <div className={classes.progressButtonWrapper}>
@@ -230,6 +238,11 @@ export default function AppDisplay() {
             }}
         >
             <div className={classes.drawerHeader}>
+                <IconButton onClick={()=>BrowserSettings.useDarkMode = !BrowserSettings.useDarkMode} >
+                    <Tooltip title={'Toggle Dark Mode'}>
+                        <SettingsBrightnessIcon />
+                    </Tooltip>
+                </IconButton>
                 <IconButton onClick={handleDrawerClose}>
                     <ChevronLeftIcon />
                 </IconButton>
@@ -248,7 +261,7 @@ export default function AppDisplay() {
             <Popper
                 id="progress-popper"
                 anchorEl={progressAnchorEl}
-                open={!!progressAnchorEl}
+                open={shouldOpenProgress}
                 className={classes.progressPopover}
             >
                 <StateDropdown />
@@ -256,4 +269,6 @@ export default function AppDisplay() {
             <BasicGallery />
         </main>
     </Box>
-}
+});
+
+export default AppDisplay;

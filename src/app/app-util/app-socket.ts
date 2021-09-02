@@ -46,12 +46,9 @@ export const SETTINGS: SettingsInterface = observable({
 
 export const SOURCE_GROUPS: SourceGroupInterface[] = observable([]);
 
-
 export const AUTHED_USERNAME = observable.box<string|null>(null);
 
 export const GLOBAL_SERVER_ERROR = observable.box<any>(null);
-
-export const USE_DARK_THEME = observable.box<boolean>(false);
 
 
 /**

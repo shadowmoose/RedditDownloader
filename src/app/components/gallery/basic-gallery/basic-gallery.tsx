@@ -18,6 +18,8 @@ import Pagination from '@material-ui/lab/Pagination';
 import {RMDStatus} from "../../../../shared/state-interfaces";
 import RefreshIcon from '@material-ui/icons/Refresh';
 import {Box, Fab, FormControl, Grid, InputLabel, MenuItem, Select, TextField, Tooltip} from "@material-ui/core";
+import {observer} from "mobx-react-lite";
+import BrowserSettings from "../../../app-util/local-config";
 
 
 const useStyles = makeStyles(() =>
@@ -50,9 +52,9 @@ const useStyles = makeStyles(() =>
 const MAX_MEDIA_SIZE = 200;
 
 
-export default function BasicGalleryBody() {
+const BasicGalleryBody = observer(() => {
     const classes = useStyles();
-    const [paging, setPaging] = useState<PagingType>({limit: 25, offset: 0});
+    const [paging, setPaging] = useState<PagingType>({limit: BrowserSettings.resultsPerPage, offset: 0});
     const [searchCommand, setSearchCommand] = useState<SearchCommand>({
         offset: 0,
         limit: 10,
@@ -75,6 +77,7 @@ export default function BasicGalleryBody() {
         sendCommand(ClientCommandTypes.LIST_DOWNLOADS, fullCommand).then(res => {
             setSearchResult(res);
         });
+        BrowserSettings.resultsPerPage = paging.limit;
     }, [JSON.stringify(fullCommand), JSON.stringify(paging)]);
 
 
@@ -122,7 +125,9 @@ export default function BasicGalleryBody() {
             ))}
         </Box>
     </Box>
-}
+});
+
+export default BasicGalleryBody;
 
 
 type PagingType = {limit: number, offset: number};
@@ -399,9 +404,11 @@ export function SortSearchInput (props: {
                 width: 100,
             }}
         />
-        {props.sorted ? sortArrow : <SortIcon
-            onClick={()=>props.onSort(sortAsc)}
-            className={classes.sortIcon}
-        />}
+        <Tooltip title={`Sort results by ${props.field}`}>
+            {props.sorted ? sortArrow : <SortIcon
+                onClick={()=>props.onSort(sortAsc)}
+                className={classes.sortIcon}
+            />}
+        </Tooltip>
     </div>
 }

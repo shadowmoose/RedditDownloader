@@ -1,6 +1,6 @@
 import React, {ReactNode, useEffect, useState} from 'react';
 import {observer} from "mobx-react-lite";
-import {Button, makeStyles, Modal, Tab, Tabs} from "@material-ui/core";
+import {Button, makeStyles, Modal, Tab, Tabs, Tooltip} from "@material-ui/core";
 import IconButton from "@material-ui/core/IconButton";
 import SettingsIcon from "@material-ui/icons/Settings";
 import {createStyles, Theme} from "@material-ui/core/styles";
@@ -79,7 +79,9 @@ export const SettingsModal = observer(()=> {
             onClick={openSettings}
             edge="start"
         >
-            <SettingsIcon />
+            <Tooltip title={`Change RMD's Settings`}>
+                <SettingsIcon />
+            </Tooltip>
         </IconButton>
 
         <Modal
