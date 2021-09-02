@@ -1,6 +1,5 @@
-import axios from 'axios';
 import {sharedPath, mkParents} from "../core/paths";
-import {downloadBinary} from "../util/http";
+import {downloadBinary, getRaw} from "../util/http";
 import * as fs from "fs";
 import path from 'path';
 import crypto from 'crypto';
@@ -8,33 +7,59 @@ import {ChildProcess} from "child_process";
 import {DownloadProgress} from "../core/state";
 import {GracefulStopError} from "./downloader-wrappers/download-wrapper";
 import {checkFFMPEGDownload, ffmpegPath} from "../file-processing/ffmpeg";
+import * as os from "os";
 const YoutubeDlWrap = require("youtube-dl-wrap");
 
+async function getChecksum(path: string): Promise<string> {
+    if (!fs.existsSync(path)) throw Error('YTDL executable is missing.');
+
+    return new Promise(function (resolve, reject) {
+        const hash = crypto.createHash('sha256');
+        const input = fs.createReadStream(path);
+
+        input.on('error', reject);
+
+        input.on('data', function (chunk) {
+            hash.update(chunk);
+        });
+
+        input.on('close', function () {
+            resolve(hash.digest('hex'));
+        });
+    });
+}
+
+const arch = os.arch() === 'x86' ? '_x86' : '';
 const isWin = process.platform === 'win32' || process.env.NODE_PLATFORM === 'windows';
 const ext = isWin ? '.exe':'';
-const updateURL = `https://yt-dl.org/downloads/latest/youtube-dl${ext}`;
+const fileName = `yt-dlp${arch}${ext}`;
+const updateURL = `https://github.com/yt-dlp/yt-dlp/releases/latest/download/`;
 
-export const exePath = sharedPath('bin', `ytdl${ext}`);
+export const exePath = sharedPath('bin', `yt-dlp${ext}`);
 
 const ytdl = new YoutubeDlWrap(exePath);
 
 
 export async function getLocalVersion(): Promise<string> {
    try{
-       return (await ytdl.getVersion()).trim();
-   } catch(err) {
+       return await getChecksum(exePath);
+   } catch (err) {
        return '';
    }
 }
 
 export async function getLatestVersion() {
-    const res = await axios({
-        method: 'head',
-        url: updateURL,
-        maxRedirects: 0
-    }).catch(err=>err.response);
+    const res: string = await getRaw(`${updateURL}SHA2-256SUMS`);
+    const lines = res.split('\n');
 
-    return (res ? res.headers['location']||'':'').match(/\d+\.\d+\.\d+/g)[0];
+    for (const l of lines) {
+        if (l.trim().startsWith(fileName)) {
+            return l.split(':')[1].trim();
+        }
+    }
+
+    console.warn(`Cannot locate latest appropriate YT-DLP download. ${fileName}`);
+    return null;
 }
 
 /**
@@ -46,8 +71,8 @@ export async function autoUpdate() {
 
     await checkFFMPEGDownload();
 
-    if (!loc || rem > loc) {
-        await downloadBinary(updateURL, exePath);
+    if (!loc || rem && (rem > loc)) {
+        await downloadBinary(`${updateURL}${fileName}`, exePath);
         fs.chmodSync(exePath, '755');
         return true;
     }
@@ -100,7 +125,7 @@ export async function download(url: string, filePath: string, progress?: Downloa
         })).on("progress", (prog: any) => {
             if (progress?.shouldStop) {
                 child.kill();
-                rej(new GracefulStopError('YTDL Terminated Child'))
+                return rej(new GracefulStopError('YTDL Terminated Child'))
             }
             if (progress) {
                 progress.status = 'Downloading with YTDL...';

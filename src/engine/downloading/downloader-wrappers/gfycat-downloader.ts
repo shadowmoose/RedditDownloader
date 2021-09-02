@@ -48,10 +48,12 @@ export class GfycatDownloader extends Downloader {
 
                 return downloadMedia(val, data.file, progress).catch(err => {
                     if (isTest()) console.error(err);
+                    if (progress.shouldStop) return;
                     return actions.markInvalid('Failed to download valid media file: ' + f);
                 });
             }
         }
+        if (progress.shouldStop) return;
         return actions.markInvalid('Failed to locate a valid file type.')
     }
 }

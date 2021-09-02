@@ -84,6 +84,7 @@ export class ImgurDownloader extends Downloader {
                 return await http.downloadMedia(await this.buildDirectURL(data.url), data.file, progress);
             } catch (err) {
                 if (isTest()) console.error(err);
+                if (progress.shouldStop) return;
                 return actions.markInvalid('Failed to download non-album image.')
             }
         } else {

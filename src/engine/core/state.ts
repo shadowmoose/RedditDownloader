@@ -4,7 +4,6 @@ import {DownloaderProgressInterface, DownloaderStateInterface, RMDStatus} from "
 
 
 export class DownloaderState implements DownloaderStateInterface {
-    @Streamer.delay(500)
     activeDownloads: (DownloadProgress|null)[] = [];
     shouldStop = false;
 
@@ -14,6 +13,7 @@ export class DownloaderState implements DownloaderStateInterface {
 
     @Streamer.delay(2000)
     newPostsScanned = 0;
+    downloadsInQueue = 0;
 
     /**
      * Set the "shouldStop" flag on this state and all its relevant children.
@@ -35,6 +35,16 @@ export class DownloaderState implements DownloaderStateInterface {
 }
 
 
+
+const percentTransformer = (newVal: number, prevVal: number): number => {
+    const nv = Math.round((newVal * 100)) / 100;
+    if (nv < 1 && Math.abs(nv - prevVal) < .1) {
+        return prevVal;
+    }
+    return nv;
+}
+
+
 export class DownloadProgress implements DownloaderProgressInterface {
     constructor(thread: number) {
         this.thread = thread;
@@ -42,21 +52,19 @@ export class DownloadProgress implements DownloaderProgressInterface {
 
     thread: number;
 
-    @Streamer.delay(1000)
-    status: string = '';
+    status: string = 'Waiting for next available post.';
 
-    @Streamer.delay(1000)
     fileName: string = '';
 
-    @Streamer.delay(1000)
-    downloader: string = 'none';
+    downloader: string = '';
 
-    @Streamer.delay(500)
     knowsPercent: boolean = false;
 
     shouldStop = false;
 
-    @Streamer.delay(1000)
-    @Streamer.transformer(number => (Math.round(number * 100) / 100))
+    @Streamer.transformer(percentTransformer)
     percent: number = 0;
+
+    url: string = '';
 }
+

@@ -10,18 +10,9 @@ import DBSetting from "./entities/db-setting";
 import DBSourceGroup from "./entities/db-source-group";
 import DBSource from "./entities/db-source";
 import DBUrl from "./entities/db-url";
-import {initial1613378705882} from "./migrations/1613378705882-initial";
-import {psTagCol1615799411768} from "./migrations/1615799411768-ps-tag-col";
-import {dlAlbumIndex1615805733346} from "./migrations/1615805733346-dl-album-index";
-import {stringPaddedIndex1615868441239} from "./migrations/1615868441239-string-padded-index";
 import DBSymLink from "./entities/db-symlink";
-import {addSymlinks1615947913892} from "./migrations/1615947913892-add-symlinks";
-import {addDirFlag1616042478022} from "./migrations/1616042478022-add-dir-flag";
-import {fileIsAlbum1616318709797} from "./migrations/1616318709797-file-is-album";
-import {addInvertedFilter1617069277622} from "./migrations/1617069277622-add-inverted-filter";
-import {fixCommentParent1618973367109} from "./migrations/1618973367109-fix-comment-parent";
-import {addSourceCascade1629767914963} from "./migrations/1629767914963-add-source-cascade";
-import {addAllDeleteCascades1629768495254} from "./migrations/1629768495254-add-all-delete-cascades";
+import DBMediaMetadata from "./entities/db-media-metadata";
+import {initialCreate1630468432441} from "./migrations/1630468432441-initial-create";
 
 let _connection: Connection|null;
 
@@ -31,24 +22,14 @@ export async function makeDB() {
     return createConnection({
         type: "better-sqlite3",
         database: envDataPath(`manifest.sqlite`),
-        entities: [DBSubmission, DBComment, DBDownload, DBFile, DBFilter, DBSetting, DBSourceGroup, DBSource, DBUrl, DBSymLink],
+        entities: [DBSubmission, DBComment, DBDownload, DBFile, DBFilter, DBSetting, DBSourceGroup, DBSource, DBUrl, DBSymLink, DBMediaMetadata],
         logging: false,
         synchronize: false,
         migrationsTransactionMode: 'all',
         migrationsRun: false,
         migrationsTableName: "migrations",
         migrations: [
-            initial1613378705882,
-            psTagCol1615799411768,
-            dlAlbumIndex1615805733346,
-            stringPaddedIndex1615868441239,
-            addSymlinks1615947913892,
-            addDirFlag1616042478022,
-            fileIsAlbum1616318709797,
-            addInvertedFilter1617069277622,
-            fixCommentParent1618973367109,
-            addSourceCascade1629767914963,
-            addAllDeleteCascades1629768495254,
+            initialCreate1630468432441
         ],  // Add migration classes here.
         subscribers: [DownloadSubscriber],
     }).then(async (connection: Connection) => {
@@ -61,6 +42,9 @@ export async function makeDB() {
         await connection.query('VACUUM');
         _connection = connection;
         return connection;
+    }).catch(err => {
+        console.error(err);
+        process.exit(1);
     });
 }
 

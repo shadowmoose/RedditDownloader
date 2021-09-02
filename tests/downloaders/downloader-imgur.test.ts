@@ -1,6 +1,7 @@
 import {ImgurDownloader} from "../../src/engine/downloading/downloader-wrappers/imgur-downloader";
 import {DownloadProgress} from "../../src/engine/core/state";
 import {mockDownloadData, mockDownloaderFunctions} from "./test-util";
+import {downloadFFProbe, getMediaMetadata} from "../../src/engine/file-processing/ffmpeg";
 
 
 describe('Imgur Download Tests', () => {
@@ -58,9 +59,13 @@ describe('Imgur Download Tests', () => {
         const dl = new ImgurDownloader();
 
         const res = await dl.download(dat, mockDownloaderFunctions(), prog);
-        expect(res).toBeTruthy();
         expect(res).toEqual('jpg');
         expect(prog.percent).toEqual(1);  // Download completes in progress tracker.
+
+        await downloadFFProbe();
+        const metadata = await getMediaMetadata(dat.file +'.'+ res);
+        expect(metadata.width).toBe(1025);
+        expect(metadata.height).toBe(1025);
     })
 
     it('download gif as mp4', async () => {
@@ -69,7 +74,6 @@ describe('Imgur Download Tests', () => {
         const dl = new ImgurDownloader();
 
         const res = await dl.download(dat, mockDownloaderFunctions(), prog);
-        expect(res).toBeTruthy();
         expect(res).toEqual('mp4');
         expect(prog.percent).toEqual(1);  // Download completes in progress tracker.
     })

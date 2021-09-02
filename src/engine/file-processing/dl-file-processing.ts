@@ -8,8 +8,15 @@ import {getAbsoluteDL} from "../core/paths";
 import {dhash} from './image-dhash';
 import {mutex} from "../util/promise-pool";
 import DBSymLink from "../database/entities/db-symlink";
-import {Brackets} from "typeorm";
+import {Brackets, getManager} from "typeorm";
+import {getMediaMetadata} from "./ffmpeg";
+import {ParsedMediaMetadata} from "../../shared/search-interfaces";
+import DBMediaMetadata from "../database/entities/db-media-metadata";
 
+
+const KNOWN_BAD_HASHES = [
+    '9b5936f4006146e4e1e9025b474c02863c0b5614132ad40db4b925a10e8bfbb9', // Imgur "This image you are requesting is no longer available..."
+];
 
 export async function distHash(file: string): Promise<string|null> {
     return dhash(file, 8).then(async (res: Buffer) => {
@@ -54,6 +61,12 @@ export const buildDedupedFile = mutex(async (fullPath: string, subpath: string, 
     const dh = await distHash(fullPath);
     const dChunks = dh?.match(/.{1,4}/g) || [];
     const skipAlbums = await DBSetting.get('skipAlbumFiles');
+
+    if (KNOWN_BAD_HASHES.includes(checksum)) {
+        console.warn('File matches known 404 hash.', subpath);
+        await fs.promises.unlink(fullPath);
+        return null;
+    }
 
     if (await DBSetting.get('dedupeFiles') && !(isAlbumFile && skipAlbums)) {
         let closeMatches = await DBFile.createQueryBuilder('f')
@@ -100,19 +113,30 @@ export const buildDedupedFile = mutex(async (fullPath: string, subpath: string, 
         }
     }
 
-    return DBFile.build({
+    const mime = mimetype.lookup(fullPath) || '';
+
+    const dbf = DBFile.build({
         shaHash: checksum,
         dHash: dh || null,
         hash1: dChunks[0] || null,
         hash2: dChunks[1] || null,
         hash3: dChunks[2] || null,
         hash4: dChunks[3] || null,
-        mimeType: mimetype.lookup(fullPath) || '',
+        mimeType: mime,
         path: subpath,
         size: stats.size,
         isDir: false,
         isAlbumFile
-    }).save();
+    });
+    const mdat = await lookupmediaMetadata(fullPath, mime);
+    const meta = mdat ? DBMediaMetadata.build({...mdat, parentFile: Promise.resolve(dbf)}) : null;
+
+    const manager = getManager();
+    await manager.save([
+        dbf, meta
+    ].filter(f=>!!f), {transaction: true});
+
+    return dbf;
 });
 
 /**
@@ -133,5 +157,24 @@ export async function redirectSymLinks(originalDest: string, newDest: string) {
         await fs.promises.symlink(target, abs);
         l.target = newDest;
         await l.save();
+    }
+}
+
+
+export async function lookupmediaMetadata(path: string, mimeType: string): Promise<ParsedMediaMetadata|void> {
+    const lookup = await getMediaMetadata(path);
+
+    if (mimeType.startsWith('audio/') || mimeType.startsWith('video/')) {
+        return lookup;
+    } else if (mimeType.startsWith('image/')) {
+        return {
+            width: lookup.width,
+            height: lookup.height,
+            audioCodec: null,
+            bitrate: null,
+            duration: null,
+            originalMediaTitle: lookup.originalMediaTitle,
+            videoCodec: null,
+        };
     }
 }

@@ -44,7 +44,7 @@ export default class DBSourceGroup extends DBEntity {
 
         for (const s of sources) {
             try {
-                if (state && state.shouldStop) return stop();
+                if (state && state.shouldStop) return;
                 if (state) state.currentSource = s.alias;
                 const gen = s.find();
 

@@ -18,7 +18,7 @@ interface DecoratorMetadata {
     before?: boolean;
     after?: boolean;
     customData?: any;
-    transformer?: (arg: any)=>any;
+    transformer?: (arg: any, current: any)=>any;
 }
 interface TrackerData {
     timer: any;
@@ -61,7 +61,8 @@ export function proxify<T>(target: T, opts: ProxyOpts, tracker: (string|number)[
             if (target[property] === newValue) return true;
             const currentMetadata: DecoratorMetadata|null = metadata || getMeta(property) || null;
             if (currentMetadata?.transformer) {
-                newValue = currentMetadata.transformer(newValue);
+                newValue = currentMetadata.transformer(newValue, target[property]);
+                if (target[property] === newValue) return true;
             }
             target[property] = newValue;
             if (!(Array.isArray(target) && property === 'length')) {
@@ -191,7 +192,13 @@ export class Streamer <T>{
             const after = metadata.after || (!metadata.after && !metadata.before);
 
             if (after && data.dirty) {
-                this.sendChange(path, isDeleted, metadata);
+                try{
+                    this.sendChange(path, isDeleted, metadata);
+                } catch(err) {
+                    console.error(err);
+                    if(scheduled.length) console.log(scheduled);
+                    console.warn(path, isDeleted, metadata, data);
+                }
             }
             this.removePending(path);
         }, metadata.delay || 0);
@@ -290,7 +297,7 @@ export class Streamer <T>{
      * Whenever the value is reassigned, the given transformer function will first be run,
      * and the value of the wrapped property will be set to the transformer function's output.
      */
-    static transformer(syncFunction: (val: any) => any) {
+    static transformer(syncFunction: (val: any, prevVal: any) => any) {
         return (targetClass: any, propertyKey: string) => {
             Streamer.setMetadata(targetClass, propertyKey, {
                 transformer: syncFunction

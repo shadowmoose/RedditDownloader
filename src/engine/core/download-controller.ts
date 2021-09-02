@@ -6,15 +6,15 @@ import {downloadAll} from "../downloading/downloaders";
 import DBSourceGroup from "../database/entities/db-source-group";
 import {forGen} from "../util/generator-util";
 import {isTest} from "./config";
-import {DownloadSubscriber} from "../database/entities/db-download";
+import DBDownload, {DownloadSubscriber} from "../database/entities/db-download";
 import {baseDownloadDir} from "./paths";
 import {RMDStatus} from "../../shared/state-interfaces";
-import {disposeRedditAPI, getRedditUsername} from "../reddit/snoo";
-import {broadcast} from "../webserver/web-server";
-import {ServerPacketTypes} from "../../shared/socket-packets";
+import {disposeRedditAPI} from "../reddit/snoo";
 import {sendError} from "./notifications";
 
+
 let streamer: Streamer<DownloaderState> |null;
+let trackerTimer: any;
 
 /**
  * Start scanning for new Posts, and also downloaing them.
@@ -36,6 +36,17 @@ export function scanAndDownload(progressCallback: SendFunction) {
     DownloadSubscriber.toggle(true);
     disposeRedditAPI();
 
+    clearInterval(trackerTimer);
+    trackerTimer = setInterval(() => {
+        DBDownload.createQueryBuilder('dl')
+            .leftJoinAndSelect('dl.url', 'url')
+            .where("url.processed = :processed", {processed: false})
+            .getCount()
+            .then(res => {
+                state.downloadsInQueue = res;
+            })
+    }, 3000);
+
     return Promise
         .all([
             scanAll(state).then(() => DownloadSubscriber.toggle(false)), // Scan all, then turn off the (blocking) subscriber.
@@ -46,9 +57,16 @@ export function scanAndDownload(progressCallback: SendFunction) {
             console.error(err);
             sendError(err);
         }).finally(() => {
-            state!.currentState = RMDStatus.FINISHED;
-            state!.currentSource = null;
-            state!.stop();
+            state.currentState = RMDStatus.FINISHED;
+            state.currentSource = null;
+            state.stop();
+            state.downloadsInQueue = 0;
+            clearInterval(trackerTimer);
+
+            for (let i=0; i<state.activeDownloads.length; i++) {
+                state.activeDownloads[i] = null;
+            }
+            console.log('== Scan & Download Finished ==');
         });
 }
 

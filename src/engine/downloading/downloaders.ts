@@ -59,6 +59,12 @@ export const getNextPendingDownload = mutex(async (ignoreURLs: Set<string>) => {
 export async function downloadAll(state: DownloaderState) {
     const pending = new Set<string>();
     const getNext = async() => (await getNextPendingDownload(pending)) || await DownloadSubscriber.awaitNew();
+    const threadCount = await DBSetting.get('concurrentThreads')
+
+    for (let i=0; i < threadCount; i++) {
+        // Initialize empty state for any listening clients.
+        state.activeDownloads[i] = new DownloadProgress(i);
+    }
 
     return promisePool(async (stop, threadNumber) => {
         const nxt = await getNext();
@@ -75,7 +81,7 @@ export async function downloadAll(state: DownloaderState) {
         }
 
         pending.delete((await nxt.url).address);
-    }, await DBSetting.get('concurrentThreads'), err => {
+    }, threadCount, err => {
         console.error(err);
         sendError(err);
     });
@@ -157,7 +163,9 @@ export const buildDownloadData = mutex(async (dl: DBDownload, prog: DownloadProg
             return null;
         },
         markInvalid: async (reason: string) => {
-            await (await dl.url).setFailed(reason, prog.downloader);
+            if (!prog.shouldStop) {
+                await (await dl.url).setFailed(reason, prog.downloader);
+            }
             throw new InvalidDownloaderError(reason);
         },
         userExit: (reason?: string) => {throw new GracefulStopError(reason||'User exit')}
@@ -171,6 +179,8 @@ export const buildDownloadData = mutex(async (dl: DBDownload, prog: DownloadProg
  */
 export async function handleDownload(dl: DBDownload, progress: DownloadProgress): Promise<any> {
     const {data, callbacks} = await buildDownloadData(dl, progress);
+
+    progress.url = data.url;
 
     for (const d of await getDownloaders()) {
         if (progress.shouldStop || (await dl.url).processed) break;
@@ -198,16 +208,21 @@ export async function handleDownload(dl: DBDownload, progress: DownloadProgress)
                     if (isTest()) console.warn('handler:', d.name, 'thought (incorrectly) it could handle', data.url);
                     continue;
                 }
+                progress.status = 'Processing downloaded file.';
                 return await processFinishedDownload(url, `${data.relativeFile}.${ext}`, d.name, !!dl.albumPaddedIndex);
             } catch (err) {
                 if (err instanceof GracefulStopError) {
                     // Swallow graceful errors, because the user wants to exit cleanly.
                     console.debug("Graceful stop encountered in downloader:", d.name, err.message);
                 } else if (err.isDownloaderError) {
-                    console.error('Error - Marked invalid by Downloader:', err.reason);
+                    if (progress.shouldStop) {
+                        console.warn('Downloader Error - Skipping invalid during shutdown:', err.reason);
+                    } else {
+                        console.error('Downloader Error - Marked invalid by Downloader:', err.reason);
+                    }
                     return;
                 } else {
-                    console.error('Downloader Error:', d.name, data.url, isTest() ? err : '<snipped error trace>');
+                    console.error('Nonspecific Downloading Error:', d.name, data.url, err);
                 }
             }
         }
@@ -229,8 +244,8 @@ export async function processFinishedDownload(url: DBUrl, subPath: string, handl
     const file = await buildDedupedFile(getAbsoluteDL(subPath), subPath, isAlbumFile);
     url.file = Promise.resolve(file);
     url.processed = true;
-    url.failed = false;
-    url.failureReason = null;
+    url.failed = file === null;
+    url.failureReason = file ? null : 'Failed to generate valid file.';
     url.completedUTC = Date.now();
     url.handler = handler;
 

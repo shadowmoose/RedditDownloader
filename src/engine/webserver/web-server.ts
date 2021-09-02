@@ -43,8 +43,6 @@ const wsServer = new ws.Server({ noServer: true });
 /* Serve an index file. */
 app.use(express.static(path.resolve(path.dirname(__filename), '../../../dist/')));
 
-console.log('Serving static files from:', path.resolve(path.dirname(__filename), '../../../dist/'));
-
 /* Serve downloaded files, using their ID. */
 app.get('/file/:id', async (req, res) => {
     const f = await DBFile.findOne({id: parseInt(req.params.id)});
@@ -52,7 +50,7 @@ app.get('/file/:id', async (req, res) => {
         return res.status(404).send('Unknown file ID.');
     }
 
-    if (!req.headers.range) console.log('Serving file:', req.params.id, '->', path.basename(f.path));
+    // if (!req.headers.range) console.log('Serving file:', req.params.id, '->', path.basename(f.path));
 
     return res.sendFile(getAbsoluteDL(f.path), {
         headers: {
@@ -62,7 +60,7 @@ app.get('/file/:id', async (req, res) => {
 });
 
 app.get('/authorize', async (req, res) => {
-    // Serve a basic landing page prompt for users working through the oAuth flow, rather than a confusing error.
+    /* Serve a basic landing page prompt for users working through the oAuth flow, rather than a confusing error. */
     res.send(`If this window doesn't auto-close soon, copy <a href=''>the URL</a> and paste it into RMD's settings.`);
 });
 
@@ -132,6 +130,7 @@ function resetPing(client: any, reCheck: boolean = false) {
  */
 export async function launchServer(): Promise<Server> {
     console.log("Launching server...");
+    console.log('Serving static files from:', path.resolve(path.dirname(__filename), '../../../dist/'));
     return new Promise(async (res) => {
         const host = await DBSetting.get('serverHost');
         const port = await DBSetting.get('serverPort');

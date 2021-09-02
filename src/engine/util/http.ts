@@ -53,10 +53,17 @@ export async function getMimeType(url: string) {
  * @returns The extension of the downloaded file, without the dot.
  */
 export async function downloadMedia(url: string, filePath: string, prog: DownloadProgress): Promise<string> {
+    const CancelToken = axios.CancelToken;
+    let cancel: any;
+
     const { data, headers } = await axios({
         url,
         method: 'GET',
-        responseType: 'stream'
+        responseType: 'stream',
+        cancelToken: new CancelToken(function executor(c) {
+            // An executor function receives a cancel function as a parameter
+            cancel = c;
+        })
     });
 
     const ext = getMediaMimeExtension(headers['content-type'])
@@ -69,6 +76,11 @@ export async function downloadMedia(url: string, filePath: string, prog: Downloa
     let downloaded = 0;
 
     data.on('data', (chunk: any) => {
+        if (prog.shouldStop) {
+            console.debug('cancel direct dl', url);
+            writer.close();
+            return cancel();
+        }
         if (totalLength) {
             downloaded += chunk.length;
             prog.knowsPercent = true;
@@ -76,15 +88,14 @@ export async function downloadMedia(url: string, filePath: string, prog: Downloa
         } else {
             prog.knowsPercent = false;
         }
-        if (prog.shouldStop) {
-            writer.close();
-            throw new GracefulStopError('Interrupted http download.');
-        }
     })
     data.pipe(writer);
 
     return new Promise((resolve, reject) => {
-        writer.on('close', () => resolve(ext as string))
+        writer.on('close', () => {
+            if (prog.shouldStop) return reject(new GracefulStopError('Interrupted http download.'))
+            resolve(ext as string)
+        })
         writer.on('error', err => reject(err))
     })
 }
