@@ -22,7 +22,8 @@ export const BoundNumberInput = observer((props: {
     useEffect(() => setVal(`${props.value}`), [props.value]);
 
     function setLimit(lim: string) {
-        let l = lim.replace(/^0+/, '').replace(/\D/, '');
+        lim = lim.replace(/\D/, '').trim();
+        let l = `${lim ? parseInt(lim) : ''}`;
 
         setVal(l);
         if (lim !== '') {

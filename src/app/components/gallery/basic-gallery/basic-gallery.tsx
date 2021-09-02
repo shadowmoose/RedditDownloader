@@ -2,7 +2,6 @@ import React, {useEffect, useState} from "react";
 import {sendCommand, useRmdState} from "../../../app-util/app-socket";
 import {ClientCommandTypes} from "../../../../shared/socket-packets";
 import {createStyles, makeStyles} from "@material-ui/core/styles";
-import {Fab, FormControl, Grid, InputLabel, MenuItem, Select, TextField, Tooltip} from "@material-ui/core";
 import FindReplaceIcon from '@material-ui/icons/FindReplace';
 import SortIcon from '@material-ui/icons/Sort';
 import {
@@ -18,6 +17,7 @@ import Typography from "@material-ui/core/Typography";
 import Pagination from '@material-ui/lab/Pagination';
 import {RMDStatus} from "../../../../shared/state-interfaces";
 import RefreshIcon from '@material-ui/icons/Refresh';
+import {Box, Fab, FormControl, Grid, InputLabel, MenuItem, Select, TextField, Tooltip} from "@material-ui/core";
 
 
 const useStyles = makeStyles(() =>
@@ -90,7 +90,7 @@ export default function BasicGalleryBody() {
         setSearchCommand(search);
     }
 
-    return <div>
+    return <Box>
         <div id={"basic-search-toolbar"}>
             <Grid style={{
                 display: 'flex',
@@ -114,14 +114,14 @@ export default function BasicGalleryBody() {
             </Grid>
         </div>
 
-        <div className={classes.root}>
+        <Box className={classes.root}>
             {searchResult.downloads.map((item) => (
                 <div className={classes.mediaWrapper} key={item.dlUID}>
                     <GenericMediaDisplay dl={item} maxSize={MAX_MEDIA_SIZE} thumbnail={true}/>
                 </div>
             ))}
-        </div>
-    </div>
+        </Box>
+    </Box>
 }
 
 

@@ -1,5 +1,5 @@
 import {observer} from "mobx-react-lite";
-import React from "react";
+import React, {useEffect} from "react";
 import UpvotedPostsSchema from "../../../../shared/source-schemas/upvoted-posts-schema";
 import Typography from "@material-ui/core/Typography";
 import Divider from "@material-ui/core/Divider";
@@ -8,6 +8,16 @@ import {BoundNumberInput} from "../../input-components/number-input";
 
 export const UpvotedPostDataForm = observer((props: {data: UpvotedPostsSchema}) => {
     const data = props.data;
+
+    useEffect(() => {
+        if (!Object.keys(data).length) {
+            const blank: UpvotedPostsSchema = {
+                limit: 0
+            };
+            Object.assign(data, blank);
+        }
+    }, [props.data]);
+
 
     return <div>
         <Divider style={{marginBottom: '10px', marginTop: '10px'}}/>

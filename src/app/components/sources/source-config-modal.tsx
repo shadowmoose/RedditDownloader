@@ -1,7 +1,7 @@
 import {observer} from "mobx-react-lite";
 import React, {useMemo, useState} from "react";
 import {SourceInterface, SourceTypes} from "../../../shared/source-interfaces";
-import {Button, FormControl, Grid, InputLabel, makeStyles, Modal, Select, TextField} from "@material-ui/core";
+import {Box, Button, FormControl, Grid, InputLabel, makeStyles, Modal, Select, TextField} from "@material-ui/core";
 import {createStyles, Theme} from "@material-ui/core/styles";
 import {removeSource, sendCommand} from "../../app-util/app-socket";
 import {ClientCommandTypes} from "../../../shared/socket-packets";
@@ -38,12 +38,14 @@ function snapshot(obj: any) {
 
 export const SourceConfigModal = observer((props: {open: boolean, onClose: (saved: boolean)=>void, source: SourceInterface, sourceGroupID: number}) => {
     const [saveIDX, setSaveIDX] = useState(0); // Exists simply to track when changes are committed.
+
     const ogConfigString = useMemo(() => {
         return JSON.stringify(props.source);
     }, [props.source, saveIDX]);
     const sourceData = useMemo(() => {
         return observable(JSON.parse(props.source.dataJSON))
     }, [props.source]);
+
     const source = props.source;
     const classes = useStyles();
 
@@ -101,7 +103,7 @@ export const SourceConfigModal = observer((props: {open: boolean, onClose: (save
         aria-labelledby="source-editor"
         aria-describedby="Edit the selected source."
     >
-        <div className={classes.modalBody}>
+        <Box className={classes.modalBody}>
             <FormControl className={classes.formControl} style={{width: '100%'}}>
                 <TextField
                     label="Source Name" value={source.name || ''}
@@ -154,7 +156,7 @@ export const SourceConfigModal = observer((props: {open: boolean, onClose: (save
                     Delete Source
                 </Button>
             </Grid>
-        </div>
+        </Box>
     </Modal>
 });
 

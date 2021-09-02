@@ -1,5 +1,5 @@
 import {observer} from "mobx-react-lite";
-import React from "react";
+import React, {useEffect} from "react";
 import {TextField} from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
 import Divider from "@material-ui/core/Divider";
@@ -10,6 +10,18 @@ import {SubmissionSortSelector} from "../../input-components/submission-sort-sel
 
 export const SubredditPostsDataForm = observer((props: {data: SubredditPostsSchema}) => {
     const data = props.data;
+
+    useEffect(() => {
+        if (!Object.keys(data).length) {
+            const blank: SubredditPostsSchema = {
+                limit: 0,
+                sort: 'top',
+                subreddit: "",
+                time: 'all'
+            };
+            Object.assign(data, blank);
+        }
+    }, [props.data]);
 
     function setSubreddits(input: string) {
         data.subreddit = input.replace('/r/', '');

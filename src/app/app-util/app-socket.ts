@@ -51,6 +51,8 @@ export const AUTHED_USERNAME = observable.box<string|null>(null);
 
 export const GLOBAL_SERVER_ERROR = observable.box<any>(null);
 
+export const USE_DARK_THEME = observable.box<boolean>(false);
+
 
 /**
  * A custom React Hook, which automatically tracks if RMD is ready to begin downloading.

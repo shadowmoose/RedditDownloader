@@ -93,7 +93,7 @@ export const SettingsModal = observer(()=> {
                         style={{marginBottom: 10}}
                         onChange={(event: React.ChangeEvent<{}>, newValue: number) =>setCurrentTab(newValue)}
                         indicatorColor="primary"
-                        textColor="primary"
+                        textColor="inherit"
                         centered
                     >
                         <Tab label="Accounts" />

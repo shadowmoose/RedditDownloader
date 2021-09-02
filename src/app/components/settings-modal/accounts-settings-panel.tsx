@@ -127,7 +127,7 @@ const RedditOAuthInput = observer(() => {
                 </Typography>
                 <ol>
                     <li>
-                        <a href={oAuth||''} target={'_blank'}>Manually visit the Reddit authentication page here.</a>
+                        <a href={oAuth||''} target={'_blank'} style={{color: 'forestgreen'}}>Manually visit the Reddit authentication page here.</a>
                     </li>
                     <li>Click "Allow" to grant RMD read-only account access.</li>
                     <li>Wait for Reddit to send you to a new (probably blank or error) page.</li>
@@ -171,7 +171,7 @@ const ImgurApiPanel = observer(() => {
         </Tooltip>
         <Typography variant={'caption'} >
             {/* TODO: Redirect to better visual documentation, since additional steps are required here. */}
-            To create an imgur client ID, go to the <a href={"https://api.imgur.com/oauth2/addclient"} target={'_blank'}>imgur API registration page.</a>
+            To create an imgur client ID, go to the <a href={"https://api.imgur.com/oauth2/addclient"} target={'_blank'} style={{color: 'forestgreen'}}>imgur API registration page.</a>
         </Typography>
     </div>
 });

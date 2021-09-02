@@ -44,6 +44,9 @@ const useStyles = makeStyles((theme: Theme) =>
             top: `50%`,
             left: `50%`,
             transform: `translate(-50%, -50%)`,
+        },
+        buttonOnLight: {
+            color: 'black'
         }
     }),
 );
@@ -89,11 +92,10 @@ export const SourceGroupDrawer = observer(() => {
         <Grid container justifyContent="center">
             <Button
                 variant="outlined"
-                color={"primary"}
                 style={{marginTop: '10px', marginBottom: '4px'}}
                 onClick={()=>setCreating(true)}
             >
-                Add new Source Group.
+                Add new Source Group
             </Button>
         </Grid>
 
@@ -190,6 +192,7 @@ export const SourceGroupEle = observer((props: {sourceGroup: SourceGroupInterfac
     const sg = props.sourceGroup;
     const [newSource, setNewSource] = useState<SourceInterface|null>(null);
     const [edit, setEdit] = useState(false);
+    const styles = useStyles();
 
     const sources = sg.sources.map((s: any, idx: number) => {
         return <SourceDraggableEle source={s} key={s.id} idx={idx} sourceGroupID={sg.id} />
@@ -233,7 +236,7 @@ export const SourceGroupEle = observer((props: {sourceGroup: SourceGroupInterfac
                     flexDirection: "row",
                     width: '100%'
                 }}>
-                    <Typography variant="h5" noWrap>
+                    <Typography variant="h5" noWrap className={styles.buttonOnLight}>
                         {sg.name}
                     </Typography>
 
@@ -257,7 +260,7 @@ export const SourceGroupEle = observer((props: {sourceGroup: SourceGroupInterfac
                 </div>
             </AccordionSummary>
 
-            <AccordionDetails>
+            <AccordionDetails className={styles.buttonOnLight}>
                 <Droppable key={sg.id} droppableId={`${sg.id}`}>
                     {(provided, snapshot) => (
                         <div
@@ -271,6 +274,7 @@ export const SourceGroupEle = observer((props: {sourceGroup: SourceGroupInterfac
                                 variant="outlined"
                                 style={{marginTop: '10px', marginBottom: '4px'}}
                                 onClick={addNewSource}
+                                color={'primary'}
                             >
                                 Add Source
                             </Button>
