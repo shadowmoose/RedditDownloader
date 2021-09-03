@@ -32,6 +32,9 @@ export default class DBDownload extends DBEntity {
     @Column({type: 'varchar', default: null})
     albumPaddedIndex!: string|null;
 
+    @Column({ default: false })
+    processed!: boolean;
+
     @ManyToOne(() => DBSubmission, sub => sub.downloads, { nullable: true, onDelete: 'CASCADE'})
     @Index()
     parentSubmission!: Promise<DBSubmission>;
@@ -74,7 +77,8 @@ export default class DBDownload extends DBEntity {
             albumID: albumID || null,
             isAlbumParent: false,
             url: Promise.resolve(u),
-            albumPaddedIndex: albumIndex
+            albumPaddedIndex: albumIndex,
+            processed: false
         });
         await forkPost(post,
             c => newDL.parentComment = Promise.resolve(c),

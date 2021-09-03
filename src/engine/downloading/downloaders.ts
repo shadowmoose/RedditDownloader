@@ -43,7 +43,7 @@ export async function getDownloaders(): Promise<Downloader[]> {
 export const getNextPendingDownload = mutex(async (ignoreURLs: Set<string>) => {
     let query = DBDownload.createQueryBuilder('dl')
         .leftJoinAndSelect('dl.url', 'url')
-        .where("url.processed = :processed", {processed: false});
+        .where("(dl.processed = :processed OR url.processed = :processed)", {processed: false});
 
     if (ignoreURLs.size) {
         query = query.andWhere("url.address NOT IN (:...addrs)", {addrs: Array.from(ignoreURLs)});
@@ -59,7 +59,7 @@ export const getNextPendingDownload = mutex(async (ignoreURLs: Set<string>) => {
 export async function downloadAll(state: DownloaderState) {
     const pending = new Set<string>();
     const getNext = async() => (await getNextPendingDownload(pending)) || await DownloadSubscriber.awaitNew();
-    const threadCount = await DBSetting.get('concurrentThreads')
+    const threadCount = await DBSetting.get('concurrentThreads');
 
     for (let i=0; i < threadCount; i++) {
         // Initialize empty state for any listening clients.
@@ -173,16 +173,53 @@ export const buildDownloadData = mutex(async (dl: DBDownload, prog: DownloadProg
     return {data, callbacks};
 });
 
+
+/**
+ * Downloader URLs can have already been "handled" in a previous DBDownloader, so this function checks for that.
+ * If previously handled, updates the DBDownloader with any important duplicate data (albumIDs, etc), and returns true.
+ * @param dl
+ */
+export async function checkDownloaderFileComplete(dl: DBDownload): Promise<boolean> {
+    const url = await dl.url;
+    let ret = false;
+
+    if (url.processed) {
+        const dls = await url.downloads;
+
+        for (const d of dls) {
+            if (d.processed) {
+                dl.isAlbumParent = d.isAlbumParent;
+                dl.albumID = d.albumID;
+                dl.albumPaddedIndex = d.albumPaddedIndex;
+                dl.processed = true;
+                ret = true;
+                break;
+            }
+        }
+    }
+
+    dl.processed = true;
+    await dl.save();
+
+    return ret;
+}
+
+
 /**
  * Iterate through all available downloaders, attempting to handle the given DBDownload.
  */
 export async function handleDownload(dl: DBDownload, progress: DownloadProgress): Promise<any> {
     const {data, callbacks} = await buildDownloadData(dl, progress);
-
+    const urlObj = await dl.url;
     progress.url = data.url;
 
+    if (await checkDownloaderFileComplete(dl) || urlObj.processed) {
+        if (dl.isAlbumParent) console.debug('Downloader pre-process step avoided full new download check:', dl.id);
+        return;
+    }
+
     for (const d of await getDownloaders()) {
-        if (progress.shouldStop || (await dl.url).processed) break;
+        if (progress.shouldStop || urlObj.processed) break;
         progress.status = `Looking for downloaders to handle this URL...`;
         if (await d.canHandle(data).catch(console.error)) {
             progress.downloader = d.name;

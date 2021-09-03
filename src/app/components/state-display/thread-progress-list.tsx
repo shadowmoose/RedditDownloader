@@ -78,7 +78,7 @@ function CircularProgressWithLabel(props: CircularProgressProps & { value: numbe
                 alignItems="center"
                 justifyContent="center"
             >
-                <Typography variant="caption" component="div" color="textSecondary">
+                <Typography variant="caption" component="div" style={{color: 'black'}}>
                     {`${Math.round(
                         props.value,
                     )}%`

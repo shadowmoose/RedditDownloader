@@ -298,8 +298,8 @@ function BasicGallerySearchCustom(props: {value: SearchCommand, onChange: (data:
 
 function GenericMediaDisplay (props: {dl: DownloadSearchResult, maxSize: number|string, thumbnail?: boolean}) {
     const dl = props.dl;
-    const type = dl.albumFiles?.firstFile.type || dl.type;
-    const fileId = dl.albumFiles?.firstFile.id || dl.id;
+    const type = dl.albumFiles?.firstFile?.type || dl.type;
+    const fileId = dl.albumFiles?.firstFile?.id || dl.id;
     const thumnail = !!props.thumbnail;
 
     // TODO: Split into new file, and use multiple components to make this less wonky.
@@ -371,6 +371,9 @@ function GenericMediaDisplay (props: {dl: DownloadSearchResult, maxSize: number|
                 </div>
             </div>
         default:
+            if (dl.isAlbumParent) {
+                return <div title={`[${dl.author}] ${dl.title}`}>Gallery has no files to display (yet).</div>;
+            }
             return <div title={`[${dl.author}] ${dl.title}`} onClick={openFullscreen}>Cannot Display Media Type "{type}"</div>;
     }
 }

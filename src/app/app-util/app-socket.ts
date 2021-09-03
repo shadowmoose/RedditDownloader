@@ -96,6 +96,7 @@ export function connectWS() {
 
     ws.onclose = () => {
         console.warn('Disconnected from RMD websocket!');
+        notify('Disconnected from RMD websocket!', {variant: 'error'});
 
         STATE.currentState = RMDStatus.CLIENT_NOT_CONNECTED;
         setFailed();
