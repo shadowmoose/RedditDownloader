@@ -26,6 +26,7 @@
         "migrate": "tsc && typeorm migration:generate -n",
         "run-reloading-server": "nodemon --watch \"src/engine/**\" --ext \"ts,json\" --exec \"ts-node ./src/engine/webserver/web-server.ts\"",
         "apply-migrations": "cross-env tsc && typeorm migration:run",
+        "checksum-file": "yarn ts-node ./src/engine/file-processing/dl-file-processing.ts",
         "/": "---     ELECTRON STUFF:       ---",
         "rebuild-binaries": "electron-rebuild",
         "build-webpack": "cross-env rimraf ./dist && webpack",

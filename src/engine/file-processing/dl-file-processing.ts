@@ -15,7 +15,8 @@ import DBMediaMetadata from "../database/entities/db-media-metadata";
 
 
 const KNOWN_BAD_HASHES = [
-    '9b5936f4006146e4e1e9025b474c02863c0b5614132ad40db4b925a10e8bfbb9', // Imgur "This image you are requesting is no longer available..."
+    '9b5936f4006146e4e1e9025b474c02863c0b5614132ad40db4b925a10e8bfbb9', // Imgur image "This image you are requesting is no longer available..."
+    '142f58d4af4b9b527e1b8b9f4bed20dd4178916c18f12d94008f1d00d847d22c', // Tumblr image "removed for violating..."
 ];
 
 export async function distHash(file: string): Promise<string|null> {
@@ -177,4 +178,14 @@ export async function lookupmediaMetadata(path: string, mimeType: string): Promi
             videoCodec: null,
         };
     }
+}
+
+if (require.main === module) {
+    const file = process.argv[1];
+
+    console.log('File:', file);
+
+    checksumFile(file).then (cs => {
+        console.log('Checksum:', cs);
+    })
 }
