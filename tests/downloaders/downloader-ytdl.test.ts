@@ -49,6 +49,9 @@ describe('YTDL Library Tests', () => {
 
 
     it('skip when up to date', async() => {
+        console.log(ytdl.exePath, await getLocalVersion(), await getLatestVersion());
+
+        expect(fs.existsSync(ytdl.exePath)).toBeTruthy();
         const upd = await ytdl.autoUpdate();
         expect(fs.existsSync(ytdl.exePath)).toBeTruthy();
         expect(upd).toBeFalsy();
@@ -133,6 +136,6 @@ describe('YTDL Downloader Tests', () => {
         const prog = new DownloadProgress(0);
         const dl = new YtdlDownloader();
 
-        await expect(dl.download(dat, mockDownloaderFunctions(), prog)).rejects.toThrow();
+        await expect(await dl.download(dat, mockDownloaderFunctions(), prog)).toBeFalsy();
     });
 });

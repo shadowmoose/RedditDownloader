@@ -61,7 +61,7 @@ const BasicGalleryBody = observer(() => {
         where: [],
         ascending: true,
         matchAll: false,
-        order: 'title'
+        order: 'id'
     });
     const [searchResult, setSearchResult] = useState<DownloadSearchResponse>({
         count: 0,
@@ -210,7 +210,7 @@ function BasicGallerySearchAll(props: {value: SearchCommand, onChange: (data: Se
                 ...props.value,
                 where: term ? searchableFieldsList.map(f => ({column: f, value: `%${term}%`})) : [],
                 matchAll: false,
-                order: 'title',
+                order: 'id',
                 ascending: true
             });
         }, 500);

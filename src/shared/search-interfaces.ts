@@ -1,6 +1,6 @@
 export const searchableFieldsList = ['title', 'author', 'body', 'subreddit'] as const;
 /** The various fields that are supported by the server when searching downloads. */
-export type SearchableField = typeof searchableFieldsList[number];
+export type SearchableField = typeof searchableFieldsList[number] | 'id';
 export interface SearchColumn {
     column: SearchableField,
     value: any
