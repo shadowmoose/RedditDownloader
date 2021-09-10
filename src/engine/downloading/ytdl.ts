@@ -53,8 +53,9 @@ export async function getLatestVersion() {
     const lines = res.split('\n');
 
     for (const l of lines) {
-        if (l.trim().startsWith(fileName)) {
-            return l.split(':')[1].trim();
+        const [ver, hash] = l.split(':');
+        if (ver.trim() === fileName) {
+            return hash.trim();
         }
     }
 
