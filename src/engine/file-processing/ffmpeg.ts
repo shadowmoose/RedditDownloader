@@ -31,11 +31,11 @@ export async function getFFMPEGVersion(): Promise<string> {
 
 export async function getFFProbeVersion(): Promise<string> {
     return new Promise((res, rej) => {
-        child_process.execFile(ffprobePath(), ['-version'], (error, stdout, _stderr) => {
+        child_process.execFile(ffprobePath(), ['-v', '0', '-of', 'json', '-show_program_version'], (error, stdout, _stderr) => {
             if (error) {
                 return rej(error)
             }
-            res(stdout.trim());
+            res(JSON.parse(stdout.trim())?.program_version?.version);
         });
     });
 }

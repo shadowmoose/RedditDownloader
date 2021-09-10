@@ -40,7 +40,6 @@ describe('YTDL Library Tests', () => {
         await checkFFMPEGDownload();
         expect(fs.existsSync(ffprobePath())).toBeTruthy();
         expect(await getFFProbeVersion()).toBeTruthy();
-        console.log(await getFFProbeVersion());
     });
 
 
@@ -125,7 +124,7 @@ describe('YTDL Downloader Tests', () => {
 
         const res = await dl.download(dat, mockDownloaderFunctions(), prog);
         expect(res).toBeTruthy();
-        expect(res).toEqual('mkv');
+        expect(res).toEqual('webm');
         expect(prog.percent).toEqual(1);  // Download completes in progress tracker.
     });
 

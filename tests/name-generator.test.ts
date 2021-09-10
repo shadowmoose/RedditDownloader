@@ -68,7 +68,8 @@ describe('Name Generator Tests', () => {
             albumID: "test",
             isAlbumParent: false,
             url: Promise.resolve(url),
-            albumPaddedIndex: null
+            albumPaddedIndex: null,
+            processed: false
         });
         (await c.downloads).push(dl);
         await c.save();
@@ -83,7 +84,8 @@ describe('Name Generator Tests', () => {
             albumID: "test",
             isAlbumParent: false,
             url: Promise.resolve(url),
-            albumPaddedIndex: null
+            albumPaddedIndex: null,
+            processed: false
         });
         (await c.downloads).push(dl);
         await dl.url;
@@ -99,7 +101,8 @@ describe('Name Generator Tests', () => {
             albumID: "test",
             isAlbumParent: false,
             url: Promise.resolve(url),
-            albumPaddedIndex: null
+            albumPaddedIndex: null,
+            processed: false
         });
         (await c.downloads).push(dl);
         await c.save();
@@ -148,13 +151,15 @@ describe('Name Generator Tests', () => {
             albumID: "album",
             isAlbumParent: false,
             url: Promise.resolve(url),
-            albumPaddedIndex: '002'
+            albumPaddedIndex: '002',
+            processed: false
         });
         const parent = DBDownload.build({
             albumID: "album",
             isAlbumParent: true,
             url: Promise.resolve(url2),
-            albumPaddedIndex: null
+            albumPaddedIndex: null,
+            processed: false
         });
         await url2.save();
         (await c.downloads).push(parent);

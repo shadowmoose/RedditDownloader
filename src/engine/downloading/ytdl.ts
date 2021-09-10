@@ -64,6 +64,7 @@ export async function getLatestVersion() {
 
 /**
  * Check the latest local YTDL version, if any, and update if the latest published version doesn't match.
+ * Also updates FFMPEG binaries, since they are a requirement for YTDL.
  */
 export async function autoUpdate() {
     const loc = await getLocalVersion();
@@ -71,7 +72,7 @@ export async function autoUpdate() {
 
     await checkFFMPEGDownload();
 
-    if (!loc || rem && (rem > loc)) {
+    if (!loc || rem && (rem !== loc)) {
         await downloadBinary(`${updateURL}${fileName}`, exePath);
         fs.chmodSync(exePath, '755');
         return true;
