@@ -1,4 +1,4 @@
-import {Box, CircularProgress, Fab, Grid, Popper, Tooltip} from "@material-ui/core";
+import {Box, CircularProgress, Fab, Grid, Popper, Tooltip, withWidth} from "@material-ui/core";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import AppBar from "@material-ui/core/AppBar";
 import clsx from "clsx";
@@ -24,7 +24,6 @@ import {createStyles, makeStyles, Theme} from "@material-ui/core/styles";
 import BrowserSettings from "../app-util/local-config";
 import {observer} from "mobx-react-lite";
 import SettingsBrightnessIcon from '@material-ui/icons/SettingsBrightness';
-
 
 
 const drawerWidth = 340;
@@ -189,9 +188,7 @@ const AppDisplay = observer(() => {
                         <SettingsModal />
                     </Grid>
 
-                    <Typography variant="h4" noWrap>
-                        Reddit Media Downloader
-                    </Typography>
+                    <TitleName />
 
                     <Grid>
                         <Fab
@@ -269,6 +266,15 @@ const AppDisplay = observer(() => {
             <BasicGallery />
         </main>
     </Box>
+});
+
+const TitleName = withWidth()((props: {width: any}) => {
+    const { width } = props;
+    const small = ['xs', 'sm', 'md'].includes(width);
+
+    return <Typography variant="h4" noWrap>
+        {small ? 'RMD': 'Reddit Media Downloader'}
+    </Typography>
 });
 
 export default AppDisplay;
