@@ -43,6 +43,9 @@ export default class DBSubmission extends DBEntity implements SubmissionInterfac
     @Column({ type: "text", nullable: true })
     flairText!: string|null;
 
+    @Column({ type: "text" })
+    sortTitle!: string;
+
     @Column({ default: false })
     processed!: boolean;
 
@@ -69,6 +72,7 @@ export default class DBSubmission extends DBEntity implements SubmissionInterfac
             return DBSubmission.build({
                 id: sub.name,
                 title: sub.title,
+                sortTitle: sub.title.replace(/\W/gm, '').trim().toUpperCase(),
                 author: sub.author.name,
                 createdUTC: sub.created_utc*1000,
                 firstFoundUTC: Date.now(),
@@ -90,6 +94,7 @@ export default class DBSubmission extends DBEntity implements SubmissionInterfac
         return DBSubmission.build({
             id: sub.id,
             title: sub.title,
+            sortTitle: sub.title.replace(/\W/gm, '').trim().toUpperCase(),
             author: sub.author,
             createdUTC: sub.created_utc*1000,
             firstFoundUTC: Date.now(),
@@ -124,6 +129,7 @@ export default class DBSubmission extends DBEntity implements SubmissionInterfac
             shouldProcess: false,
             subreddit: "test_sub",
             title: "test title",
+            sortTitle: "TESTTITLE",
             fromPushshift: false,
             ...opts
         });

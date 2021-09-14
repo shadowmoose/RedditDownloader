@@ -13,6 +13,7 @@ import DBUrl from "./entities/db-url";
 import DBSymLink from "./entities/db-symlink";
 import DBMediaMetadata from "./entities/db-media-metadata";
 import {initialCreate1630468432441} from "./migrations/1630468432441-initial-create";
+import {sortTitle1631586866337} from "./migrations/1631586866337-sort-title";
 
 let _connection: Connection|null;
 
@@ -29,7 +30,8 @@ export async function makeDB() {
         migrationsRun: false,
         migrationsTableName: "migrations",
         migrations: [
-            initialCreate1630468432441
+            initialCreate1630468432441,
+            sortTitle1631586866337
         ],  // Add migration classes here.
         subscribers: [DownloadSubscriber],
     }).then(async (connection: Connection) => {

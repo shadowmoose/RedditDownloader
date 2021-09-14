@@ -80,6 +80,8 @@ export class CommandListDownloads extends Command {
                 return 'COALESCE(comment.subreddit, submission.subreddit)'
             case 'id':
                 return 'COALESCE(comment.firstFoundUTC, submission.firstFoundUTC)'
+            case 'title':
+                return 'submission.sortTitle'
             default:
                 return field
         }

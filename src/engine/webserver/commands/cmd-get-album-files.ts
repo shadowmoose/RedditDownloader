@@ -26,6 +26,7 @@ export class CommandGetAlbumFiles extends Command {
                 AND f.id is not null
                 AND dl.albumID = ?
                 AND dl.isAlbumParent = false
+            ORDER BY albumPaddedIndex;
         `;
 
         return manager.query(sql, [albumID]);
