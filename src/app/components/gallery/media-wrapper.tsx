@@ -15,6 +15,7 @@ import {sendCommand} from "../../app-util/app-socket";
 import {ClientCommandTypes} from "../../../shared/socket-packets";
 import IconButton from "@material-ui/core/IconButton";
 import {ArrowBack, ArrowForward} from "@material-ui/icons";
+import {updateSearch} from "./basic-gallery/basic-gallery";
 
 
 const useStyles = makeStyles((_theme: Theme) =>
@@ -147,6 +148,20 @@ function DisplayHeader(props: {dl: DownloadSearchResult, dimensions: Dimensions}
         window.open('https://redd.it/' + props.dl.submissionId.replace('t3_',''));
     }
 
+    function searchAuthor() {
+        updateSearch({
+            clientUsingAdvancedSearch: true,
+            where: [{column: 'author', value: props.dl.author}],
+        });
+    }
+
+    function searchSubreddit() {
+        updateSearch({
+            clientUsingAdvancedSearch: true,
+            where: [{column: 'subreddit', value: props.dl.subreddit}],
+        });
+    }
+
     return <div
         style={{
             minWidth: '200px',
@@ -161,24 +176,24 @@ function DisplayHeader(props: {dl: DownloadSearchResult, dimensions: Dimensions}
                 wordWrap: "break-word",
                 maxWidth: Math.max(Math.floor(props.dimensions.width/4), 450),
                 minWidth: 450,
-                background: 'rgba(0,0,0,.7)',
+                background: BrowserSettings.useDarkMode ? 'rgba(0,0,0,.7)' : 'rgba(255, 255, 255, .9)',
                 padding: 8,
                 border: '1px solid black'
             }}
         >
             <div style={{width: 150, marginRight: 10}}>
-                <div style={{display: 'flex', flexDirection: 'row', alignItems: "center"}}>
+                <div style={{display: 'flex', flexDirection: 'row', alignItems: "center", cursor: 'pointer'}} onClick={searchAuthor}>
                     <AccountCircleIcon color={'primary'} />
-                    <Tooltip title={props.dl.author}>
+                    <Tooltip title={`View all from ${props.dl.author}`}>
                         <Typography variant={'caption'} noWrap>
                             {props.dl.author}
                         </Typography>
                     </Tooltip>
                 </div>
 
-                <div style={{display: 'flex', flexDirection: 'row', alignItems: "center"}}>
+                <div style={{display: 'flex', flexDirection: 'row', alignItems: "center", cursor: 'pointer'}} onClick={searchSubreddit}>
                     <RedditIcon color={'secondary'} />
-                    <Tooltip title={props.dl.subreddit}>
+                    <Tooltip title={`View all in ${props.dl.subreddit}`}>
                         <Typography variant={'caption'} noWrap>
                             {props.dl.subreddit}
                         </Typography>
@@ -283,7 +298,7 @@ function DisplayAudio(props: { dl: DownloadSearchResult, thumbnail: boolean, dim
             <div>
                 <AudiotrackIcon style={{fontSize: 40}}/>
             </div>
-            <div style={{width: props.dimensions.width, wordWrap: "break-word"}}>
+            <div style={{width: props.dimensions.width - 5, wordWrap: "break-word"}}>
                 <Typography variant={'subtitle2'} noWrap>{dl.title}</Typography>
             </div>
         </div>

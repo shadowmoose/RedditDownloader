@@ -5,7 +5,7 @@ import {
     DownloadSearchResponse, SearchableField,
     SearchColumn,
     SearchCommand,
-    DownloadSearchResult
+    DownloadSearchResult, ExtraSearchFilters
 } from "../../../shared/search-interfaces";
 
 
@@ -26,7 +26,7 @@ export class CommandListDownloads extends Command {
         await Promise.all(downloads.filter((d)=>d.isAlbumParent).map(async (d) => {
             console.debug('lookup album details:', d.albumID);
 
-            d.albumFiles = await this.selectAlbumInfo(d.albumID!);  // TODO: Type this.
+            d.albumFiles = await this.selectAlbumInfo(d.albumID!);
         }));
 
         console.debug('[server] responding to search.');
@@ -70,6 +70,33 @@ export class CommandListDownloads extends Command {
         };
     }
 
+    private buildExtWhere(extra: ExtraSearchFilters) {
+        let strs: string[] = [];
+        let vals = [];
+
+        if (extra.hasAudio) {
+            strs.push('md.audioCodec IS NOT NULL');
+        }
+
+        if (extra.hasVideo) {
+            strs.push('md.videoCodec IS NOT NULL');
+        }
+
+        if (extra.galleryOnly) {
+            strs.push('dl.isAlbumparent');
+        }
+
+        if (extra.fileExtension) {
+            strs.push('file.mimeType like ?');
+            vals.push('%/' + extra.fileExtension.replace(/^\./, '').replace('jpg', 'jpeg'));
+        }
+
+        return {
+            extWhereStrings: strs.map(s => `(${s})`).join(' and ').trim() || '1=1',
+            extVals: vals
+        };
+    }
+
     private translateOrderBy(field: SearchableField) {
         switch (field) {
             case 'author':
@@ -88,7 +115,7 @@ export class CommandListDownloads extends Command {
     }
 
     private async select(search: SearchCommand, countOnly: boolean) {
-        const {where, limit, offset, order, ascending, matchAll} = search;
+        const {where, limit, offset, order, ascending, matchAll, extraFilters} = search;
         const manager = getManager();
         const select = `
             file.path as path, 
@@ -104,6 +131,7 @@ export class CommandListDownloads extends Command {
             COALESCE(comment.selfText, submission.selfText) as postText,
             submission.id as submissionId`;
         const {whereStrings, vals} = this.buildWhere(where, !!matchAll);
+        const {extWhereStrings, extVals} = this.buildExtWhere(extraFilters);
         let filters = '';
         let filterVals: number[] = [];
         let orderBy = '';
@@ -134,11 +162,14 @@ export class CommandListDownloads extends Command {
                 on submission.id == dl.parentSubmissionId or submission.id = comment.parentSubmissionId
             left join urls url on url.id = dl.urlId
             left join files file on file.id = url.fileId
+            left join media_metadata md on md.parentFileId = file.id
             where
                 (dl.albumID is null or dl.isAlbumparent)
                 and (url.processed and not url.failed)
-                and (${whereStrings}) ${orderBy} ${filters}`;
-        const searchParams = [...vals, ...filterVals];
+                and (${whereStrings})
+                and (${extWhereStrings}) 
+            ${orderBy} ${filters}`;
+        const searchParams = [...vals, ...extVals, ...filterVals];
 
         // console.log(sql, searchParams);
 

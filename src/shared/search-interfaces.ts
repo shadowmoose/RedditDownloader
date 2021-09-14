@@ -15,6 +15,17 @@ export interface SearchCommand {
 
     /** If true, all given `where` clauses must match for every returned post. */
     matchAll?: boolean;
+
+    extraFilters: ExtraSearchFilters;
+
+    clientUsingAdvancedSearch: boolean;
+}
+
+export interface ExtraSearchFilters {
+    hasVideo: boolean;
+    hasAudio: boolean;
+    galleryOnly: boolean;
+    fileExtension: string|null;
 }
 
 export interface SearchFileInfo {
