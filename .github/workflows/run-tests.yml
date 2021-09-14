@@ -37,6 +37,10 @@ jobs:
     - name: Install dependencies
       run: yarn install --frozen-lockfile
 
+    - name: Build UI
+      # Validate that the UI can build properly after any code changes.
+      run: yarn build-webpack
+
     - name: Test
       env:
         RMD_REFRESH_TOKEN: ${{secrets.RMD_REFRESH_TOKEN}}

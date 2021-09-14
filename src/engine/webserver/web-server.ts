@@ -20,6 +20,7 @@ import {CommandListDownloads} from "./commands/cmd-list-downloads";
 import {CommandSetOAuthCode} from "./commands/cmd-set-oauth";
 import {CommandGetOAuthUrl} from "./commands/cmd-get-oauth-url";
 import {CommandGetAuthedUsername} from "./commands/cmd-get-authed-username";
+import {CommandGetAlbumFiles} from "./commands/cmd-get-album-files";
 
 
 /** All available command processors. */
@@ -34,6 +35,7 @@ const commands: Command[] = [
     new CommandGetOAuthUrl(),
     new CommandSetOAuthCode(),
     new CommandGetAuthedUsername(),
+    new CommandGetAlbumFiles(),
 ];
 const commandMap: Record<string, Command> = commands.reduce((p: any, c) => {p[c.type] = c; return p}, {});
 export const clients: ws[] = [];

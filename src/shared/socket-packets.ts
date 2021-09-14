@@ -38,6 +38,8 @@ export enum ClientCommandTypes {
     SET_OAUTH_CODE = 'setOAuth',
     /** Set the oAuth code for RMD to use in retrieving a refresh token. */
     GET_AUTHED_USERNAME = 'getUsername',
+    /** Get a full list of files for the given album code. */
+    GET_ALBUM_FILES = 'getAlbumFiles',
 }
 
 export enum ServerPacketTypes {

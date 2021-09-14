@@ -6,20 +6,46 @@ import FindReplaceIcon from '@material-ui/icons/FindReplace';
 import SortIcon from '@material-ui/icons/Sort';
 import {
     DownloadSearchResponse,
-    DownloadSearchResult,
     SearchableField,
-    searchableFieldsList,
+    searchableFieldsList, SearchColumn,
     SearchCommand
 } from "../../../../shared/search-interfaces";
 import {ArrowDownward, ArrowUpward} from "@material-ui/icons";
-import AudiotrackIcon from '@material-ui/icons/Audiotrack';
-import Typography from "@material-ui/core/Typography";
 import Pagination from '@material-ui/lab/Pagination';
 import {RMDStatus} from "../../../../shared/state-interfaces";
 import RefreshIcon from '@material-ui/icons/Refresh';
-import {Box, Fab, FormControl, Grid, InputLabel, MenuItem, Select, TextField, Tooltip} from "@material-ui/core";
+import {
+    Box,
+    Fab,
+    FormControl,
+    FormControlLabel,
+    Grid,
+    InputLabel,
+    MenuItem,
+    Select,
+    Switch,
+    TextField,
+    Tooltip
+} from "@material-ui/core";
 import {observer} from "mobx-react-lite";
 import BrowserSettings from "../../../app-util/local-config";
+import {MediaWrapper} from "../media-wrapper";
+import {observable} from "mobx";
+
+const MAX_MEDIA_SIZE = 200;
+
+export const SEARCH_OBJECT = observable<SearchCommand>({
+    offset: 0,
+    limit: BrowserSettings.resultsPerPage,
+    where: [],
+    order: 'id',
+    ascending: true,
+    matchAll: false
+});
+
+export function updateSearch(cmd: Partial<SearchCommand>) {
+    Object.assign(SEARCH_OBJECT, cmd);
+}
 
 
 const useStyles = makeStyles(() =>
@@ -49,48 +75,38 @@ const useStyles = makeStyles(() =>
     })
 );
 
-const MAX_MEDIA_SIZE = 200;
-
 
 const BasicGalleryBody = observer(() => {
     const classes = useStyles();
-    const [paging, setPaging] = useState<PagingType>({limit: BrowserSettings.resultsPerPage, offset: 0});
-    const [searchCommand, setSearchCommand] = useState<SearchCommand>({
-        offset: 0,
-        limit: 10,
-        where: [],
-        ascending: true,
-        matchAll: false,
-        order: 'id'
-    });
     const [searchResult, setSearchResult] = useState<DownloadSearchResponse>({
         count: 0,
         downloads: []
     });
     const [useSimpleSearch, setUseSimpleSearch] = useState(true);
-    const fullCommand: SearchCommand = {
-        ...searchCommand,
-        ...paging
-    };
+    const [lastWhere, setLastWhere] = useState<SearchColumn[]>([]);
 
     useEffect(() => {
-        sendCommand(ClientCommandTypes.LIST_DOWNLOADS, fullCommand).then(res => {
-            setSearchResult(res);
-        });
-        BrowserSettings.resultsPerPage = paging.limit;
-    }, [JSON.stringify(fullCommand), JSON.stringify(paging)]);
+        const isNewWhere = JSON.stringify(lastWhere) !== JSON.stringify(SEARCH_OBJECT.where);
+
+        const to = setTimeout(() => {
+            sendCommand(ClientCommandTypes.LIST_DOWNLOADS, SEARCH_OBJECT).then(res => {
+                setSearchResult(res);
+            });
+        }, isNewWhere ? 500 : 0);
+        BrowserSettings.resultsPerPage = SEARCH_OBJECT.limit;
+
+        setLastWhere(SEARCH_OBJECT.where);
+
+        return ()=>clearTimeout(to);
+    }, [JSON.stringify(SEARCH_OBJECT)]);
+
+    useEffect(() => {
+        SEARCH_OBJECT.where = [];
+    }, [useSimpleSearch])
 
 
     function toggleSearch() {
         setUseSimpleSearch(!useSimpleSearch);
-    }
-
-    function onSearch(search: SearchCommand) {
-        setPaging({
-            ...paging,
-            offset: 0
-        });
-        setSearchCommand(search);
     }
 
     return <Box>
@@ -110,17 +126,20 @@ const BasicGalleryBody = observer(() => {
                 </Tooltip>
 
                 {useSimpleSearch ?
-                    <BasicGallerySearchAll value={searchCommand} onChange={onSearch} /> :
-                    <BasicGallerySearchCustom value={searchCommand} onChange={onSearch} />
+                    <BasicGallerySearchAll /> :
+                    <BasicGallerySearchCustom />
                 }
-                <BasicGalleryPagingSelector totalResults={searchResult.count} paging={paging} onUpdate={setPaging} />
+
+                <AutoplayToggle />
+
+                <BasicGalleryPagingSelector totalResults={searchResult.count} />
             </Grid>
         </div>
 
         <Box className={classes.root}>
             {searchResult.downloads.map((item) => (
                 <div className={classes.mediaWrapper} key={item.dlUID}>
-                    <GenericMediaDisplay dl={item} maxSize={MAX_MEDIA_SIZE} thumbnail={true}/>
+                    <MediaWrapper dl={item} maxSize={MAX_MEDIA_SIZE} />
                 </div>
             ))}
         </Box>
@@ -130,38 +149,37 @@ const BasicGalleryBody = observer(() => {
 export default BasicGalleryBody;
 
 
-type PagingType = {limit: number, offset: number};
-
-function BasicGalleryPagingSelector (props: {totalResults: number, paging: {limit: number, offset: number}, onUpdate: (paging: PagingType)=>void}) {
-    const {limit, offset} = props.paging;
+const BasicGalleryPagingSelector = observer((props: {totalResults: number}) => {
+    const {limit, offset} = SEARCH_OBJECT;
     const {rmdState} = useRmdState();
     const currentPage = Math.floor(offset/limit);
     const totalPages = Math.ceil(props.totalResults/limit);
 
     function updateLimit(event: any) {
         const newLimit = parseInt(event.target.value);
-        props.onUpdate({
-            offset: Math.floor(offset/newLimit)*newLimit,
+        updateSearch({
             limit: newLimit
         })
     }
 
     function updatePage(_event: any, page: number) {
-        props.onUpdate({
-            ...props.paging,
+        updateSearch({
             offset: (page-1)*limit
         })
     }
 
     function sendRefresh() {
-        const old = props.paging;
+        const old = SEARCH_OBJECT.limit;
 
-        props.onUpdate({
-            ...old,
-            offset: old.offset+1
+        updateSearch({
+            limit: old+1
         });
 
-        setTimeout(() => props.onUpdate(old), 1);
+        setTimeout(() => {
+            updateSearch({
+                limit: old
+            })
+        }, 1);
     }
 
     return <Grid
@@ -180,7 +198,7 @@ function BasicGalleryPagingSelector (props: {totalResults: number, paging: {limi
                 id="select-page-result-count"
                 value={limit}
                 onChange={updateLimit}
-                style={{marginLeft: 10}}
+                style={{marginLeft: 10, marginRight: 10}}
             >
                 <MenuItem value={10}>10</MenuItem>
                 <MenuItem value={25}>25</MenuItem>
@@ -193,7 +211,23 @@ function BasicGalleryPagingSelector (props: {totalResults: number, paging: {limi
         {totalPages ? <Pagination count={totalPages} page={currentPage+1} onChange={updatePage} /> : null}
         {rmdState === RMDStatus.RUNNING && <Tooltip title={'RMD is actively adding new posts. Click to refresh search results.'}><Fab onClick={sendRefresh}><RefreshIcon /></Fab></Tooltip>}
     </Grid>
-}
+});
+
+
+const AutoplayToggle = observer(() => {
+    return <FormControlLabel
+        style={{marginLeft: 10}}
+        control={
+            <Switch
+                checked={BrowserSettings.autoPlayVideo}
+                onChange={ev => BrowserSettings.autoPlayVideo = ev.target.checked}
+                color={'primary'}
+                name="autoplaySwitch"
+            />
+        }
+        label="Autoplay"
+    />
+});
 
 
 /**
@@ -201,22 +235,17 @@ function BasicGalleryPagingSelector (props: {totalResults: number, paging: {limi
  * @param props
  * @constructor
  */
-function BasicGallerySearchAll(props: {value: SearchCommand, onChange: (data: SearchCommand) => void}) {
+function BasicGallerySearchAll(props: {}) {
     const [term, setTerm] = useState<string>('');
 
     useEffect(() => {
-        const to = setTimeout(() => {
-            props.onChange({
-                ...props.value,
-                where: term ? searchableFieldsList.map(f => ({column: f, value: `%${term}%`})) : [],
-                matchAll: false,
-                order: 'id',
-                ascending: true
-            });
-        }, 500);
-
-        return ()=>clearTimeout(to);
-    }, [term])
+        updateSearch({
+            where: term ? searchableFieldsList.map(f => ({column: f, value: `%${term}%`})) : [],
+            matchAll: false,
+            order: 'id',
+            ascending: true
+        });
+    }, [term]);
 
     return <TextField
         onChange={e => setTerm(e.target.value)}
@@ -231,46 +260,34 @@ function BasicGallerySearchAll(props: {value: SearchCommand, onChange: (data: Se
  * @param props
  * @constructor
  */
-function BasicGallerySearchCustom(props: {value: SearchCommand, onChange: (data: SearchCommand) => void}) {
-    const [searchData, setSearchData] = useState<Record<SearchableField, string>>({} as any);
-    const [orderBy, setOrderBy] = useState<SearchableField|null>(null);
-    const [sortAsc, setSortAsc] = useState(true);
-
-    useEffect(() => {
-        const to = setTimeout(() => {
-            const data: SearchCommand = {
-                offset: 0,
-                limit: 10,
-                where: searchableFieldsList.filter(k=>searchData[k]).map(k => {
-                    return {
-                        column: k,
-                        value: `%${searchData[k]}%`
-                    }
-                }),
-                order: orderBy || 'title',
-                ascending: sortAsc,
-                matchAll: true
-            };
-
-            props.onChange(data);
-        }, 500);
-
-        return ()=>clearTimeout(to);
-    }, [JSON.stringify(searchData), orderBy, sortAsc]);
+const BasicGallerySearchCustom = observer(() => {
+    const searchData: Record<string, string> = {};
+    for (const w of SEARCH_OBJECT.where) {
+        searchData[w.column as string] = w.value;
+    }
 
     function searchSetter(key: SearchableField) {
         return (val: any) => {
-            setSearchData({
-                ...searchData,
-                [key]: val
-            });
+            const ex = SEARCH_OBJECT.where.find(w => w.column === key);
+            const value = `%${val}%`;
+
+            if (ex) {
+                ex.value = value;
+            } else {
+                SEARCH_OBJECT.where.push({
+                    column: key,
+                    value
+                });
+            }
         }
     }
 
     function sortSetter(key: SearchableField) {
         return (val: boolean) => {
-            setOrderBy(key);
-            setSortAsc(val);
+            updateSearch({
+                order: key,
+                ascending: val
+            })
         }
     }
 
@@ -278,9 +295,9 @@ function BasicGallerySearchCustom(props: {value: SearchCommand, onChange: (data:
         return <td key={f}>
             <SortSearchInput
                 field={f}
-                value={searchData[f] || ''}
+                value={(searchData[f] || '').replace(/^%|%$/gm, '')}
                 onChange={searchSetter(f)}
-                sorted={orderBy === f}
+                sorted={SEARCH_OBJECT.order === f}
                 onSort={sortSetter(f)}
             />
         </td>
@@ -293,90 +310,7 @@ function BasicGallerySearchCustom(props: {value: SearchCommand, onChange: (data:
             </tr>
         </tbody>
     </table>
-}
-
-
-function GenericMediaDisplay (props: {dl: DownloadSearchResult, maxSize: number|string, thumbnail?: boolean}) {
-    const dl = props.dl;
-    const type = dl.albumFiles?.firstFile?.type || dl.type;
-    const fileId = dl.albumFiles?.firstFile?.id || dl.id;
-    const thumnail = !!props.thumbnail;
-
-    // TODO: Split into new file, and use multiple components to make this less wonky.
-    // TODO: Add "Open Modal" logic for everything, including galleries.
-    // TODO: Add icons to denote galleries/videos.
-
-    function openFullscreen() {
-        window.open(`/file/${fileId}`);
-    }
-
-    switch ((type || '').split('/')[0]) {
-        case 'image':
-            return <img
-                src={`/file/${fileId}`}
-                alt={`[${dl.author}] ${dl.title}`}
-                key={fileId}
-                style={{
-                    maxWidth: props.maxSize,
-                    maxHeight: props.maxSize,
-                    height: 'auto',
-                    border: '3px solid blue',
-                    cursor: 'pointer'
-                }}
-                title={`[${dl.author}] ${dl.title}`}
-                onClick={openFullscreen}
-            />
-        case 'video':
-            // TODO: Look into custom player, maybe, for things like playback speed or sound editing.
-            // TODO: Pause when off screen.
-            return <video
-                key={fileId}
-                style={{
-                    maxWidth: props.maxSize,
-                    maxHeight: props.maxSize,
-                    height: 'auto',
-                    border: '3px solid green',
-                    cursor: 'pointer'
-                }}
-                controls={!props.thumbnail}
-                loop={true}
-                title={`[${dl.author}] ${dl.title}`}
-                autoPlay
-                muted={thumnail}
-                onClick={openFullscreen}
-                playsInline={thumnail}
-            >
-                <source src={`/file/${fileId}`} type={type} />
-            </video>
-        case 'audio':
-            return <div
-                title={`[${dl.author}] ${dl.title}`}
-                style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    maxWidth: props.maxSize,
-                    maxHeight: props.maxSize,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    border: '3px solid orange',
-                    cursor: 'pointer'
-                }}
-                onClick={openFullscreen}
-            >
-                <div>
-                    <AudiotrackIcon style={{ fontSize: 40 }} />
-                </div>
-                <div style={{maxWidth: props.maxSize, wordWrap: "break-word"}}>
-                    <Typography variant={'subtitle2'} noWrap>{dl.title}</Typography>
-                </div>
-            </div>
-        default:
-            if (dl.isAlbumParent) {
-                return <div title={`[${dl.author}] ${dl.title}`}>Gallery has no files to display (yet).</div>;
-            }
-            return <div title={`[${dl.author}] ${dl.title}`} onClick={openFullscreen}>Cannot Display Media Type "{type}"</div>;
-    }
-}
+});
 
 
 export function SortSearchInput (props: {
@@ -387,7 +321,7 @@ export function SortSearchInput (props: {
     onSort: (ascending: boolean)=>void
 }) {
     const classes = useStyles();
-    const [sortAsc, setSortAsc] = useState(false);
+    const [sortAsc, setSortAsc] = useState(true);
 
     function toggleSort() {
         props.onSort(!sortAsc);
@@ -407,7 +341,7 @@ export function SortSearchInput (props: {
                 width: 100,
             }}
         />
-        <Tooltip title={`Sort results by ${props.field}`}>
+        <Tooltip title={`Order results by ${props.field}`}>
             {props.sorted ? sortArrow : <SortIcon
                 onClick={()=>props.onSort(sortAsc)}
                 className={classes.sortIcon}

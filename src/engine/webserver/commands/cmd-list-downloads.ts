@@ -96,10 +96,11 @@ export class CommandListDownloads extends Command {
             dl.albumId,
             dl.id as dlUID,
             submission.title as title,
+            submission.subreddit as subreddit,
             COALESCE(comment.author, submission.author) as author,
             CASE WHEN comment.id is null THEN 'submission' ELSE 'comment' END AS postType,
             COALESCE(comment.selfText, submission.selfText) as postText,
-            COALESCE(comment.id, submission.id) as postId`;
+            submission.id as submissionId`;
         const {whereStrings, vals} = this.buildWhere(where, !!matchAll);
         let filters = '';
         let filterVals: number[] = [];

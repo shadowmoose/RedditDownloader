@@ -7,7 +7,8 @@ import {observable, reaction} from "mobx";
 const BrowserSettings = observable({
     useDarkMode: window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches,
     openDownloadProgress: true,
-    resultsPerPage: 25
+    resultsPerPage: 25,
+    autoPlayVideo: true
 });
 
 const RMD_KEY = 'localRMDSettings'
@@ -40,7 +41,7 @@ for (const k of Object.keys(BrowserSettings)) {
     reaction(
         () => BrowserSettings[k as keyof typeof BrowserSettings],
         (val) => {
-            // Monitor for setting changes, and write the back to local storage.
+            // Watch each key for setting changes, and write the back to local storage.
             save(k, val);
         }
     );
