@@ -5,6 +5,7 @@ class App extends React.Component {
 		let current = 0;
 		this._openPage = this.openPage.bind(this);
 		this._start_download = this.startDownload.bind(this);
+		this._stop_download = this.stopDownload.bind(this);
 		this.pages = [
 			// [Element, Name, enabled_while_running]
 			[<Home />, 'Home', true],
@@ -75,6 +76,21 @@ class App extends React.Component {
 		});
 	}
 
+	stopDownload(evt){
+		evt.preventDefault();
+		if(!this.state.downloading)
+			return;
+		console.log('Stopping RMD download process!');
+		eel.stop_download()(n => {
+			if (n) {
+				clearTimeout(this.check_timer);
+				this.checkStatus();
+			} else {
+				alertify.error('Unable to stop RMD downloading - Is it already stopped?')
+			}
+		});
+	}
+
 	render() {
 		let pages = this.pages.map((p, idx)=>{
 			if(this.state.downloading && this.pages[idx][2] === false){
@@ -89,8 +105,8 @@ class App extends React.Component {
 			let idx = this.pages.indexOf(p);
 			return <div key={idx} className={this.state.page === idx? 'active_page_container':'hidden'} >{p[0]}</div>
 		});
-		let run_btn = <li className={'right ' + (this.state.downloading ? 'disabled' : 'special')} key={'dl_button'}>
-			<a onClick={this._start_download}>{this.state.downloading?'Downloading...':'Start Downloading!'}</a>
+		let run_btn = <li className={'right ' + ('special')} key={'dl_button'}>
+			<a onClick={this.state.downloading?this._stop_download : this._start_download}>{this.state.downloading?'Downloading... STOP?':'Start Downloading!'}</a>
 		</li>;
 
 		return (

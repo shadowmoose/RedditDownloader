@@ -279,6 +279,17 @@ def start_download():
 		print('Started downloader.')
 		return True
 
+@eel.expose
+def stop_download():
+	global _controller
+	if _controller is not None and _controller.is_running():
+		_controller.stop()
+		_controller = None
+		print('Stopped downloader.')
+		return True
+	else:
+		return False
+
 
 @eel.expose
 def download_status():

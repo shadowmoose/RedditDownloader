@@ -38,9 +38,11 @@ class RMDController(threading.Thread):
 		[t.join() for t in self._all_processes]
 
 	def stop(self):
+		# Set the stop event for all threads, so there's no new work
 		self.loader.get_stop_event().set()
+		# Wait for each downloader to finish it's current task
 		for d in self._downloaders:
-			d.terminate()
+			d.join()
 		self.loader.terminate()
 
 	def is_running(self):
