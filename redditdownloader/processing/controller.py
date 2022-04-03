@@ -43,6 +43,7 @@ class RMDController(threading.Thread):
 		# Wait for each downloader to finish it's current task
 		for d in self._downloaders:
 			d.join()
+		# will also terminate any deduplicator thread as well.
 		self.loader.terminate()
 
 	def is_running(self):
