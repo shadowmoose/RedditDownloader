@@ -21,7 +21,7 @@ jobs:
             artifact: RMD-windows.exe
             path: ./dist/RedditDownloader.exe
             run_test: ./dist/RedditDownloader.exe --skip_update --run_tests=*
-          - os: ubuntu-16.04
+          - os: ubuntu-latest
             artifact: RMD-ubuntu
             path: ./dist/RedditDownloader
             run_test: chmod +x ./dist/RedditDownloader && ./dist/RedditDownloader --skip_update --run_tests=*
