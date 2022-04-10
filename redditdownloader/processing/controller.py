@@ -40,9 +40,11 @@ class RMDController(threading.Thread):
 	def stop(self):
 		# Set the stop event for all threads, so there's no new work
 		self.loader.get_stop_event().set()
-		# Wait for each downloader to finish it's current task
+		# Give each downloader 2 seconds to finish it's current task (max len(self._downloaders) * 2 seconds)
 		for d in self._downloaders:
-			d.join()
+			# if the join times out, whatever is running will be re-downloaded when downloading starts again
+			# since the database is updated on completion
+			d.join(2)
 		# will also terminate any deduplicator thread as well.
 		self.loader.terminate()
 
