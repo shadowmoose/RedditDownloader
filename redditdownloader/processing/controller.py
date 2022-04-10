@@ -45,6 +45,9 @@ class RMDController(threading.Thread):
 			# if the join times out, whatever is running will be re-downloaded when downloading starts again
 			# since the database is updated on completion
 			d.join(2)
+			if d.is_alive():
+				# Downloader thread did not stop in time, so we help it along
+				d.terminate()
 		# will also terminate any deduplicator thread as well.
 		self.loader.terminate()
 
