@@ -17,12 +17,13 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu, windows, macOS]
-        python-version: [3.6, 3.7]
+        python-version: [3.x]
 
     steps:
       - uses: actions/checkout@v1
+      
       - name: Set up Python
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v3
         with:
           python-version: ${{ matrix.python-version }}
 
