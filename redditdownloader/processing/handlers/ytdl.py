@@ -1,4 +1,4 @@
-import youtube_dl
+import yt_dlp
 import os
 import sys
 from processing.handlers import HandlerResponse
@@ -57,7 +57,7 @@ class YTDLWrapper:
 		}
 		failed = False
 		try:
-			with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+			with yt_dlp.YoutubeDL(ydl_opts) as ydl:
 				self.progress.set_status("Looking for video...")
 				ydl.download([url])
 		except Exception as ex:

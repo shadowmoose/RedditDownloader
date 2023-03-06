@@ -1,5 +1,5 @@
 psaw~=0.0.12
-youtube_dl
+yt-dlp
 imgurpython==1.1.7
 requests>=2.22.0
 sqlalchemy==1.3.23
