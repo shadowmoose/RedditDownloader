@@ -9,6 +9,7 @@ from processing.downloader import Downloader
 from processing.post_processing import Deduplicator
 from processing.wrappers import ProgressManifest
 from multiprocessing import RLock
+import time
 
 
 class RMDController(threading.Thread):
@@ -38,9 +39,19 @@ class RMDController(threading.Thread):
 		[t.join() for t in self._all_processes]
 
 	def stop(self):
+		# Set the stop event for all threads, so there's no new work
 		self.loader.get_stop_event().set()
+		# Record what time we want to be done by (now + 5 seconds)
+		# Gives the downloaders up to 5 seconds from now to finish their current tasks
+		max_time = time.time() + 5
 		for d in self._downloaders:
-			d.terminate()
+			# if the join times out, whatever is running will be re-downloaded when downloading starts again
+			# since the database is updated on completion
+			d.join(max(0, max_time - time.time()))
+			if d.is_alive():
+				# Downloader thread did not stop in time, so we help it along
+				d.terminate()
+		# Also terminate any running deduplicator threads
 		self.loader.terminate()
 
 	def is_running(self):
