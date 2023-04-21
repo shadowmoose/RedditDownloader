@@ -162,8 +162,8 @@
   "body": "This release fixes yet additional album bugs that were introduced by PRAW. The release also pins more of the required package versions, in order to prevent automatic updates from breaking over time.",
   "reactions": {
     "url": "https://api.github.com/repos/shadowmoose/RedditDownloader/releases/40606978/reactions",
-    "total_count": 5,
-    "+1": 1,
+    "total_count": 6,
+    "+1": 2,
     "-1": 0,
     "laugh": 4,
     "hooray": 0,
