@@ -1,0 +1,12 @@
+version: "3.3"
+
+services:
+  reddit-downloader:
+    restart: unless-stopped
+    build: .
+    volumes:
+      - ./storage/:/storage/
+      - ./download/:/download/
+    container_name: RedditDownloader
+    ports:
+      - "7505:7505"
