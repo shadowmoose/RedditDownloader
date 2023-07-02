@@ -1,9 +1,27 @@
 # Reddit Media Downloader 
 [![badge](https://github.com/shadowmoose/RedditDownloader/workflows/Pytest/badge.svg)](https://github.com/shadowmoose/RedditDownloader/actions) 
 [![badge](https://github.com/shadowmoose/RedditDownloader/workflows/Docs/badge.svg)](https://shadowmoose.github.io/RedditDownloader/)
-[![Docker Build](https://img.shields.io/docker/cloud/build/shadowmoose/redditdownloader)](https://hub.docker.com/r/shadowmoose/redditdownloader)
 [![codecov](https://codecov.io/gh/shadowmoose/RedditDownloader/branch/master/graph/badge.svg)](https://codecov.io/gh/shadowmoose/RedditDownloader)
 ![lines of code](https://raw.githubusercontent.com/shadowmoose/RedditDownloader/project-badges/loc-badge.svg)
+
+
+# Update as of July, 2023
+*Due to the Reddit API changes, RMD will no longer function. First the Reddit admins destroyed PushShift,
+the platform RMD heavily relied on for historical data, and now they have completely restricted access to their direct API.*
+
+*In conjunction, these actions make it impossible for RMD to operate. It would have been possible to require users to register their own application keys in order to continue, 
+but this process has also now been restricted by Reddit.
+Additionally, I (the primary dev of RMD) not longer wish to work with or support anything involving the company.
+While this was already a discouraging factor before the latest changes, this latest debacle has made it clear where Reddit stands.*
+
+*I'll leave the project up for a little while longer, then likely archive it all and move on. I'll presrve as much as possible when I do - including the original README below.
+Other users are welcome to fork the project and continue onward, if anybody is willing to continue in spite of the Admin actions pushing against them.*
+
+*Thanks for all the support for the project over the years. It's been great. Catch you at the next one.*
+
+~ ShadowMoose
+
+# Original text below:
 
 **Let's face it:** In this day and age, the internet is ephemeral. Anything anybody posts might be here one day,
 and gone the next. Websites take down or move their images and videos, posts get hidden or removed, and their
