@@ -4,9 +4,9 @@ import traceback
 
 def sorted_list():
 	""" A list of all available static Handlers, pre-sorted by order. """
-	from processing.handlers import github, imgur, generic_newspaper, reddit_handler, ytdl, tumblr, direct_link, gfycat
+	from processing.handlers import github, imgur, generic_newspaper, reddit_handler, ytdl, tumblr, direct_link, gfycat, redgifs
 	return sorted([
-		generic_newspaper, github, imgur, reddit_handler, ytdl, tumblr, direct_link, gfycat
+		generic_newspaper, github, imgur, reddit_handler, ytdl, tumblr, direct_link, gfycat, redgifs
 	], key=lambda x: x.order, reverse=False)
 
 
