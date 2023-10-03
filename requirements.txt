@@ -8,7 +8,7 @@ lxml==4.9.1
 newspaper3k==0.2.8
 beautifulsoup4==4.7.1
 colorama==0.4.1
-Pillow==9.0.1
+Pillow==10.0.1
 pathvalidate==0.28.1
 eel==0.11.1
 twitter-text-python==1.1.1
